@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --bg-base: #060913; --bg-card: #0d1527; --cyber-cyan: #06b6d4;
+            --cyber-green: #10b981; --cyber-red: #f43f5e; --text-glow: #f8fafc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-glow); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; }
+
+        .login-card { background: var(--bg-card); border: 2px solid var(--cyber-cyan); border-radius: 20px; padding: 40px 25px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 0 30px rgba(6, 182, 212, 0.3); }
+        .std-panel-input { background: #04060d; border: 1px solid #1e293b; border-radius: 8px; color: #fff; padding: 12px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; margin-bottom: 15px; text-align: center; }
+        .std-panel-input:focus { border-color: var(--cyber-cyan); }
+        .std-panel-btn { background: linear-gradient(135deg, var(--cyber-cyan), #0891b2); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; }
+        .std-panel-btn:active { transform: scale(0.97); }
+        .error-txt { color: var(--cyber-red); font-size: 12px; margin-top: 10px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2 style="color:var(--cyber-cyan); margin-bottom:5px; font-weight:900; font-size:24px;">DUDO</h2>
+        <h3 style="color:#fff; font-size:15px; margin-bottom:20px; text-transform:uppercase;">Staff Sub-Panel Portal</h3>
+        
+        <input type="text" id="agentUsernameInput" class="std-panel-input" placeholder="Enter Staff ID (Name)..." autocomplete="off">
+        <input type="password" id="agentPasscodeInput" class="std-panel-input" placeholder="Enter Staff Passcode...">
+        
+        <button class="std-panel-btn" onclick="authenticateAgentLogin()">Login to Dashboard</button>
+        <div id="errorMsg" class="error-txt">❌ Invalid ID or Passcode!</div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+
+        function authenticateAgentLogin() {
+            let user = document.getElementById("agentUsernameInput").value.trim().toLowerCase();
+            let pass = document.getElementById("agentPasscodeInput").value.trim();
+            let errBox = document.getElementById("errorMsg");
+
+            if(!user || !pass) {
+                errBox.innerText = "❌ Please enter both Staff ID and Passcode!";
+                errBox.style.display = "block";
+                return;
+            }
+
+            // Database se check kar raha hai ID aur Password
+            database.ref('internal_agents_nodes/' + user).once('value').then((snap) => {
+                if(snap.exists()) {
+                    let agentData = snap.val();
+                    if(agentData.passcode === pass) {
+                        // Password Sahi Hai! Token save karke admin.html par bhej do
+                        localStorage.setItem("agentAutoLogin", user);
+                        window.location.href = "admin.html"; // Redirect to your file
+                    } else {
+                        errBox.innerText = "❌ Incorrect Passcode!";
+                        errBox.style.display = "block";
+                    }
+                } else {
+                    errBox.innerText = "❌ Staff ID not found!";
+                    errBox.style.display = "block";
+                }
+            }).catch((error) => {
+                errBox.innerText = "❌ Connection Error!";
+                errBox.style.display = "block";
+            });
+        }
+    </script>
+</body>
+</html>

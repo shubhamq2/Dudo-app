@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystery Gift Box - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        
+        /* Premium Navigation Sync Header */
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #ec4899; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #ec4899; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(236, 72, 153, 0.1); }
+        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; align-items: center; }
+
+        /* 📢 AD INCOME SOURCE SLOTS MAP */
+        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #ec4899; margin: 5px 0; }
+
+        /* Main Terminal Box Container Card */
+        .vault-main-card { width: 100%; background: #1e293b; border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); position: relative; }
+        
+        /* Floating Graphic Animated Present Node */
+        .gift-box-vector { font-size: 84px; margin: 15px 0; cursor: pointer; display: inline-block; animation: floatLoot 2.5s infinite alternate; transition: transform 0.3s ease; }
+        .gift-box-vector:active { transform: scale(0.92); }
+        @keyframes floatLoot { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-12px) rotate(3deg); } }
+
+        .vault-timer-badge { background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); color: #f472b6; font-size: 13px; padding: 6px 16px; border-radius: 50px; font-weight: 800; text-transform: uppercase; display: inline-block; margin-bottom: 15px; }
+
+        .action-unlock-btn { width: 100%; background: linear-gradient(135deg, #ec4899, #be185d); color: #fff; border: none; padding: 15px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); cursor: pointer; text-transform: uppercase; transition: 0.2s; font-weight: 800; }
+        .action-unlock-btn:disabled { background: #334155; color: #64748b; box-shadow: none; cursor: not-allowed; }
+
+        /* 🔒 ADVIDEO VERIFICATION OVERLAY MASK ELEMENT */
+        .validation-panel-card { display: none; background: #0f172a; border-radius: 16px; padding: 20px; border: 1px solid #ef4444; margin-top: 15px; }
+        .validation-panel-card h4 { margin: 0 0 5px 0; font-size: 14px; color: #ef4444; font-weight: 800; text-transform: uppercase; }
+        .validation-clock { font-size: 26px; font-weight: 900; color: #facc15; margin: 5px 0; }
+
+        .claim-loot-btn { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); text-transform: uppercase; margin-top: 10px; display: none; }
+
+        .security-guard-box { border: 1px dashed #ec4899; background: rgba(236, 72, 153, 0.02); border-radius: 12px; padding: 12px 15px; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2>Hourly Mystery Box</h2>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="ad-banner-slot">
+           <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+        </div>
+
+        <div class="vault-main-card">
+            <div class="vault-timer-badge" id="lootStatusBadgeText">Status: Box Ready</div>
+            
+            <br>
+            <div class="gift-box-vector" id="lootBoxEmojiState" onclick="executeTriggerAdVideoUnlocker()">🎁</div>
+            
+            <h3 style="margin: 0 0 5px 0; font-size: 19px;" id="lootBoxMainTitleText">Sponsor Mystery Box</h3>
+            <p style="margin: 0 0 20px 0; font-size: 12px; color: #94a3b8; line-height: 1.4;" id="lootBoxSubDescriptionText">Tap the magical box above or click unlock down below to stream the video sponsor payload validation. Cleared users instantly crack random drop codes container coins!</p>
+
+            <button class="action-unlock-btn" id="vaultActionTriggerBtn" onclick="executeTriggerAdVideoUnlocker()">Unlock Mystery Loot 🔓</button>
+
+            <div class="validation-panel-card" id="videoAdVerificationPanel">
+                <h4>Streaming Video Content Payload...</h4>
+                <div class="validation-clock" id="verificationCountdownTicker">15s</div>
+                <p style="font-size: 11px; color: #64748b; margin: 0;">Do not close the sponsor window target. Keep application focus active.</p>
+                
+                <button class="claim-loot-btn" id="claimRandomLootCoinsBtn" onclick="executeCreditLootLedgerPool()">Claim Exploded Gift Reward 🌟</button>
+            </div>
+        </div>
+
+        <div class="ad-banner-slot">
+            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        </div>
+
+        <div class="security-guard-box">
+            <span>🛡️</span>
+            <span>Validation verification protocols are active on this window handle thread process. Closing pages prematurely or launching concurrent splits locks loot arrays.</span>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let verificationTickerInt = 15; // 15 seconds required stream engagement hold
+        let totalSecondsOpenedInt = 0;
+        let countdownTrackingInterval = null;
+        let cooldownClockInterval = null;
+        let proxyTargetAdWindow = null;
+        
+        let calculatedLootDropCoinsValue = 0;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            executeValidateHourlyMysteryCooldown();
+        });
+
+        // 🧠 TIME VERIFICATION: Manages the chronological locking multi-node limits
+        function executeValidateHourlyMysteryCooldown() {
+            const lastMysteryClaimTime = parseInt(localStorage.getItem("lastMysteryBoxClaimTime") || "0");
+            const currentTimeInstantNow = Date.now();
+
+            if(cooldownClockInterval) clearInterval(cooldownClockInterval);
+
+            if(lastMysteryClaimTime !== 0 && (currentTimeInstantNow - lastMysteryClaimTime < 3600000)) {
+                // Cooldown lock sequence is active
+                document.getElementById("vaultActionTriggerBtn").disabled = true;
+                document.getElementById("lootBoxEmojiState").style.animation = "none";
+                document.getElementById("lootBoxEmojiState").innerText = "📦";
+                document.getElementById("lootBoxMainTitleText").innerText = "Box Sealed Over Lock";
+                executeTriggerSealedCountdownClock(lastMysteryClaimTime);
+            } else {
+                // Safe clear active status ready
+                document.getElementById("vaultActionTriggerBtn").disabled = false;
+                document.getElementById("lootStatusBadgeText").innerText = "Status: Box Ready";
+                document.getElementById("lootBoxEmojiState").innerText = "🎁";
+                document.getElementById("lootBoxEmojiState").style.animation = "floatLoot 2.5s infinite alternate";
+                document.getElementById("lootBoxMainTitleText").innerText = "Sponsor Mystery Box";
+                document.getElementById("lootBoxSubDescriptionText").innerText = "Tap the magical box above or click unlock down below to stream the video sponsor payload validation. Cleared users instantly crack random drop codes container coins!";
+                document.getElementById("videoAdVerificationPanel").style.display = "none";
+            }
+        }
+
+        function executeTriggerSealedCountdownClock(lastClaimTimestamp) {
+            function updateSealedClock() {
+                const elapsedPassed = Date.now() - lastClaimTimestamp;
+                const remainingTimeLeft = 3600000 - elapsedPassed;
+
+                if(remainingTimeLeft <= 0) {
+                    clearInterval(cooldownClockInterval);
+                    executeValidateHourlyMysteryCooldown();
+                } else {
+                    let minutesLeft = Math.floor(remainingTimeLeft / 60000);
+                    let secondsLeft = Math.floor((remainingTimeLeft % 60000) / 1000);
+                    
+                    let formatMin = minutesLeft < 10 ? "0" + minutesLeft : minutesLeft;
+                    let formatSec = secondsLeft < 10 ? "0" + secondsLeft : secondsLeft;
+                    
+                    document.getElementById("lootStatusBadgeText").innerText = `Cooldown: ${formatMin}m ${formatSec}s`;
+                    document.getElementById("lootBoxSubDescriptionText").innerText = `This mystery box vault cache structural node is recharging tracking loops. Return in ${formatMin}m ${formatSec}s to execute the next unlock sequence.`;
+                }
+            }
+            updateSealedClock();
+            cooldownClockInterval = setInterval(updateSealedClock, 1000);
+        }
+
+        // 🔒 VIDEO SYSTEM VALIDATION ENGINE: Launches external frame and verifies active focus tags
+        function executeTriggerAdVideoUnlocker() {
+            if(document.getElementById("vaultActionTriggerBtn").disabled === true) return;
+
+            const ADSTERRA_VIDEO_URL = "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+
+            verificationTickerInt = 15;
+            totalSecondsOpenedInt = 0;
+
+            // Compute the randomized reward payload range limits beforehand (Min 20 - Max 60 Coins)
+            calculatedLootDropCoinsValue = Math.floor(20 + Math.random() * 41);
+
+            document.getElementById("vaultActionTriggerBtn").style.display = "none";
+            document.getElementById("videoAdVerificationPanel").style.display = "block";
+            document.getElementById("verificationCountdownTicker").style.display = "block";
+            document.getElementById("claimRandomLootCoinsBtn").style.display = "none";
+
+            proxyTargetAdWindow = window.open(ADSTERRA_VIDEO_URL, '_blank', 'noopener,noreferrer');
+
+            countdownTrackingInterval = setInterval(() => {
+                // Verification Check 1: Window terminated early protection guard
+                if(proxyTargetAdWindow && proxyTargetAdWindow.closed) {
+                    clearInterval(countdownTrackingInterval);
+                    executeRollbackDashboardUI();
+                    alert("❌ Stream Interrupted! You closed the verification ad window before completion loop.");
+                    return;
+                }
+
+                // Verification Check 2: App switching focus monitoring filter
+                if(!document.hidden) {
+                    if(totalSecondsOpenedInt < 14) {
+                        clearInterval(countdownTrackingInterval);
+                        executeRollbackDashboardUI();
+                        alert("❌ System Monitor Alert! Page focus minimized. Stay on the site to crack the loot vault.");
+                        return;
+                    }
+                }
+
+                totalSecondsOpenedInt++;
+                verificationTickerInt--;
+                document.getElementById("verificationCountdownTicker").innerText = `${verificationTickerInt}s`;
+
+                if(verificationTickerInt <= 0) {
+                    clearInterval(countdownTrackingInterval);
+                    
+                    // Unlock target prize state layouts
+                    document.getElementById("verificationCountdownTicker").style.display = "none";
+                    document.getElementById("lootBoxEmojiState").innerText = "💥"; // Box burst display override
+                    document.getElementById("claimRandomLootCoinsBtn").style.display = "block";
+                }
+            }, 1000);
+        }
+
+        // 💰 REWARD ENGINE MODULE: Dispatches data directly straight inside user profile path logs
+        function executeCreditLootLedgerPool() {
+            database.ref('users/' + uid).once('value').then((snapshot) => {
+                if(snapshot.exists()) {
+                    let coreCurrentCoins = snapshot.val().coins || 0;
+
+                    database.ref('users/' + uid).update({
+                        coins: coreCurrentCoins + calculatedLootDropCoinsValue
+                    }).then(() => {
+                        localStorage.setItem("lastMysteryBoxClaimTime", Date.now().toString());
+                        alert(`🎉 Vault Cracked! Mystery Box burst revealed +${calculatedLootDropCoinsValue} Coins!`);
+                        executeRollbackDashboardUI();
+                        executeValidateHourlyMysteryCooldown();
+                    });
+                }
+            });
+        }
+
+        function executeRollbackDashboardUI() {
+            document.getElementById("vaultActionTriggerBtn").style.display = "block";
+            document.getElementById("videoAdVerificationPanel").style.display = "none";
+        }
+    </script>
+</body>
+</html>

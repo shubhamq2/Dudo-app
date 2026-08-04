@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dudo Core Matrix v20.0 - Ultimate Edition</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --bg-base: #060913; --bg-card: #0d1527; --bg-dark-well: #04060d;
+            --cyber-cyan: #06b6d4; --cyber-green: #10b981; --cyber-red: #f43f5e;
+            --cyber-purple: #d946ef; --cyber-orange: #f97316; --cyber-pink: #ec4899;
+            --text-glow: #f8fafc; --text-dim: #475569; --border-neon: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-glow); min-height: 100vh; overflow-x: hidden; }
+
+        #emergencyKillBanner { display: none; background: linear-gradient(90deg, var(--cyber-red), #991b1b); color: #fff; padding: 12px; text-align: center; font-weight: 900; font-size: 13px; text-transform: uppercase; position: sticky; top: 0; z-index: 1000000; box-shadow: 0 5px 25px rgba(244, 63, 94, 0.4); }
+        
+        #masterLockOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-base); z-index: 9999999; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .lock-interface-box { background: var(--bg-card); border: 2px solid var(--cyber-cyan); border-radius: 20px; padding: 45px 25px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 0 30px rgba(6, 182, 212, 0.3); }
+
+        .app-layout-wrapper { display: none; width: 100%; max-width: 800px; margin: 0 auto; background: var(--bg-base); min-height: 100vh; border-left: 1px solid var(--border-neon); border-right: 1px solid var(--border-neon); padding-bottom: 80px; }
+        .app-top-navbar { background: var(--bg-card); border-bottom: 2px solid var(--cyber-cyan); padding: 16px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 9000; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .menu-hamburger-btn { background: none; border: none; color: var(--cyber-cyan); font-size: 26px; cursor: pointer; font-weight: bold; }
+        .app-navbar-title { font-size: 19px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(90deg, #fff, var(--cyber-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .app-tab-navigation-bar { display: flex; overflow-x: auto; background: #111a2e; border-bottom: 1px solid var(--border-neon); }
+        .app-tab-navigation-bar::-webkit-scrollbar { height: 4px; }
+        .app-tab-navigation-bar::-webkit-scrollbar-thumb { background: var(--cyber-cyan); border-radius: 4px; }
+        .nav-action-tab-btn { flex: 1; min-width: 100px; background: none; border: none; padding: 14px 5px; color: var(--text-dim); font-weight: 800; font-size: 11px; text-transform: uppercase; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .nav-action-tab-btn.tab-active { color: var(--cyber-cyan); border-bottom-color: var(--cyber-cyan); background: rgba(6, 182, 212, 0.04); }
+
+        .workspace-fluid-body { padding: 15px; }
+        .view-workspace-content-pane { display: none; }
+        .view-workspace-content-pane.pane-active { display: block; }
+
+        .control-block-card { background: var(--bg-card); border: 1px solid var(--border-neon); border-radius: 14px; padding: 16px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .block-title-txt { font-size: 12px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-neon); padding-bottom: 8px; margin-bottom: 12px; }
+        .std-panel-input, .std-panel-select { background: var(--bg-dark-well); border: 1px solid var(--border-neon); border-radius: 8px; color: #fff; padding: 12px; font-size: 13px; font-weight: 600; outline: none; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+        .std-panel-input:focus, .std-panel-select:focus { border-color: var(--cyber-cyan); }
+        .std-panel-textarea { width: 100%; height: 60px; background: var(--bg-dark-well); border: 1px solid var(--border-neon); border-radius: 8px; color: #fff; padding: 10px; outline: none; font-size: 12px; resize: none; margin-bottom: 10px; box-sizing: border-box; font-weight: 600; }
+        .input-row-group { display: flex; gap: 8px; margin-bottom: 10px; }
+        
+        .std-panel-btn { background: linear-gradient(135deg, var(--cyber-cyan), #0891b2); color: #fff; border: none; padding: 12px 18px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer; text-transform: uppercase; white-space: nowrap; margin-bottom: 10px; transition:0.2s;}
+        .std-panel-btn:active { transform: scale(0.95); }
+        .btn-green { background: linear-gradient(135deg, var(--cyber-green), #047857); }
+        .btn-red { background: linear-gradient(135deg, var(--cyber-red), #be123c); }
+        .btn-purple { background: linear-gradient(135deg, var(--cyber-purple), #701a75); }
+        .btn-orange { background: linear-gradient(135deg, var(--cyber-orange), #c2410c); }
+        .btn-pink { background: linear-gradient(135deg, var(--cyber-pink), #be185d); }
+        .btn-dark { background: #1e293b; border: 1px solid #475569; color: #cbd5e1; }
+
+        .table-scroller-box { width: 100%; overflow-x: auto; background: var(--bg-dark-well); border-radius: 10px; border: 1px solid var(--border-neon); margin-top: 10px; margin-bottom: 15px; }
+        .ledger-data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; min-width: 600px; }
+        .ledger-data-table th { background: #111a2e; color: #94a3b8; padding: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid var(--border-neon); }
+        .ledger-data-table td { padding: 12px; border-bottom: 1px solid var(--border-neon); color: #cbd5e1; vertical-align: top; }
+
+        .all-files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; margin-bottom: 20px; }
+        .file-box { background: var(--bg-dark-well); border: 1px solid var(--border-neon); border-radius: 10px; padding: 15px 5px; text-align: center; color: var(--text-glow); font-size: 11px; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; transition: 0.2s; }
+        .file-box:hover { border-color: var(--cyber-cyan); transform: translateY(-2px); }
+
+        /* MODALS */
+        .deep-file-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
+        .deep-file-card { background: var(--bg-card); border: 2px solid var(--cyber-purple); border-radius: 15px; padding: 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 30px rgba(217, 70, 239, 0.3); }
+
+        .users-registry-cards-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .user-profile-data-card { background: var(--bg-dark-well); border: 1px solid var(--border-neon); border-radius: 12px; padding: 15px; position: relative; font-size: 12px; line-height: 1.5; }
+        .user-card-uid-header { font-size: 10px; font-family: monospace; background: rgba(6, 182, 212, 0.06); padding: 4px 8px; border-radius: 4px; color: var(--cyber-cyan); font-weight: bold; display: inline-block; margin-bottom: 10px; }
+        .quick-action-select-btn { position: absolute; top: 15px; right: 15px; background: rgba(6, 182, 212, 0.15); border: 1px solid var(--cyber-cyan); color: white; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .card-property-row { display: flex; justify-content: space-between; margin-bottom: 5px; align-items: center; }
+        .card-property-row span:first-child { color: var(--text-dim); font-weight: 700; text-transform: uppercase; font-size: 10px; }
+        .card-property-row span:last-child { color: #fff; font-weight: 600; text-align: right; }
+
+        .side-drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100000; display: none; }
+        .agents-slidout-drawer { position: fixed; top: 0; left: -320px; width: 300px; height: 100vh; background: var(--bg-card); border-right: 2px solid var(--cyber-cyan); z-index: 100001; padding: 20px; overflow-y: auto; transition: left 0.3s cubic-bezier(0.1, 0.9, 0.2, 1); }
+        
+        .roles-checkbox-container { display: grid; grid-template-columns: 1fr; gap: 8px; background: var(--bg-dark-well); padding: 12px; border-radius: 8px; border: 1px solid var(--border-neon); margin-bottom:10px; }
+        .checkbox-item-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: bold; cursor: pointer; color: #cbd5e1; }
+        .system-modal-alert { display: none; position: fixed; top: 20px; right: 20px; background: var(--bg-card); border-left: 5px solid var(--cyber-cyan); padding: 15px 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 11000000; font-weight: bold; font-size: 12px; text-transform: uppercase; }
+
+        .metric-trio-box { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .revenue-metric-strip-card { flex: 1; min-width: 45%; background: linear-gradient(135deg, #1e1b4b, #0f172a); border: 1px solid var(--border-neon); border-radius: 12px; padding: 16px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; text-align: center; }
+        @media (max-width: 600px) {
+            .revenue-metric-strip-card { padding: 12px 8px; }
+            .revenue-metric-strip-card div:first-child { font-size: 9px !important; }
+            .revenue-metric-strip-card div:last-child { font-size: 18px !important; }
+        }
+
+        .module-toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; background: var(--bg-dark-well); padding: 15px; border-radius: 10px; border: 1px solid var(--border-neon); max-height: 300px; overflow-y: auto;}
+        .module-toggle-item { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: bold; color: #e2e8f0; }
+        .module-toggle-item input[type="checkbox"] { accent-color: var(--cyber-green); transform: scale(1.2); cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="emergencyKillBanner">🚨 SYSTEM MAINTENANCE OVERLAY DEPLOYED: DATA DISPATCH PAUSED 🚨</div>
+    <div class="system-modal-alert" id="systemToastNotificationNode">Console matrix stream updated live.</div>
+
+    <!-- 🔒 LOGIN OVERLAY -->
+    <div id="masterLockOverlay">
+        <div class="lock-interface-box">
+            <h2 style="margin:0 0 5px 0; color:var(--cyber-cyan); font-weight:900; text-transform:uppercase; font-size: 24px;">Dudo Admin Console</h2>
+            <h3 style="color:#fff; font-size:16px; margin-bottom: 15px;">Secure Control Node</h3>
+            <input type="password" id="consoleAccessKey" class="std-panel-input" placeholder="Enter Secure Access Token..." style="text-align:center; margin-bottom:15px; font-size:16px;">
+            <button class="std-panel-btn" style="width:100%; font-size: 14px;" onclick="validateSecurityGateToken()">Access Console Area</button>
+        </div>
+    </div>
+
+    <!-- 📂 DEEP FILE DYNAMIC MODAL -->
+    <div class="deep-file-modal" id="deepFileModal">
+        <div class="deep-file-card">
+            <h3 id="dfmTitle" style="color:var(--cyber-purple); margin-top:0; border-bottom:1px solid var(--border-neon); padding-bottom:10px; margin-bottom:15px; text-transform:uppercase;">File Settings</h3>
+            <div id="dfmDynamicFieldsContainer" style="display:flex; flex-direction:column;"></div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="std-panel-btn btn-purple" style="flex:1; margin:0;" onclick="saveDynamicDeepFileSettings()">SAVE CHANGES</button>
+                <button class="std-panel-btn btn-red" style="flex:1; margin:0;" onclick="closeDeepFileModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📜 USER EARNING HISTORY MODAL -->
+    <div class="deep-file-modal" id="userHistoryModal">
+        <div class="deep-file-card" style="max-width: 600px;">
+            <h3 id="uhTitle" style="color:var(--cyber-cyan); margin-top:0; border-bottom:1px solid var(--border-neon); padding-bottom:10px; margin-bottom:15px; text-transform:uppercase;">User History</h3>
+            <div class="table-scroller-box" style="max-height:400px; margin-top:0;">
+                <table class="ledger-data-table">
+                    <thead><tr><th>Date & Time</th><th>Activity / Source</th><th>Coins 🪙</th><th>Cash (₹)</th></tr></thead>
+                    <tbody id="userHistoryTableBody"></tbody>
+                </table>
+            </div>
+            <button class="std-panel-btn btn-red" style="width:100%; margin-top:15px; margin-bottom:0;" onclick="closeUserHistoryModal()">CLOSE TRACKER</button>
+        </div>
+    </div>
+
+    <!-- 👁️ FULL USER DETAILS MODAL -->
+    <div class="deep-file-modal" id="fullUserDetailsModal">
+        <div class="deep-file-card" style="max-width: 500px;">
+            <h3 style="color:var(--cyber-green); margin-top:0; border-bottom:1px solid var(--border-neon); padding-bottom:10px; margin-bottom:15px; text-transform:uppercase;">Full Profile Data</h3>
+            <div id="fullUserJsonDisplay" style="background:#020409; padding:15px; border-radius:8px; border:1px solid var(--border-neon); color:#a7f3d0; font-family:monospace; font-size:11px; white-space:pre-wrap; max-height:400px; overflow-y:auto; word-break:break-all;"></div>
+            <button class="std-panel-btn btn-red" style="width:100%; margin-top:15px; margin-bottom:0;" onclick="closeFullUserDetailsModal()">CLOSE DETAILS</button>
+        </div>
+    </div>
+
+    <!-- 📱 MAIN LAYOUT -->
+    <div class="app-layout-wrapper" id="adminDashboardCore">
+        
+        <div class="app-top-navbar">
+            <button class="menu-hamburger-btn" onclick="toggleSidebarAgentsDrawer(true)">☰</button>
+            <div class="app-navbar-title">Admin Core</div>
+            <div id="currentSessionRoleBadge" style="margin-left: auto; font-size: 10px; font-weight: 800; color: var(--cyber-green); background: rgba(16,185,129,0.1); padding: 4px 10px; border-radius: 20px;">ROOT</div>
+        </div>
+
+        <div class="app-tab-navigation-bar">
+            <button class="nav-action-tab-btn tab-active" id="btn_tab_users" onclick="switchActiveWorkspacePaneSelector('pane_users')">All Users</button>
+            <button class="nav-action-tab-btn" id="btn_tab_deposits" onclick="switchActiveWorkspacePaneSelector('pane_deposits')">Credits (Inward)</button>
+            <button class="nav-action-tab-btn" id="btn_tab_withdrawals" onclick="switchActiveWorkspacePaneSelector('pane_withdrawals')">Redemptions</button>
+            <button class="nav-action-tab-btn" id="btn_tab_esports" onclick="switchActiveWorkspacePaneSelector('pane_esports')">Gaming Arena</button>
+            <button class="nav-action-tab-btn" id="btn_tab_lottery" onclick="switchActiveWorkspacePaneSelector('pane_lottery')">Rewards & Boxes</button>
+            <button class="nav-action-tab-btn" id="btn_tab_notifications" onclick="switchActiveWorkspacePaneSelector('pane_notifications')">Alerts & Feeds</button>
+            <button class="nav-action-tab-btn" id="btn_tab_support" onclick="switchActiveWorkspacePaneSelector('pane_support')">Support</button>
+            <button class="nav-action-tab-btn" id="btn_tab_allfiles" onclick="switchActiveWorkspacePaneSelector('pane_allfiles')">App Files</button>
+            <button class="nav-action-tab-btn" id="btn_tab_settings" onclick="switchActiveWorkspacePaneSelector('pane_settings')">Settings/P2P</button>
+        </div>
+
+        <div class="workspace-fluid-body">
+
+            <!-- 🔥 TOP METRICS 4-BOX -->
+            <div class="metric-trio-box">
+                <div class="revenue-metric-strip-card" id="card_net_analytics_row" style="border-color:var(--cyber-purple);">
+                    <div style="font-size:11px; font-weight:bold; text-transform:uppercase; color:#cbd5e1;">📈 Net Revenue</div>
+                    <div id="statLiveNetProfit" style="font-size:20px; color:var(--cyber-purple); font-weight:900;">₹0.00</div>
+                </div>
+                <div class="revenue-metric-strip-card" style="border-color:var(--cyber-cyan);">
+                    <div style="font-size:11px; font-weight:bold; text-transform:uppercase; color:#cbd5e1;">👥 Registered Users</div>
+                    <div id="statRealTotalUsers" style="font-size:20px; color:var(--cyber-cyan); font-weight:900;">0</div>
+                </div>
+                <div class="revenue-metric-strip-card" style="border-color:var(--cyber-green); background: linear-gradient(135deg, #064e3b, #0f172a);">
+                    <div style="font-size:11px; font-weight:bold; text-transform:uppercase; color:#a7f3d0;">🟢 App Live Traffic</div>
+                    <div id="statLiveUsers" style="font-size:20px; color:var(--cyber-green); font-weight:900; animation: pulseBadge 2s infinite alternate;">0</div>
+                </div>
+                <div class="revenue-metric-strip-card" style="border-color:var(--cyber-orange);">
+                    <div style="font-size:11px; font-weight:bold; text-transform:uppercase; color:#cbd5e1;">🎫 Support Tickets</div>
+                    <div id="statPendingTickets" style="font-size:20px; color:var(--cyber-orange); font-weight:900;">0</div>
+                </div>
+            </div>
+            <style>@keyframes pulseBadge { 0% { opacity: 0.8; } 100% { opacity: 1; text-shadow: 0 0 10px var(--cyber-green); } }</style>
+
+            <!-- ===================== 1. PANE: ALL USERS ===================== -->
+            <div class="view-workspace-content-pane pane-active" id="pane_users">
+                <div style="margin-bottom:15px; display:flex; justify-content: space-between; align-items:center;">
+                    <div style="color:var(--cyber-cyan); font-size: 12px; font-weight: bold;">Total: <span id="count_lbl_users" style="color:#fff;">0</span></div>
+                    <input type="text" id="userProfileFilterKey" class="std-panel-input" placeholder="🔍 Search via Name, Number, Email, UID..." oninput="renderUserAccountsCoreLedgerBox()" style="width: 70%; margin-bottom: 0;">
+                </div>
+
+                <button class="std-panel-btn btn-orange" style="width:100%; margin-bottom:15px;" onclick="runNetworkScanner()">🕵️ RUN NETWORK ANALYZER (Identify Linked Devices)</button>
+
+                <!-- EDIT / BAN BLOCK -->
+                <div class="control-block-card" id="user_mgmt_block" style="border-color: var(--cyber-cyan);">
+                    <div class="block-title-txt" style="color:var(--cyber-cyan);">Profile Wallet Modifiers & User Edit</div>
+                    <input type="text" id="modTargetUidKey" class="std-panel-input" placeholder="Selected profile active UID target">
+                    <input type="number" id="modDeltaCountValue" class="std-panel-input" placeholder="Enter numeric value">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+                        <button class="std-panel-btn btn-green" onclick="executeProfileManualDeltaAdjustmentValue('balance', 'add')">+ WALLET BALANCE</button>
+                        <button class="std-panel-btn btn-red" onclick="executeProfileManualDeltaAdjustmentValue('balance', 'cut')">- WALLET BALANCE</button>
+                        <button class="std-panel-btn btn-green" onclick="executeProfileManualDeltaAdjustmentValue('coins', 'add')">+ COINS UNIT</button>
+                        <button class="std-panel-btn btn-red" onclick="executeProfileManualDeltaAdjustmentValue('coins', 'cut')">- COINS UNIT</button>
+                    </div>
+
+                    <div style="display:flex; gap:8px; margin-bottom:10px;">
+                        <input type="text" id="editUserName" class="std-panel-input" placeholder="Edit Name" style="margin:0;">
+                        <input type="text" id="editUserPhone" class="std-panel-input" placeholder="Edit Phone/Email" style="margin:0;">
+                    </div>
+                    <button class="std-panel-btn btn-purple" style="width:100%; margin-bottom:8px;" onclick="executeEditUserProfileDetails()">UPDATE USER DETAILS</button>
+                    <button class="std-panel-btn btn-red" style="width:100%; margin-bottom:8px;" onclick="executeDeleteUserProfileAccount()">🗑️ REMOVE USER PROFILE</button>
+
+                    <textarea id="modSingleTargetPushText" class="std-panel-textarea" placeholder="Isolated Custom Warning notification message..."></textarea>
+                    <button class="std-panel-btn btn-purple" style="width:100%; margin-bottom:8px;" onclick="dispatchPersonalSingleTargetPushNotification()">SEND TARGETED SYSTEM ALERT</button>
+                    <button class="std-panel-btn btn-red" style="width:100%; font-size:11px;" onclick="executeHardDeviceLockBanShieldOperation()">🚫 RESTRICT DEVICE ACCESS (FIREWALL)</button>
+                </div>
+
+                <!-- PROMO CODES -->
+                <div class="control-block-card" id="promo_mgmt_block" style="border-color: var(--cyber-pink);">
+                    <div class="block-title-txt" style="color:var(--cyber-pink);">🎫 PROMO VOUCHER DEPLOYER</div>
+                    <div class="input-row-group">
+                        <input type="text" id="pcInputStringKey" class="std-panel-input" placeholder="Coupon string" style="margin-bottom:0;">
+                        <input type="number" id="pcInputRewardCoins" class="std-panel-input" placeholder="Coins Reward" style="margin-bottom:0;">
+                    </div>
+                    <input type="number" id="pcInputMaxClaimsLimit" class="std-panel-input" placeholder="Maximum allowed claims limit">
+                    <button class="std-panel-btn" style="width:100%; background:var(--cyber-pink);" onclick="executeDeployFreshPromoRewardTokenString()">DEPLOY PROMO VOUCHER</button>
+                </div>
+
+                <div id="networkScannerResults" style="display:none; background:#450a0a; padding:15px; border:1px solid #ef4444; border-radius:10px; margin-bottom:15px;"></div>
+                
+                <h3 style="font-size: 14px; color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border-neon); padding-bottom: 5px; margin-bottom: 10px;">User Registry (Full Info)</h3>
+                <div class="users-registry-cards-grid" id="userProfilesTableRenderSocket"></div>
+            </div>
+
+            <!-- ===================== 2. PANE: INWARD POINTS (Deposits) ===================== -->
+            <div class="view-workspace-content-pane" id="pane_deposits">
+                <input type="text" id="depositRequestFilterKey" class="std-panel-input" placeholder="🔍 Filter inward requests via UID or UTR..." oninput="renderDepositsQueueWorkspaceDesk()">
+                
+                <h3 style="font-size: 12px; color: var(--cyber-orange); text-transform: uppercase; margin-top: 15px;">⏳ PENDING CREDITS</h3>
+                <div class="table-scroller-box">
+                    <table class="ledger-data-table">
+                        <thead><tr><th>Audit ID</th><th>User Info</th><th>Amount</th><th>UTR/Ref</th><th>Status</th><th>Resolutions</th></tr></thead>
+                        <tbody id="depositPendingRenderSocket"></tbody>
+                    </table>
+                </div>
+
+                <h3 style="font-size: 12px; color: var(--cyber-green); text-transform: uppercase; margin-top: 20px;">✅ PROCESSED CREDITS HISTORY</h3>
+                <div class="table-scroller-box">
+                    <table class="ledger-data-table">
+                        <thead><tr><th>Audit ID</th><th>User Info</th><th>Amount</th><th>UTR/Ref</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="depositProcessedRenderSocket"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===================== 3. PANE: REDEMPTIONS (Withdrawals) ===================== -->
+            <div class="view-workspace-content-pane" id="pane_withdrawals">
+                <input type="text" id="withdrawalRequestFilterKey" class="std-panel-input" placeholder="🔍 Type transaction ID or UID to extract..." oninput="renderWithdrawalsQueueWorkspaceDesk()">
+                <div class="control-block-card" style="border-color:var(--cyber-orange); background:rgba(249, 115, 22, 0.05);">
+                    <div class="block-title-txt" style="color:var(--cyber-orange);">🤖 Automated Verification System</div>
+                    <select id="cfgAutoRejectState" class="std-panel-input" onchange="updateCoreGlobalConfigParamNode('auto_reject_withdrawals')" style="margin-bottom:0;">
+                        <option value="OFF">OFF - Manual Verification Only</option><option value="ON">ON - Smart System Active</option>
+                    </select>
+                </div>
+
+                <h3 style="font-size: 12px; color: var(--cyber-orange); text-transform: uppercase; margin-top: 15px;">⏳ PENDING REDEMPTIONS</h3>
+                <div class="table-scroller-box">
+                    <table class="ledger-data-table">
+                        <thead><tr><th>Ticket ID</th><th>Outflow (₹)</th><th>Processing Destination</th><th>Current Status</th><th>Bounded Action Controls</th></tr></thead>
+                        <tbody id="withdrawPendingRenderSocket"></tbody>
+                    </table>
+                </div>
+
+                <h3 style="font-size: 12px; color: var(--cyber-green); text-transform: uppercase; margin-top: 20px;">✅ PROCESSED REDEMPTIONS HISTORY</h3>
+                <div class="table-scroller-box">
+                    <table class="ledger-data-table">
+                        <thead><tr><th>Ticket ID</th><th>Outflow (₹)</th><th>Processing Destination</th><th>Current Status</th><th>Action</th></tr></thead>
+                        <tbody id="withdrawProcessedRenderSocket"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===================== 4. PANE: GAMING ARENA ===================== -->
+            <div class="view-workspace-content-pane" id="pane_esports">
+                
+                <!-- 🔥 LIVE POLL MANAGER -->
+                <div class="control-block-card" style="border-color: #d946ef;">
+                    <div class="block-title-txt" style="color:#d946ef;">📊 LIVE USER POLL MANAGER</div>
+                    <input type="text" id="pollQuestion" class="std-panel-input" placeholder="Poll Question (e.g. Next match time?)">
+                    <div class="input-row-group">
+                        <input type="text" id="pollOpt1" class="std-panel-input" placeholder="Option 1" style="margin:0;">
+                        <input type="text" id="pollOpt2" class="std-panel-input" placeholder="Option 2" style="margin:0;">
+                        <input type="text" id="pollOpt3" class="std-panel-input" placeholder="Option 3 (Optional)" style="margin:0;">
+                    </div>
+                    <div class="input-row-group" style="margin-top:10px;">
+                        <button class="std-panel-btn btn-purple" style="flex:1; margin:0;" onclick="deployEsportsPoll()">🚀 PUBLISH LIVE POLL</button>
+                        <button class="std-panel-btn btn-red" style="flex:1; margin:0;" onclick="deleteActiveAlert('freefire_tournaments/live_poll')">🗑️ DELETE POLL</button>
+                    </div>
+                </div>
+
+                <div class="control-block-card" style="border-color: #f97316;">
+                    <div class="block-title-txt" style="color:#f97316;">⚔️ CREATE NEW ESPORTS MATCH</div>
+                    
+                    <select id="esportsGameType" class="std-panel-select" style="border-color:var(--cyber-orange); font-size:16px; font-weight:900; background:#1e1b4b;">
+                        <option value="freefire">🔥 Esports Match 1</option>
+                        <option value="pubg">🪖 Esports Match 2</option>
+                    </select>
+
+                    <div class="input-row-group">
+                        <input type="text" id="esMatchTitle" class="std-panel-input" placeholder="Match Title (e.g. Solo Clash #101)">
+                        <input type="text" id="esMatchTime" class="std-panel-input" placeholder="Time (e.g. Today, 08:00 PM)">
+                    </div>
+                    
+                    <div class="input-row-group">
+                        <select id="esFeeType" class="std-panel-select" style="margin-bottom:0;">
+                            <option value="coins">Entry in Coins (🪙)</option>
+                            <option value="rupees">Entry in Rupees (₹)</option>
+                        </select>
+                        <select id="esPrizeType" class="std-panel-select" style="margin-bottom:0;">
+                            <option value="coins">Prize in Coins (🪙)</option>
+                            <option value="rupees">Prize in Rupees (₹)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-row-group" style="margin-top:10px;">
+                        <input type="number" id="esMatchFee" class="std-panel-input" placeholder="Entry Fee Value" style="margin-bottom:0;">
+                        <input type="number" id="esMatchPrizePool" class="std-panel-input" placeholder="Total Prize Pool Value" style="margin-bottom:0;">
+                    </div>
+
+                    <div class="input-row-group" style="margin-top:10px;">
+                        <input type="text" id="esMatchMap" class="std-panel-input" placeholder="Map (e.g. Bermuda / Erangel)">
+                        <input type="text" id="esMatchType" class="std-panel-input" placeholder="Type (e.g. Solo/Squad)">
+                    </div>
+                    <button class="std-panel-btn btn-orange" style="width:100%;" onclick="createEsportsMatch()">🚀 LAUNCH NEW MATCH TO APP</button>
+                </div>
+
+                <div class="control-block-card" style="border-color: var(--cyber-cyan);">
+                    <div class="block-title-txt" style="color:var(--cyber-cyan);">🎮 ACTIVE MATCHES & WINNER PAYOUTS</div>
+                    <div class="table-scroller-box">
+                        <table class="ledger-data-table">
+                            <thead><tr><th>Match Details</th><th>Room Credentials</th><th>Participants List</th><th>Top 3 Winners Payout</th></tr></thead>
+                            <tbody id="esActiveMatchesSocket"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== 7. PANE: LOTTERY & BOXES ===================== -->
+            <div class="view-workspace-content-pane" id="pane_lottery">
+                
+                <div class="control-block-card" style="border-color: var(--cyber-purple);">
+                    <div class="block-title-txt" style="color:var(--cyber-purple);">🎰 200 COIN MEGA REWARD TRACKER</div>
+                    <div class="table-scroller-box" style="margin-bottom:15px; max-height:250px;">
+                        <table class="ledger-data-table">
+                            <thead><tr><th>Ticket ID</th><th>User Details</th><th>Action</th></tr></thead>
+                            <tbody id="jackpotBidsRenderSocket"></tbody>
+                        </table>
+                    </div>
+                    <button class="std-panel-btn btn-red" style="width:100%; margin-bottom:15px; font-size:10px;" onclick="deleteActiveAlert('jackpot_bids_tracker')">🗑️ CLEAR ALL MEGA REWARD ENTRIES</button>
+                    
+                    <h3 style="font-size:12px; color:#fff; margin-bottom:10px;">🏆 DECLARE MEGA REWARD WINNER</h3>
+                    <input type="text" id="jackpotWinUid" class="std-panel-input" placeholder="Target Winner UID (e.g. UID_12345)">
+                    <input type="number" id="jackpotWinAmt" class="std-panel-input" placeholder="Winning Prize Amount (Coins)">
+                    <button class="std-panel-btn btn-purple" style="width:100%;" onclick="executeDrawWinner('jackpot')">DRAW MEGA REWARD WINNER</button>
+                </div>
+
+                <div class="control-block-card" style="border-color: var(--cyber-cyan);">
+                    <div class="block-title-txt" style="color:var(--cyber-cyan);">🎁 50 COIN SURPRISE BOX TRACKER</div>
+                    <div class="table-scroller-box" style="margin-bottom:15px; max-height:250px;">
+                        <table class="ledger-data-table">
+                            <thead><tr><th>Ticket ID</th><th>User Details</th><th>Action</th></tr></thead>
+                            <tbody id="mysteryBidsRenderSocket"></tbody>
+                        </table>
+                    </div>
+                    <button class="std-panel-btn btn-red" style="width:100%; margin-bottom:15px; font-size:10px;" onclick="deleteActiveAlert('mystery_box_bids_tracker')">🗑️ CLEAR NEW SURPRISE ENTRIES</button>
+                    <button class="std-panel-btn btn-red" style="width:100%; margin-bottom:15px; font-size:10px;" onclick="deleteActiveAlert('lottery_bids_tracker')">🗑️ CLEAR OLD LEGACY ENTRIES</button>
+                    
+                    <h3 style="font-size:12px; color:#fff; margin-bottom:10px;">🏆 DECLARE SURPRISE WINNER</h3>
+                    <input type="text" id="mysteryWinUid" class="std-panel-input" placeholder="Target Winner UID (e.g. UID_12345)">
+                    <input type="number" id="mysteryWinAmt" class="std-panel-input" placeholder="Winning Prize Amount (Coins)">
+                    <button class="std-panel-btn btn-cyan" style="width:100%;" onclick="executeDrawWinner('mysterybox')">DRAW SURPRISE WINNER</button>
+                </div>
+
+            </div>
+
+            <!-- ===================== 8. PANE: ALERTS, FEEDS & PROMO DATA ===================== -->
+            <div class="view-workspace-content-pane" id="pane_notifications">
+                
+                <div class="control-block-card" id="promo_data_block" style="border-color: var(--cyber-pink);">
+                    <div class="block-title-txt" style="color:var(--cyber-pink);">📝 SYSTEM REWARD PAYOUTS & MARQUEE FEED</div>
+                    <p style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;">Create promotional scrolling alerts for the live feed.</p>
+                    <textarea id="cfgPromoPayoutsTextString" class="std-panel-textarea" placeholder="Rahul won ₹100 via UPI; Aman converted 500 Coins"></textarea>
+                    <div style="display:flex; gap:10px;">
+                        <button class="std-panel-btn btn-pink" style="flex:2; margin:0;" onclick="deployDynamicPromoIncentivePopupsDataFeed()">DEPLOY PROMO MARQUEE FEED</button>
+                        <button class="std-panel-btn btn-red" style="flex:1; margin:0; font-size:9px;" onclick="deleteActiveAlert('incentives_popup_array_feed_source')">🗑️ CLEAR FEED</button>
+                    </div>
+                </div>
+
+                <div class="control-block-card" style="border-color: var(--cyber-cyan);">
+                    <div class="block-title-txt" style="color:var(--cyber-cyan);">🔔 NOTIFICATION CENTER (BELL ICON)</div>
+                    <input type="text" id="ncTitle" class="std-panel-input" placeholder="Notification Title">
+                    <textarea id="ncMsg" class="std-panel-textarea" placeholder="Notification Message..."></textarea>
+                    <input type="text" id="ncImage" class="std-panel-input" placeholder="Banner/Image URL">
+                    <select id="ncType" class="std-panel-input">
+                        <option value="normal">Normal Message</option>
+                        <option value="success">Success (Green)</option>
+                        <option value="urgent">Warning/Urgent (Red)</option>
+                    </select>
+                    <div style="display:flex; gap:10px;">
+                        <button class="std-panel-btn btn-cyan" style="flex:2; margin:0;" onclick="pushToNotificationCenter()">PUSH TO BELL ICON</button>
+                        <button class="std-panel-btn btn-red" style="flex:1; margin:0; font-size:9px;" onclick="deleteActiveAlert('notification_center')">🗑️ CLEAR ALL</button>
+                    </div>
+                </div>
+
+                <div class="control-block-card" style="border-color: var(--cyber-red);">
+                    <div class="block-title-txt" style="color:var(--cyber-red);">🚨 PRIORITY SYSTEM POP-UP (OVERLAY)</div>
+                    <input type="text" id="utTitle" class="std-panel-input" placeholder="Pop-up Bold Title">
+                    <textarea id="utDesc" class="std-panel-textarea" placeholder="Description/Instruction Text"></textarea>
+                    <input type="text" id="utUrl" class="std-panel-input" placeholder="Target Destination URL (e.g. index.html)">
+                    <select id="utActive" class="std-panel-input"><option value="true">ENABLE POPUP FOR ALL USERS</option><option value="false">DISABLE POPUP</option></select>
+                    <div style="display:flex; gap:10px;">
+                        <button class="std-panel-btn btn-red" style="flex:2; margin:0;" onclick="deployUrgentTask()">UPDATE PRIORITY POP-UP</button>
+                        <button class="std-panel-btn" style="flex:1; margin:0; font-size:9px; background:#450a0a; border:1px solid #ef4444;" onclick="deleteActiveAlert('global_system_runtime_configurations/urgent_task')">🗑️ DELETE</button>
+                    </div>
+                </div>
+
+                <div class="control-block-card" id="dom_section_push_broadcaster" style="border-color: var(--cyber-purple);">
+                    <div class="block-title-txt" style="color:var(--cyber-purple);">🛰️ SYSTEM WIRELESS NATIVE PUSH BROADCAST</div>
+                    <input type="text" id="broadcastPayloadTitle" class="std-panel-input" placeholder="Native Push Title">
+                    <input type="text" id="broadcastPayloadMessage" class="std-panel-input" placeholder="Native Push Description Message">
+                    <input type="text" id="broadcastPayloadImage" class="std-panel-input" placeholder="Big Picture URL (Optional)">
+                    <button class="std-panel-btn btn-purple" style="width:100%; margin-bottom:0;" onclick="executeGlobalSystemBroadcastAlertNotification()">Transmit Wireless Native App Push Alert</button>
+                </div>
+            </div>
+
+            <!-- ===================== 9. PANE: SUPPORT TICKETS ===================== -->
+            <div class="view-workspace-content-pane" id="pane_support">
+                <div class="control-block-card" style="border-color: #3b82f6;">
+                    <div class="block-title-txt" style="color:#3b82f6;">🎫 USER SUPPORT & HELP DESK TICKETS</div>
+                    <input type="text" id="supportTicketFilterKey" class="std-panel-input" placeholder="🔍 Search via Ticket ID, UID, or Subject..." oninput="renderSupportTicketsQueueWorkspaceDesk()">
+                    <div class="table-scroller-box" style="max-height: 500px;">
+                        <table class="ledger-data-table">
+                            <thead><tr><th>Ticket ID / Date</th><th>User Info</th><th>Subject / Message</th><th>Status</th><th>Action</th></tr></thead>
+                            <tbody id="supportTicketsRenderSocket"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== 10. PANE: ALL FILES / GENERIC DEEP LINKS ===================== -->
+            <div class="view-workspace-content-pane" id="pane_allfiles">
+                <h3 style="font-size: 14px; color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border-neon); padding-bottom: 5px; margin-bottom: 10px;">Available System Files</h3>
+                <div class="all-files-grid">
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('greeting_page')" style="background:var(--cyber-pink); border-color:#fff; color:#fff;">Festive Wishing Page</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('daily_checkin')">Daily Check-in</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('watch_ads')">Video Zone</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('app_testing')">App Testing Zone</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('social_tasks')">Social Tasks</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('monlix')">Task Server 1</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('monetag')">Task Server 2</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('adgem')">Games Zone</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('mega_offers')">Premium Offers</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('extra_bonus')">Extra Bonus</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('read_articles')">Read Articles</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('1v1')">1v1 Coin Battles</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('hourly_key')">Hourly Key</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('special_missions')">Special Missions</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('spin_win')">Spin & Win</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('scratch_card')">Scratch Rewards</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('cpx')">Task Server 3</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('top_rewards')">Instant Coins</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('timewall')">Task Server 4</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('bitlabs')">Task Server 5</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('square_dash')">Arcade Zone</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('pool')">4-Player Pool</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('esports_zone')">Esports Zone</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('surprise')">Surprise Box</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('web_explorer')">Web Tasks</div>
+                </div>
+
+                <div class="control-block-card" style="border-color: var(--cyber-green);">
+                    <div class="block-title-txt" style="color:var(--cyber-green);">➕ ADD NEW DYNAMIC HOME MODULE</div>
+                    <div class="input-row-group">
+                        <input type="text" id="nfTitle" class="std-panel-input" placeholder="Title (e.g. New Game)" style="margin-bottom:0;">
+                        <input type="text" id="nfIcon" class="std-panel-input" placeholder="Emoji Icon (e.g. 🎲)" style="margin-bottom:0;">
+                    </div>
+                    <input type="text" id="nfDesc" class="std-panel-input" placeholder="Short Description">
+                    <input type="text" id="nfUrl" class="std-panel-input" placeholder="Destination URL Link (e.g. new_game.html)">
+                    <input type="text" id="nfBadge" class="std-panel-input" placeholder="Badge Text (e.g. HOT / NEW)">
+                    <button class="std-panel-btn btn-green" style="width:100%; margin-bottom:0;" onclick="deployNewAppModule()">INJECT NEW MODULE TO HOME</button>
+                </div>
+            </div>
+
+            <!-- ===================== 11. PANE: SETTINGS & P2P ===================== -->
+            <div class="view-workspace-content-pane" id="pane_settings">
+                
+                <div class="control-block-card" style="border-color: var(--cyber-green); background: rgba(16, 185, 129, 0.05);">
+                    <div class="block-title-txt" style="color:var(--cyber-green);">👁️ GLOBAL APP MODULE TOGGLES (PLAY STORE SAFETY)</div>
+                    <p style="font-size: 11px; color: #94a3b8; margin-bottom: 15px;">Turn OFF restricted modules (🔴) before submitting to Play Store. Turn them ON after approval.</p>
+                    <div class="module-toggle-grid" id="moduleTogglesContainer"></div>
+                    <button class="std-panel-btn btn-green" style="width:100%; margin-bottom: 0;" onclick="saveModuleToggles()">💾 SAVE VISIBILITY SETTINGS</button>
+                </div>
+
+                <div class="control-block-card" style="border-color: var(--cyber-purple);">
+                    <div class="block-title-txt" style="color:var(--cyber-purple);">🏦 P2P UPI ROTATOR MANAGER (CREDITS)</div>
+                    <div class="input-row-group">
+                        <input type="text" id="p2pUpiName" class="std-panel-input" placeholder="Merchant Name" style="margin-bottom:0;">
+                        <input type="text" id="p2pUpiId" class="std-panel-input" placeholder="UPI ID" style="margin-bottom:0;">
+                    </div>
+                    <button class="std-panel-btn btn-purple" style="width:100%;" onclick="addP2pUpiId()">➕ ADD TO ROTATOR LIST</button>
+                    <div class="table-scroller-box" style="margin-top:10px; max-height:200px;">
+                        <table class="ledger-data-table">
+                            <thead><tr><th>Merchant Name</th><th>UPI ID</th><th>Action</th></tr></thead>
+                            <tbody id="p2pUpiListSocket"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="control-block-card" style="border-color: var(--cyber-pink);">
+                    <div class="block-title-txt" style="color:var(--cyber-pink);">🔗 GLOBAL LINKS MANAGER</div>
+                    <label style="font-size:11px; color:var(--text-dim); font-weight:bold;">Telegram Channel URL</label>
+                    <div class="input-row-group"><input type="text" id="glTelegram" class="std-panel-input" style="margin:0;"><button class="std-panel-btn btn-pink" style="margin:0;" onclick="saveApiKeys('telegram_url', 'glTelegram')">SAVE</button></div>
+                    <label style="font-size:11px; color:var(--text-dim); font-weight:bold;">Privacy Policy URL</label>
+                    <div class="input-row-group"><input type="text" id="glPrivacy" class="std-panel-input" style="margin:0;"><button class="std-panel-btn btn-pink" style="margin:0;" onclick="saveApiKeys('privacy_url', 'glPrivacy')">SAVE</button></div>
+                    <label style="font-size:11px; color:var(--text-dim); font-weight:bold;">Play Store App Link</label>
+                    <div class="input-row-group"><input type="text" id="glPlayStore" class="std-panel-input" style="margin:0;"><button class="std-panel-btn btn-pink" style="margin:0;" onclick="saveApiKeys('playstore_url', 'glPlayStore')">SAVE</button></div>
+                </div>
+
+                <div class="control-block-card" style="border-color: var(--cyber-cyan);">
+                    <div class="block-title-txt" style="color:var(--cyber-cyan);">⚙️ GLOBAL SYSTEM CONFIGURATIONS</div>
+                    <div class="input-row-group">
+                        <div style="flex:1;"><label style="font-size:11px; color:var(--text-dim);">Maintenance Lock</label><select id="cfgMaintenanceState" class="std-panel-input" onchange="updateCoreGlobalConfigParamNode('app_maintenance')"><option value="OFF">OFF</option><option value="ON">ON</option></select></div>
+                        <div style="flex:1;"><label style="font-size:11px; color:var(--text-dim);">Network Shield Blocker</label><select id="cfgVpnBlockState" class="std-panel-input" onchange="updateCoreGlobalConfigParamNode('vpn_block_shield')"><option value="OFF">OFF</option><option value="ON">ON</option></select></div>
+                    </div>
+                    <div class="input-row-group">
+                        <div style="flex:1;"><label style="font-size:11px; color:var(--text-dim);">Coin Rate (e.g. 100 = ₹1)</label><input type="number" id="cfgCoinConversionValue" class="std-panel-input"><button class="std-panel-btn btn-cyan" style="width:100%;" onclick="updateCoreGlobalConfigParamNode('coin_rate')">SET RATE</button></div>
+                        <div style="flex:1;"><label style="font-size:11px; color:var(--text-dim);">Cooldown Timer (Sec)</label><input type="number" id="cfgCooldownSeconds" class="std-panel-input"><button class="std-panel-btn btn-cyan" style="width:100%;" onclick="updateCoreGlobalConfigParamNode('cooldown_timer')">SET TIME</button></div>
+                    </div>
+                    <div class="input-row-group">
+                        <div style="flex:1;"><label style="font-size:11px; color:var(--text-dim);">Simulated Traffic Count</label><input type="number" id="cfgBaseVirtualOnlineCount" class="std-panel-input"><button class="std-panel-btn btn-orange" style="width:100%;" onclick="updateCoreGlobalConfigParamNode('fake_online_count')">SET TRAFFIC</button></div>
+                        <div style="flex:1;"><label style="font-size:11px; color:var(--text-dim);">Referral Reward (Coins)</label><input type="number" id="cfgReferralReward" class="std-panel-input"><button class="std-panel-btn btn-green" style="width:100%;" onclick="updateCoreGlobalConfigParamNode('referral_reward_coins')">SET REFER COIN</button></div>
+                    </div>
+                    <button class="std-panel-btn btn-purple" style="width:100%; margin-top:10px;" onclick="triggerGlobalLimitsManualResetEngineNode()">🔄 RESET ALL USER DAILY LIMITS</button>
+                    <div style="margin-top:15px; border-top:1px solid var(--cyber-red); padding-top:15px;">
+                        <button class="std-panel-btn btn-red" id="emergencySwitchKillBtn" style="width:100%; margin-bottom:0; padding:14px; font-weight:900;" onclick="toggleMasterEmergencyKillSwitchState()">DEPLOY SYSTEM MAINTENANCE OVERLAY</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 👥 STAFF SLIDEOUT DRAWER -->
+    <div class="side-drawer-overlay" id="drawerBackOverlayMask" onclick="toggleSidebarAgentsDrawer(false)"></div>
+    <div class="agents-slidout-drawer" id="drawerMainAgentsBodyPanelContainer">
+        <h3 style="font-size:16px; text-transform:uppercase; color:var(--cyber-cyan); border-bottom:1px solid var(--border-neon); padding-bottom:8px; margin-bottom:15px;">👥 STAFF PROVISIONS CORE</h3>
+        
+        <div style="background:var(--bg-base); padding:12px; border-radius:10px; border:1px solid var(--border-neon); margin-bottom:15px;">
+            <input type="text" id="agInputUser" class="std-panel-input" placeholder="Assign staff node login ID" style="margin-bottom:8px;">
+            <input type="password" id="agInputToken" class="std-panel-input" placeholder="Assign secure access token" style="margin-bottom:8px;">
+            
+            <label style="font-size:10px; font-weight:bold; display:block; color:var(--cyber-cyan); margin:5px 0 5px 2px;">DELEGATE LIMITED OPERATIONS RIGHTS</label>
+            <div class="roles-checkbox-container">
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_deposit"> Inward Desk Right</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_withdraw"> Redeem Desk Right</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_esports"> Arena Organizer Right</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_support"> Support Tickets Right</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_ads"> Settings & Global Configs</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_push"> Notifications & Alerts</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_files"> All Files (UI) Access</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_lottery"> Rewards & Jackpot</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_users"> User Mgmt (Edit/Restrict)</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_promo_data"> Promo Feeds & Polls</label>
+                <label class="checkbox-item-label"><input type="checkbox" id="role_p_analytics"> Net Revenue Analytics</label>
+            </div>
+            <button class="std-panel-btn btn-green" style="width:100%; font-size:10px; margin-bottom:0;" onclick="executeCreateAndProvisionAgentProfileNode()">Provision Staff Account</button>
+        </div>
+
+        <h4 style="font-size:11px; color:var(--text-glow); text-transform:uppercase; margin-bottom:8px; border-bottom:1px solid var(--border-neon); padding-bottom:4px;">Staff Node Performance</h4>
+        <div id="drawerAgentsListSocket" style="display:flex; flex-direction:column; gap:10px; overflow-y:auto; max-height:200px; margin-bottom:15px;"></div>
+
+        <h4 style="font-size:10px; color:var(--cyber-purple); text-transform:uppercase; margin-bottom:6px; font-weight:900;">🔍 SYSTEM AUDIT & COMPLIANCE LOG</h4>
+        <div class="table-scroller-box" style="margin:0; height:150px; overflow-y:auto; margin-bottom:20px;"><table class="ledger-data-table" style="font-size:10px; background:#020409;"><tbody id="agentAuditCctvLogSocket"></tbody></table></div>
+    </div>
+
+    <!-- 🔥 FIREBASE SDK & CONTROLLERS JAVASCRIPT 🔥 -->
+    <script>
+        const FIREBASE_CENTRAL_CONFIG = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+
+        if (!firebase.apps.length) { firebase.initializeApp(FIREBASE_CENTRAL_CONFIG); }
+        const database = firebase.database();
+
+        let runtimeInMemoryUsersCollection = {};
+        let runtimeInMemoryWithdrawRequestsCollection = {};
+        let runtimeInMemoryDepositRequestsCollection = {};
+        let runtimeInMemorySupportTicketsCollection = {};
+        
+        let runtimeEsportsMatches = {}; 
+        let runtimeEsportsParticipants = {}; 
+        
+        let runtimeInMemoryJackpotBidsCollection = {};
+        let runtimeInMemoryMysteryBidsCollection = {};
+        let runtimeOldLotteryBidsCollection = {};
+
+        let runtimeActiveSessionProfilePermissionsMap = { isSuperAdmin: true };
+        let activeAuthenticatedOperatorUsernameString = "root_system";
+
+        let baseOnlineCount = 120;
+        function updateLiveTrafficSimulator() {
+            let fluc = Math.floor(Math.random() * 30) - 10;
+            let displayCount = baseOnlineCount + fluc;
+            if(displayCount < 5) displayCount = 5;
+            document.getElementById("statLiveUsers").innerText = displayCount;
+        }
+        setInterval(updateLiveTrafficSimulator, 5000); 
+
+        function validateSecurityGateToken() {
+            const enteredToken = document.getElementById("consoleAccessKey").value.trim();
+            if (enteredToken === "shubham1008") {
+                activeAuthenticatedOperatorUsernameString = "SuperAdminRoot";
+                runtimeActiveSessionProfilePermissionsMap = { isSuperAdmin: true, p_deposit: true, p_withdraw: true, p_support: true, p_esports: true, p_ads: true, p_analytics: true, p_push: true, p_files: true, p_lottery: true, p_users: true, p_promo_data: true };
+                initializeDashboardLiveStreamsInterceptorsLinks();
+            } else {
+                database.ref('internal_agents_nodes/' + enteredToken).once('value').then((snap) => {
+                    if (snap.exists()) {
+                        let ag = snap.val();
+                        activeAuthenticatedOperatorUsernameString = enteredToken;
+                        runtimeActiveSessionProfilePermissionsMap = { isSuperAdmin: false, p_deposit: ag.p_deposit, p_withdraw: ag.p_withdraw, p_support: ag.p_support, p_esports: ag.p_esports, p_ads: ag.p_ads, p_analytics: ag.p_analytics, p_push: ag.p_push, p_files: ag.p_files, p_lottery: ag.p_lottery, p_users: ag.p_users, p_promo_data: ag.p_promo_data };
+                        document.getElementById("currentSessionRoleBadge").innerText = `STAFF NODE: @${enteredToken}`;
+                        initializeDashboardLiveStreamsInterceptorsLinks();
+                        applyRoleVisibilityLocks();
+                    } else {
+                        alert("🚨 Access Exception Denial: Master access key signature mismatch!");
+                    }
+                });
+            }
+        }
+
+        function applyRoleVisibilityLocks() {
+            if (runtimeActiveSessionProfilePermissionsMap.isSuperAdmin) return;
+            if(!runtimeActiveSessionProfilePermissionsMap.p_deposit) document.getElementById("btn_tab_deposits").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_withdraw) document.getElementById("btn_tab_withdrawals").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_support) document.getElementById("btn_tab_support").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_esports) document.getElementById("btn_tab_esports").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_push) document.getElementById("btn_tab_notifications").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_files) document.getElementById("btn_tab_allfiles").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_ads) document.getElementById("btn_tab_settings").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_lottery) document.getElementById("btn_tab_lottery").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_analytics) document.getElementById("card_net_analytics_row").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_users) document.getElementById("user_mgmt_block").style.display = "none";
+            if(!runtimeActiveSessionProfilePermissionsMap.p_promo_data) document.getElementById("promo_data_block").style.display = "none";
+        }
+
+        function switchActiveWorkspacePaneSelector(targetPaneIdStringKey) {
+            document.querySelectorAll('.view-workspace-content-pane').forEach(p => p.classList.remove('pane-active'));
+            document.querySelectorAll('.nav-action-tab-btn').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById(targetPaneIdStringKey).classList.add('pane-active');
+            let btnId = targetPaneIdStringKey.replace('pane_', 'btn_tab_');
+            if(document.getElementById(btnId)) document.getElementById(btnId).classList.add('tab-active');
+        }
+
+        function toggleSidebarAgentsDrawer(shouldDisplayOpenFlag) {
+            const overlay = document.getElementById("drawerBackOverlayMask");
+            const sidePanel = document.getElementById("drawerMainAgentsBodyPanelContainer");
+            if(shouldDisplayOpenFlag) { overlay.style.display = "block"; sidePanel.style.left = "0"; } 
+            else { overlay.style.display = "none"; sidePanel.style.left = "-320px"; }
+        }
+
+        function triggerUiToastNotifierNotificationBox(msg, isHighlightGreen = false) {
+            const toast = document.getElementById("systemToastNotificationNode");
+            toast.style.borderLeftColor = isHighlightGreen ? "var(--cyber-green)" : "var(--cyber-cyan)";
+            toast.innerText = msg; toast.style.display = "block";
+            setTimeout(() => { toast.style.display = "none"; }, 3500);
+        }
+
+        function togglePasswordMask(spanId) {
+            let sp = document.getElementById(spanId);
+            if(sp.getAttribute('data-hidden') === 'true') {
+                sp.innerText = sp.getAttribute('data-pass');
+                sp.setAttribute('data-hidden', 'false');
+            } else {
+                sp.innerText = '••••••••';
+                sp.setAttribute('data-hidden', 'true');
+            }
+        }
+
+        // ======================= MODULE TOGGLES (PLAY STORE SAFETY) =======================
+        const appModulesForToggle = [
+            { id: 'add_points', name: 'Add Points (Inward) 🔴' },
+            { id: 'my_points', name: 'My Ledger (Wallet) 🟢' },
+            { id: 'history', name: 'User History Tab 🟢' },
+            { id: 'upi', name: 'UPI Gateway 🔴' },
+            { id: 'paypal', name: 'PayPal Gateway 🔴' },
+            { id: 'esports_zone', name: 'Gaming Arena 🔴' },
+            { id: 'special_missions', name: 'Special Missions 🔴' },
+            { id: 'lucky_box', name: 'Mega Reward Box 🔴' },
+            { id: 'web_explorer', name: 'Web Tasks 🔴' },
+            { id: 'daily', name: 'Daily Check-in 🟢' },
+            { id: 'tasks', name: 'Video Zone 🟢' },
+            { id: 'apptesting', name: 'App Testing 🟢' },
+            { id: 'social', name: 'Social Tasks 🟢' },
+            { id: 'monlix', name: 'Task Server 1 🟢' },
+            { id: 'monetag', name: 'Task Server 2 🟢' },
+            { id: 'adgem', name: 'Games Zone 🟢' },
+            { id: 'greeting', name: 'Festive Wishes 🟢' },
+            { id: 'mega_offers', name: 'Premium Offers 🟢' },
+            { id: 'extra_bonus', name: 'Extra Bonus 🟢' },
+            { id: 'article', name: 'Read Articles 🟢' },
+            { id: '1v1', name: '1v1 Coin Battle 🟢' },
+            { id: 'hourly_key', name: 'Hourly Key 🟢' },
+            { id: 'spin', name: 'Spin & Win 🟢' },
+            { id: 'cpx', name: 'Task Server 3 🟢' },
+            { id: 'top_rewards', name: 'Instant Coins 🟢' },
+            { id: 'timewall', name: 'Task Server 4 🟢' },
+            { id: 'bitlabs', name: 'Task Server 5 🟢' },
+            { id: 'square_dash', name: 'Arcade Zone 🟢' },
+            { id: 'pool', name: '4-Player Pool 🟢' }
+        ];
+
+        function renderModuleTogglesUI() {
+            const container = document.getElementById("moduleTogglesContainer");
+            container.innerHTML = "";
+            appModulesForToggle.forEach(mod => {
+                let colorAttr = mod.name.includes('🔴') ? 'color: var(--cyber-red);' : 'color: var(--cyber-green);';
+                container.innerHTML += `<label class="module-toggle-item" style="${colorAttr}"><input type="checkbox" id="toggle_${mod.id}"> ${mod.name}</label>`;
+            });
+
+            database.ref('global_system_runtime_configurations/module_toggles').on('value', snap => {
+                let toggles = snap.val() || {};
+                appModulesForToggle.forEach(mod => {
+                    let cb = document.getElementById("toggle_" + mod.id);
+                    if (cb) {
+                        let isDanger = mod.name.includes('🔴');
+                        if (toggles[mod.id] !== undefined) { cb.checked = toggles[mod.id]; } 
+                        else { cb.checked = isDanger ? false : true; }
+                    }
+                });
+            });
+        }
+
+        function saveModuleToggles() {
+            let payload = {};
+            appModulesForToggle.forEach(mod => { let cb = document.getElementById("toggle_" + mod.id); if (cb) { payload[mod.id] = cb.checked; } });
+            database.ref('global_system_runtime_configurations/module_toggles').set(payload).then(() => { triggerUiToastNotifierNotificationBox("💾 App Module Visibility Settings Saved!", true); });
+        }
+
+        function addP2pUpiId() {
+            let name = document.getElementById("p2pUpiName").value.trim(); let upi = document.getElementById("p2pUpiId").value.trim();
+            if(!name || !upi) return;
+            let id = "UPI_" + Date.now();
+            database.ref('global_system_runtime_configurations/p2p_upi_list/' + id).set({ name: name, upi_id: upi }).then(() => {
+                document.getElementById("p2pUpiName").value = ""; document.getElementById("p2pUpiId").value = "";
+                triggerUiToastNotifierNotificationBox("✔ Account Added to P2P Rotator!");
+            });
+        }
+
+        function removeP2pUpiId(id) { if(confirm("Delete this from Rotator?")) { database.ref('global_system_runtime_configurations/p2p_upi_list/' + id).remove(); } }
+
+        function deleteActiveAlert(nodeKey) {
+            if(!confirm("Are you sure you want to permanently DELETE this item? Action cannot be undone.")) return;
+            database.ref(nodeKey).remove().then(() => { triggerUiToastNotifierNotificationBox("🗑️ Item successfully cleared from system.", true); });
+        }
+
+        // ======================= INITIALIZATION =======================
+        function initializeDashboardLiveStreamsInterceptorsLinks() {
+            document.getElementById("masterLockOverlay").style.display = "none";
+            document.getElementById("adminDashboardCore").style.display = "block";
+            triggerUiToastNotifierNotificationBox("🔓 Administrative Central Synced Cockpit Activated Live.", true);
+
+            renderModuleTogglesUI();
+
+            database.ref('platform_analytics_net_revenue_ledger_node').on('value', snap => { document.getElementById("statLiveNetProfit").innerText = "₹" + parseFloat(snap.val() || 0).toFixed(2); });
+
+            database.ref('users').on('value', snap => {
+                runtimeInMemoryUsersCollection = snap.val() || {};
+                let userCount = Object.keys(runtimeInMemoryUsersCollection).length;
+                document.getElementById("count_lbl_users").innerText = userCount;
+                document.getElementById("statRealTotalUsers").innerText = userCount;
+                renderUserAccountsCoreLedgerBox();
+            });
+
+            database.ref('global_system_runtime_configurations/p2p_upi_list').on('value', (snap) => {
+                let socket = document.getElementById("p2pUpiListSocket"); if(!socket) return; socket.innerHTML = "";
+                if(snap.exists()) {
+                    let data = snap.val();
+                    Object.keys(data).forEach(k => { socket.innerHTML += `<tr><td>${data[k].name}</td><td style="color:var(--cyber-cyan);">${data[k].upi_id}</td><td><button class="std-panel-btn btn-red" style="padding:4px 8px; margin:0;" onclick="removeP2pUpiId('${k}')">DELETE</button></td></tr>`; });
+                }
+            });
+
+            database.ref('user_support_tickets').on('value', snap => { 
+                runtimeInMemorySupportTicketsCollection = snap.val() || {}; 
+                renderSupportTicketsQueueWorkspaceDesk(); 
+                let pCount = 0; Object.values(runtimeInMemorySupportTicketsCollection).forEach(t => { if(t.status === 'Pending') pCount++; });
+                document.getElementById("statPendingTickets").innerText = pCount;
+            });
+
+            database.ref('requests').on('value', snap => { runtimeInMemoryWithdrawRequestsCollection = snap.val() || {}; renderWithdrawalsQueueWorkspaceDesk(); });
+            database.ref('deposits').on('value', snap => { runtimeInMemoryDepositRequestsCollection = snap.val() || {}; renderDepositsQueueWorkspaceDesk(); });
+
+            function fetchEsportsData() {
+                let allMatches = {}; let allParts = {};
+                database.ref('freefire_tournaments/matches').on('value', snap => { if(snap.exists()) { Object.keys(snap.val()).forEach(k => { allMatches[k] = snap.val()[k]; allMatches[k]._game = 'freefire'; }); } runtimeEsportsMatches = allMatches; renderEsportsAdminDesk(); });
+                database.ref('freefire_tournaments/participants').on('value', snap => { if(snap.exists()) { Object.keys(snap.val()).forEach(k => allParts[k] = snap.val()[k]); } runtimeEsportsParticipants = allParts; renderEsportsAdminDesk(); });
+                database.ref('pubg_tournaments/matches').on('value', snap => { if(snap.exists()) { Object.keys(snap.val()).forEach(k => { allMatches[k] = snap.val()[k]; allMatches[k]._game = 'pubg'; }); } runtimeEsportsMatches = allMatches; renderEsportsAdminDesk(); });
+                database.ref('pubg_tournaments/participants').on('value', snap => { if(snap.exists()) { Object.keys(snap.val()).forEach(k => allParts[k] = snap.val()[k]); } runtimeEsportsParticipants = allParts; renderEsportsAdminDesk(); });
+            }
+            fetchEsportsData();
+
+            database.ref('jackpot_bids_tracker').on('value', snap => {
+                runtimeInMemoryJackpotBidsCollection = snap.val() || {};
+                renderBoxBids("jackpotBidsRenderSocket", runtimeInMemoryJackpotBidsCollection, 'jackpot_bids_tracker');
+            });
+            database.ref('lottery_bids_tracker').on('value', snap => {
+                runtimeOldLotteryBidsCollection = snap.val() || {};
+                renderBoxBids("mysteryBidsRenderSocket", {...runtimeOldLotteryBidsCollection, ...runtimeInMemoryMysteryBidsCollection}, 'hybrid_mystery');
+            });
+            database.ref('mystery_box_bids_tracker').on('value', snap => {
+                runtimeInMemoryMysteryBidsCollection = snap.val() || {};
+                renderBoxBids("mysteryBidsRenderSocket", {...runtimeOldLotteryBidsCollection, ...runtimeInMemoryMysteryBidsCollection}, 'hybrid_mystery');
+            });
+
+            database.ref('global_system_runtime_configurations').on('value', snap => {
+                if (snap.exists()) {
+                    let c = snap.val();
+                    if(document.getElementById("cfgMaintenanceState")) document.getElementById("cfgMaintenanceState").value = c.app_maintenance || "OFF";
+                    if(document.getElementById("cfgVpnBlockState")) document.getElementById("cfgVpnBlockState").value = c.vpn_block_shield || "OFF";
+                    if(document.getElementById("cfgCooldownSeconds")) document.getElementById("cfgCooldownSeconds").value = c.cooldown_timer || "";
+                    if(document.getElementById("cfgCoinConversionValue")) document.getElementById("cfgCoinConversionValue").value = c.coin_rate || "";
+                    if(document.getElementById("cfgBaseVirtualOnlineCount")) document.getElementById("cfgBaseVirtualOnlineCount").value = c.fake_online_count || "";
+                    if(document.getElementById("cfgReferralReward")) document.getElementById("cfgReferralReward").value = c.referral_reward_coins || "";
+                    if(document.getElementById("cfgAutoRejectState")) document.getElementById("cfgAutoRejectState").value = c.auto_reject_withdrawals || "OFF";
+                    baseOnlineCount = parseInt(c.fake_online_count) || 120;
+                }
+            });
+
+            database.ref('global_system_runtime_configurations/api_links').on('value', snap => {
+                if(snap.exists()) {
+                    let d = snap.val();
+                    if(d.telegram_url) document.getElementById("glTelegram").value = d.telegram_url;
+                    if(d.privacy_url) document.getElementById("glPrivacy").value = d.privacy_url;
+                    if(d.playstore_url) document.getElementById("glPlayStore").value = d.playstore_url;
+                }
+            });
+
+            database.ref('internal_agents_nodes').on('value', snap => { renderProxyAgentsPerformanceNetworkLedger(snap.val() || {}); });
+            database.ref('security_agent_audit_compliance_cctv_logs').on('value', snap => { renderAgentActionAuditCctvLogSocket(snap.val() || {}); });
+        }
+
+        // ======================= NOTIFICATION LOGIC =======================
+        function pushToNotificationCenter() {
+            let t = document.getElementById("ncTitle").value.trim(); let m = document.getElementById("ncMsg").value.trim();
+            let i = document.getElementById("ncImage").value.trim(); let typ = document.getElementById("ncType").value;
+            if(!t || !m) return;
+            database.ref('notification_center').push({ title: t, message: m, image: i, type: typ, timestamp: Date.now() }).then(() => {
+                triggerUiToastNotifierNotificationBox("🔔 Notification Pushed to Bell Icon"); document.getElementById("ncTitle").value = ""; document.getElementById("ncMsg").value = "";
+            });
+        }
+
+        function deployUrgentTask() {
+            let t = document.getElementById("utTitle").value.trim(); let d = document.getElementById("utDesc").value.trim();
+            let u = document.getElementById("utUrl").value.trim(); let a = document.getElementById("utActive").value;
+            database.ref('global_system_runtime_configurations/urgent_task').set({ title: t, desc: d, url: u, active: a }).then(() => { triggerUiToastNotifierNotificationBox("🚨 Priority Popup Deployed!"); });
+        }
+
+        // ======================= FF / PUBG ESPORTS LOGIC =======================
+        function deployEsportsPoll() {
+            let q = document.getElementById("pollQuestion").value.trim(); let o1 = document.getElementById("pollOpt1").value.trim();
+            let o2 = document.getElementById("pollOpt2").value.trim(); let o3 = document.getElementById("pollOpt3").value.trim();
+            if(!q || !o1 || !o2) return alert("Question and at least 2 options are required!");
+            
+            let pollId = "POLL_" + Date.now();
+            let options = { opt1: {text: o1, votes: 0}, opt2: {text: o2, votes: 0} };
+            if(o3) options.opt3 = {text: o3, votes: 0};
+
+            database.ref('freefire_tournaments/live_poll').set({ poll_id: pollId, question: q, options: options, active: true }).then(() => {
+                triggerUiToastNotifierNotificationBox("📊 Live Poll Published for App Users!");
+                document.getElementById("pollQuestion").value = ""; document.getElementById("pollOpt1").value = ""; document.getElementById("pollOpt2").value = ""; document.getElementById("pollOpt3").value = "";
+            });
+        }
+
+        function createEsportsMatch() {
+            let gameType = document.getElementById("esportsGameType").value; let title = document.getElementById("esMatchTitle").value.trim(); let time = document.getElementById("esMatchTime").value.trim();
+            let feeType = document.getElementById("esFeeType").value; let prizeType = document.getElementById("esPrizeType").value;
+            let fee = parseInt(document.getElementById("esMatchFee").value); let prizePool = parseInt(document.getElementById("esMatchPrizePool").value);
+            let map = document.getElementById("esMatchMap").value.trim(); let type = document.getElementById("esMatchType").value.trim();
+
+            if(!title || !time || isNaN(fee) || isNaN(prizePool) || !map || !type) { alert("All fields are mandatory!"); return; }
+
+            let id = gameType === 'freefire' ? "ES_" + Math.random().toString(36).substr(2,4).toUpperCase() : "ES_" + Math.random().toString(36).substr(2,4).toUpperCase();
+            let matchData = { title: title, time: time, feeType: feeType, prizeType: prizeType, fee: fee, prizePool: prizePool, map: map, type: type, status: 'active', roomId: '', roomPass: '' };
+
+            database.ref(`${gameType}_tournaments/matches/` + id).set(matchData).then(() => {
+                executeLogAgentAuditTrackingActionTrail(`Created Esports Match: ${id}`); triggerUiToastNotifierNotificationBox(`🚀 Esports Match Deployed!`);
+            });
+        }
+
+        function deleteEsportsMatch(gameType, matchId) {
+            if(!confirm("⚠️ Are you sure you want to permanently DELETE this match? Users will no longer see it.")) return;
+            database.ref(`${gameType}_tournaments/matches/${matchId}`).remove().then(() => {
+                database.ref(`${gameType}_tournaments/participants/${matchId}`).remove();
+                executeLogAgentAuditTrackingActionTrail(`Deleted Esports Match Code: ${matchId}`);
+                triggerUiToastNotifierNotificationBox("🗑️ Match Deleted Successfully!", true);
+            }).catch(err => alert("Error: " + err.message));
+        }
+
+        function renderEsportsAdminDesk() {
+            let socket = document.getElementById("esActiveMatchesSocket"); socket.innerHTML = "";
+            let keys = Object.keys(runtimeEsportsMatches).sort((a,b) => b.localeCompare(a));
+            keys.forEach(k => {
+                let m = runtimeEsportsMatches[k];
+                if(m.status === 'active') {
+                    let feeSym = m.feeType === 'rupees' ? '₹' : '🪙'; let przSym = m.prizeType === 'rupees' ? '₹' : '🪙';
+                    let gameBadge = m._game === 'freefire' ? '🔥 ES 1' : '🪖 ES 2'; let gameColor = m._game === 'freefire' ? '#f97316' : '#eab308';
+                    let matchPlayers = runtimeEsportsParticipants[k] || {}; let playersHTML = ""; let pKeys = Object.keys(matchPlayers);
+                    
+                    if(pKeys.length === 0) { playersHTML = "<p style='color:#64748b; font-size:10px; text-align:center;'>No players yet</p>"; } 
+                    else { playersHTML = pKeys.map(pUid => { let ffData = matchPlayers[pUid]; return `<div style="padding:4px; border-bottom:1px solid #1e293b;"><b style="color:var(--cyber-cyan);">${ffData.ff_id || "Unknown"}</b> <br> <span style="color:#94a3b8; font-size:9px; font-family:monospace;">UID: ${pUid}</span></div>`; }).join(''); }
+                    
+                    socket.innerHTML += `<tr>
+                            <td style="min-width:160px;"><span style="background:${gameColor}; color:#fff; font-size:9px; padding:2px 4px; border-radius:4px;">${gameBadge}</span><br><div style="margin-top:5px; font-family:monospace; color:var(--cyber-pink); font-size:11px; font-weight:bold;">Code: ${k}</div><b style="color:var(--cyber-cyan);">${m.title}</b><br><small style="color:var(--text-dim);">${m.time} | Fee: ${feeSym}${m.fee} | Pool: ${przSym}${m.prizePool}</small></td>
+                            <td style="min-width:120px;"><input type="text" id="rID_${k}" class="std-panel-input" placeholder="Room ID" value="${m.roomId||''}" style="padding:6px; font-size:11px; margin-bottom:4px;"><input type="text" id="rPass_${k}" class="std-panel-input" placeholder="Password" value="${m.roomPass||''}" style="padding:6px; font-size:11px; margin-bottom:4px;"><button class="std-panel-btn btn-orange" style="font-size:9px; padding:4px 8px; width:100%; margin-bottom:4px;" onclick="updateEsportsRoomDetails('${m._game}', '${k}')">UPDATE ID/PASS</button><button class="std-panel-btn btn-red" style="font-size:9px; padding:4px 8px; width:100%; margin:0;" onclick="deleteEsportsMatch('${m._game}', '${k}')">🗑️ DELETE MATCH</button></td>
+                            <td style="min-width:180px;"><div style="height:120px; overflow-y:auto; background:#020409; border:1px solid var(--border-neon); border-radius:6px; padding:4px;">${playersHTML}</div></td>
+                            <td style="min-width: 250px;">
+                                <div style="display:flex; gap:4px; margin-bottom:4px;"><input type="text" id="w1UID_${k}" class="std-panel-input" placeholder="1st Winner UID" style="padding:6px; font-size:10px; margin:0; border-color:var(--cyber-green);"><input type="number" id="w1Prize_${k}" class="std-panel-input" placeholder="Prize (${przSym})" style="padding:6px; font-size:10px; margin:0; width:70px;"></div>
+                                <div style="display:flex; gap:4px; margin-bottom:4px;"><input type="text" id="w2UID_${k}" class="std-panel-input" placeholder="2nd Winner UID" style="padding:6px; font-size:10px; margin:0;"><input type="number" id="w2Prize_${k}" class="std-panel-input" placeholder="Prize (${przSym})" style="padding:6px; font-size:10px; margin:0; width:70px;"></div>
+                                <div style="display:flex; gap:4px; margin-bottom:4px;"><input type="text" id="w3UID_${k}" class="std-panel-input" placeholder="3rd Winner UID" style="padding:6px; font-size:10px; margin:0;"><input type="number" id="w3Prize_${k}" class="std-panel-input" placeholder="Prize (${przSym})" style="padding:6px; font-size:10px; margin:0; width:70px;"></div>
+                                <button class="std-panel-btn btn-green" style="font-size:9px; padding:4px 8px; width:100%; margin-top:4px; margin-bottom:0;" onclick="finishEsportsMatch('${m._game}', '${k}', '${m.prizeType}')">END MATCH & PAYOUT</button>
+                            </td>
+                        </tr>`;
+                }
+            });
+        }
+
+        function updateEsportsRoomDetails(gameType, id) {
+            let rId = document.getElementById(`rID_${id}`).value.trim(); let rPass = document.getElementById(`rPass_${id}`).value.trim();
+            database.ref(`${gameType}_tournaments/matches/${id}`).update({roomId: rId, roomPass: rPass, "room_details": {room_id: rId, password: rPass}}).then(() => { triggerUiToastNotifierNotificationBox("✔ Room Details Pushed!"); });
+        }
+
+        function finishEsportsMatch(gameType, matchId, prizeType) {
+            let w1UID = document.getElementById(`w1UID_${matchId}`).value.trim(); let w1Prize = parseInt(document.getElementById(`w1Prize_${matchId}`).value) || 0;
+            let w2UID = document.getElementById(`w2UID_${matchId}`).value.trim(); let w2Prize = parseInt(document.getElementById(`w2Prize_${matchId}`).value) || 0;
+            let w3UID = document.getElementById(`w3UID_${matchId}`).value.trim(); let w3Prize = parseInt(document.getElementById(`w3Prize_${matchId}`).value) || 0;
+
+            if(!w1UID || w1Prize <= 0) { alert("1st Winner UID and Prize amount are mandatory!"); return; }
+            if(!confirm("Are you sure? This will declare winners, automatically transfer funds to their wallets, and close the match.")) return;
+
+            let updatePromises = []; let matchResultObj = { status: 'completed' };
+
+            function processWinnerPayout(rank, inputUid, prizeAmt) {
+                if(!inputUid || prizeAmt <= 0) return;
+                let isRealUser = runtimeInMemoryUsersCollection[inputUid] !== undefined; let displayName = inputUid;
+                if(runtimeEsportsParticipants[matchId] && runtimeEsportsParticipants[matchId][inputUid]) { displayName = runtimeEsportsParticipants[matchId][inputUid].ff_id; } 
+                else if(isRealUser) { displayName = runtimeInMemoryUsersCollection[inputUid].name || inputUid; }
+                if(isRealUser) {
+                    let targetNode = prizeType === 'rupees' ? 'balance' : 'coins';
+                    let currentBal = parseFloat(runtimeInMemoryUsersCollection[inputUid][targetNode]) || 0;
+                    updatePromises.push(database.ref(`users/${inputUid}/${targetNode}`).set(currentBal + prizeAmt));
+                    updatePromises.push(database.ref(`users/${inputUid}/earning_history`).push({ activity: `Arena Rank ${rank} Prize`, amount: prizeType === 'rupees' ? prizeAmt : 0, coins_credited: prizeType === 'coins' ? prizeAmt : 0, timestamp: Date.now() }));
+                }
+                matchResultObj[`win${rank}Name`] = displayName; matchResultObj[`win${rank}Prize`] = prizeAmt;
+            }
+
+            processWinnerPayout(1, w1UID, w1Prize); processWinnerPayout(2, w2UID, w2Prize); processWinnerPayout(3, w3UID, w3Prize);
+
+            Promise.all(updatePromises).then(() => { database.ref(`${gameType}_tournaments/matches/${matchId}`).update(matchResultObj).then(() => { triggerUiToastNotifierNotificationBox(`🏆 Match Finished & Prizes Distributed Automatically!`, true); }); }).catch(err => alert("❌ Error distributing prizes: " + err.message));
+        }
+
+        // ======================= SEPARATED REWARD BOX LOGIC =======================
+        function renderBoxBids(socketId, bidsObj, deleteNodePrefix) {
+            const s = document.getElementById(socketId); if(!s) return; s.innerHTML = "";
+            let keys = Object.keys(bidsObj).reverse();
+            keys.forEach(k => {
+                let b = bidsObj[k]; let userDetail = runtimeInMemoryUsersCollection[b.uid] || {}; let userName = userDetail.name || "Unknown"; let ticketIdDisplay = b.ticket_id || k; 
+                let exactNode = runtimeOldLotteryBidsCollection[k] ? 'lottery_bids_tracker' : deleteNodePrefix;
+                s.innerHTML += `<tr>
+                    <td><b style="color:var(--cyber-pink); font-size:10px;">#${ticketIdDisplay}</b><br><small style="color:var(--text-dim);">${new Date(b.timestamp).toLocaleString()}</small></td>
+                    <td><span style="font-family:monospace; color:var(--cyber-cyan); font-size:11px;">UID: ${b.uid}</span><br><b>${userName}</b></td>
+                    <td><button class="std-panel-btn btn-red" style="padding:4px 8px; margin:0; font-size:9px;" onclick="deleteActiveAlert('${exactNode}/${k}')">🗑️ Delete Entry</button></td>
+                </tr>`;
+            });
+        }
+
+        function executeDrawWinner(boxType) {
+            let winUid = ""; let winAmt = 0; let activityMsg = "";
+            if (boxType === 'jackpot') { winUid = document.getElementById("jackpotWinUid").value.trim(); winAmt = parseInt(document.getElementById("jackpotWinAmt").value); activityMsg = 'Mega Reward Winner Prize'; } 
+            else { winUid = document.getElementById("mysteryWinUid").value.trim(); winAmt = parseInt(document.getElementById("mysteryWinAmt").value); activityMsg = 'Surprise Box Winner Prize'; }
+
+            if(!winUid || !winAmt) return alert("Please enter Winner UID and Prize Amount.");
+            if(!confirm(`Declare UID ${winUid} as winner with ${winAmt} Coins for ${boxType.toUpperCase()}?`)) return;
+            
+            let currentBal = parseFloat(runtimeInMemoryUsersCollection[winUid]?.coins || 0);
+            database.ref(`users/${winUid}/coins`).set(currentBal + winAmt);
+            database.ref(`users/${winUid}/earning_history`).push({ activity: activityMsg, coins_credited: winAmt, timestamp: Date.now() });
+            triggerUiToastNotifierNotificationBox(`🏆 ${boxType.toUpperCase()} Winner Declared: ${winUid}`);
+            
+            if(boxType === 'jackpot') { document.getElementById("jackpotWinUid").value = ""; document.getElementById("jackpotWinAmt").value = ""; } 
+            else { document.getElementById("mysteryWinUid").value = ""; document.getElementById("mysteryWinAmt").value = ""; }
+        }
+
+        // ======================= PENDING VS PROCESSED SPLIT TABLES =======================
+        function renderDepositsQueueWorkspaceDesk() {
+            const pendingSocket = document.getElementById("depositPendingRenderSocket"); const processedSocket = document.getElementById("depositProcessedRenderSocket");
+            const filter = document.getElementById("depositRequestFilterKey").value.trim().toLowerCase();
+            pendingSocket.innerHTML = ""; processedSocket.innerHTML = "";
+
+            let keys = Object.keys(runtimeInMemoryDepositRequestsCollection).sort((a,b) => b.localeCompare(a));
+            keys.forEach(k => {
+                let d = runtimeInMemoryDepositRequestsCollection[k];
+                if (filter !== "" && !k.toLowerCase().includes(filter) && !(d.utr||"").toLowerCase().includes(filter)) return;
+                
+                let rowBase = `<td><b style="font-family:monospace; color:var(--cyber-purple); font-size:11px;">${k}</b></td><td><small style="font-family:monospace; color:#64748b;">${d.uid || 'N/A'}</small></td><td style="font-weight:900; color:var(--cyber-green);">₹${parseFloat(d.amount||0).toFixed(2)}</td><td style="font-family:monospace; font-size:11px;">${d.utr || 'N/A'}</td>`;
+                if(d.status === 'pending') {
+                    let btns = `<button class="std-panel-btn btn-green" style="font-size:10px; padding:4px 8px; margin:0;" onclick="resolveDeposit('${k}', 'approved')">APPROVE</button><button class="std-panel-btn btn-red" style="font-size:10px; padding:4px 8px; margin:0;" onclick="resolveDeposit('${k}', 'rejected')">DECLINE</button>`;
+                    pendingSocket.innerHTML += `<tr>${rowBase}<td style="color:var(--cyber-orange); font-size:10px; text-transform:uppercase;">${d.status}</td><td><div style="display:flex; gap:4px;">${btns}</div></td></tr>`;
+                } else {
+                    let color = d.status === 'approved' ? 'var(--cyber-green)' : 'var(--cyber-red)';
+                    let delBtn = `<button class="std-panel-btn btn-dark" style="font-size:9px; padding:4px 8px; margin:0;" onclick="deleteActiveAlert('deposits/${k}')">🗑️ Delete Record</button>`;
+                    processedSocket.innerHTML += `<tr>${rowBase}<td style="color:${color}; font-size:10px; font-weight:bold; text-transform:uppercase;">${d.status}</td><td>${delBtn}</td></tr>`;
+                }
+            });
+        }
+
+        function resolveDeposit(key, status) {
+            let d = runtimeInMemoryDepositRequestsCollection[key]; let note = "";
+            if (status === 'rejected') { note = prompt("Declined Reason:", "Invalid Info"); if (!note) return; }
+            if(!confirm(`Confirm status to [${status}]?`)) return;
+            let updates = {}; updates[`deposits/${key}/status`] = status; updates[`deposits/${key}/op_log`] = activeAuthenticatedOperatorUsernameString;
+            if (status === 'approved') {
+                let currBal = runtimeInMemoryUsersCollection[d.uid] ? parseFloat(runtimeInMemoryUsersCollection[d.uid].balance || 0) : 0;
+                updates[`users/${d.uid}/balance`] = currBal + parseFloat(d.amount || 0);
+            } else { updates[`deposits/${key}/admin_note`] = note; }
+            database.ref().update(updates).then(() => { triggerUiToastNotifierNotificationBox(`✔ Request Resolved: ${status}`); });
+        }
+
+        function renderWithdrawalsQueueWorkspaceDesk() {
+            const pendingSocket = document.getElementById("withdrawPendingRenderSocket"); const processedSocket = document.getElementById("withdrawProcessedRenderSocket");
+            const filter = document.getElementById("withdrawalRequestFilterKey").value.trim().toLowerCase();
+            pendingSocket.innerHTML = ""; processedSocket.innerHTML = "";
+
+            let keys = Object.keys(runtimeInMemoryWithdrawRequestsCollection).sort((a,b) => b.localeCompare(a));
+            keys.forEach(k => {
+                let w = runtimeInMemoryWithdrawRequestsCollection[k];
+                if (filter !== "" && !k.toLowerCase().includes(filter) && !(w.uid||"").toLowerCase().includes(filter)) return;
+                let u = runtimeInMemoryUsersCollection[w.uid] || {};
+                let tCoins = u.total_lifetime_coins_earned || u.coins || 1; let adCoins = u.ad_coins || 0; let ratio = (adCoins/tCoins)*100;
+                let isFraud = ratio < 50 || u.account_security_status_state_flag === 'BANNED_TERMINATED';
+                
+                let autoRejectState = document.getElementById("cfgAutoRejectState")?.value || "OFF";
+                if(autoRejectState === "ON" && isFraud && w.status === 'pending') {
+                    database.ref(`requests/${k}`).update({ status: 'rejected', admin_note: 'Declined by Verification System' });
+                    let currBal = parseFloat(u.balance || 0); database.ref(`users/${w.uid}/balance`).set(currBal + parseFloat(w.amount || 0)); return;
+                }
+                
+                let warningTag = isFraud && w.status === 'pending' ? `<br><span style="background:var(--cyber-red); color:#fff; font-size:9px; padding:2px 4px; border-radius:4px;">⚠️ ALERT: Ratio ${ratio.toFixed(0)}%</span>` : '';
+                let rowBase = `<td><b style="font-family:monospace; color:var(--cyber-cyan); font-size:11px;">${k}</b><br><small style="color:var(--text-dim);">${w.uid}</small>${warningTag}</td><td style="font-weight:900; color:var(--cyber-red);">₹${parseFloat(w.amount||0).toFixed(2)}</td><td style="font-family:monospace; font-size:11px;">[${w.gateway || 'UPI'}] ${w.userInputDetails || w.details || 'N/A'}</td>`;
+                
+                if(w.status === 'pending') {
+                    let actionBtns = `<button class="std-panel-btn btn-green" style="font-size:10px; padding:4px 8px; margin:0;" onclick="resolveWithdrawal('${k}', 'approved')">APPROVE</button><button class="std-panel-btn btn-red" style="font-size:10px; padding:4px 8px; margin:0;" onclick="resolveWithdrawal('${k}', 'rejected')">DECLINE</button>`;
+                    pendingSocket.innerHTML += `<tr>${rowBase}<td style="font-size:10px; color:var(--cyber-orange); text-transform:uppercase;">${w.status}</td><td><div style="display:flex; gap:4px;">${actionBtns}</div></td></tr>`;
+                } else {
+                    let color = w.status === 'approved' ? 'var(--cyber-green)' : 'var(--cyber-red)';
+                    let delBtn = `<button class="std-panel-btn btn-dark" style="font-size:9px; padding:4px 8px; margin:0;" onclick="deleteActiveAlert('requests/${k}')">🗑️ Delete Record</button>`;
+                    processedSocket.innerHTML += `<tr>${rowBase}<td style="font-size:10px; font-weight:bold; color:${color}; text-transform:uppercase;">${w.status}</td><td>${delBtn}</td></tr>`;
+                }
+            });
+        }
+
+        function resolveWithdrawal(key, status) {
+            let w = runtimeInMemoryWithdrawRequestsCollection[key]; let note = "";
+            if (status === 'rejected') { note = prompt("Declined Reason:", "Verification issue / Incomplete tasks"); if (!note) return; }
+            if(!confirm(`Confirm redemption status to [${status}]?`)) return;
+            let updates = {}; updates[`requests/${key}/status`] = status; updates[`requests/${key}/op_log`] = activeAuthenticatedOperatorUsernameString;
+            if (status === 'rejected') {
+                updates[`requests/${key}/admin_note`] = note;
+                let currBal = runtimeInMemoryUsersCollection[w.uid] ? parseFloat(runtimeInMemoryUsersCollection[w.uid].balance || 0) : 0;
+                updates[`users/${w.uid}/balance`] = currBal + parseFloat(w.amount || 0);
+            }
+            database.ref().update(updates).then(() => { triggerUiToastNotifierNotificationBox(`✔ Redemption Resolved: ${status}`); });
+        }
+
+        // ======================= SUPPORT DESK TICKET LOGIC =======================
+        function renderSupportTicketsQueueWorkspaceDesk() {
+            const socket = document.getElementById("supportTicketsRenderSocket");
+            const filter = document.getElementById("supportTicketFilterKey").value.trim().toLowerCase();
+            socket.innerHTML = "";
+            let keys = Object.keys(runtimeInMemorySupportTicketsCollection).sort().reverse();
+            keys.forEach(k => {
+                let t = runtimeInMemorySupportTicketsCollection[k];
+                let searchStr = `${k} ${t.uid} ${t.subject}`.toLowerCase();
+                if (filter !== "" && !searchStr.includes(filter)) return;
+                let statusColor = t.status === 'Resolved' ? 'var(--cyber-green)' : (t.status === 'Pending' ? 'var(--cyber-orange)' : 'var(--cyber-red)');
+                let actionBtn = t.status === 'Pending' ? `<button class="std-panel-btn btn-green" style="font-size:10px; padding:4px 8px; margin:0; width:100%; margin-bottom:5px;" onclick="resolveSupportTicket('${k}')">RESOLVE</button>` : `<b style="color:var(--text-dim); display:block; margin-bottom:5px;">Done</b>`;
+                actionBtn += `<button class="std-panel-btn btn-red" style="font-size:10px; padding:4px 8px; margin:0; width:100%;" onclick="deleteActiveAlert('user_support_tickets/${k}')">DELETE</button>`;
+                
+                socket.innerHTML += `<tr><td><b style="font-family:monospace; color:var(--cyber-cyan); font-size:11px;">${k}</b><br><small style="color:var(--text-dim);">${new Date(t.timestamp).toLocaleString()}</small></td><td><span style="font-family:monospace; color:var(--cyber-purple); font-size:11px;">UID: ${t.uid}</span><br><b>${t.user_name || 'N/A'}</b></td><td><b style="color:#fff;">${t.subject}</b><br><span style="color:#94a3b8; font-size:11px;">${t.message}</span></td><td><b style="font-size:10px; color:${statusColor}; text-transform:uppercase;">${t.status}</b></td><td>${actionBtn}</td></tr>`;
+            });
+        }
+
+        function resolveSupportTicket(ticketId) {
+            let reply = prompt("Admin Reply (Optional):", "Your issue has been successfully resolved.");
+            if(reply === null) return; 
+            database.ref(`user_support_tickets/${ticketId}`).update({ status: 'Resolved', admin_reply: reply, resolved_by: activeAuthenticatedOperatorUsernameString, resolved_at: Date.now() }).then(() => {
+                triggerUiToastNotifierNotificationBox(`✔ Support Ticket Resolved: ${ticketId}`);
+            });
+        }
+
+        // ======================= USER MANAGEMENT & FULL DETAILS =======================
+        function renderUserAccountsCoreLedgerBox() {
+            const socket = document.getElementById("userProfilesTableRenderSocket");
+            const filterKey = document.getElementById("userProfileFilterKey").value.trim().toLowerCase();
+            socket.innerHTML = "";
+            let usersArr = Object.keys(runtimeInMemoryUsersCollection);
+            usersArr.forEach(k => {
+                let u = runtimeInMemoryUsersCollection[k];
+                let searchStr = `${k} ${u.name||''} ${u.phone||''} ${u.email||''} ${u.device_id_token||''}`.toLowerCase();
+                if (filterKey !== "" && !searchStr.includes(filterKey)) return;
+                
+                let securityFlagDisplaySpan = `<span style="color:var(--cyber-green); font-weight:800;">ACTIVE SECURE</span>`;
+                if(u.account_security_status_state_flag === 'BANNED_TERMINATED') { securityFlagDisplaySpan = `<span style="color:var(--cyber-red); font-weight:900; text-decoration:line-through;">🚫 RESTRICTED</span>`; }
+                
+                let authMethodDisplay = u.auth_method === 'GOOGLE' ? '<span style="color:var(--cyber-cyan);">🔴 Google Login</span>' : '<span style="color:var(--cyber-green);">🟢 Phone/Pass</span>';
+                let emailDisplay = u.email ? `<span style="color:var(--cyber-orange); font-size:10px; display:block;">📧 ${u.email}</span>` : '';
+
+                let card = document.createElement("div"); card.className = "user-profile-data-card";
+                card.innerHTML = `
+                    <button class="quick-action-select-btn" onclick="executeQuickSelectUserTokenTokenPassKey('${k}')">Select ID</button>
+                    <div class="user-card-uid-header">UID Key: ${k}</div>
+                    <div class="card-property-row"><span>User Name:</span><span>${u.name || 'N/A'}</span></div>
+                    <div class="card-property-row"><span>Mobile / Auth:</span><span style="text-align:right;"><b style="color:var(--cyber-cyan);">${u.phone || 'N/A'}</b><br>${authMethodDisplay} ${emailDisplay}</span></div>
+                    <div class="card-property-row"><span>Access Token:</span><span>
+                        <span id="pwd_${k}" data-pass="${u.password || 'N/A'}" data-hidden="true" style="font-family:monospace; background:var(--bg-base); padding:1px 4px; border-radius:4px;">••••••••</span>
+                        <span style="cursor:pointer; margin-left:5px;" onclick="togglePasswordMask('pwd_${k}')">👁️</span>
+                    </span></div>
+                    <div class="card-property-row" style="margin-top:6px; border-top:1px dashed var(--border-neon); padding-top:4px;"><span>Wallet balance:</span><span style="color:var(--cyber-green); font-weight:800;">₹${parseFloat(u.balance || 0).toFixed(2)}</span></div>
+                    <div class="card-property-row"><span>Coins Acc.:</span><span style="color:var(--cyber-orange); font-weight:800;">🪙 ${u.coins || 0}</span></div>
+                    <div class="card-property-row" style="margin-top:6px; border-top:1px dashed var(--border-neon); padding-top:4px;"><span>Total Invites:</span><span style="color:var(--cyber-green); font-weight:800;">${u.total_referrals || 0} Users</span></div>
+                    <div class="card-property-row"><span>Security state:</span><span>${securityFlagDisplaySpan}</span></div>
+                    
+                    <div style="display:flex; gap:5px; margin-top:8px;">
+                        <button class="std-panel-btn btn-cyan" style="flex:1; font-size:9px; padding:6px; margin:0; border: 1px dashed var(--cyber-cyan); background: rgba(6, 182, 212, 0.1);" onclick="viewUserDetailedEarningHistory('${k}')">📜 HISTORY</button>
+                        <button class="std-panel-btn btn-green" style="flex:1; font-size:9px; padding:6px; margin:0; border: 1px dashed var(--cyber-green); background: rgba(16, 185, 129, 0.1);" onclick="showFullUserDetailsModal('${k}')">👁️ FULL DETAILS</button>
+                    </div>
+                `;
+                socket.appendChild(card);
+            });
+        }
+
+        function showFullUserDetailsModal(uidKey) {
+            document.getElementById('fullUserDetailsModal').style.display = 'flex';
+            let uData = runtimeInMemoryUsersCollection[uidKey];
+            let displayNode = document.getElementById('fullUserJsonDisplay');
+            if(!uData) { displayNode.innerText = "No data found for this UID."; return; }
+            displayNode.innerHTML = JSON.stringify(uData, null, 4);
+        }
+        function closeFullUserDetailsModal() { document.getElementById('fullUserDetailsModal').style.display = 'none'; }
+
+        function viewUserDetailedEarningHistory(targetUid) {
+            document.getElementById('userHistoryModal').style.display = 'flex';
+            document.getElementById('uhTitle').innerText = 'History: ' + targetUid;
+            const tbody = document.getElementById('userHistoryTableBody'); tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Extracting logs...</td></tr>';
+            
+            database.ref('users/' + targetUid + '/earning_history').once('value').then(snap => {
+                tbody.innerHTML = '';
+                if(!snap.exists()){ tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--cyber-red);">No earning history found.</td></tr>'; return; }
+                let hist = snap.val(); let keys = Object.keys(hist).sort((a,b)=> hist[b].timestamp - hist[a].timestamp); 
+                keys.forEach(k => {
+                    let h = hist[k]; let amtDisplay = h.amount ? `₹${parseFloat(h.amount).toFixed(2)}` : '-'; let coinDisplay = h.coins_credited ? `+${h.coins_credited}` : '-';
+                    tbody.innerHTML += `<tr><td style="font-size:10px; color:#94a3b8;">${new Date(h.timestamp).toLocaleString()}</td><td style="font-weight:bold; color:#e2e8f0; font-size:11px;">${h.activity || 'Task Reward'}</td><td style="color:var(--cyber-orange); font-weight:900;">${coinDisplay}</td><td style="color:var(--cyber-green); font-weight:900;">${amtDisplay}</td></tr>`;
+                });
+            });
+        }
+        function closeUserHistoryModal() { document.getElementById('userHistoryModal').style.display = 'none'; }
+
+        function runNetworkScanner() {
+            let resBox = document.getElementById("networkScannerResults"); resBox.style.display = "block"; resBox.innerHTML = "<h4 style='color:#fca5a5; margin-bottom:10px;'>🕵️ Scanner Results (Shared Devices)</h4>";
+            let deviceMap = {}; let foundDupes = false;
+            Object.keys(runtimeInMemoryUsersCollection).forEach(k => {
+                let devId = runtimeInMemoryUsersCollection[k].device_id_token;
+                if(devId && devId !== "N/A" && devId !== "UNKNOWN_DEVICE") { if(!deviceMap[devId]) deviceMap[devId] = []; deviceMap[devId].push(k); }
+            });
+            Object.keys(deviceMap).forEach(devId => {
+                if(deviceMap[devId].length > 1) { foundDupes = true; resBox.innerHTML += `<div style="margin-bottom:8px; font-size:11px; color:#fecaca;">⚠️ <b>Device ID [${devId}]</b> used by ${deviceMap[devId].length} accounts: <span style="font-family:monospace; color:var(--cyber-cyan);">${deviceMap[devId].join(', ')}</span></div>`; }
+            });
+            if(!foundDupes) resBox.innerHTML += "<div style='color:var(--cyber-green); font-size:12px;'>✅ Clean! No shared registrations found.</div>";
+        }
+
+        function executeQuickSelectUserTokenTokenPassKey(uidTokenStringKey) {
+            document.getElementById("modTargetUidKey").value = uidTokenStringKey; let u = runtimeInMemoryUsersCollection[uidTokenStringKey] || {};
+            document.getElementById("editUserName").value = u.name || ""; document.getElementById("editUserPhone").value = u.phone || u.email || "";
+            triggerUiToastNotifierNotificationBox(`🎯 Target Profile Selected: ${uidTokenStringKey}`); window.scrollTo(0, 0);
+        }
+
+        function executeEditUserProfileDetails() {
+            const uid = document.getElementById("modTargetUidKey").value.trim(); const newName = document.getElementById("editUserName").value.trim(); const newPhone = document.getElementById("editUserPhone").value.trim();
+            if(!uid || !runtimeInMemoryUsersCollection[uid]) return;
+            database.ref(`users/${uid}`).update({ name: newName, phone: newPhone }).then(() => { triggerUiToastNotifierNotificationBox("✔ User Details Updated Successfully!"); });
+        }
+
+        function executeDeleteUserProfileAccount() {
+            const uid = document.getElementById("modTargetUidKey").value.trim();
+            if(!uid || !runtimeInMemoryUsersCollection[uid]) return;
+            if(!confirm(`⚠️ Are you sure you want to completely DELETE account UID: ${uid}?`)) return;
+            database.ref(`users/${uid}`).remove().then(() => { triggerUiToastNotifierNotificationBox("🗑️ User Account Deleted Successfully!", true); });
+        }
+
+        function executeProfileManualDeltaAdjustmentValue(balanceTypeKeyMapString, arithmeticActionDirectionTypeModeString) {
+            const uid = document.getElementById("modTargetUidKey").value.trim(); const val = parseFloat(document.getElementById("modDeltaCountValue").value.trim());
+            if (!uid || isNaN(val) || val <= 0 || !runtimeInMemoryUsersCollection[uid]) return;
+            let initVal = parseFloat(runtimeInMemoryUsersCollection[uid][balanceTypeKeyMapString] || 0);
+            let finalVal = arithmeticActionDirectionTypeModeString === 'add' ? (initVal + val) : Math.max(0, initVal - val);
+            
+            database.ref(`users/${uid}/earning_history`).push({ activity: `Admin ${arithmeticActionDirectionTypeModeString === 'add'?'Reward':'Deduction'} (${balanceTypeKeyMapString})`, coins_credited: balanceTypeKeyMapString === 'coins' ? (arithmeticActionDirectionTypeModeString === 'add'?val:-val) : 0, amount: balanceTypeKeyMapString === 'balance' ? (arithmeticActionDirectionTypeModeString === 'add'?val:-val) : 0, timestamp: Date.now() });
+            database.ref(`users/${uid}/${balanceTypeKeyMapString}`).set(finalVal).then(() => { triggerUiToastNotifierNotificationBox(`✔ Wallet Updated: ${finalVal}`); });
+        }
+
+        function dispatchPersonalSingleTargetPushNotification() {
+            const uid = document.getElementById("modTargetUidKey").value.trim(); const msg = document.getElementById("modSingleTargetPushText").value.trim();
+            if(!uid || !msg) return;
+            database.ref(`users/${uid}/personal_alert_inbox_node`).set({ title: "⚠️ Administrative Alert", message: msg, timestamp: Date.now(), unread_status_flag: true }).then(() => { triggerUiToastNotifierNotificationBox("🛰️ Direct Single Push Transmitted."); });
+        }
+
+        function executeHardDeviceLockBanShieldOperation() {
+            const uid = document.getElementById("modTargetUidKey").value.trim();
+            if(!uid || !runtimeInMemoryUsersCollection[uid]) return;
+            let devId = runtimeInMemoryUsersCollection[uid].device_id_token || null;
+            if(!devId || devId === "N/A" || devId === "UNKNOWN_DEVICE") return;
+            if(!confirm(`⚠️ INITIATE ACCESS RESTRICTION for Device ID: [${devId}]?`)) return;
+            let updates = {}; updates[`users/${uid}/account_security_status_state_flag`] = "BANNED_TERMINATED"; updates[`absolute_blacklisted_hardware_device_fingerprints_registry/${devId}`] = { timestamp: Date.now(), uid: uid, op: activeAuthenticatedOperatorUsernameString };
+            database.ref().update(updates).then(() => { triggerUiToastNotifierNotificationBox("🚫 Device Restricted Permanently.", true); });
+        }
+
+        // ======================= DEEP DYNAMIC FILE MODAL =======================
+        const FILE_BLUEPRINTS = {
+            'greeting_page': { name: 'Festival Wishing Page', fields: [ {id: 'festival_name', label: 'Festival Name', type: 'input'}, {id: 'festival_date', label: 'Target Date', type: 'input'}, {id: 'theme_bg_image', label: 'Background Image URL', type: 'input'}, {id: 'theme_color', label: 'Theme Hex Color', type: 'input'}, {id: 'border_emoji', label: 'Border Emoji', type: 'input'}, {id: 'card_inner_bg', label: 'Inner Card Photo URL', type: 'input'}, {id: 'banner_1', label: 'Top Banner Ad Code', type: 'textarea'}, {id: 'banner_2', label: 'Bottom Banner Ad Code', type: 'textarea'}, {id: 'promo_title', label: 'Promo Box Title', type: 'input'}, {id: 'promo_desc', label: 'Promo Box Description', type: 'input'}, {id: 'app_download_url', label: 'App Download URL', type: 'input'} ] },
+            'daily_checkin': { name: 'Daily Check-in', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'direct_link', label: 'Custom Verification / Sponsor Link', type: 'input'}, {id: 'reward_amount', label: 'Reward Coins', type: 'input'} ] },
+            'watch_ads': { name: 'Video Zone', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'custom_link_1', label: 'Custom Video/Ad Link 1', type: 'input'}, {id: 'custom_link_2', label: 'Custom Video/Ad Link 2', type: 'input'}, {id: 'custom_link_3', label: 'Custom Video/Ad Link 3', type: 'input'}, {id: 'custom_link_4', label: 'Custom Video/Ad Link 4', type: 'input'}, {id: 'custom_link_5', label: 'Custom Video/Ad Link 5', type: 'input'}, {id: 'server_option', label: 'Current Active Server Name', type: 'input'} ] },
+            'app_testing': { name: 'App Testing Zone', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'custom_app_1', label: 'Custom App Install Link 1', type: 'input'}, {id: 'custom_app_2', label: 'Custom App Install Link 2', type: 'input'}, {id: 'custom_app_3', label: 'Custom App Install Link 3', type: 'input'}, {id: 'custom_app_4', label: 'Custom App Install Link 4', type: 'input'} ] },
+            'social_tasks': { name: 'Social Tasks', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'social_link_1', label: 'Custom Social Link 1 (Telegram/YT etc)', type: 'input'}, {id: 'social_link_2', label: 'Custom Social Link 2', type: 'input'}, {id: 'social_link_3', label: 'Custom Social Link 3', type: 'input'}, {id: 'social_link_4', label: 'Custom Social Link 4', type: 'input'} ] },
+            'monlix': { name: 'Task Server 1 (Offers)', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'offer_link_1', label: 'Custom Offerwall / Task URL 1', type: 'input'}, {id: 'offer_link_2', label: 'Custom Offerwall / Task URL 2', type: 'input'}, {id: 'offer_link_3', label: 'Custom Offerwall / Task URL 3', type: 'input'}, {id: 'offer_link_4', label: 'Custom Offerwall / Task URL 4', type: 'input'}, {id: 'offer_link_5', label: 'Custom Offerwall / Task URL 5', type: 'input'} ] },
+            'monetag': { name: 'Task Server 2 (Smartlinks)', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'ad_link_1', label: 'Custom Smartlink / Ad URL 1', type: 'input'}, {id: 'ad_link_2', label: 'Custom Smartlink / Ad URL 2', type: 'input'}, {id: 'ad_link_3', label: 'Custom Smartlink / Ad URL 3', type: 'input'}, {id: 'ad_link_4', label: 'Custom Smartlink / Ad URL 4', type: 'input'}, {id: 'ad_link_5', label: 'Custom Smartlink / Ad URL 5', type: 'input'} ] },
+            'adgem': { name: 'Games Zone', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'game_link_1', label: 'Custom Game Web URL 1', type: 'input'}, {id: 'game_link_2', label: 'Custom Game Web URL 2', type: 'input'}, {id: 'game_link_3', label: 'Custom Game Web URL 3', type: 'input'}, {id: 'game_link_4', label: 'Custom Game Web URL 4', type: 'input'}, {id: 'game_link_5', label: 'Custom Game Web URL 5', type: 'input'} ] },
+            'mega_offers': { name: 'Premium Offers', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'mega_link_1', label: 'Custom Mega Offer URL 1', type: 'input'}, {id: 'mega_link_2', label: 'Custom Mega Offer URL 2', type: 'input'}, {id: 'mega_link_3', label: 'Custom Mega Offer URL 3', type: 'input'}, {id: 'mega_link_4', label: 'Custom Mega Offer URL 4', type: 'input'}, {id: 'mega_link_5', label: 'Custom Mega Offer URL 5', type: 'input'} ] },
+            'extra_bonus': { name: 'Extra Bonus', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'} ] },
+            'scratch_card': { name: 'Scratch Rewards', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'direct_link', label: 'Custom Verification / Ad Link', type: 'input'}, {id: 'daily_limit', label: 'Daily Scratch Limit', type: 'input'} ] },
+            'hourly_key': { name: 'Hourly Bonus', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'direct_link', label: 'Custom Verification / Ad Link', type: 'input'}, {id: 'unlock_bonus', label: 'Hourly Reward Coins', type: 'input'} ] },
+            'special_missions': { name: 'Special Missions', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'mission_link_1', label: 'Custom High-Speed Mirror Link 1', type: 'input'}, {id: 'mission_link_2', label: 'Custom Secure Encrypted Link 2', type: 'input'}, {id: 'mission_link_3', label: 'Custom Global Buffer Link 3', type: 'input'} ] },
+            'read_articles': { name: 'Read Articles', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'article_link_1', label: 'Custom Article / Blog URL 1', type: 'input'}, {id: 'article_link_2', label: 'Custom Article / Blog URL 2', type: 'input'}, {id: 'article_link_3', label: 'Custom Article / Blog URL 3', type: 'input'}, {id: 'article_link_4', label: 'Custom Article / Blog URL 4', type: 'input'}, {id: 'article_link_5', label: 'Custom Article / Blog URL 5', type: 'input'}, {id: 'read_articles_coins', label: 'Reward Coins Value', type: 'input'} ] },
+            '1v1': { name: '1v1 Coin Battles', fields: [ {id: 'banner_1', label: 'Banner Ad 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner Ad 2', type: 'textarea'}, {id: 'battle_control_url', label: 'Custom Matchmaking / Ad Link', type: 'input'} ] },
+            'spin_win': { name: 'Spin & Win', fields: [ {id: 'banner_1', label: 'Banner Ad 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner Ad 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner Ad 3', type: 'textarea'}, {id: 'spin_control_url', label: 'Custom Verification / Ad Link', type: 'input'}, {id: 'daily_limit', label: 'Daily Spin Limit Count', type: 'input'} ] },
+            'cpx': { name: 'Task Server 3', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'custom_api_1', label: 'Custom Offerwall / Survey URL', type: 'input'} ] },
+            'top_rewards': { name: 'Instant Coins', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'click_link_1', label: 'Custom Click / Visit URL 1', type: 'input'}, {id: 'click_link_2', label: 'Custom Click / Visit URL 2', type: 'input'} ] },
+            'timewall': { name: 'Task Server 4', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'custom_api_2', label: 'Custom Offerwall / Task URL', type: 'input'} ] },
+            'bitlabs': { name: 'Task Server 5', fields: [ {id: 'banner_1', label: 'Banner 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner 4', type: 'textarea'}, {id: 'custom_api_3', label: 'Custom Offerwall / Task URL', type: 'input'} ] },
+            'square_dash': { name: 'Arcade Zone', fields: [ {id: 'banner_1', label: 'Banner Ad 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner Ad 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner Ad 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner Ad 4', type: 'textarea'}, {id: 'game_control_url', label: 'Custom Game / Ad Link', type: 'input'} ] },
+            'pool': { name: 'Pool Zone', fields: [ {id: 'banner_1', label: 'Banner Ad 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner Ad 2', type: 'textarea'}, {id: 'banner_3', label: 'Banner Ad 3', type: 'textarea'}, {id: 'banner_4', label: 'Banner Ad 4', type: 'textarea'}, {id: 'pool_control_url', label: 'Custom Game / Ad Link', type: 'input'} ] },
+            'esports_zone': { name: 'Esports Zone', fields: [ {id: 'banner_1', label: 'Banner Ad 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner Ad 2', type: 'textarea'} ] },
+            'lucky_box': { name: 'Mega Reward Box', fields: [ {id: 'banner_1', label: 'Banner Ad 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner Ad 2', type: 'textarea'} ] },
+            'web_explorer': { name: 'Web Tasks', fields: [ {id: 'banner_1', label: 'Banner Ad 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner Ad 2', type: 'textarea'} ] },
+            'surprise': { name: 'Surprise Box', fields: [ {id: 'banner_1', label: 'Banner Ad 1', type: 'textarea'}, {id: 'banner_2', label: 'Banner Ad 2', type: 'textarea'} ] }
+        };
+
+        let activeDeepFileKey = "";
+        function openDynamicDeepFileSettings(fileKey) {
+            let blueprint = FILE_BLUEPRINTS[fileKey] || { name: fileKey, fields: [] }; activeDeepFileKey = fileKey;
+            document.getElementById("dfmTitle").innerText = `Settings: ${blueprint.name}`;
+            const container = document.getElementById("dfmDynamicFieldsContainer"); container.innerHTML = ""; 
+            blueprint.fields.forEach(field => {
+                let html = `<label style="font-size:11px; color:var(--text-dim); font-weight:bold;">${field.label}</label>`;
+                if(field.type === 'textarea') { html += `<textarea id="dfm_${field.id}" class="std-panel-textarea" placeholder="Value..."></textarea>`; } 
+                else { html += `<input type="text" id="dfm_${field.id}" class="std-panel-input" placeholder="Value...">`; }
+                container.innerHTML += html;
+            });
+            database.ref(`app_files_deep_config/${fileKey}`).once('value').then((snap) => {
+                if(snap.exists()) {
+                    let d = snap.val();
+                    blueprint.fields.forEach(field => { let domEl = document.getElementById(`dfm_${field.id}`); if(domEl && d[field.id]) { domEl.value = d[field.id]; } });
+                }
+            });
+            document.getElementById("deepFileModal").style.display = "flex";
+        }
+        function closeDeepFileModal() { document.getElementById("deepFileModal").style.display = "none"; }
+        function saveDynamicDeepFileSettings() {
+            if(!activeDeepFileKey) return;
+            let blueprint = FILE_BLUEPRINTS[activeDeepFileKey]; let payload = {};
+            blueprint.fields.forEach(field => { let domEl = document.getElementById(`dfm_${field.id}`); if(domEl) { let val = domEl.value.trim(); if(val) payload[field.id] = val; } });
+            database.ref(`app_files_deep_config/${activeDeepFileKey}`).set(payload).then(() => { triggerUiToastNotifierNotificationBox(`✔ Saved settings for ${blueprint.name}`); closeDeepFileModal(); });
+        }
+
+        function deployNewAppModule() {
+            let title = document.getElementById("nfTitle").value.trim(); let icon = document.getElementById("nfIcon").value.trim() || '🚀';
+            let desc = document.getElementById("nfDesc").value.trim(); let url = document.getElementById("nfUrl").value.trim(); let badge = document.getElementById("nfBadge").value.trim();
+            let id = "mod_" + Date.now();
+            if(!title || !url) return;
+            database.ref('global_system_runtime_configurations/home_dynamic_modules/' + id).set({ title: title, icon: icon, desc: desc, url: url, badge: badge, is_active: true }).then(() => { triggerUiToastNotifierNotificationBox("➕ New App File Injected!"); });
+        }
+
+        // ======================= API KEYS & CONFIGS =======================
+        function saveApiKeys(keyName, inputId) { let val = document.getElementById(inputId).value.trim(); database.ref(`global_system_runtime_configurations/api_links/${keyName}`).set(val).then(() => { triggerUiToastNotifierNotificationBox(`✔ Saved: ${keyName}`); }); }
+
+        function updateCoreGlobalConfigParamNode(fieldKey) {
+            let val = null;
+            if(fieldKey === 'app_maintenance') val = document.getElementById("cfgMaintenanceState").value;
+            if(fieldKey === 'vpn_block_shield') val = document.getElementById("cfgVpnBlockState").value;
+            if(fieldKey === 'auto_reject_withdrawals') val = document.getElementById("cfgAutoRejectState").value;
+            if(fieldKey === 'cooldown_timer') val = parseInt(document.getElementById("cfgCooldownSeconds").value.trim());
+            if(fieldKey === 'coin_rate') val = parseInt(document.getElementById("cfgCoinConversionValue").value.trim());
+            if(fieldKey === 'fake_online_count') val = parseInt(document.getElementById("cfgBaseVirtualOnlineCount").value.trim());
+            if(fieldKey === 'referral_reward_coins') val = parseInt(document.getElementById("cfgReferralReward").value.trim());
+            database.ref('global_system_runtime_configurations/' + fieldKey).set(val).then(() => { triggerUiToastNotifierNotificationBox(`✔ Config Synchronized: ${fieldKey}`); });
+        }
+
+        function deployDynamicPromoIncentivePopupsDataFeed() {
+            const rawText = document.getElementById("cfgPromoPayoutsTextString").value.trim(); if(!rawText) return;
+            let tokensArr = rawText.split(';').map(i => i.trim()).filter(i => i.length > 0);
+            database.ref('incentives_popup_array_feed_source').set(tokensArr).then(() => { triggerUiToastNotifierNotificationBox("🎉 Flash Incentives Promo Sequence Live."); });
+        }
+
+        function triggerGlobalLimitsManualResetEngineNode() {
+            if(!confirm("Are you fully certain you wish to enforce full manual reboot database loops?")) return;
+            database.ref('users').once('value').then((snap) => {
+                if(snap.exists()) {
+                    let dataset = snap.val(); let batchUpdatesPlanMap = {};
+                    Object.keys(dataset).forEach(uKey => { batchUpdatesPlanMap[`users/${uKey}/daily_captcha_count`] = 0; batchUpdatesPlanMap[`users/${uKey}/daily_spin_count`] = 0; batchUpdatesPlanMap[`users/${uKey}/daily_scratch_count`] = 0; batchUpdatesPlanMap[`users/${uKey}/daily_total_withdrawn_amount`] = 0; });
+                    database.ref().update(batchUpdatesPlanMap).then(() => { triggerUiToastNotifierNotificationBox("⚡ All Global Daily Limit Accumulation Counters Flushed Live."); });
+                }
+            });
+        }
+
+        function toggleMasterEmergencyKillSwitchState() {
+            database.ref('emergency_kill_switch_state').once('value').then((snap) => {
+                let next = (snap.val() || "OFF") === "OFF" ? "ON" : "OFF";
+                database.ref('emergency_kill_switch_state').set(next).then(() => { triggerUiToastNotifierNotificationBox(`🚨 System Protective State Matrix: ${next}`, true); });
+            });
+        }
+
+        // ======================= STAFF PROVISIONING =======================
+        function executeCreateAndProvisionAgentProfileNode() {
+            const user = document.getElementById("agInputUser").value.trim().toLowerCase(); const token = document.getElementById("agInputToken").value.trim();
+            if(!user || !token) return;
+            database.ref('internal_agents_nodes/' + user).set({
+                username: user, passcode: token, p_deposit: document.getElementById("role_p_deposit").checked, p_withdraw: document.getElementById("role_p_withdraw").checked, p_esports: document.getElementById("role_p_esports").checked, p_support: document.getElementById("role_p_support").checked, p_ads: document.getElementById("role_p_ads").checked, p_analytics: document.getElementById("role_p_analytics").checked, p_push: document.getElementById("role_p_push").checked, p_files: document.getElementById("role_p_files").checked, p_lottery: document.getElementById("role_p_lottery").checked, p_users: document.getElementById("role_p_users").checked, p_promo_data: document.getElementById("role_p_promo_data").checked
+            }).then(() => { document.getElementById("agInputUser").value = ""; document.getElementById("agInputToken").value = ""; triggerUiToastNotifierNotificationBox("👥 Staff Node Assigned", true); });
+        }
+
+        function renderProxyAgentsPerformanceNetworkLedger(agentsObj) {
+            const socketNode = document.getElementById("drawerAgentsListSocket"); socketNode.innerHTML = "";
+            Object.keys(agentsObj).forEach(k => {
+                let a = agentsObj[k]; let r = [];
+                if(a.p_deposit) r.push("DEP"); if(a.p_withdraw) r.push("WD"); if(a.p_esports) r.push("FF"); if(a.p_support) r.push("SUP"); if(a.p_ads) r.push("SETT"); if(a.p_push) r.push("PUSH"); if(a.p_files) r.push("FILE"); if(a.p_lottery) r.push("LOTT"); if(a.p_users) r.push("USR"); if(a.p_promo_data) r.push("PROMO");
+                socketNode.innerHTML += `<div style="background:var(--bg-base); border:1px solid var(--border-neon); padding:10px; border-radius:8px; font-size:11px; line-height:1.4;"><div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--cyber-cyan); margin-bottom:4px;"><span>@${a.username}</span><span style="color:var(--cyber-red); cursor:pointer;" onclick="executeRevokeTerminateAgentProfileNodeLink('${a.username}')">[REVOKE]</span></div><div><b>Rights:</b> <span style="color:var(--text-dim); font-size:10px;">${r.join(', ')}</span></div></div>`;
+            });
+        }
+
+        function executeRevokeTerminateAgentProfileNodeLink(agentId) {
+            if(!confirm(`Revoke staff node ID: ${agentId}?`)) return;
+            database.ref('internal_agents_nodes/' + agentId).remove();
+        }
+
+        function executeLogAgentAuditTrackingActionTrail(desc) {
+            let id = "AUDIT-" + Date.now();
+            database.ref('security_agent_audit_compliance_cctv_logs/' + id).set({ timestamp_string: new Date().toLocaleString(), operator_id: activeAuthenticatedOperatorUsernameString, action_trace_desc: desc });
+        }
+
+        function renderAgentActionAuditCctvLogSocket(auditObj) {
+            const socketNode = document.getElementById("agentAuditCctvLogSocket"); socketNode.innerHTML = "";
+            let keys = Object.keys(auditObj).sort().reverse();
+            keys.forEach(k => {
+                let log = auditObj[k]; let time = log.timestamp_string.split(',')[1] ? log.timestamp_string.split(',')[1].trim() : 'System';
+                socketNode.innerHTML += `<tr><td style="color:var(--text-dim); font-family:monospace; padding:4px 0;">[${time}] <b style="color:var(--cyber-orange);">@${log.operator_id}</b>: ${log.action_trace_desc}</td></tr>`;
+            });
+        }
+    </script>
+</body>
+</html>

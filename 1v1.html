@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Coin Battles - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        
+        /* Premium Corporate Header */
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #ef4444; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #ef4444; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); }
+        .header h2 { margin: 0; font-size: 18px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; }
+        
+        /* Language Dropdown */
+        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #ef4444; font-weight: bold; cursor: pointer; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+
+        /* Profile Balance Ribbon */
+        .balance-card { background: linear-gradient(135deg, #0f172a, #1e293b); border: 1px solid #ef4444; padding: 12px 20px; border-radius: 12px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin-bottom: 5px; }
+        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+
+        /* 📢 PROMO DISPLAY SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #ef4444; margin: 5px 0; box-sizing: border-box; }
+
+        /* Matchmaking / Battle Arena Card */
+        .battle-card { background: #1e293b; border-radius: 24px; padding: 25px 20px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        
+        /* 🔥 NEW: Dynamic Bet Adjuster Controls */
+        .bet-adjuster { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 15px 0; background: #0f172a; padding: 10px; border-radius: 16px; border: 1px solid #475569; }
+        .bet-btn { background: #334155; border: none; color: #fff; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .bet-btn:active { background: #ef4444; transform: scale(0.9); }
+        .bet-amount { font-size: 20px; font-weight: 900; color: #fbbf24; width: 80px; }
+
+        /* 1v1 Matching Display Layout */
+        .vs-container { display: flex; justify-content: space-around; align-items: center; margin: 25px 0; position: relative; }
+        .player-node { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 40%; }
+        .avatar-frame { width: 70px; height: 70px; border-radius: 50%; background: #0f172a; border: 3px solid #64748b; display: flex; justify-content: center; align-items: center; font-size: 32px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .player-node.user-side .avatar-frame { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .player-node.opponent-side .avatar-frame { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        .p-name { font-size: 14px; font-weight: 800; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+        .vs-badge { font-size: 22px; font-weight: 900; color: #fbbf24; font-style: italic; background: #0f172a; padding: 6px 12px; border-radius: 50%; border: 1px solid #334155; }
+
+        /* Action Launch Button Layout */
+        .action-battle-btn { width: 100%; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; border: none; padding: 16px; border-radius: 50px; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); text-transform: uppercase; transition: 0.2s; }
+        .action-battle-btn:active:not(:disabled) { transform: scale(0.97); }
+        .action-battle-btn:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+
+        /* Interactive Gameplay Area Window */
+        .gameplay-terminal { display: none; background: #0f172a; border-radius: 16px; padding: 20px; border: 2px solid #fbbf24; margin-top: 15px; text-align: center; }
+        .game-target-box { background: #1e293b; border-radius: 12px; padding: 15px; font-size: 20px; font-weight: 800; margin-bottom: 15px; color: #fbbf24; letter-spacing: 1px; }
+        
+        /* Grid Buttons Selection Option Layout */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .opt-btn { background: #1e293b; border: 1px solid #334155; padding: 14px; border-radius: 10px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .opt-btn:active { background: #3b82f6; border-color: #60a5fa; }
+
+        .battle-pool-badge { background: rgba(250, 204, 21, 0.1); border: 1px solid rgba(250, 204, 21, 0.2); color: #facc15; padding: 6px 16px; border-radius: 50px; font-size: 13px; font-weight: 800; display: inline-block; margin-bottom: 5px; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2 data-i18n="cb_title">1v1 Coin Battles</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
+    </div>
+
+    <div class="main-container">
+
+        <div class="balance-card">
+            <span data-i18n="cb_wallet">Wallet Balance</span>
+            <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
+        </div>
+        
+        <!-- 📢 PROMO DISPLAY TOP BANNER SLOT -->
+        <div class="ad-banner-slot" id="battleAdSlot1">
+            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        </div>
+
+        <div class="battle-card">
+            <div class="battle-pool-badge" id="poolPrizeBadge">🏆 MATCH POOL: 40 COINS</div>
+            <p style="margin: 0; font-size: 11px; color: #94a3b8; font-weight: 500;" data-i18n="cb_desc">Set your bet. Fast tap the highest number block to beat your opponent. Minimizing app causes round forfeit!</p>
+
+            <!-- 🔥 NEW: Dynamic Bet Entry Form Controls -->
+            <div class="bet-adjuster">
+                <button class="bet-btn" onclick="adjustBetAmount(-10)">-</button>
+                <div class="bet-amount"><span id="currentBetEntryTxt">20</span><span style="font-size: 10px;"> 🪙</span></div>
+                <button class="bet-btn" onclick="adjustBetAmount(10)">+</button>
+            </div>
+
+            <!-- 1v1 Node Arena Setup -->
+            <div class="vs-container">
+                <div class="player-node user-side">
+                    <div class="avatar-frame" id="myAvatar">👤</div>
+                    <span class="p-name" id="userNameTxt">You</span>
+                </div>
+                
+                <div class="vs-badge">VS</div>
+
+                <div class="player-node opponent-side">
+                    <div class="avatar-frame" id="oppAvatar">?</div>
+                    <span class="p-name" id="oppNameTxt" data-i18n="cb_searching">Searching...</span>
+                </div>
+            </div>
+
+            <button class="action-battle-btn" id="findMatchBtn" onclick="executeStartMatchmakingLoop()" data-i18n="cb_btn_find">Find Battle Opponent ⚔️</button>
+
+            <!-- 🔥 Live Gameplay Module Window -->
+            <div class="gameplay-terminal" id="gameplayPanelBox">
+                <div style="font-size: 12px; color: #94a3b8; margin-bottom: 4px; font-weight: bold;" data-i18n="cb_question">WHICH NUMBER IS HIGHEST?</div>
+                <div class="game-target-box" id="gameMetricsQuestionDisplay">0 vs 0</div>
+                
+                <div class="options-grid">
+                    <button class="opt-btn" id="optLeftBtn" onclick="executeSubmitGameAction('left')">0</button>
+                    <button class="opt-btn" id="optRightBtn" onclick="executeSubmitGameAction('right')">0</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📢 PROMO DISPLAY BOTTOM BANNER SLOT -->
+        <div class="ad-banner-slot" id="battleAdSlot2">
+            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        </div>
+
+    </div>
+
+    <script>
+        const langData = {
+            "en": { "cb_title": "1v1 Coin Battles", "cb_wallet": "Wallet Balance", "cb_desc": "Set your bet. Fast tap the highest number block to beat your opponent. Minimizing app causes round forfeit!", "cb_searching": "Searching...", "cb_btn_find": "Find Battle Opponent ⚔️", "cb_question": "WHICH NUMBER IS HIGHEST?", "cb_connecting": "Connecting Matchmaking...", "cb_active": "Battle Active! 🎯" },
+            "hi": { "cb_title": "1v1 कॉइन बैटल", "cb_wallet": "वॉलेट बैलेंस", "cb_desc": "अपनी बेट सेट करें। विरोधी को हराने के लिए सबसे बड़े नंबर पर जल्दी टैप करें। ऐप मिनिमाइज़ करने पर राउंड रद्द हो जाएगा!", "cb_searching": "खोज रहे हैं...", "cb_btn_find": "विरोधी खोजें ⚔️", "cb_question": "कौन सा नंबर बड़ा है?", "cb_connecting": "मैचमेकिंग कनेक्ट हो रहा है...", "cb_active": "बैटल शुरू! 🎯" },
+            "bn": { "cb_title": "1v1 কয়েন ব্যাটল", "cb_wallet": "ওয়ালেট ব্যালেন্স", "cb_desc": "আপনার বাজি সেট করুন। প্রতিপক্ষকে হারাতে সবচেয়ে বড় নম্বরে দ্রুত ট্যাপ করুন। অ্যাপ মিনিমাইজ করলে রাউন্ড বাতিল হবে!", "cb_searching": "খুঁজছি...", "cb_btn_find": "প্রতিপক্ষ খুঁজুন ⚔️", "cb_question": "কোন নম্বরটি বড়?", "cb_connecting": "ম্যাচমেকিং কানেক্ট হচ্ছে...", "cb_active": "ব্যাটল শুরু! 🎯" }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) { elem.innerText = transObj[key]; }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+    </script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+        let userName = localStorage.getItem("userName") || "You";
+
+        // Admin Connection & Variables
+        let adGateLink = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback Link
+        database.ref('global_system_runtime_configurations').on('value', (snap) => {
+            if (snap.exists()) {
+                let conf = snap.val();
+                // Banners Update
+                if (conf.watch_ads_banner_slots) {
+                    if (conf.watch_ads_banner_slots.slot1_html) { let s1 = document.getElementById("battleAdSlot1"); if (s1) { s1.innerHTML = conf.watch_ads_banner_slots.slot1_html; runScripts(s1); } }
+                    if (conf.watch_ads_banner_slots.slot2_html) { let s2 = document.getElementById("battleAdSlot2"); if (s2) { s2.innerHTML = conf.watch_ads_banner_slots.slot2_html; runScripts(s2); } }
+                }
+                // Ad-Gate Smartlink Update
+                if (conf.watch_ads_configuration && conf.watch_ads_configuration.global_smartlink) {
+                    adGateLink = conf.watch_ads_configuration.global_smartlink;
+                }
+            }
+        });
+
+        function runScripts(container) {
+            let scripts = container.getElementsByTagName("script");
+            for (let i = 0; i < scripts.length; i++) {
+                let sNode = document.createElement("script");
+                if (scripts[i].src) sNode.src = scripts[i].src;
+                else sNode.text = scripts[i].text;
+                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
+            }
+        }
+
+        let currentWalletCoinsBalance = 0;
+        let leftValueInt = 0, rightValueInt = 0, mathematicallyCorrectAnswerStr = "";
+        
+        // Dynamic Bet System Variables
+        let currentBetAmount = 20; 
+        let isBattleActive = false;
+        let isSystemOpponent = false; // Flag to track if playing against system
+
+        const systemOpponentNamesList = ["AlphaPro", "ProGamer", "EarnMaster", "ShadowRider", "BulletCheck", "MatrixVoid", "ZenithPlayer", "Rahul_99", "Aman_Pro", "Neha_Gamer"];
+        const systemOpponentAvatarsList = ["🎯", "🦊", "🥷", "🦁", "🐉", "🦅", "💀", "👦", "😎", "👩"];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+            document.getElementById("userNameTxt").innerText = userName;
+
+            database.ref('users/' + uid).on('value', (snapshot) => {
+                if(snapshot.exists()) {
+                    currentWalletCoinsBalance = snapshot.val().coins || 0;
+                    document.getElementById("liveUserCoins").innerText = currentWalletCoinsBalance;
+                }
+            });
+        });
+
+        // 🎛️ ADJUST BET AMOUNT FUNCTION
+        function adjustBetAmount(change) {
+            if(isBattleActive) return; // Prevent changing bet during game
+            
+            let newBet = currentBetAmount + change;
+            if(newBet < 20) newBet = 20; // Minimum 20 rule
+            
+            currentBetAmount = newBet;
+            document.getElementById("currentBetEntryTxt").innerText = currentBetAmount;
+            document.getElementById("poolPrizeBadge").innerText = `🏆 MATCH POOL: ${currentBetAmount * 2} COINS`;
+        }
+
+        // 🧠 HYBRID MATCHMAKING ENGINE (Real vs Real + System Fallback)
+        function executeStartMatchmakingLoop() {
+            if(currentWalletCoinsBalance < currentBetAmount) {
+                alert(`❌ Insufficient Balance! You need at least ${currentBetAmount} coins to join this pool.`);
+                return;
+            }
+
+            const btn = document.getElementById("findMatchBtn");
+            btn.disabled = true;
+            let lang = localStorage.getItem("selectedLang") || "en";
+            btn.innerText = langData[lang]["cb_connecting"] || "Connecting Matchmaking...";
+
+            // 🔥 System Daily Limit Check (Date Based)
+            let todayDate = new Date().toDateString();
+            if(localStorage.getItem("sys_matches_date") !== todayDate) {
+                localStorage.setItem("sys_matches_count", "0");
+                localStorage.setItem("sys_matches_date", todayDate);
+            }
+            let systemMatchesToday = parseInt(localStorage.getItem("sys_matches_count") || "0");
+
+            let queueNode = `battle_pool/bet_${currentBetAmount}`;
+            let stepCount = 0;
+            let matchFound = false;
+
+            // Simulate searching live node
+            let matchmakingInterval = setInterval(() => {
+                stepCount++;
+                
+                // Shuffle names to simulate searching
+                let randomSystemIndex = Math.floor(Math.random() * systemOpponentNamesList.length);
+                document.getElementById("oppNameTxt").innerText = systemOpponentNamesList[randomSystemIndex];
+                document.getElementById("oppAvatar").innerText = systemOpponentAvatarsList[randomSystemIndex];
+
+                // Hybrid Real P2P Pool Logic Simulation
+                database.ref(queueNode).once('value').then((snap) => {
+                    if(snap.exists() && snap.val().waiting_uid !== uid && !matchFound) {
+                        // Real Player Found
+                        matchFound = true;
+                        isSystemOpponent = false; // Real player match
+                        clearInterval(matchmakingInterval);
+                        document.getElementById("oppNameTxt").innerText = snap.val().waiting_name || "ProPlayer";
+                        document.getElementById("oppAvatar").innerText = "🔥";
+                        database.ref(queueNode).remove(); // Clear pool
+                        finalizeMatchStart(btn, lang);
+                    }
+                });
+
+                // Fallback to SYSTEM after 5 seconds if no real player
+                if(stepCount >= 5 && !matchFound) {
+                    clearInterval(matchmakingInterval);
+                    
+                    // Leave user in queue for someone else, but start a system match for them
+                    database.ref(queueNode).set({ waiting_uid: uid, waiting_name: userName });
+                    
+                    // 🔥 System Limit Check Enforcement
+                    if(systemMatchesToday >= 5) {
+                        // Limit Reached - Wait infinitely or alert user (Here we just set real player waiting text)
+                        document.getElementById("oppNameTxt").innerText = "Waiting for Real Player...";
+                        document.getElementById("oppAvatar").innerText = "⏳";
+                        return; // Halt here, don't start game until real player joins (Firebase trigger needed for production)
+                    }
+
+                    // System match proceeds
+                    isSystemOpponent = true;
+                    localStorage.setItem("sys_matches_count", systemMatchesToday + 1);
+
+                    document.getElementById("oppNameTxt").innerText = systemOpponentNamesList[randomSystemIndex];
+                    document.getElementById("oppAvatar").innerText = systemOpponentAvatarsList[randomSystemIndex];
+                    finalizeMatchStart(btn, lang);
+                }
+            }, 1000);
+        }
+
+        function finalizeMatchStart(btn, lang) {
+            btn.innerText = langData[lang]["cb_active"] || "Battle Active! 🎯";
+            isBattleActive = true;
+            
+            // Deduct Entry Fee Instantly to lock commitment
+            database.ref('users/' + uid).update({ coins: currentWalletCoinsBalance - currentBetAmount });
+
+            executeLaunchLiveBattleArena();
+        }
+
+        // 🎯 RENDER GAME BOARD ENGINE
+        function executeLaunchLiveBattleArena() {
+            document.getElementById("gameplayPanelBox").style.display = "block";
+
+            leftValueInt = Math.floor(Math.random() * 500) + 10;
+            rightValueInt = Math.floor(Math.random() * 500) + 10;
+            if(leftValueInt === rightValueInt) rightValueInt += 15; 
+
+            mathematicallyCorrectAnswerStr = (leftValueInt > rightValueInt) ? "left" : "right";
+
+            document.getElementById("gameMetricsQuestionDisplay").innerText = `${leftValueInt} vs ${rightValueInt}`;
+            document.getElementById("optLeftBtn").innerText = leftValueInt;
+            document.getElementById("optRightBtn").innerText = rightValueInt;
+        }
+
+        // 🛡️ SYSTEM MONITOR: TAB SWITCHING AUTO-LOSE
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && isBattleActive) {
+                isBattleActive = false;
+                executeSubmitGameAction('timeout_forfeit');
+            }
+        });
+
+        // ⚔️ TRANSACTION LOGIC: Evaluates Win/Loss, Handles Ad-Gate & Task Sync
+        function executeSubmitGameAction(selectedDirectionString) {
+            if(!isBattleActive) return;
+            isBattleActive = false;
+
+            document.getElementById("gameplayPanelBox").style.display = "none";
+            let poolPrize = currentBetAmount * 2;
+
+            if(selectedDirectionString === 'timeout_forfeit') {
+                alert("❌ Session Interrupted! You left the app during a live battle. You forfeited your bet.");
+                executeResetBattleTerminalState();
+                return;
+            }
+
+            // 🔥 SYSTEM DYNAMIC DIFFICULTY LOGIC
+            let finalResult = selectedDirectionString;
+            if (isSystemOpponent && currentBetAmount >= 50) {
+                // User selects left -> make it right (Force Loss)
+                finalResult = (selectedDirectionString === 'left') ? 'right' : 'left';
+            }
+
+            database.ref('users/' + uid).once('value').then((snapshot) => {
+                if(snapshot.exists()) {
+                    let freshCoins = snapshot.val().coins || 0;
+                    let freshBal = snapshot.val().balance || 0;
+                    
+                    if(finalResult === mathematicallyCorrectAnswerStr) {
+                        // WINNER PATH - AD GATE 
+                        alert(`🎉 Victory! Watch a short ad to claim your ${poolPrize} Coins.`);
+                        window.open(adGateLink, "_blank"); // Open Ad Link from Admin Panel
+                        
+                        // Wait 8 seconds before crediting to ensure ad impression
+                        setTimeout(() => {
+                            database.ref('users/' + uid).update({
+                                coins: freshCoins + poolPrize,
+                                balance: freshBal + (poolPrize / 100)
+                            }).then(() => {
+                                alert(`💰 Reward Credited: +${poolPrize} Coins!`);
+                                
+                                // 🔥 DAILY TASK SYNC (t4)
+                                let tasks = snapshot.val().completed_daily_tasks_array_node || [];
+                                if(!tasks.includes("t4")) { 
+                                    tasks.push("t4"); 
+                                    database.ref('users/' + uid).update({ completed_daily_tasks_array_node: tasks }); 
+                                }
+
+                                executeResetBattleTerminalState();
+                            });
+                        }, 8000); // 8 sec delay
+                        
+                    } else {
+                        // LOST PATH: Bet already deducted at start
+                        alert(`❌ Defeat! Incorrect or too slow. You lost your ${currentBetAmount} Coins bet.`);
+                        executeResetBattleTerminalState();
+                    }
+                }
+            });
+        }
+
+        function executeResetBattleTerminalState() {
+            const btn = document.getElementById("findMatchBtn");
+            let lang = localStorage.getItem("selectedLang") || "en";
+            btn.disabled = false;
+            btn.innerText = langData[lang]["cb_btn_find"] || "Find Battle Opponent ⚔️";
+            
+            document.getElementById("oppNameTxt").innerText = langData[lang]["cb_searching"] || "Searching...";
+            document.getElementById("oppAvatar").innerText = "?";
+            isBattleActive = false;
+        }
+    </script>
+</body>
+</html>

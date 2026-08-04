@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Tasks - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #ef4444; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #ef4444; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); }
+        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+
+        /* 📢 AD INCOME BANNER SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #ef4444; margin: 5px 0; }
+
+        /* 📺 Premium Video Player Card Layout */
+        .video-task-card { background: #1e293b; border-radius: 24px; padding: 20px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .video-wrapper { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 14px; overflow: hidden; background: #000; border: 2px solid #334155; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        /* Timer Analytics Ticker Widget */
+        .watch-timer-box { background: linear-gradient(135deg, #ef4444, #b91c1c); padding: 10px 16px; border-radius: 50px; font-weight: bold; font-size: 14px; margin: 15px auto; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+
+        .video-meta-info { text-align: left; margin-top: 10px; padding: 0 5px; }
+        .video-meta-info h4 { margin: 0 0 5px 0; font-size: 16px; color: #ffffff; font-weight: 800; }
+        .video-meta-info p { margin: 0; font-size: 12px; color: #94a3b8; font-weight: 500; line-height: 1.4; }
+
+        /* Claim Status Action Trigger Button */
+        .claim-video-btn { width: 100%; background: #10b981; color: #fff; border: none; padding: 15px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); cursor: pointer; display: none; text-transform: uppercase; margin-top: 15px; }
+        .claim-video-btn:active { transform: scale(0.97); }
+
+        .security-box { border: 1px dashed #ef4444; background: rgba(239, 68, 68, 0.05); border-radius: 12px; padding: 12px 15px; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2>Micro-Video Tasks</h2>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="ad-banner-slot">
+            <script type="text/javascript">atOptions={'key':'9d8e7e12df3875a6c3846d0cb748a04b','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"></script>
+        </div>
+
+        <div class="video-task-card">
+            <div class="video-wrapper">
+                <iframe id="taskVideoIframe" src="https://www.youtube.com/embed/VIDEO_ID_HERE?enablejsapi=1&rel=0&controls=1" allowfullscreen></iframe>
+            </div>
+
+            <div class="watch-timer-box" id="videoTimerBox">
+                <span>⏱️ Required Watch Time:</span> <span id="videoCountdownTxt">60</span>s
+            </div>
+
+            <div class="video-meta-info">
+                <h4>Watch & Earn Premium Coins Reward</h4>
+                <p>Stay focused on this video player. Leaving the page or minimized states instantly puts the watch clock counter on freeze hold.</p>
+            </div>
+
+            <button class="claim-video-btn" id="claimVideoRewardBtn" onclick="executeClaimVideoRewardCoins()">Claim 40 Task Coins 🪙</button>
+        </div>
+
+        <div class="ad-banner-slot">
+            <script type="text/javascript">atOptions={'key':'7c12f3875a6c3846d0cb748a04b9d8e','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/7c12f3875a6c3846d0cb748a04b9d8e/invoke.js"></script>
+        </div>
+
+        <div class="security-box">
+            <span>🛡️</span>
+            <span>System monitor is analyzing this video stream window session. Skipping or using splitter view mode locks balance dispatch channels instantly.</span>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let videoTimeLeftInt = 60; // 60 seconds strict task loop rule
+        let isWindowInFocusState = true;
+        let videoTimerInterval = null;
+        const taskRewardCoinsInt = 40;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            startVideoWatchVerificationEngine();
+        });
+
+        // 🛡️ VALIDATION ENGINE: Monitors active page view visibility tags
+        document.addEventListener("visibilitychange", () => {
+            isWindowInFocusState = !document.hidden;
+            const timerBox = document.getElementById("videoTimerBox");
+            
+            if (!isWindowInFocusState) {
+                // Focus lost, freeze color alert
+                timerBox.style.background = "#ef4444";
+                timerBox.innerHTML = "⚠️ Validation Paused! Return to Video Layout";
+            } else {
+                timerBox.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)";
+                timerBox.innerHTML = `<span>⏱️ Required Watch Time:</span> <span>${videoTimeLeftInt}</span>s`;
+            }
+        });
+
+        // ⏱️ CLOCK PIPELINE: Tracks watch sessions chronological constraints
+        function startVideoWatchVerificationEngine() {
+            videoTimerInterval = setInterval(() => {
+                if (isWindowInFocusState) {
+                    videoTimeLeftInt--;
+                    
+                    // Keep text layout synced during normal ticking states
+                    if(isWindowInFocusState) {
+                        document.getElementById("videoCountdownTxt").innerText = videoTimeLeftInt;
+                    }
+
+                    if (videoTimeLeftInt <= 0) {
+                        clearInterval(videoTimerInterval);
+                        
+                        // Switch layouts immediately to reveal Claim Action Trigger
+                        document.getElementById("videoTimerBox").style.background = "#10b981";
+                        document.getElementById("videoTimerBox").innerText = "🎉 Watch Task Completed Successfully!";
+                        document.getElementById("claimVideoRewardBtn").style.display = "block";
+                    }
+                }
+            }, 1000);
+        }
+
+        // 💰 LEDGER SYNC ROUTER: Pushes points directly inside Firebase database tree nodes
+        function executeClaimVideoRewardCoins() {
+            database.ref('users/' + uid).once('value').then((snapshot) => {
+                if(snapshot.exists()) {
+                    let oldCoins = snapshot.val().coins || 0;
+                    
+                    database.ref('users/' + uid).update({
+                        coins: oldCoins + taskRewardCoinsInt
+                    }).then(() => {
+                        alert(`🎉 Success! ${taskRewardCoinsInt} coins credited straight inside your wallet.`);
+                        window.location.href = "ho.html"; // Redirect back securely
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

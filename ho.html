@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; overflow-x: hidden; }
+        
+        /* Premium Header */
+        .header { width: 100%; background: #ffffff; display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #e8f5e9; }
+        .header h2 { margin: 0; color: #4CAF50; font-size: 22px; font-weight: 900; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.05); }
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        
+        /* Language Dropdown & Icons */
+        .custom-lang-select { padding: 4px 6px; border-radius: 8px; border: 1px solid #ddd; outline: none; font-size: 11px; background: #f9f9f9; color: #333; font-weight: bold; cursor: pointer; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
+
+        /* Notification Bell */
+        .notif-bell { position: relative; width: 32px; height: 32px; background: #f0fdf4; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; border: 1px solid #bbf7d0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s; }
+        .notif-bell:active { transform: scale(0.9); }
+        .notif-badge { position: absolute; top: -3px; right: -3px; background: #ef4444; color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #ffffff; }
+
+        .profile-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #2196F3, #1976D2); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; box-shadow: 0 2px 5px rgba(33,150,243,0.4); }
+
+        /* Wallet Card */
+        .wallet-card { background: linear-gradient(135deg, #4CAF50, #45a049); color: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center; box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3); box-sizing: border-box; position: relative; overflow: hidden; }
+        .wallet-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 60%); pointer-events: none; }
+        .wallet-card p { margin: 0; font-size: 14px; opacity: 0.9; font-weight: 500; }
+        .wallet-card h1 { margin: 10px 0; font-size: 38px; font-weight: bold; }
+        .coins-display { font-size: 14px; background: rgba(255,255,255,0.25); padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 15px; font-weight: bold; }
+        
+        .wallet-buttons-row { display: flex; justify-content: center; gap: 10px; }
+        .ledger-btn { background: white; color: #4CAF50; border: none; padding: 10px 20px; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; flex: 1; max-width: 150px; }
+        .ledger-btn:active { transform: scale(0.95); }
+
+        /* Ad Banners */
+        .ad-banner { width: 90%; max-width: 400px; min-height: 50px; margin: 15px 0; border-radius: 8px; display: flex; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: #e0e0e0; border: 1px dashed #ccc; }
+
+        /* Section Title */
+        .section-title { width: 90%; max-width: 400px; margin: 15px 0 10px 0; font-size: 18px; color: #333; font-weight: 800; text-align: left; }
+
+        /* Grid Layouts */
+        .grid-container { width: 90%; max-width: 400px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px; }
+        
+        .zone-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-decoration: none; color: #333; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; border: 1px solid #f0f0f0; position: relative; }
+        .zone-card:active { transform: scale(0.95); background: #f9f9f9; }
+        .zone-icon { font-size: 32px; margin-bottom: 8px; }
+        .zone-card h3 { margin: 0 0 5px 0; font-size: 14px; font-weight: bold; }
+        .zone-card p { margin: 0; font-size: 11px; color: #777; }
+        
+        .zone-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 20px; color: #fff; text-transform: uppercase; }
+        .badge-hot { background: #ef4444; }
+        .badge-new { background: #10b981; }
+        .badge-ad { background: #f59e0b; }
+
+        /* Full Width Card */
+        .full-card { width: 90%; max-width: 400px; background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-decoration: none; color: #333; display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0; border-left: 5px solid #FF9800; box-sizing: border-box; border-top: 1px solid #f0f0f0; border-right: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; transition: 0.2s; }
+        .full-card:active { transform: scale(0.98); }
+        .full-card .zone-icon { margin-bottom: 0; font-size: 35px; }
+        .full-card h3 { margin: 0; font-size: 18px; color: #FF9800; font-weight: bold; }
+
+        /* Mini Tasks */
+        .mini-task-grid { width: 90%; max-width: 400px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .mini-box { background: white; padding: 15px 10px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; }
+        .mini-box:active { transform: scale(0.95); border-color: #3b82f6; }
+        .mini-icon { font-size: 24px; margin-bottom: 5px; }
+        .mini-title { font-size: 13px; font-weight: bold; color: #334155; margin: 0; }
+        .mini-reward { font-size: 11px; color: #10b981; font-weight: bold; margin-top: 2px; }
+        
+        /* Premium Footer */
+        .premium-footer { margin-top: 20px; text-align: center; padding-bottom: 10px; }
+        .premium-footer p { margin: 0; font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; }
+        .premium-footer .brand { color: #4CAF50; font-weight: 900; font-size: 14px; }
+        .premium-footer .studio { color: #2196F3; font-weight: 900; font-size: 14px; }
+        
+        /* ONLINE USERS DOCK BAR STYLE */
+        .live-traffic-monitor-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: rgba(76, 175, 80, 0.08); border: 1px solid rgba(76, 175, 80, 0.2); padding: 8px 24px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #2e7d32; margin-top: 15px; margin-bottom: -5px; box-shadow: 0 2px 8px rgba(76,175,80,0.1); }
+        .glowing-pulse-dot { width: 8px; height: 8px; background-color: #4CAF50; border-radius: 50%; animation: pulseOpacity 1.5s infinite; box-shadow: 0 0 6px #4CAF50; }
+        @keyframes pulseOpacity { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+
+        /* LIVE TICKER BAR */
+        .reward-ticker-wrapper { width: 90%; max-width: 400px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; margin-top: 15px; margin-bottom: 5px; padding: 6px 10px; overflow: hidden; box-sizing: border-box; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+        .ticker-badge-live { background: #10b981; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; animation: flashBadge 1s infinite alternate; }
+        @keyframes flashBadge { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+        .marquee-container-box { overflow: hidden; white-space: nowrap; width: 100%; }
+        #livePayoutStream { display: inline-block; padding-left: 100%; font-size: 12.5px; font-weight: 600; color: #475569; position: relative; white-space: nowrap; }
+        #livePayoutStream span { margin-right: 40px; color: #16a34a; }
+        @keyframes smoothMarqueeLoop { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+
+        /* FULL SCREEN MAINTENANCE & SYSTEM OVERLAYS */
+        .system-restrict-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; color: #fff; box-sizing: border-box; backdrop-filter: blur(10px); }
+        #interceptorMaintenanceScreenOverlay { background: rgba(15, 23, 42, 0.95); }
+        #interceptorNetworkShieldOverlay { background: rgba(59, 7, 18, 0.95); }
+        #interceptorForceBuildUpgradeOverlay { background: rgba(26, 28, 58, 0.95); }
+        #interceptorAccessRestrictedOverlay { background: #000000; }
+        .restrict-icon { font-size: 60px; margin-bottom: 15px; }
+        .update-btn-style { background: #10b981; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 15px; box-shadow: 0 4px 10px rgba(16,185,129,0.3); }
+
+        /* WINNERS 3-TIER PODIUM */
+        .winners-podium-container { width: 90%; max-width: 400px; background: #ffffff; border-radius: 12px; padding: 15px; box-sizing: border-box; border: 1px solid #f0f0f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin: 10px 0; border-left: 5px solid #a855f7; }
+        .podium-title { font-size: 18px; color: #333; font-weight: 800; text-align: left; margin: 0 0 12px 0; }
+        .winner-rank-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 8px; border-bottom: 1px dashed #e2e8f0; font-size: 14px; font-weight: bold; }
+        .winner-rank-row:last-child { border-bottom: none; }
+        .rank-user-info { display: flex; align-items: center; gap: 10px; color: #334155; }
+        .winner-prize-tag { background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 12px; }
+
+        /* PROGRESS BAR & TASKS */
+        .task-progress-card { width: 90%; max-width: 400px; background: #1e293b; border-radius: 16px; padding: 20px; box-sizing: border-box; border: 1px solid #334155; margin: 20px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-title { font-size: 14px; font-weight: bold; color: #fff; }
+        .next-reward-hint { font-size: 12px; color: #fbbf24; font-weight: bold; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; transform: scale(1.02); } 100% { opacity: 0.8; } }
+        .progress-track { position: relative; background: #0f172a; height: 12px; border-radius: 6px; margin: 25px 0 15px 0; border: 1px solid #1e293b; }
+        .progress-fill { background: linear-gradient(to right, #3b82f6, #10b981); height: 100%; width: 0%; border-radius: 6px; transition: width 0.5s ease-in-out; }
+        .milestone { position: absolute; top: -6px; width: 22px; height: 22px; background: #1e293b; border: 3px solid #475569; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: #94a3b8; transform: translateX(-50%); z-index: 2; }
+        .milestone.achieved { border-color: #10b981; background: #10b981; color: #fff; }
+        .milestone-tag { position: absolute; top: -25px; font-size: 10px; font-weight: 800; color: #fbbf24; white-space: nowrap; transform: translateX(-50%); }
+
+        .checklist-container { margin-top: 15px; max-height: 0px; overflow-y: auto; overflow-x: hidden; padding-right: 4px; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .checklist-container.expanded { max-height: 210px; }
+        .checklist-container::-webkit-scrollbar { width: 5px; }
+        .checklist-container::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
+        .checklist-container::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+
+        .task-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 12px 15px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #1e293b; }
+        .task-info { display: flex; align-items: center; gap: 10px; }
+        .task-checkbox { width: 18px; height: 18px; accent-color: #10b981; pointer-events: none; }
+        .task-text { font-size: 13px; color: #e2e8f0; }
+        .task-reward { font-size: 12px; font-weight: bold; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 6px; }
+        .task-item.completed .task-text { text-decoration: line-through; color: #64748b; }
+        .task-item.completed { opacity: 0.7; border-color: rgba(16, 185, 129, 0.3); }
+
+        .toggle-tasks-btn { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: #3b82f6; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: 12px; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .toggle-tasks-btn:active { background: #1e293b; }
+        .toggle-tasks-btn .arrow-icon { font-size: 12px; transition: transform 0.3s ease; }
+        .toggle-tasks-btn.active .arrow-icon { transform: rotate(180deg); }
+
+        /* NOTIFICATION CENTER MODAL */
+        .notif-center-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1001; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .notif-center-card { background: #ffffff; border-radius: 20px; width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; box-shadow: 0 15px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; max-height: 80vh; position: relative; }
+        .notif-center-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0fdf4; padding-bottom: 10px; margin-bottom: 15px; }
+        .notif-center-header h3 { margin: 0; color: #166534; font-size: 18px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+        .close-notif-btn { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; font-weight: bold; color: #64748b; cursor: pointer; transition: 0.2s; }
+        .close-notif-btn:active { background: #e2e8f0; }
+        .notif-list-area { overflow-y: auto; flex-grow: 1; padding-right: 5px; display: flex; flex-direction: column; gap: 10px; }
+        .notif-list-area::-webkit-scrollbar { width: 4px; }
+        .notif-list-area::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .notif-list-area::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 10px; }
+        
+        .notif-item { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 12px 15px; border-radius: 8px; position: relative; }
+        .notif-item.urgent { border-left-color: #ef4444; background: #fef2f2; }
+        .notif-item.success { border-left-color: #22c55e; background: #f0fdf4; }
+        .notif-item h4 { margin: 0 0 5px 0; font-size: 14px; color: #1e293b; padding-right: 25px; }
+        .notif-item p { margin: 0; font-size: 12px; color: #475569; line-height: 1.4; }
+        .notif-time { font-size: 10px; color: #94a3b8; display: block; margin-top: 5px; text-align: right; }
+
+        .notif-delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 14px; cursor: pointer; opacity: 0.5; transition: 0.2s; padding:0; }
+        .notif-delete-btn:hover { opacity: 1; transform: scale(1.2); color: #ef4444; }
+        .clear-all-notif-btn { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .clear-all-notif-btn:active { transform: scale(0.95); }
+
+        /* URGENT TASK POPUP */
+        .urgent-task-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
+        .urgent-card { background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 3px solid #ef4444; border-radius: 20px; width: 100%; max-width: 350px; padding: 30px 20px; text-align: center; box-shadow: 0 0 40px rgba(239, 68, 68, 0.6); animation: urgentPulse 1.5s infinite alternate; }
+        @keyframes urgentPulse { 0% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); transform: scale(1); } 100% { box-shadow: 0 0 50px rgba(239, 68, 68, 0.8); transform: scale(1.02); } }
+        .urgent-card h3 { color: #fca5a5; margin: 0 0 10px 0; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .urgent-card p { color: #fecaca; font-size: 15px; line-height: 1.5; margin: 0 0 25px 0; font-weight: 500; }
+        .urgent-btn { background: linear-gradient(90deg, #facc15, #eab308); color: #713f12; border: none; padding: 14px 30px; border-radius: 50px; font-weight: 900; font-size: 16px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.4); transition: 0.2s; width: 100%; }
+        .urgent-btn:active { transform: scale(0.95); }
+        .urgent-close { background: transparent; border: none; color: #fca5a5; margin-top: 15px; text-decoration: underline; font-size: 12px; cursor: pointer; }
+
+        /* Modern Alert Modal Setup */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; width: 80%; max-width: 350px; text-align: center; }
+        .custom-alert.success-border { border-color: #10b981; }
+        .custom-alert p { margin: 0 0 15px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
+        .custom-alert button { background: #10b981; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1999; }
+        
+        /* OFFLINE BLOCKER */
+        #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); box-sizing: border-box; }
+        .offline-box-card { background: #0d1527; border: 2px solid #f43f5e; border-radius: 24px; padding: 35px 25px; width: 100%; max-width: 360px; box-shadow: 0 0 40px rgba(244, 63, 94, 0.3); }
+        .offline-icon-pulse { font-size: 55px; margin-bottom: 15px; animation: pulseIcon 1.5s infinite ease-in-out; }
+        @keyframes pulseIcon { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 15px #f43f5e); } 100% { transform: scale(1); opacity: 0.8; } }
+
+        /* 🔥 SURPRISE BOX PREMIUM DESIGN 🔥 */
+        .surprise-box-card {
+            width: 90%;
+            max-width: 400px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            border: 2px solid #a855f7;
+        }
+        .surprise-box-card::before {
+            content: '💕';
+            position: absolute;
+            font-size: 80px;
+            right: -10px;
+            top: -15px;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+        .surprise-badge {
+            background: #facc15;
+            color: #713f12;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: inline-block;
+            box-shadow: 0 2px 10px rgba(250, 204, 21, 0.3);
+        }
+        .surprise-content {
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+        }
+        .surprise-content .winner-label {
+            font-size: 15px;
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .surprise-content .winner-label span {
+            color: #fbcfe8;
+            font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .surprise-content .ticket-label {
+            font-size: 12px;
+            color: #e2e8f0;
+            font-family: monospace;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 10px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .play-surprise-btn {
+            background: #ffffff;
+            color: #6366f1;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: 0.2s;
+            text-transform: uppercase;
+            width: 100%;
+            z-index: 1;
+        }
+        .play-surprise-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<!-- 🌐 OFFLINE BLOCKER SCREEN -->
+<div id="globalOfflineWarningOverlay">
+    <div class="offline-box-card">
+        <div class="offline-icon-pulse">📡❌</div>
+        <h2 style="color: #f43f5e; font-size: 20px; font-weight: 900; text-transform: uppercase; margin: 0 0 10px 0;">No Internet Connection</h2>
+        <p style="color: #94a3b8; font-size: 13px; line-height: 1.5; margin: 0 0 20px 0;">Internet connection lost. Please enable your <b>Mobile Data</b> or <b>Wi-Fi</b> to continue.</p>
+        <button onclick="window.location.reload()" style="background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; width: 100%; box-shadow: 0 5px 15px rgba(244,63,94,0.4);">Retry Connection</button>
+    </div>
+</div>
+
+<!-- 🚨 GLOBAL ADMIN CONTROL SHIELDS -->
+<div class="system-restrict-overlay" id="interceptorMaintenanceScreenOverlay">
+    <div class="restrict-icon">🛠️</div>
+    <h3 style="font-weight:900; margin-bottom:6px; font-size: 22px;">Under Maintenance</h3>
+    <p style="font-size:14px; color:#94a3b8; line-height:1.4;">App is under temporary updates synchronization loops.<br>We will be back live shortly.</p>
+</div>
+
+<div class="system-restrict-overlay" id="interceptorNetworkShieldOverlay">
+    <div class="restrict-icon">🚫</div>
+    <h3 style="font-weight:900; margin-bottom:6px; font-size: 22px;">Unsupported Network</h3>
+    <p style="font-size:14px; color:#fca5a5; line-height:1.4;">To ensure a secure environment, the use of unauthorized network routing or VPNs is not permitted.</p>
+</div>
+
+<div class="system-restrict-overlay" id="interceptorForceBuildUpgradeOverlay">
+    <div class="restrict-icon">🛰️</div>
+    <h3 style="font-weight:900; margin-bottom:6px; font-size: 22px;">Update Required</h3>
+    <p style="font-size:14px; color:#9fa8da; line-height:1.4;">Your current application compile build version is deprecated.<br>Kindly update your build from direct production channel link.</p>
+    <button class="update-btn-style" id="btnForceBuildUpdateRedirectAnchor" onclick="executeForceBuildRedirectDownloadUrlActionPath()">UPDATE BUILD NOW</button>
+</div>
+
+<div class="system-restrict-overlay" id="interceptorAccessRestrictedOverlay">
+    <div class="restrict-icon">🚫</div>
+    <h3 style="font-weight:900; margin-bottom:6px; font-size: 22px; color: #ff3333;">Access Restricted</h3>
+    <p style="font-size:14px; color:#a0aec0; line-height:1.4;">Access to this account has been restricted due to unauthorized activity or Terms of Service violations.</p>
+</div>
+
+<div class="overlay" id="alertOverlay"></div>
+<div class="custom-alert" id="customAlertBox">
+    <p id="alertMessage">Message</p>
+    <button onclick="closeCustomAlert()">OK</button>
+</div>
+
+<!-- 🔥 URGENT TASK MODAL (FLASHING RED) -->
+<div class="urgent-task-modal" id="urgentTaskModalOverlay">
+    <div class="urgent-card">
+        <div style="font-size: 60px; margin-bottom: 10px; animation: pulse 1s infinite;">🚨</div>
+        <h3 id="urgentTaskTitle">High Paying Task!</h3>
+        <p id="urgentTaskDesc">Complete this new urgent survey to get 50 Coins instantly. This offer expires soon!</p>
+        <button class="urgent-btn" id="urgentTaskBtn">GO TO TASK NOW</button>
+        <button class="urgent-close" onclick="closeUrgentTask()">Skip for now</button>
+    </div>
+</div>
+
+<!-- 🔥 NOTIFICATION CENTER MODAL -->
+<div class="notif-center-modal" id="notificationCenterModal">
+    <div class="notif-center-card">
+        <div class="notif-center-header">
+            <h3>🔔 Notifications</h3>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="clear-all-notif-btn" onclick="clearAllNotifications()">Clear All</button>
+                <button class="close-notif-btn" onclick="closeNotificationCenter()">✕</button>
+            </div>
+        </div>
+        <div class="notif-list-area" id="notifListContainer">
+            <div style="text-align:center; color:#94a3b8; font-size:13px; margin-top:20px;">Loading updates...</div>
+        </div>
+    </div>
+</div>
+
+    <div class="header">
+        <h2 class="notranslate">Dudo</h2>
+        <div class="header-controls">
+            <select class="custom-lang-select notranslate" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">English</option><option value="hi">हिंदी (HI)</option><option value="bn">বাংলা (BN)</option>
+ <option value="te">తెలుగు (TE)</option><option value="mr">मराठी (MR)</option><option value="ta">தமிழ் (TA)</option>
+ <option value="ur">اردو (UR)</option><option value="gu">ગુજરાતી (GU)</option><option value="es">Español (ES)</option>
+ <option value="fr">Français (FR)</option><option value="ar">عربي (AR)</option><option value="pt">Português (PT)</option> <option value="ru">Русский (RU)</option>
+            </select>
+            <!-- 🔥 NOTIFICATION BELL BUTTON -->
+            <div class="notif-bell" onclick="openNotificationCenter()">
+                🔔<span class="notif-badge" id="notifUnreadBadge" style="display:none;">0</span>
+            </div>
+            <a href="profile.html" class="profile-icon notranslate" id="homeProfileIcon" style="overflow: hidden; text-decoration: none; display: flex; justify-content: center; align-items: center; padding: 0;">
+    👤
+</a>
+        </div>
+    </div>
+
+<div class="live-traffic-monitor-pill">
+    <div class="glowing-pulse-dot"></div>
+    <span>Online Users: <b id="lblLiveOnlineCalculatedTrafficCounter">1,065</b></span>
+</div>
+    
+    <div class="wallet-card">
+        <p data-i18n="total_balance">My Balance</p>
+        <h1 class="notranslate" id="liveBalance">₹ 0.00</h1>
+        <div class="coins-display"><span class="notranslate">🪙</span> <span id="liveCoins" class="notranslate">0</span> <span data-i18n="coins">Coins</span></div>
+        <br>
+        <div class="wallet-buttons-row">
+            <!-- Safe Ledger Button -->
+            <button class="ledger-btn" id="mod_my_points" onclick="window.location.href='my_points.html'" data-i18n="withdraw_btn">My Ledger</button>
+            <!-- System Add Points Button (Hidden by default for Play Store safety) -->
+            <button class="ledger-btn" id="mod_add_points" onclick="window.location.href='add_points.html'" style="display:none; background:#ffffff; color:#4CAF50; border: 1px solid #4CAF50;">+ Add Points</button>
+        </div>
+    </div>
+
+<div class="reward-ticker-wrapper">
+    <div class="ticker-badge-live">LIVE</div>
+    <div class="marquee-container-box">
+        <div id="livePayoutStream">Loading recent rewards...</div>
+    </div>
+</div>
+
+<!-- 🔥 DAILY PROGRESS TASK BAR -->
+<div class="task-progress-card">
+    <div class="progress-header">
+        <div class="progress-title">Daily Tasks Done: <span id="doneCount">0</span>/8</div>
+        <div class="next-reward-hint" id="rewardHint">Complete tasks to unlock bonus!</div>
+    </div>
+    
+    <div class="progress-track">
+        <div class="progress-fill" id="taskProgressFill"></div>
+        
+        <div class="milestone" style="left: 25%;" id="mNode1">
+            <div class="milestone-tag">+10🪙</div>2
+        </div>
+        <div class="milestone" style="left: 62.5%;" id="mNode2">
+            <div class="milestone-tag">+30🪙</div>5
+        </div>
+        <div class="milestone" style="left: 100%;" id="mNode3">
+            <div class="milestone-tag">+100🪙 🔥</div>8
+        </div>
+    </div>
+    
+    <div class="checklist-container" id="dailyChecklistHTML"></div>
+
+    <button class="toggle-tasks-btn" id="btnToggleDailyChecklistMenu" onclick="toggleDailyTasksChecklistDisplay()">
+        <span id="lblToggleTasksText" data-i18n="show_tasks_btn">Show Tasks</span>
+        <span class="arrow-icon">▼</span>
+    </button>
+</div>
+
+<!-- 🔥 PREMIUM SURPRISE BOX (Bug Fixed & Redesigned) 🔥 -->
+<div class="surprise-box-card" id="mod_surprise_box" style="display: none;">
+    <div class="surprise-badge">🎁 SURPRISE REWARD</div>
+    <div class="surprise-content">
+        <div class="winner-label">Last Winner: <span id="lwWinnerNameDisplay">Loading...</span></div>
+        <div class="ticket-label" id="lwWinnerTicketDisplay">Pass: #N/A</div>
+    </div>
+    <button class="play-surprise-btn" onclick="window.location.href='surprise.html'">Open Surprise Box ➔</button>
+</div>
+
+    <div class="ad-banner">
+        <script type="text/javascript">
+            atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+    </div>
+
+    <div class="section-title" data-i18n="earning_zones">Earning Zones</div>
+
+    <div class="grid-container">
+        <a href="daily.html" class="zone-card" id="mod_daily">
+            <div class="zone-icon">🎁</div>
+            <h3 style="color:#4CAF50;" data-i18n="daily_checkin">Daily Check-in</h3>
+            <p data-i18n="daily_desc">Earn Coins everyday</p>
+        </a>
+        <a href="tasks.html" class="zone-card" id="mod_tasks">
+            <div class="zone-icon">📺</div>
+            <h3 style="color:#2196F3;" data-i18n="watch_ads">Video Zone</h3>
+            <p data-i18n="watch_desc">Watch clips & earn</p>
+        </a>
+    </div>
+
+    <div class="ad-banner">
+    <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+</div>
+
+    <div class="grid-container">
+        <a href="apptesting.html" class="zone-card" id="mod_apptesting">
+            <div class="zone-icon">📱</div>
+            <h3 style="color:#e91e63;" data-i18n="app_testing">App Testing</h3>
+            <p data-i18n="app_desc">Premium Rewards</p>
+        </a>
+        <a href="social.html" class="zone-card" id="mod_social">
+            <div class="zone-icon">💬</div>
+            <h3 style="color:#009688;" data-i18n="social_tasks">Social Tasks</h3>
+            <p data-i18n="social_desc">Watch & Comment</p>
+        </a>
+    </div>
+
+    <div class="ad-banner">
+    <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+</div>
+
+<!-- Monlix & Monetag Balanced 2-Column Grid Area -->
+<div class="grid-container">
+    <a href="monlix.html" class="zone-card" id="mod_monlix" style="border-color: #a855f7;">
+        <div class="zone-icon">🔥</div>
+        <h3 style="color: #a855f7;">Monlix Offers</h3>
+        <p>Premium Games & Surveys</p>
+    </a>
+    
+    <a href="monetag.html" class="zone-card" id="mod_monetag" style="border-color: #ff5722;">
+        <div class="zone-icon">🚀</div>
+        <h3 style="color: #ff5722;">Monetag Tasks</h3>
+        <p>Smartlink & Video Ads</p>
+    </a>
+</div>
+
+    <div class="ad-banner">
+    <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+</div>
+
+<!-- AdGem Balanced 2-Column Grid Area -->
+<div class="grid-container">
+    <a href="adgem.html" class="zone-card" id="mod_adgem" style="border-color: #3f51b5;">
+        <div class="zone-icon">🎮</div>
+        <h3 style="color: #3f51b5;">AdGem Games</h3>
+        <p>High Payout Offerwall</p>
+    </a>
+    
+    <a href="greeting.html" class="zone-card" id="mod_greeting" style="border-color: #facc15; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.2);">
+    <div class="zone-icon" style="font-size: 30px;">🎉🥳</div>
+    <h3 style="color: #facc15; font-weight: 800;">Festive Wishes</h3>
+    <p style="color: #94a3b8;">Share with friends & Earn</p>
+</a>
+</div>
+
+    <div class="grid-container">
+        <a href="offers.html" class="zone-card" id="mod_mega_offers">
+            <div class="zone-icon">🔥</div>
+            <h3 style="color:#f44336;" data-i18n="mega_offers">Premium Offers</h3>
+            <p data-i18n="mega_desc">CPA Offers</p>
+        </a>
+        <a href="bonus.html" class="zone-card" id="mod_extra_bonus">
+            <div class="zone-icon">🚀</div>
+            <h3 style="color:#9c27b0;" data-i18n="extra_bonus">Extra Bonus</h3>
+            <p data-i18n="extra_desc">Games & Promo</p>
+        </a>
+    </div>
+
+<div class="section-title" style="margin-top: 20px; color: #10b981; font-weight: 800; text-transform: uppercase;">
+    Premium Micro Tasks
+</div>
+
+<div class="grid-container">
+    <a href="article.html" class="zone-card" id="mod_article" style="border-color: #06b6d4;">
+        <div class="zone-badge badge-hot">AdSense</div>
+        <div class="zone-icon">📰</div>
+        <h3 style="color: #06b6d4;">Read Articles</h3>
+        <p>Read 30s & Earn Coins</p>
+    </a>
+    <a href="1v1.html" class="zone-card" id="mod_1v1" style="border-color: #f59e0b;">
+        <div class="zone-icon">⚔️</div>
+        <h3 style="color: #f59e0b;">Coin Battle</h3>
+        <p>Play matches to win</p>
+    </a>
+</div>
+
+<div class="grid-container" style="margin-bottom: 20px;">
+    <a href="hourly_key.html" class="zone-card" id="mod_hourly_key" style="border-color: #ec4899;">
+        <div class="zone-badge badge-new">Hourly</div>
+        <div class="zone-icon">🔑</div>
+        <h3 style="color: #ec4899;">Hourly Key</h3>
+        <p>Claim free bonus keys</p>
+    </a>
+    <!-- System Module: Special Missions / Hidden Default -->
+    <a href="special_missions.html" class="zone-card" id="mod_special_missions" style="display:none; border-color: #ef4444;">
+        <div class="zone-icon">🔓</div>
+        <h3 style="color: #ef4444;">Special Mission</h3>
+        <p>Hidden bonus tasks</p>
+    </a>
+    
+    <!-- System Module: Web Explorer / Hidden Default -->
+    <a href="web_explorer.html" class="zone-card" id="mod_web_explorer" style="display:none; border-color: #64748b;">
+        <div class="zone-icon">🌐</div>
+        <h3 style="color: #64748b;">Web Explorer</h3>
+        <p>Browse and earn</p>
+    </a>
+</div>
+
+    <div class="ad-banner">
+        <script type="text/javascript">
+            atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+    </div>
+
+    <a href="spin.html" class="full-card" id="mod_spin">
+        <div class="zone-icon">🎡</div>
+        <div>
+            <h3 data-i18n="spin_win">Spin & Win</h3>
+            <p style="margin:0; font-size:12px; color:#777;" data-i18n="spin_desc">Spin & win daily</p>
+        </div>
+    </a>
+
+    <div class="section-title" data-i18n="quick_tasks">Quick Tasks</div>
+
+    <div class="mini-task-grid">
+        <div class="mini-box" id="mod_cpx" onclick="window.location.href='cpx.html'">
+            <div class="mini-icon">📊</div>
+            <p class="mini-title" data-i18n="cpx_survey">CPX Surveys</p>
+            <p class="mini-reward" data-i18n="up_to_50">Up to 50 🪙</p>
+        </div>
+        
+        <div class="mini-box" id="mod_top_rewards" onclick="window.location.href='top_rewards.html'">
+            <div class="mini-icon">⚡</div>
+            <p class="mini-title" data-i18n="clickearn">Instant Coins</p>
+            <p class="mini-reward" data-i18n="instant_coin">Instant 5 🪙</p>
+        </div>
+    </div>
+
+    <div class="mini-task-grid">
+       <div class="mini-box" id="mod_timewall" onclick="window.location.href='timewall.html'">
+            <div class="mini-icon">⏱️</div>
+            <p class="mini-title" data-i18n="time_wall">Timewall Clicks</p>
+            <p class="mini-reward" data-i18n="easy_tasks">Easy Tasks</p>
+        </div>
+        
+        <div class="mini-box" id="mod_bitlabs" onclick="window.location.href='bitlabs.html'">
+            <div class="mini-icon">🧬</div>
+            <p class="mini-title" data-i18n="bitlabs">Bitlabs Offer</p>
+            <p class="mini-reward" data-i18n="high_pay">High Paying</p>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <script type="text/javascript">
+            atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+    </div>
+
+<div class="section-title" style="margin-top: 20px; color: #f43f5e; font-weight: 800; text-transform: uppercase;">
+    Dudo Games Zone
+</div>
+
+<div class="grid-container" style="margin-top: 10px; margin-bottom: 15px;">
+    
+    <a href="game.html" class="zone-card" id="mod_square_dash" style="border-color: #f43f5e;">
+        <div class="zone-icon">🎯</div>
+        <h3 style="color: #f43f5e;">Square Dash</h3>
+        <p>Play game & earn coins</p>
+    </a>
+    
+    <a href="pool.html" class="zone-card" id="mod_pool" style="border-color: #10b981;">
+        <div class="zone-badge" style="position: absolute; top: 8px; right: 8px; font-size: 8px; background: #10b981; color: #fff; padding: 2px 6px; border-radius: 10px; font-weight: bold;">POOL</div>
+        <div class="zone-icon">🎱</div>
+        <h3 style="color: #10b981;">4-Player Pool</h3>
+        <p>Play pool & earn rewards</p>
+    </a>
+
+    <!-- System Module: Esports Zone (Hidden Default for Play Store) -->
+    <a href="esports_zone.html" class="zone-card" id="mod_esports_zone" style="display:none; border-color: #f97316;">
+        <div class="zone-icon">🎮</div>
+        <h3 style="color: #f97316;">Esports Zone</h3>
+        <p>Join Daily Custom Rooms</p>
+    </a>
+    
+</div>
+
+<!-- 🔥 SERVER DRIVEN UI (DYNAMIC MODULES INJECTED HERE BY ADMIN) 🔥 -->
+<div class="section-title" id="dynamicSectionTitle" style="display:none; color: #a855f7;">New Discoveries</div>
+<div class="grid-container" id="dynamicAdminModulesContainer">
+    <!-- Javascript will generate new buttons here from Firebase -->
+</div>
+
+<div class="winners-podium-container" id="anchor_retention">
+    <h3 class="podium-title" id="lblWinnerSectionHeadline">Winners</h3>
+    <div style="display:flex; flex-direction:column;">
+        
+        <div class="winner-rank-row">
+            <div class="rank-user-info">
+                <span class="rank-medal">🥇</span>
+                <div class="rank-text"><b>1st:</b> <span class="rank-user-name" id="lblWinnerRank1Name">Loading...</span></div>
+            </div>
+            <div class="winner-prize-tag" id="lblWinnerRank1Prize">+0 Coins</div>
+        </div>
+        
+        <div class="winner-rank-row">
+            <div class="rank-user-info">
+                <span class="rank-medal">🥈</span>
+                <div class="rank-text"><b>2nd:</b> <span class="rank-user-name" id="lblWinnerRank2Name">Loading...</span></div>
+            </div>
+            <div class="winner-prize-tag" id="lblWinnerRank2Prize">+0 Coins</div>
+        </div>
+        
+        <div class="winner-rank-row">
+            <div class="rank-user-info">
+                <span class="rank-medal">🥉</span>
+                <div class="rank-text"><b>3rd:</b> <span class="rank-user-name" id="lblWinnerRank3Name">Loading...</span></div>
+            </div>
+            <div class="winner-prize-tag" id="lblWinnerRank3Prize">+0 Coins</div>
+        </div>
+        
+    </div>
+</div>
+
+    <div class="premium-footer notranslate">
+        <p>Powered by <span class="brand">Shubham</span> <span style="color:#ccc;">||</span> <span class="studio">tvtune</span></p>
+    </div>
+
+    <script>
+    // 🌐 GLOBAL NETWORK STATUS MONITOR
+function checkUserNetworkStatusConnection() {
+    const overlayNode = document.getElementById("globalOfflineWarningOverlay");
+    if (!navigator.onLine) {
+        if (overlayNode) overlayNode.style.display = "flex";
+    } else {
+        if (overlayNode) overlayNode.style.display = "none";
+    }
+}
+
+window.addEventListener('online', () => {
+    const overlayNode = document.getElementById("globalOfflineWarningOverlay");
+    if (overlayNode) overlayNode.style.display = "none";
+});
+
+window.addEventListener('offline', () => {
+    const overlayNode = document.getElementById("globalOfflineWarningOverlay");
+    if (overlayNode) overlayNode.style.display = "flex";
+});
+
+// Run check immediately on page load
+window.addEventListener("DOMContentLoaded", () => {
+    checkUserNetworkStatusConnection();
+});
+        const langData = {
+            "en": {
+                "total_balance": "My Balance", "coins": "Coins", "withdraw_btn": "My Rewards", "earning_zones": "Earning Zones",
+                "daily_checkin": "Daily Check-in", "daily_desc": "Earn Coins everyday", "watch_ads": "Video Zone", "watch_desc": "Watch clips & earn",
+                "app_testing": "App Testing", "app_desc": "Premium Rewards", "social_tasks": "Social Tasks", "social_desc": "Watch & Comment",
+                "mega_offers": "Premium Offers", "mega_desc": "CPA Offers", "extra_bonus": "Extra Bonus", "extra_desc": "Games & Promo",
+                "spin_win": "Spin & Win", "spin_desc": "Spin & win daily", "quick_tasks": "Quick Tasks",
+                "cpx_survey": "CPX Surveys", "up_to_50": "Up to 50 🪙", "click_earn": "Instant Coins", "instant_coin": "Instant 5 🪙",
+                "time_wall": "Timewall Clicks", "easy_tasks": "Easy Tasks", "bitlabs": "Bitlabs Offer", "high_pay": "High Paying",
+                "show_tasks_btn": "Show Tasks", "hide_tasks_btn": "Hide Tasks"
+            },
+ "hi": {
+"total_balance": "मेरा बैलेंस", "coins": "सिक्के", "withdraw_btn": "मेरे रिवॉर्ड", "earning_zones": "कमाई के तरीके",
+"daily_checkin": "दैनिक चेक-इन", "daily_desc": "रोजाना सिक्के कमाएं", "watch_ads": "वीडियो ज़ोन", "watch_desc": "वीडियो देखें और कमाएं",
+"app_testing": "ऐप टेस्टिंग", "app_desc": "प्रीमियम रिवॉर्ड", "social_tasks": "सोशल टास्क", "social_desc": "देखें और कमेंट करें",
+"mega_offers": "प्रीमियम ऑफर्स", "mega_desc": "ऐप इंस्टॉल ऑफर्स", "extra_bonus": "अतिरिक्त बोनस", "extra_desc": "गेम और प्रोमो",
+"spin_win": "स्पिन और विन", "spin_desc": "रोजाना घुमाएं", "quick_tasks": "क्विक टास्क",
+"cpx_survey": "CPX सर्वे", "up_to_50": "50 🪙 तक", "click_earn": "इंस्टेंट कॉइन्स", "instant_coin": "तुरंत 5 🪙",
+"time_wall": "Timewall टास्क", "easy_tasks": "आसान टास्क", "bitlabs": "Bitlabs ऑफर", "high_pay": "ज्यादा कमाई",
+"show_tasks_btn": "टास्क दिखाएं", "hide_tasks_btn": "टास्क छुपाएं"
+},
+"bn": {
+                "total_balance": "মোট ব্যালেন্স", "coins": "কয়েন", "withdraw_btn": "আমার রিওয়ার্ড", "earning_zones": "উপার্জন অঞ্চল",
+                "daily_checkin": "দৈনিক চেক-ইন", "daily_desc": "প্রতিদিন কয়েন উপার্জন করুন", "watch_ads": "ভিডিও জোন", "watch_desc": "ভিডিও দেখে আয় করুন",
+                "app_testing": "অ্যাপ টেস্টিং", "app_desc": "প্রিমিয়াম রিওয়ার্ড", "social_tasks": "সোশ্যাল টাস্ক", "social_desc": "দেখুন এবং মন্তব্য করুন",
+                "mega_offers": "প্রিমিয়াম অফার", "mega_desc": "অ্যাপ ইনস্টল অফার", "extra_bonus": "অতিরিক্ত বোনাস", "extra_desc": "গেমস এবং প্রোমো",
+                "spin_win": "স্পিন এবং জয়", "spin_desc": "প্রতিদিন স্পিন করুন", "quick_tasks": "দ্রুত টাস্ক",
+                "cpx_survey": "CPX সার্ভে", "up_to_50": "50 🪙 পর্যন্ত", "click_earn": "ইনস্ট্যান্ট কয়েন", "instant_coin": "তাত্ক্ষণিক 5 🪙",
+                "time_wall": "Timewall ক্লিক", "easy_tasks": "সহজ কাজ", "bitlabs": "Bitlabs অফার", "high_pay": "বেশি আয়",
+                "show_tasks_btn": "টাস্ক দেখান", "hide_tasks_btn": "টাস্ক লুকান"
+ },
+     "te": {
+                "total_balance": "మొత్తం బ్యాలెన్స్", "coins": "నాణేలు", "withdraw_btn": "నా రివార్డ్స్", "earning_zones": "సంపాదన మార్గాలు",
+                "daily_checkin": "రోజువారీ చెక్-ఇన్", "daily_desc": "ప్రతిరోజూ నాణేలు సంపాదించండి", "watch_ads": "వీడియో జోన్", "watch_desc": "చూడండి & సంపాదించండి",
+                "app_testing": "యాప్ టెస్టింగ్", "app_desc": "ప్రీమియం రివార్డ్స్", "social_tasks": "సామాజిక పనులు", "social_desc": "చూడండి & వ్యాఖ్యానించండి",
+                "mega_offers": "ప్రీమియం ఆఫర్‌లు", "mega_desc": "CPA ఆఫర్‌లు", "extra_bonus": "అదనపు బోనస్", "extra_desc": "గేమ్స్ & ప్రోమో",
+                "spin_win": "స్పిన్ & విన్", "spin_desc": "రోజూ ఆడండి", "quick_tasks": "శీఘ్ర పనులు",
+                "cpx_survey": "CPX సర్వేలు", "up_to_50": "50 🪙 వరకు", "click_earn": "ఇన్‌స్టంట్ కాయిన్స్", "instant_coin": "తక్షణం 5 🪙",
+                "time_wall": "Timewall పనులు", "easy_tasks": "సులువు పనులు", "bitlabs": "Bitlabs ఆఫర్", "high_pay": "అధిక చెల్లింపు",
+                "show_tasks_btn": "టాస్క్‌లు చూపించు", "hide_tasks_btn": "టాస్క్‌లు దాచు"
+            },
+            "mr": {
+                "total_balance": "एकूण शिल्लक", "coins": "नाणी", "withdraw_btn": "माझे रिवॉर्ड्स", "earning_zones": "कमाईचे मार्ग",
+                "daily_checkin": "दैनिक चेक-इन", "daily_desc": "दररोज नाणी मिळवा", "watch_ads": "व्हिडिओ झोन", "watch_desc": "व्हिडिओ पाहून कमवा",
+                "app_testing": "अॅप टेस्टिंग", "app_desc": "प्रीमियम रिवॉर्ड", "social_tasks": "सोशल टास्क", "social_desc": "पहा आणि टिप्पणी करा",
+                "mega_offers": "प्रीमियम ऑफर्स", "mega_desc": "अॅप इन्स्टॉल करा", "extra_bonus": "अतिरिक्त बोनस", "extra_desc": "गेम्स आणि प्रोमो",
+                "spin_win": "स्पिन आणि जिंका", "spin_desc": "दररोज स्पिन करा", "quick_tasks": "क्विक टास्क",
+                "cpx_survey": "CPX सर्वेक्षण", "up_to_50": "50 🪙 पर्यंत", "click_earn": "इन्स्टंट कॉइन्स", "instant_coin": "त्वरित 5 🪙",
+                "time_wall": "Timewall टास्क", "easy_tasks": "सोपी कामे", "bitlabs": "Bitlabs ऑफर", "high_pay": "जास्त कमाई",
+                "show_tasks_btn": "टास्क दाखवा", "hide_tasks_btn": "टास्क लपवा"
+            },
+            "ta": {
+                "total_balance": "மொத்த இருப்பு", "coins": "நாணயங்கள்", "withdraw_btn": "என் வெகுமதிகள்", "earning_zones": "வருமான வழிகள்",
+                "daily_checkin": "தினசரி செக்-இன்", "daily_desc": "தினமும் நாணயங்களை பெறுங்கள்", "watch_ads": "வீடியோ மண்டலம்", "watch_desc": "பார்த்து சம்பாதிக்கவும்",
+                "app_testing": "பயன்பாடு சோதனை", "app_desc": "பிரீமியம் வெகுமதி", "social_tasks": "சமூக பணிகள்", "social_desc": "பார்த்து கருத்து தெரிவிக்கவும்",
+                "mega_offers": "பிரீமியம் சலுகைகள்", "mega_desc": "CPA சலுகைகள்", "extra_bonus": "கூடுதல் போனஸ்", "extra_desc": "விளையாட்டுகள் & ப்ரோமோ",
+                "spin_win": "ஸ்பின் & வின்", "spin_desc": "தினமும் விளையாடுங்கள்", "quick_tasks": "விரைவான பணிகள்",
+                "cpx_survey": "CPX ஆய்வுகள்", "up_to_50": "50 🪙 வரை", "click_earn": "உடனடி நாணயங்கள்", "instant_coin": "உடனடி 5 🪙",
+                "time_wall": "Timewall பணிகள்", "easy_tasks": "எளிய பணிகள்", "bitlabs": "Bitlabs சலுகை", "high_pay": "அதிக வருமானம்",
+                "show_tasks_btn": "பணிகளைக் காட்டு", "hide_tasks_btn": "பணிகளை மறை"
+ },
+    "ur": {
+                "total_balance": "کل بیلنس", "coins": "سکے", "withdraw_btn": "میرے انعامات", "earning_zones": "کمائی کے زونز",
+                "daily_checkin": "روزانہ چیک ان", "daily_desc": "روزانہ سکے کمائیں", "watch_ads": "ویڈیو زون", "watch_desc": "دیکھیں اور کمائیں",
+                "app_testing": "ایپ ٹیسٹنگ", "app_desc": "پریمیم انعامات", "social_tasks": "سوشل ٹاسک", "social_desc": "دیکھیں اور تبصرہ کریں",
+                "mega_offers": "پریمیم آفرز", "mega_desc": "CPA آفرز", "extra_bonus": "اضافی بونس", "extra_desc": "گیمز اور پرومو",
+                "spin_win": "اسپن اور جیتیں", "spin_desc": "روزانہ اسپن کریں", "quick_tasks": "فوری ٹاسک",
+                "cpx_survey": "CPX سروے", "up_to_50": "50 🪙 تک", "click_earn": "فوری کوئنز", "instant_coin": "فوری 5 🪙",
+                "time_wall": "Timewall ٹاسک", "easy_tasks": "آسان ٹاسک", "bitlabs": "Bitlabs آفر", "high_pay": "زیادہ کمائی",
+                "show_tasks_btn": "ٹاسک دکھائیں", "hide_tasks_btn": "ٹاسک چھپائیں"
+            },
+            "gu": {
+                "total_balance": "કુલ બેલેન્સ", "coins": "સિક્કા", "withdraw_btn": "મારા ઇનામો", "earning_zones": "કમાણીના ઝોન",
+                "daily_checkin": "દૈનિક ચેક-ઇન", "daily_desc": "દરરોજ સિક્કા કમાઓ", "watch_ads": "વિડિઓ ઝોન", "watch_desc": "જુઓ અને કમાઓ",
+                "app_testing": "એપ્લિકેશન ટેસ્ટિંગ", "app_desc": "પ્રીમિયમ ઇનામો", "social_tasks": "સામાજિક કાર્યો", "social_desc": "જુઓ અને ટિપ્પણી કરો",
+                "mega_offers": "પ્રીમિયમ ઓફર્સ", "mega_desc": "CPA ઓફર્સ", "extra_bonus": "વધારાનું બોનસ", "extra_desc": "રમતો અને પ્રોમો",
+                "spin_win": "સ્પિન અને જીતો", "spin_desc": "દરરોજ રમો", "quick_tasks": "ઝડપી કાર્યો",
+                "cpx_survey": "CPX સર્વે", "up_to_50": "50 🪙 સુધી", "click_earn": "તરત સિક્કા", "instant_coin": "તરત 5 🪙",
+                "time_wall": "Timewall કાર્યો", "easy_tasks": "સરળ કાર્યો", "bitlabs": "Bitlabs ઓફર", "high_pay": "વધુ ચૂકવણી",
+                "show_tasks_btn": "કાર્યો બતાવો", "hide_tasks_btn": "કાર્યો છુપાવો"
+            },
+            "es": {
+                "total_balance": "Saldo Total", "coins": "Monedas", "withdraw_btn": "Mis Recompensas", "earning_zones": "Zonas de Ganancia",
+                "daily_checkin": "Registro Diario", "daily_desc": "Gana monedas a diario", "watch_ads": "Zona de Video", "watch_desc": "Mira y gana",
+                "app_testing": "Probar Apps", "app_desc": "Recompensas Premium", "social_tasks": "Tareas Sociales", "social_desc": "Mira y comenta",
+                "mega_offers": "Ofertas Premium", "mega_desc": "Ofertas CPA", "extra_bonus": "Bono Extra", "extra_desc": "Juegos y Promos",
+                "spin_win": "Gira y Gana", "spin_desc": "Gira a diario", "quick_tasks": "Tareas Rápidas",
+                "cpx_survey": "Encuestas CPX", "up_to_50": "Hasta 50 🪙", "click_earn": "Monedas al Instante", "instant_coin": "5 🪙 al instante",
+                "time_wall": "Tareas Timewall", "easy_tasks": "Tareas Fáciles", "bitlabs": "Oferta Bitlabs", "high_pay": "Buen Pago",
+                "show_tasks_btn": "Mostrar Tareas", "hide_tasks_btn": "Ocultar Tareas"
+ },
+   "fr": {
+                "total_balance": "Solde Total", "coins": "Pièces", "withdraw_btn": "Mes Récompenses", "earning_zones": "Zones de Gain",
+                "daily_checkin": "Check-in Quotidien", "daily_desc": "Gagnez chaque jour", "watch_ads": "Zone Vidéo", "watch_desc": "Regardez et gagnez",
+                "app_testing": "Test d'App", "app_desc": "Récompense Premium", "social_tasks": "Tâches Sociales", "social_desc": "Regardez et commentez",
+                "mega_offers": "Offres Premium", "mega_desc": "Offres CPA", "extra_bonus": "Bonus Extra", "extra_desc": "Jeux & Promos",
+                "spin_win": "Tournez & Gagnez", "spin_desc": "Tournez chaque jour", "quick_tasks": "Tâches Rapides",
+                "cpx_survey": "Sondages CPX", "up_to_50": "Jusqu'à 50 🪙", "click_earn": "Pièces Instantanées", "instant_coin": "5 🪙 instantanés",
+                "time_wall": "Tâches Timewall", "easy_tasks": "Tâches Faciles", "bitlabs": "Offre Bitlabs", "high_pay": "Haut Paiement",
+                "show_tasks_btn": "Afficher les tâches", "hide_tasks_btn": "Masquer les tâches"
+            },
+            "ar": {
+                "total_balance": "إجمالي الرصيد", "coins": "معادلات", "withdraw_btn": "مكافآتي", "earning_zones": "مناطق الكسب",
+                "daily_checkin": "تسجيل يومي", "daily_desc": "اكسب كل يوم", "watch_ads": "منطقة الفيديو", "watch_desc": "شاهد واربح",
+                "app_testing": "اختبار التطبيقات", "app_desc": "مكافآت مميزة", "social_tasks": "مهام اجتماعية", "social_desc": "شاهد وعلق",
+                "mega_offers": "عروض مميزة", "mega_desc": "عروض CPA", "extra_bonus": "مكافأة إضافية", "extra_desc": "ألعاب وعروض",
+                "spin_win": "دور واربح", "spin_desc": "العب يومياً", "quick_tasks": "مهام سريعة",
+                "cpx_survey": "استطلاعات CPX", "up_to_50": "حتى 50 🪙", "click_earn": "عملات فورية", "instant_coin": "5 🪙 فوراً",
+                "time_wall": "مهام Timewall", "easy_tasks": "مهام سهلة", "bitlabs": "عروض Bitlabs", "high_pay": "عالي الدفع",
+                "show_tasks_btn": "إظهار المهام", "hide_tasks_btn": "إخفاء المهام"
+            },
+            "pt": {
+                "total_balance": "Saldo Total", "coins": "Moedas", "withdraw_btn": "Minhas Recompensas", "earning_zones": "Zonas de Ganho",
+                "daily_checkin": "Check-in Diário", "daily_desc": "Ganhe todos os dias", "watch_ads": "Zona de Vídeo", "watch_desc": "Assista e ganhe",
+                "app_testing": "Testar Apps", "app_desc": "Recompensas Premium", "social_tasks": "Tarefas Sociais", "social_desc": "Assista e comente",
+                "mega_offers": "Ofertas Premium", "mega_desc": "Ofertas CPA", "extra_bonus": "Bônus Extra", "extra_desc": "Jogos e Promos",
+                "spin_win": "Gire e Ganhe", "spin_desc": "Gire diariamente", "quick_tasks": "Tarefas Rápidas",
+                "cpx_survey": "Pesquisas CPX", "up_to_50": "Até 50 🪙", "click_earn": "Moedas Instantâneas", "instant_coin": "5 🪙 na hora",
+                "time_wall": "Tarefas Timewall", "easy_tasks": "Tarefas fáceis", "bitlabs": "Oferta Bitlabs", "high_pay": "Bom Pagamento",
+                "show_tasks_btn": "Mostrar Tarefas", "hide_tasks_btn": "Ocultar Tarefas"
+            },
+            "ru": {
+                "total_balance": "Общий баланс", "coins": "Монеты", "withdraw_btn": "Мои Награды", "earning_zones": "Зоны заработка",
+                "daily_checkin": "Ежедневная отметка", "daily_desc": "Монеты каждый день", "watch_ads": "Видео Зона", "watch_desc": "Смотри и зарабатывай",
+                "app_testing": "Тест приложений", "app_desc": "Премиум Награды", "social_tasks": "Соц. задания", "social_desc": "Смотри и комментируй",
+                "mega_offers": "Премиум предложения", "mega_desc": "CPA предложения", "extra_bonus": "Экстра бонус", "extra_desc": "Игры и акции",
+                "spin_win": "Крути и выигрывай", "spin_desc": "Крути каждый день", "quick_tasks": "Быстрые задания",
+                "cpx_survey": "Опросы CPX", "up_to_50": "До 50 🪙", "click_earn": "Мгновенные монеты", "instant_coin": "Сразу 5 🪙",
+                "time_wall": "Задания Timewall", "easy_tasks": "Легкие задания", "bitlabs": "Оффер Bitlabs", "high_pay": "Высокая оплата",
+                "show_tasks_btn": "Показать задания", "hide_tasks_btn": "Скрыть задания"
+            }
+
+        };
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+    </script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId");
+
+        // ======= 📊 DAILY CHECKLIST TASK SHEETS REGISTER =======
+        const dailyTasksList = [
+            { id: "t1", text: "Watch Video Ad 1", coins: 10 },
+            { id: "t2", text: "Watch Video Ad 2", coins: 10 },
+            { id: "t3", text: "Click Premium Banner Ad", coins: 15 },
+            { id: "t4", text: "Spin the Lucky Wheel 3 Times", coins: 12 },
+            { id: "t5", text: "Complete 1 Math Quiz", coins: 20 },
+            { id: "t6", text: "Claim Hourly Vault Key", coins: 15 },
+            { id: "t11", text: "Play Daily Spin", coins: 10 },
+            { id: "t15", text: "Play Square Dash Arcade", coins: 20 }
+        ];
+        
+        function toggleDailyTasksChecklistDisplay() {
+            const container = document.getElementById("dailyChecklistHTML");
+            const toggleBtn = document.getElementById("btnToggleDailyChecklistMenu");
+            const toggleText = document.getElementById("lblToggleTasksText");
+            
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            const transObj = langData[savedLang] || langData["en"];
+            
+            if (!container || !toggleBtn || !toggleText) return;
+            
+            if (container.classList.contains("expanded")) {
+                container.classList.remove("expanded");
+                toggleBtn.classList.remove("active");
+                toggleText.innerText = transObj["show_tasks_btn"] || "Show Tasks";
+            } else {
+                container.classList.add("expanded");
+                toggleBtn.classList.add("active");
+                toggleText.innerText = transObj["hide_tasks_btn"] || "Hide Tasks";
+            }
+        }
+
+        // 🔔 NOTIFICATION SYSTEM WITH LOCAL DELETE LOGIC
+        let globalFetchedNotifsData = {};
+
+        function renderNotificationsListUI() {
+            const listContainer = document.getElementById("notifListContainer");
+            const badge = document.getElementById("notifUnreadBadge");
+            if (!listContainer) return;
+            
+            listContainer.innerHTML = "";
+            let unreadCount = 0;
+            let viewedIds = JSON.parse(localStorage.getItem("viewed_notifications") || "[]");
+            let deletedNotifsArray = JSON.parse(localStorage.getItem("user_deleted_notifs") || "[]");
+            let hasVisible = false;
+
+            let keys = Object.keys(globalFetchedNotifsData).reverse();
+            keys.forEach(key => {
+                if (!deletedNotifsArray.includes(key)) {
+                    hasVisible = true;
+                    let n = globalFetchedNotifsData[key];
+                    if (!viewedIds.includes(key)) unreadCount++;
+                    
+                    let styleClass = n.type === "urgent" ? "urgent" : (n.type === "success" ? "success" : "");
+
+                    listContainer.innerHTML += `
+                        <div class="notif-item ${styleClass}" style="position:relative;">
+                            <button class="notif-delete-btn" onclick="deleteSingleNotification('${key}')">🗑️</button>
+                            <h4 style="padding-right:25px;">${n.title}</h4>
+                            <p>${n.message}</p>
+                            ${n.image_url ? `<img src="${n.image_url}" style="width:100%; border-radius:6px; margin-top:8px; margin-bottom:8px;">` : ''}
+                            <span class="notif-time">${n.date || "Just now"}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            if (!hasVisible) {
+                listContainer.innerHTML = `<div style="text-align:center; padding:30px 10px; color:#94a3b8; font-size:13px;">🎉 You're all caught up!<br><small>No new notifications right now.</small></div>`;
+            }
+
+            badge.innerText = unreadCount;
+            if (unreadCount > 0) {
+                badge.style.display = "flex";
+            } else {
+                badge.style.display = "none";
+            }
+
+            window.latestNotificationIds = keys;
+        }
+
+        window.deleteSingleNotification = function(notifKey) {
+            let deleted = JSON.parse(localStorage.getItem("user_deleted_notifs") || "[]");
+            if (!deleted.includes(notifKey)) {
+                deleted.push(notifKey);
+                localStorage.setItem("user_deleted_notifs", JSON.stringify(deleted));
+            }
+            renderNotificationsListUI(); 
+        };
+
+        window.clearAllNotifications = function() {
+            let deleted = JSON.parse(localStorage.getItem("user_deleted_notifs") || "[]");
+            Object.keys(globalFetchedNotifsData).forEach(key => {
+                if (!deleted.includes(key)) {
+                    deleted.push(key);
+                }
+            });
+            localStorage.setItem("user_deleted_notifs", JSON.stringify(deleted));
+            renderNotificationsListUI(); 
+        };
+
+        // 🔔 MODAL CONTROLS
+        function openNotificationCenter() {
+            document.getElementById("notificationCenterModal").style.display = "flex";
+            if(window.latestNotificationIds) {
+                localStorage.setItem("viewed_notifications", JSON.stringify(window.latestNotificationIds));
+            }
+            document.getElementById("notifUnreadBadge").style.display = "none";
+            document.getElementById("notifUnreadBadge").innerText = "0";
+            renderNotificationsListUI();
+        }
+        function closeNotificationCenter() {
+            document.getElementById("notificationCenterModal").style.display = "none";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // 🛑 GLOBAL DYNAMIC TOGGLE ENGINE (PLAY STORE SAFE) 🛑
+            // Admin panel can show or hide any of these buttons globally
+            database.ref('global_system_runtime_configurations/module_toggles').on('value', (snap) => {
+                let toggles = snap.val() || {};
+                const allModules = [
+                    'add_points', 'my_points', 'daily', 'tasks', 'apptesting', 'social', 
+                    'monlix', 'monetag', 'adgem', 'greeting', 'mega_offers', 'extra_bonus', 
+                    'article', '1v1', 'hourly_key', 'special_missions', 'spin', 'cpx', 
+                    'top_rewards', 'timewall', 'bitlabs', 'square_dash', 'pool', 
+                    'esports_zone', 'lucky_box', 'web_explorer', 'surprise_box'
+                ];
+                
+                // Danger buttons default to HIDDEN. Must strictly be TRUE in database to show.
+                const dangerModules = ['add_points', 'esports_zone', 'special_missions', 'web_explorer', 'lucky_box', 'surprise_box'];
+
+                allModules.forEach(mod => {
+                    let el = document.getElementById('mod_' + mod);
+                    if(el) {
+                        if (dangerModules.includes(mod)) {
+                            // If it's lucky_box toggle in DB, apply to surprise_box in UI
+                            let dbToggleKey = (mod === 'surprise_box') ? 'lucky_box' : mod;
+                            el.style.display = (toggles[dbToggleKey] === true) ? '' : 'none';
+                        } else {
+                            // Safe modules show by default, unless explicitly set to FALSE
+                            el.style.display = (toggles[mod] === false) ? 'none' : '';
+                        }
+                    }
+                });
+            });
+
+            // 🔒 1. HARDWARE BAN SECURITY SHIELD CHECK
+            database.ref('users/' + uid + '/account_security_status_state_flag').on('value', (snap) => {
+                if (snap.exists() && snap.val() === "BANNED_TERMINATED") {
+                    document.body.innerHTML = `
+                        <div style="background:#0f172a; width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-align:center; padding:20px; box-sizing:border-box;">
+                            <div style="font-size:60px; margin-bottom:15px;">🚫</div>
+                            <h1 style="color:#f43f5e; margin:0 0 10px 0; font-size:24px; text-transform:uppercase;">Account Restricted</h1>
+                            <p style="color:#94a3b8; font-size:14px; max-width:350px; line-height:1.5; margin:0 0 25px 0;">Access to this account has been restricted due to unauthorized activity or Terms of Service violations.</p>
+                            <div style="background:#1e293b; border:1px solid #334155; padding:10px 20px; border-radius:10px; font-family:monospace; font-size:12px; color:#cbd5e1;">UID: ${uid}</div>
+                        </div>
+                    `;
+                    localStorage.removeItem("userId");
+                }
+            });
+
+            // 🔔 2. ISOLATED WARNING PUSH INBOX LISTENER
+            database.ref('users/' + uid + '/personal_alert_inbox_node').on('value', (snap) => {
+                if (snap.exists()) {
+                    let alertData = snap.val();
+                    if (alertData.unread_status_flag) {
+                        showIsolatedWarningPopup(alertData.title, alertData.message);
+                        database.ref('users/' + uid + '/personal_alert_inbox_node/unread_status_flag').set(false);
+                    }
+                }
+            });
+
+            function showIsolatedWarningPopup(title, message) {
+                let existingOverlay = document.getElementById("isolatedAlertOverlay");
+                if (existingOverlay) existingOverlay.remove();
+                
+                let popupHtml = `
+                    <div id="isolatedAlertOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999999; display:flex; justify-content:center; align-items:center; padding:20px; backdrop-filter:blur(5px);">
+                        <div style="background:#1e293b; border:2px solid #f43f5e; border-radius:20px; padding:25px; width:100%; max-width:340px; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.6);">
+                            <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
+                            <h3 style="color:#fff; margin:0 0 10px 0; font-size:18px;">${title}</h3>
+                            <p style="color:#cbd5e1; font-size:13px; line-height:1.5; margin:0 0 20px 0;">${message}</p>
+                            <button onclick="document.getElementById('isolatedAlertOverlay').remove()" style="background:#f43f5e; color:#fff; border:none; padding:10px 30px; border-radius:30px; font-weight:bold; cursor:pointer; text-transform:uppercase;">I Understand</button>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', popupHtml);
+            }
+
+            if (!uid) { window.location.href = "index.html"; return; }
+            
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+            
+            // 1. BALANCE & PROGRESS TRACKER
+            database.ref('users/' + uid).on('value', (snap) => {
+                if (snap.exists()) {
+                    let bal = snap.val().balance || 0;
+                    let coins = snap.val().coins || 0;
+                    document.getElementById("liveBalance").innerText = "₹ " + bal.toFixed(2);
+                    document.getElementById("liveCoins").innerText = coins;
+                    // Profile Pic Update Logic
+if (snap.val().profile_pic) {
+    document.getElementById("homeProfileIcon").innerHTML = `<img src="${snap.val().profile_pic}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+}
+                    
+                    let todayDateString = new Date().toDateString();
+                    let lastResetDate = localStorage.getItem("last_task_reset_date");
+
+                    if (lastResetDate !== todayDateString) {
+                        database.ref('users/' + uid).update({
+                            completed_daily_tasks_array_node: []
+                        }).then(() => {
+                            localStorage.setItem("last_task_reset_date", todayDateString);
+                        });
+                        return;
+                    }
+                    
+                    let completedTasksArray = snap.val().completed_daily_tasks_array_node || [];
+                    executeRealtimeChecklistEvaluation(snap.val(), completedTasksArray);
+                }
+            });
+
+            // 2. 🟢 ONLINE USERS AUTOMATED FLUCTUATION LOGIC (Safe Mode)
+            database.ref('global_system_runtime_configurations/fake_online_count').on('value', (snap) => {
+                let baseOnlineUsers = snap.exists() ? parseInt(snap.val()) : 1065;
+                if (window.onlineUsersTimerLoop) clearInterval(window.onlineUsersTimerLoop);
+                
+                document.getElementById("lblLiveOnlineCalculatedTrafficCounter").innerText = baseOnlineUsers.toLocaleString();
+                
+                window.onlineUsersTimerLoop = setInterval(() => {
+                    let dynamicChange = Math.floor(Math.random() * 9) - 4;
+                    baseOnlineUsers = baseOnlineUsers + dynamicChange;
+                    if (baseOnlineUsers < 950) baseOnlineUsers = 1030;
+                    if (baseOnlineUsers > 1250) baseOnlineUsers = 1080;
+                    document.getElementById("lblLiveOnlineCalculatedTrafficCounter").innerText = baseOnlineUsers.toLocaleString();
+                }, 2500); 
+            });
+
+            // 3. 🚨 URGENT TASK LISTENER
+            database.ref('global_system_runtime_configurations/urgent_task').on('value', (snap) => {
+                let urgentModal = document.getElementById("urgentTaskModalOverlay");
+                if (snap.exists()) {
+                    let task = snap.val();
+                    let lastSeenUrgentId = localStorage.getItem("last_urgent_task_id");
+                    
+                    if (task.is_active === true && lastSeenUrgentId !== task.id) {
+                        document.getElementById("urgentTaskTitle").innerText = task.title || "Urgent Task!";
+                        document.getElementById("urgentTaskDesc").innerText = task.desc || "Complete this to earn rewards!";
+                        
+                        document.getElementById("urgentTaskBtn").onclick = function() {
+                            localStorage.setItem("last_urgent_task_id", task.id);
+                            window.location.href = task.url;
+                        };
+                        
+                        urgentModal.style.display = "flex";
+                        window.currentUrgentTaskId = task.id;
+                    } else {
+                        urgentModal.style.display = "none";
+                    }
+                } else {
+                    urgentModal.style.display = "none";
+                }
+            });
+
+            // 4. 🔔 SMART NOTIFICATION CENTER LISTENER
+            database.ref('global_system_runtime_configurations/notification_list').on('value', (snap) => {
+                if (snap.exists()) {
+                    globalFetchedNotifsData = snap.val();
+                } else {
+                    globalFetchedNotifsData = {};
+                }
+                renderNotificationsListUI();
+            });
+
+            // 🏆 LATEST LOTTERY WINNER & TICKET LISTENER
+            database.ref('global_system_runtime_configurations/latest_lottery_winner').on('value', (snap) => {
+                // Modified to use the new Surprise Box ID
+                let displayBox = document.getElementById("mod_surprise_box");
+                if (displayBox && displayBox.style.display !== 'none') {
+                    if (snap.exists()) {
+                        let w = snap.val();
+                        document.getElementById("lwWinnerNameDisplay").innerText = w.name || "Mystery Player";
+                        document.getElementById("lwWinnerTicketDisplay").innerText = `Pass: #${w.ticket_id || 'N/A'}`;
+                    }
+                }
+            });
+
+            // 5. 🔥 SERVER-DRIVEN UI ENGINE
+            database.ref('global_system_runtime_configurations/home_dynamic_modules').on('value', (snap) => {
+                const container = document.getElementById("dynamicAdminModulesContainer");
+                const sectionTitle = document.getElementById("dynamicSectionTitle");
+                container.innerHTML = ""; 
+                
+                if (snap.exists()) {
+                    let modules = snap.val();
+                    let activeCount = 0;
+
+                    Object.keys(modules).forEach(key => {
+                        let mod = modules[key];
+                        if (mod.is_active === true) {
+                            activeCount++;
+                            let badgeHtml = "";
+                            if(mod.badge) {
+                                let badgeClass = mod.badge.toLowerCase() === "hot" ? "badge-hot" : "badge-new";
+                                badgeHtml = `<div class="zone-badge ${badgeClass}">${mod.badge}</div>`;
+                            }
+
+                            let card = document.createElement("a");
+                            card.href = mod.url || "#";
+                            card.className = "zone-card";
+                            card.innerHTML = `
+                                ${badgeHtml}
+                                <div class="zone-icon">${mod.icon || '🚀'}</div>
+                                <h3>${mod.title || 'New App'}</h3>
+                                <p>${mod.desc || 'Tap to explore'}</p>
+                            `;
+                            container.appendChild(card);
+                        }
+                    });
+
+                    if(activeCount > 0) sectionTitle.style.display = "block";
+                    else sectionTitle.style.display = "none";
+                } else {
+                    sectionTitle.style.display = "none";
+                }
+            });
+
+            // MAINTENANCE & NETWORK BLOCKERS
+            database.ref('global_system_runtime_configurations/app_maintenance').on('value', (snap) => {
+                let overlay = document.getElementById("interceptorMaintenanceScreenOverlay");
+                if (!overlay) return;
+                overlay.style.display = (snap.exists() && snap.val() === 'ON') ? "flex" : "none";
+            });
+
+            database.ref('global_system_runtime_configurations/vpn_block_shield').on('value', (snap) => {
+                let networkOverlay = document.getElementById("interceptorNetworkShieldOverlay");
+                if (!networkOverlay) return;
+                if (snap.exists() && snap.val() === 'ON') {
+                    if (navigator.webdriver || navigator.languages.length === 0) {
+                        networkOverlay.style.display = "flex";
+                        return;
+                    }
+                }
+                networkOverlay.style.display = "none";
+            });
+
+            // LIVE REWARDS TICKER BAR 
+            database.ref('incentives_popup_array_feed_source').on('value', (snap) => {
+                let marqueeContainer = document.getElementById("livePayoutStream");
+                if (!marqueeContainer) return;
+                
+                if (snap.exists()) {
+                    let feedDataArray = snap.val() || [];
+                    if (feedDataArray.length > 0) {
+                        marqueeContainer.innerHTML = "";
+                        feedDataArray.forEach(payoutString => { marqueeContainer.innerHTML += `<span>• ${payoutString} reward redeemed</span>`; });
+                    } else {
+                        marqueeContainer.innerHTML = `<span>• Sudhir - ₹500 Reward redeemed</span><span>• Manav - ₹500 Reward redeemed</span>`;
+                    }
+                } else {
+                    marqueeContainer.innerHTML = `<span>• Rakesh redeemed ₹50 success</span><span>• Neha redeemed ₹200 success</span>`;
+                }
+                
+                setTimeout(() => {
+                    let textWidth = marqueeContainer.offsetWidth; 
+                    let speedConstant = 60;
+                    let calculatedDuration = textWidth / speedConstant;
+                    
+                    marqueeContainer.style.animation = "none";
+                    marqueeContainer.offsetHeight; 
+                    marqueeContainer.style.animation = `smoothMarqueeLoop ${calculatedDuration}s linear infinite`;
+                }, 100);
+            });
+            
+            // WINNERS PODIUM
+            database.ref('global_system_runtime_configurations/leaderboard_winners_podium').on('value', (snap) => {
+                if (snap.exists()) {
+                    let podiumData = snap.val();
+                    if (podiumData.rank1_name) document.getElementById("lblWinnerRank1Name").innerText = podiumData.rank1_name;
+                    if (podiumData.rank1_prize) document.getElementById("lblWinnerRank1Prize").innerText = "+" + podiumData.rank1_prize + " Coins";
+                    if (podiumData.rank2_name) document.getElementById("lblWinnerRank2Name").innerText = podiumData.rank2_name;
+                    if (podiumData.rank2_prize) document.getElementById("lblWinnerRank2Prize").innerText = "+" + podiumData.rank2_prize + " Coins";
+                    if (podiumData.rank3_name) document.getElementById("lblWinnerRank3Name").innerText = podiumData.rank3_name;
+                    if (podiumData.rank3_prize) document.getElementById("lblWinnerRank3Prize").innerText = "+" + podiumData.rank3_prize + " Coins";
+                } else {
+                    document.getElementById("lblWinnerRank1Name").innerText = "Shubham Singh";
+                    document.getElementById("lblWinnerRank1Prize").innerText = "+10,000 Coins";
+                    document.getElementById("lblWinnerRank2Name").innerText = "Aman Verma";
+                    document.getElementById("lblWinnerRank2Prize").innerText = "+5,000 Coins";
+                    document.getElementById("lblWinnerRank3Name").innerText = "Rahul Kumar";
+                    document.getElementById("lblWinnerRank3Prize").innerText = "+2,500 Coins";
+                }
+            });
+        });
+
+        // 🚨 URGENT TASK POPUP TRIGGERS
+        function closeUrgentTask() {
+            document.getElementById("urgentTaskModalOverlay").style.display = "none";
+            if(window.currentUrgentTaskId) {
+                localStorage.setItem("last_urgent_task_id", window.currentUrgentTaskId);
+            }
+        }
+
+        function showCustomAlert(msg) {
+            document.getElementById("alertMessage").innerText = msg;
+            document.getElementById("alertOverlay").style.display = "block";
+            document.getElementById("customAlertBox").style.display = "block";
+        }
+        function closeCustomAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
+        }
+
+        function executeRealtimeChecklistEvaluation(uData, completedTaskIds) {
+            const container = document.getElementById("dailyChecklistHTML");
+            if (!container) return;
+            
+            container.innerHTML = ""; 
+            let doneCount = 0;
+            
+            dailyTasksList.forEach(task => {
+                const isDone = completedTaskIds.includes(task.id);
+                if (isDone) doneCount++;
+                
+                const taskBox = document.createElement("div");
+                taskBox.className = `task-item ${isDone ? 'completed' : ''}`;
+                taskBox.innerHTML = `
+                    <div class="task-info">
+                        <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onclick="return false;">
+                        <span class="task-text">${task.text}</span>
+                    </div>
+                    <div class="task-reward">+${task.coins}🪙</div>
+                `;
+                container.appendChild(taskBox);
+            });
+            
+            document.getElementById("doneCount").innerText = doneCount;
+            let percentage = (doneCount / dailyTasksList.length) * 100;
+            document.getElementById("taskProgressFill").style.width = percentage + "%";
+            
+            document.getElementById("mNode1").classList.remove("achieved");
+            document.getElementById("mNode2").classList.remove("achieved");
+            document.getElementById("mNode3").classList.remove("achieved");
+            
+            let hintText = "";
+            if (doneCount < 2) {
+                hintText = `Complete ${2 - doneCount} more tasks for +10🪙 Bonus!`;
+            } else if (doneCount >= 2 && doneCount < 5) {
+                document.getElementById("mNode1").classList.add("achieved");
+                hintText = `Awesome! ${5 - doneCount} more tasks for +30🪙 Extra!`;
+            } else if (doneCount >= 5 && doneCount < 8) {
+                document.getElementById("mNode1").classList.add("achieved");
+                document.getElementById("mNode2").classList.add("achieved");
+                hintText = `💥 Just ${8 - doneCount} tasks left for +100🪙 MEGA BONUS!`;
+            } else if (doneCount >= 8) {
+                document.getElementById("mNode1").classList.add("achieved");
+                document.getElementById("mNode2").classList.add("achieved");
+                document.getElementById("mNode3").classList.add("achieved");
+                hintText = "🎉 All Daily Tasks Done! Mega Bonus Claimed!";
+            }
+            document.getElementById("rewardHint").innerText = hintText;
+        }
+    </script>
+</body>
+</html>

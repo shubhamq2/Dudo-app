@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Tasks - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; padding-bottom: 20px; }
+        
+        /* Premium Corporate Header */
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3b82f6; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #3b82f6; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); }
+        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        
+        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #3b82f6; font-weight: bold; cursor: pointer; }
+
+        .main-container { width: 100%; max-width: 500px; margin-top: 10px; box-sizing: border-box; }
+        .iframe-wrapper { width: 100%; min-height: 90vh; background: #ffffff; border-radius: 12px; overflow: hidden; border: none; }
+        
+        /* Live Synced Mini Dashboard for User Trust */
+        .task-status-bar { width: 92%; max-width: 460px; background: rgba(59, 130, 246, 0.1); border: 1px dashed #3b82f6; padding: 10px 15px; border-radius: 10px; margin-top: 15px; display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; color: #93c5fd; box-sizing: border-box; }
+        .coin-accent { color: #facc15; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="home.html" class="back-btn">←</a>
+        <h2 data-i18n="task_title">Premium Tasks</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
+    </div>
+
+    <div class="task-status-bar">
+        <span>📊 Status: <span style="color:#4ade80;" data-i18n="wall_active">Wall Connected</span></span>
+        <span>Coins: <span class="coin-accent" id="liveTaskCoins">0 🪙</span></span>
+    </div>
+
+    <div class="main-container">
+        <div id="offerwallLocation"></div>
+    </div>
+
+    <script>
+        const langData = {
+            "en": { "task_title": "Premium Tasks", "wall_active": "Wall Connected" },
+            "hi": { "task_title": "प्रीमियम टास्क", "wall_active": "सक्रिय (Live)" },
+            "bn": { "task_title": "প্রিমিয়াম টাস্ক", "wall_active": "সংযুক্ত আছে" },
+            "te": { "task_title": "ప్రీమియం టాస్క్‌లు", "wall_active": "కనెక్ట్ చేయబడింది" },
+            "mr": { "task_title": "प्रीमियम टास्क", "wall_active": "कनेक्ट केले" },
+            "ta": { "task_title": "பிரீமியம் பணிகள்", "wall_active": "இணைக்கப்பட்டது" },
+            "ur": { "task_title": "پریمیم ٹاسک", "wall_active": "కనెక్ట్ చేయబడింది" },
+            "gu": { "task_title": "પ્રીમિયમ ટાસ્ક", "wall_active": "કનેક્ટેડ" },
+            "es": { "task_title": "Tareas Premium", "wall_active": "Conectado" },
+            "fr": { "task_title": "Tâches Premium", "wall_active": "Connecté" },
+            "ar": { "task_title": "مهام مميزة", "wall_active": "متصل الآن" },
+            "pt": { "task_title": "Tarefas Premium", "wall_active": "Conectado" },
+            "ru": { "task_title": "Премиум задачи", "wall_active": "Подключено" }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) { elem.innerText = transObj[key]; }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+    </script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            // Fetch live user coins to show on top header
+            database.ref('users/' + uid).on('value', (snap) => {
+                if(snap.exists()){
+                    document.getElementById("liveTaskCoins").innerText = (snap.val().coins || 0) + " 🪙";
+                }
+            });
+
+            // Fetch info to compile dynamic secure iframe link URL
+            database.ref('users/' + uid).once('value').then((snap) => {
+                let uname = "User";
+                let uemail = "user@gmail.com";
+                
+                if(snap.exists()) {
+                    let d = snap.val();
+                    uname = encodeURIComponent(d.name || "User");
+                    uemail = encodeURIComponent(d.email || "user@gmail.com");
+                }
+
+                // Dynamic App ID Injection match parameter
+                let secureFrameSrc = `https://offers.cpx-research.com/index.php?app_id=33205&ext_user_id=${uid}&username=${uname}&email=${uemail}`;
+                
+                document.getElementById("offerwallLocation").innerHTML = `
+                    <iframe class="iframe-wrapper" src="${secureFrameSrc}"></iframe>
+                `;
+            });
+
+            // 🔥 PRIMARY REVENUE SYSTEM GATEWAY (POSTBACK REALTIME LISTENER) 🔥
+            // This triggers whenever CPX hits our server node endpoint cluster
+            database.ref('cpx_postback').on('child_added', (snapshot) => {
+                let postbackData = snapshot.val();
+                
+                // Security Check: process only if it belongs to current active user and status is successful (status=1)
+                if(postbackData && postbackData.ext_user_id === uid && postbackData.status == "1") {
+                    let rawAmountLocal = parseFloat(postbackData.amount_local || 0); // Dynamic coins credited by CPX
+                    let transactionKey = snapshot.key; // Unique transaction token from CPX webhook
+
+                    // Deduplicate logic: check if this transaction token was already processed locally
+                    database.ref('processed_tasks/' + transactionKey).once('value').then((taskSnap) => {
+                        if (!taskSnap.exists()) {
+                            
+                            // Read current user balances to add mathematical vectors safely
+                            database.ref('users/' + uid).once('value').then((userSnap) => {
+                                if(userSnap.exists()) {
+                                    let oldCoins = userSnap.val().coins || 0;
+                                    let oldBalance = userSnap.val().balance || 0;
+                                    let oldTaskEarnings = userSnap.val().taskEarnings || 0;
+
+                                    let continuousCoinsEarned = rawAmountLocal;
+                                    let continuousMoneyEarned = continuousCoinsEarned / 100; // 100 coins = ₹1 standard translation logic
+
+                                    // Fire global batch updates into server database
+                                    database.ref('users/' + uid).update({
+                                        coins: oldCoins + continuousCoinsEarned,
+                                        balance: oldBalance + continuousMoneyEarned,
+                                        taskEarnings: oldTaskEarnings + continuousMoneyEarned
+                                    }).then(() => {
+                                        // Flag this transaction token as successfully processed to prevent duplicate processing
+                                        database.ref('processed_tasks/' + transactionKey).set({
+                                            processedAt: firebase.database.ServerValue.TIMESTAMP,
+                                            amount: continuousMoneyEarned
+                                        });
+                                        console.log(`🎉 Task rewards credited securely: +${continuousCoinsEarned} Coins`);
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

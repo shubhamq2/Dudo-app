@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esports Arena - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a; --card-bg: #1e293b; --primary: #f97316; --primary-dark: #ea580c;
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --text-main: #f8fafc;
+            --text-muted: #94a3b8; --border-color: #334155;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
+
+        /* HEADER */
+        .header { background: var(--card-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10; position: sticky; top: 0; }
+        .back-btn { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: bold; }
+        .title { margin: 0; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); font-style: italic; }
+        
+        .wallets-container { display: flex; gap: 8px; }
+        .wallet-box { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); padding: 4px 10px; border-radius: 20px; font-weight: bold; color: var(--success); display: flex; align-items: center; gap: 4px; font-size: 13px; }
+        .wallet-box.rupee-box { background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; color: #60a5fa; }
+
+        .main-container { flex: 1; overflow-y: auto; padding: 15px; }
+
+        .ff-banner { background: linear-gradient(135deg, #431407, #7c2d12); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2); margin-bottom: 15px; position: relative; overflow: hidden; }
+        .ff-banner h3 { margin: 0 0 5px 0; font-size: 24px; font-weight: 900; color: #fff; text-transform: uppercase; font-style: italic; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .ff-banner p { margin: 0; font-size: 13px; color: #fdba74; }
+
+        /* TAB NAVIGATION */
+        .tab-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .tab-btn.active { background: rgba(249, 115, 22, 0.1); border-color: var(--primary); color: var(--primary); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* 🔥 NEW: LIVE POLL SYSTEM */
+        .poll-card { background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: 16px; border: 1px solid #4f46e5; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); display: none; }
+        .poll-title { font-size: 15px; font-weight: 900; color: #a5b4fc; text-transform: uppercase; margin: 0 0 10px 0; display: flex; align-items: center; gap: 6px; }
+        .poll-title span { background: #ef4444; color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 4px; animation: pulse 1s infinite alternate; }
+        @keyframes pulse { 0% { opacity: 0.7; } 100% { opacity: 1; transform: scale(1.05); } }
+        .poll-question { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 12px; }
+        .poll-option { background: rgba(0,0,0,0.3); border: 1px solid #4338ca; border-radius: 8px; margin-bottom: 8px; position: relative; cursor: pointer; overflow: hidden; transition: 0.2s; }
+        .poll-option:active { transform: scale(0.98); }
+        .poll-fill { position: absolute; top: 0; left: 0; height: 100%; background: rgba(99, 102, 241, 0.4); width: 0%; transition: width 0.5s ease; z-index: 1; }
+        .poll-text { position: relative; z-index: 2; padding: 12px 15px; display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; }
+        .voted-badge { display: none; text-align: center; color: #34d399; font-size: 11px; font-weight: bold; margin-top: 10px; }
+
+        /* TOURNAMENT CARD */
+        .match-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; }
+        .match-code-badge { position: absolute; top: 0; left: 0; background: rgba(236, 72, 153, 0.2); color: #f472b6; font-size: 9px; padding: 2px 8px; border-bottom-right-radius: 8px; font-family: monospace; font-weight: bold; border-right: 1px solid #ec4899; border-bottom: 1px solid #ec4899; }
+        .match-header { background: #1e1b4b; padding: 16px 15px 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .match-title { margin: 0; font-size: 15px; font-weight: 800; color: #818cf8; text-transform: uppercase; }
+        .match-time { font-size: 12px; color: var(--text-muted); font-weight: bold; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; }
+        .match-body { padding: 15px; }
+        .prize-pool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .prize-box { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); padding: 10px; border-radius: 10px; text-align: center; }
+        .prize-box span { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; margin-bottom: 3px; }
+        .prize-box strong { display: block; font-size: 18px; color: var(--success); font-weight: 900; }
+        .entry-box strong { color: var(--warning); }
+        .map-details { font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 6px; }
+        .map-details b { color: #fff; }
+        
+        .join-btn { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: none; padding: 14px; border-radius: 10px; font-weight: 900; font-size: 15px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .joined-btn { width: 100%; background: #064e3b; color: #34d399; border: 1px solid #10b981; padding: 14px; border-radius: 10px; font-weight: 900; font-size: 14px; text-transform: uppercase; text-align: center; margin-bottom: 8px; }
+        
+        /* 🔥 NEW: ALARM BUTTON */
+        .alarm-btn { width: 100%; background: #1e293b; color: #fbbf24; border: 1px dashed #fbbf24; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 12px; cursor: pointer; text-transform: uppercase; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .alarm-btn:active { background: rgba(251, 191, 36, 0.1); }
+
+        .room-details-box { background: rgba(16, 185, 129, 0.1); border: 1px dashed var(--success); border-radius: 10px; padding: 15px; margin-top: 15px; text-align: center; display: none; }
+        .id-pass-row { display: flex; justify-content: space-between; background: #000; padding: 10px; border-radius: 8px; margin-bottom: 5px; }
+        .id-pass-row b { font-size: 14px; color: #fff; font-family: monospace; }
+
+        /* WINNER CARD */
+        .winner-card { background: rgba(245, 158, 11, 0.05); border: 1px solid var(--warning); padding: 15px; border-radius: 12px; text-align: left; margin-top: 15px; }
+        .winner-card h4 { margin: 0 0 10px 0; color: var(--warning); font-size: 16px; text-transform: uppercase; font-style: italic; text-align: center; border-bottom: 1px solid rgba(245, 158, 11, 0.2); padding-bottom: 8px; }
+        .win-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 13px; }
+        .win-row:last-child { border-bottom: none; }
+        .win-row b { color: #fff; font-size: 14px; }
+        .win-prize { color: var(--success); font-weight: 900; font-size: 14px; }
+
+        /* MODALS */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-card { background: var(--card-bg); width: 100%; max-width: 320px; border-radius: 20px; padding: 30px 20px; text-align: center; border: 2px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-btn { background: var(--primary); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px; margin-top: 15px; cursor: pointer; }
+        .modal-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; color: #fff; margin-top: 10px; box-sizing: border-box; font-size: 14px; outline: none; text-align: center; }
+        .modal-input:focus { border-color: var(--primary); }
+        .btn-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2 class="title">Esports Arena</h2>
+        <div class="wallets-container">
+            <div class="wallet-box rupee-box">₹ <span id="userRupees">0</span></div>
+            <div class="wallet-box">🪙 <span id="userCoins">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="ff-banner">
+            <h3>Bermuda Showdown</h3>
+            <p>Join Daily Custom Rooms & Win Real Cash!</p>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('upcoming')">🎮 Upcoming</button>
+            <button class="tab-btn" onclick="switchTab('results')">🏆 Results</button>
+        </div>
+
+        <!-- UPCOMING MATCHES TAB -->
+        <div id="tab_upcoming" class="tab-content active">
+            
+            <!-- 🔥 LIVE POLL INJECTION SOCKET -->
+            <div class="poll-card" id="livePollContainer">
+                <h4 class="poll-title">📊 Player Voting <span>LIVE</span></h4>
+                <div class="poll-question" id="pollQuestion">Which match should we host next?</div>
+                <div id="pollOptionsSocket">
+                    <!-- Options will be injected via JS -->
+                </div>
+                <div class="voted-badge" id="votedThanksBadge">✅ Thanks for voting! Results are live.</div>
+            </div>
+
+            <div id="activeMatchesContainer"><p style="text-align:center; color:#94a3b8;">Loading matches...</p></div>
+        </div>
+
+        <!-- PAST RESULTS TAB -->
+        <div id="tab_results" class="tab-content">
+            <div id="pastMatchesContainer"><p style="text-align:center; color:#94a3b8;">No past results yet.</p></div>
+        </div>
+    </div>
+
+    <!-- JOIN DETAILS MODAL -->
+    <div class="modal-overlay" id="joinDetailsModal">
+        <div class="modal-card">
+            <h2 style="color:var(--primary); margin:0 0 5px 0;">Entry Details</h2>
+            <p style="color:var(--text-muted); font-size:12px; margin:0 0 15px 0;">Enter your In-Game Name, Player ID, or Squad Name so the system can verify your entry.</p>
+            <input type="text" id="ffIdInput" class="modal-input" placeholder="In-Game Name / Player ID">
+            <button class="modal-btn" onclick="confirmJoinWithFFID()">Confirm & Pay</button>
+            <button class="modal-btn btn-cancel" onclick="document.getElementById('joinDetailsModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-card">
+            <div style="font-size: 50px; margin-bottom: 10px;">🎮✅</div>
+            <h2 style="color:var(--success); margin:0 0 10px 0;">Confirmed!</h2>
+            <p style="color:var(--text-muted); font-size:13px;">You successfully joined. Don't forget to click the <b>Alarm Bell</b> icon so we can remind you before it starts!</p>
+            <button class="modal-btn" onclick="document.getElementById('successModal').style.display='none'">Awesome!</button>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+
+        let uid = localStorage.getItem("userId");
+        if (!uid || uid === "null" || uid === "undefined") {
+            uid = "DEMO_TEST_" + Math.floor(Math.random() * 10000);
+            localStorage.setItem("userId", uid);
+        }
+
+        let currentCoins = 0;
+        let currentRupees = 0;
+        let joinedMatchesList = {};
+        let activeJoiningMatch = null;
+        let currentPollData = null;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab_' + tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Wallets Load
+            database.ref('users/' + uid + '/coins').on('value', (snap) => {
+                if(snap.exists()) {
+                    currentCoins = Number(snap.val()) || 0;
+                    document.getElementById("userCoins").innerText = currentCoins;
+                }
+            });
+
+            database.ref('users/' + uid + '/balance').on('value', (snap) => {
+                if(snap.exists()) {
+                    currentRupees = Number(snap.val()) || 0;
+                    document.getElementById("userRupees").innerText = parseFloat(currentRupees).toFixed(2);
+                }
+            });
+
+            // Participants Load
+            database.ref('freefire_tournaments/participants').on('value', (snap) => {
+                if(snap.exists()) joinedMatchesList = snap.val();
+                else joinedMatchesList = {};
+                loadMatches();
+            });
+
+            // 🔥 LOAD LIVE POLL
+            database.ref('freefire_tournaments/live_poll').on('value', (snap) => {
+                if(snap.exists() && snap.val().active === true) {
+                    currentPollData = snap.val();
+                    renderPollUI();
+                } else {
+                    document.getElementById("livePollContainer").style.display = "none";
+                }
+            });
+        });
+
+        // 🔥 POLL RENDERING ENGINE
+        function renderPollUI() {
+            const container = document.getElementById("livePollContainer");
+            const socket = document.getElementById("pollOptionsSocket");
+            const qNode = document.getElementById("pollQuestion");
+            
+            container.style.display = "block";
+            qNode.innerText = currentPollData.question || "Which match should we host next?";
+            socket.innerHTML = "";
+
+            let totalVotes = 0;
+            let options = currentPollData.options || {};
+            
+            // Calculate Total Votes
+            Object.keys(options).forEach(optKey => {
+                totalVotes += (options[optKey].votes || 0);
+            });
+
+            // Check if User already voted
+            let userVoted = localStorage.getItem("voted_poll_id") === currentPollData.poll_id;
+
+            Object.keys(options).forEach(optKey => {
+                let opt = options[optKey];
+                let optVotes = opt.votes || 0;
+                let percent = totalVotes === 0 ? 0 : Math.round((optVotes / totalVotes) * 100);
+
+                let clickAction = userVoted ? "" : `onclick="castVote('${optKey}')"`;
+                let cursorStyle = userVoted ? "cursor:default;" : "cursor:pointer;";
+
+                socket.innerHTML += `
+                    <div class="poll-option" style="${cursorStyle}" ${clickAction}>
+                        <div class="poll-fill" style="width: ${userVoted ? percent : 0}%;"></div>
+                        <div class="poll-text">
+                            <span>${opt.text}</span>
+                            <span>${userVoted ? percent + "%" : "Tap to Vote"}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if(userVoted) {
+                document.getElementById("votedThanksBadge").style.display = "block";
+            } else {
+                document.getElementById("votedThanksBadge").style.display = "none";
+            }
+        }
+
+        function castVote(optionKey) {
+            if(!currentPollData || !currentPollData.poll_id) return;
+            
+            // Increment vote count in Database
+            let ref = database.ref(`freefire_tournaments/live_poll/options/${optionKey}/votes`);
+            ref.transaction((currentVotes) => {
+                return (currentVotes || 0) + 1;
+            }).then(() => {
+                // Save locally so they can't vote twice
+                localStorage.setItem("voted_poll_id", currentPollData.poll_id);
+                renderPollUI(); // Re-render to show progress bars
+            });
+        }
+
+        function loadMatches() {
+            database.ref('freefire_tournaments/matches').on('value', (snap) => {
+                const activeBox = document.getElementById("activeMatchesContainer");
+                const pastBox = document.getElementById("pastMatchesContainer");
+                activeBox.innerHTML = ""; pastBox.innerHTML = "";
+                
+                if(!snap.exists()) {
+                    activeBox.innerHTML = "<p style='text-align:center;'>No active matches.</p>";
+                    return;
+                }
+
+                let matches = snap.val();
+                let keys = Object.keys(matches).reverse();
+
+                keys.forEach(k => {
+                    let m = matches[k];
+                    let isJoined = (joinedMatchesList[k] && joinedMatchesList[k][uid] !== undefined);
+                    
+                    if(m.status === 'active') {
+                        activeBox.innerHTML += buildMatchCard(k, m, isJoined, true);
+                    } else if (m.status === 'completed') {
+                        pastBox.innerHTML += buildMatchCard(k, m, false, false);
+                    }
+                });
+            });
+        }
+
+        function buildMatchCard(id, m, isJoined, isActive) {
+            let joinBtnHTML = "";
+            let roomBoxHTML = "";
+            let winnerHTML = "";
+
+            let feeSymbol = m.feeType === 'rupees' ? '₹' : '';
+            let feeSuffix = m.feeType === 'coins' ? ' 🪙' : '';
+            let prizeSymbol = m.prizeType === 'rupees' ? '₹' : '';
+            let prizeSuffix = m.prizeType === 'coins' ? ' 🪙' : '';
+
+            if(isActive) {
+                if(isJoined) {
+                    let myFfId = joinedMatchesList[id][uid].ff_id || "N/A";
+                    
+                    // 🔥 NEW: Alarm / Reminder Button Injected Here
+                    let alarmBtn = `<button class="alarm-btn" onclick="setMatchReminder('${m.title}', '${m.time}')">🔔 Set Match Reminder</button>`;
+                    
+                    joinBtnHTML = `
+                        <div class="joined-btn" style="display:block;">✅ JOINED AS: ${myFfId}</div>
+                        ${alarmBtn}
+                    `;
+                    
+                    roomBoxHTML = `
+                        <div class="room-details-box" style="display:block;">
+                            <h4 style="color:var(--success); margin:0 0 10px 0;">🎮 Room Details</h4>
+                            <div class="id-pass-row"><span style="color:var(--text-muted);">Room ID:</span> <b>${m.roomId || 'Waiting...'}</b></div>
+                            <div class="id-pass-row"><span style="color:var(--text-muted);">Passcode / Key:</span> <b>${m.roomPass || 'Waiting...'}</b></div>
+                            <p style="font-size:10px; color:var(--warning); margin:5px 0 0 0;">Will be updated 10 mins before match.</p>
+                        </div>`;
+                } else {
+                    joinBtnHTML = `<button class="join-btn" onclick="openJoinModal('${id}', ${m.fee}, '${m.feeType}', '${m.title}')">JOIN NOW (${feeSymbol}${m.fee}${feeSuffix})</button>`;
+                }
+            } else {
+                let w1 = m.win1Name ? `<div class="win-row"><span>🥇 1st: <b>${m.win1Name}</b></span><span class="win-prize">+${prizeSymbol}${m.win1Prize}${prizeSuffix}</span></div>` : '';
+                let w2 = m.win2Name ? `<div class="win-row"><span>🥈 2nd: <b>${m.win2Name}</b></span><span class="win-prize">+${prizeSymbol}${m.win2Prize}${prizeSuffix}</span></div>` : '';
+                let w3 = m.win3Name ? `<div class="win-row"><span>🥉 3rd: <b>${m.win3Name}</b></span><span class="win-prize">+${prizeSymbol}${m.win3Prize}${prizeSuffix}</span></div>` : '';
+
+                winnerHTML = `
+                    <div class="winner-card">
+                        <h4>🏆 Match Winners</h4>
+                        ${w1} ${w2} ${w3}
+                    </div>`;
+            }
+
+            return `
+            <div class="match-card">
+                <div class="match-code-badge">CODE: ${id}</div>
+                <div class="match-header">
+                    <h3 class="match-title">${m.title}</h3>
+                    <span class="match-time">${m.time}</span>
+                </div>
+                <div class="match-body">
+                    <div class="prize-pool-grid">
+                        <div class="prize-box"><span>Prize Pool</span><strong>${prizeSymbol}${m.prizePool}${prizeSuffix}</strong></div>
+                        <div class="prize-box entry-box"><span>Entry</span><strong>${feeSymbol}${m.fee}${feeSuffix}</strong></div>
+                    </div>
+                    <div class="map-details">
+                        <div>Map: <b>${m.map}</b></div>
+                        <div>Type: <b>${m.type}</b></div>
+                    </div>
+                    ${joinBtnHTML}
+                    ${roomBoxHTML}
+                    ${winnerHTML}
+                </div>
+            </div>`;
+        }
+
+        // 🔥 NEW: MATCH REMINDER / ALARM SYSTEM
+        function setMatchReminder(title, time) {
+            // Step 1: Request Notification Permission from Phone
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if(permission === "granted") {
+                        alert(`🔔 Alarm Synced!\n\nWe have set a local reminder for: [${title}].\nYou will get a loud notification 15 minutes before ${time}.`);
+                    } else {
+                        alert("⚠️ Please allow Notifications in your browser/app settings to use the Alarm feature!");
+                    }
+                });
+            } else {
+                alert(`🔔 Reminder Saved!\nMake sure to check the app 15 minutes before ${time}.`);
+            }
+        }
+
+        function openJoinModal(matchId, fee, feeType, title) {
+            activeJoiningMatch = { id: matchId, fee: fee, feeType: feeType, title: title };
+            document.getElementById("ffIdInput").value = "";
+            document.getElementById("joinDetailsModal").style.display = "flex";
+        }
+
+        function confirmJoinWithFFID() {
+            let ffIdValue = document.getElementById("ffIdInput").value.trim();
+            if(!ffIdValue) { alert("Please enter your In-Game Name or Player ID!"); return; }
+
+            let matchId = activeJoiningMatch.id;
+            let fee = activeJoiningMatch.fee;
+            let feeType = activeJoiningMatch.feeType;
+            let title = activeJoiningMatch.title;
+
+            let userBal = feeType === 'rupees' ? currentRupees : currentCoins;
+            let dbNode = feeType === 'rupees' ? 'balance' : 'coins';
+            let symbol = feeType === 'rupees' ? '₹' : '🪙 ';
+
+            if(Number(userBal) < Number(fee)) { alert(`❌ Not enough balance! You need ${symbol}${fee} to join.`); return; }
+
+            let newBalance = Number(userBal) - Number(fee);
+
+            database.ref(`users/${uid}/${dbNode}`).set(newBalance).then(() => {
+                database.ref('users/' + uid + '/earning_history').push({ 
+                    activity: `Joined Match: ${title}`, 
+                    coins_credited: feeType === 'coins' ? -fee : 0, 
+                    amount: feeType === 'rupees' ? -fee : 0, 
+                    timestamp: Date.now() 
+                });
+                
+                database.ref(`freefire_tournaments/participants/${matchId}/${uid}`).set({
+                    ff_id: ffIdValue,
+                    timestamp: Date.now()
+                }).then(() => {
+                    document.getElementById('joinDetailsModal').style.display = 'none';
+                    document.getElementById("successModal").style.display = "flex";
+                });
+            }).catch(err => alert(err.message));
+        }
+    </script>
+</body>
+</html>

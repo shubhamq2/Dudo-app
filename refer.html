@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refer & Earn - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #1e293b; padding-bottom: 40px; }
+        
+        /* Clean Corporate Header */
+        .header { width: 100%; background: #ffffff; padding: 15px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e2e8f0; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #000; text-decoration: none; padding: 5px 10px; }
+        .header h2 { margin: 0; font-size: 18px; color: #000; font-weight: 700; flex-grow: 1; text-align: left; margin-left: 10px; }
+        
+        .custom-lang-select { padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1; outline: none; font-size: 13px; background: #fff; color: #334155; font-weight: 600; cursor: pointer; }
+
+        .main-container { width: 92%; max-width: 400px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
+
+        /* EXACT IMAGE DESIGN: GREEN DASHED BOX */
+        .gift-box-card { background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 20px; padding: 30px 20px; text-align: center; box-sizing: border-box; position: relative; }
+        .gift-icon { width: 80px; height: 80px; margin: 0 auto 15px auto; display: block; }
+        .gift-box-card h3 { margin: 0 0 10px 0; font-size: 24px; color: #15803d; font-weight: 800; }
+        .gift-box-card p { margin: 0; font-size: 14px; color: #166534; font-weight: 600; line-height: 1.5; }
+
+        /* 🔥 UPDATED: TOTAL EARNINGS & PENDING TICKER */
+        .earnings-grid { display: flex; gap: 10px; }
+        .total-earnings-card { flex: 1; background: linear-gradient(135deg, #10b981, #059669); border-radius: 20px; padding: 18px; text-align: center; color: #ffffff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); box-sizing: border-box; }
+        .total-earnings-card div { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }
+        .total-earnings-card h3 { margin: 5px 0 0 0; font-size: 24px; font-weight: 900; }
+        
+        .pending-earnings-card { flex: 1; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 20px; padding: 18px; text-align: center; color: #ffffff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2); box-sizing: border-box; }
+        .pending-earnings-card div { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }
+        .pending-earnings-card h3 { margin: 5px 0 0 0; font-size: 24px; font-weight: 900; }
+
+        /* MULTI-TIER NETWORK ANALYTICS STYLING */
+        .network-dashboard-card { background: #ffffff; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); box-sizing: border-box; text-align: center; }
+        .network-dashboard-card h4 { margin: 0 0 15px 0; font-size: 15px; color: #0f172a; font-weight: 800; }
+        .network-grid { display: flex; justify-content: space-between; gap: 10px; }
+        .network-tier-box { flex: 1; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 12px 6px; }
+        .network-tier-box .tier-num { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+        .network-tier-box .tier-count { font-size: 18px; font-weight: 800; color: #2563eb; }
+
+        /* EXACT IMAGE DESIGN: HOW IT WORKS */
+        .how-it-works-card { background: #ffffff; border-radius: 20px; padding: 25px 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); box-sizing: border-box; }
+        .how-it-works-card h4 { margin: 0 0 20px 0; font-size: 16px; color: #0f172a; font-weight: 800; text-align: center; }
+        
+        .step-row { display: flex; align-items: center; margin-bottom: 20px; gap: 15px; }
+        .step-row:last-child { margin-bottom: 0; }
+        .step-number { width: 40px; height: 40px; background: #eff6ff; color: #2563eb; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
+        .step-text { text-align: left; }
+        .step-text h5 { margin: 0; font-size: 14px; color: #1f2937; font-weight: 700; }
+        .step-text p { margin: 3px 0 0 0; font-size: 12px; color: #6b7280; font-weight: 500; }
+
+        /* EXACT IMAGE DESIGN: CODE COPY BOX */
+        .invite-code-section { text-align: center; margin-top: 10px; }
+        .invite-code-section label { font-size: 14px; font-weight: 700; color: #4b5563; display: block; margin-bottom: 10px; }
+        
+        .code-container { display: flex; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .code-display { flex-grow: 1; padding: 14px; font-size: 18px; font-weight: 800; color: #1f2937; letter-spacing: 1.5px; text-align: center; background: #fff; }
+        .copy-btn { background: #22c55e; color: #ffffff; border: none; padding: 0 25px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .copy-btn:active { background: #16a34a; }
+
+        /* EXACT IMAGE DESIGN: BIG ORANGE INVITE BUTTON */
+        .invite-now-btn { width: 100%; background: linear-gradient(135deg, #f97316, #ea580c); color: #ffffff; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; margin-top: 10px; }
+        .invite-now-btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2 data-i18n="refer_title">Refer & Earn</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">English</option><option value="hi">हिन्दी (HI)</option><option value="bn">বাংলা (BN)</option>
+            <option value="te">తెలుగు (TE)</option><option value="mr">मराठी (MR)</option><option value="ta">தமிழ் (TA)</option>
+            <option value="ur">اردو (UR)</option><option value="gu">ગુજરાતી (GU)</option><option value="es">Español</option>
+            <option value="fr">Français</option><option value="ar">العربية</option><option value="pt">Português</option>
+            <option value="ru">Русский</option>
+        </select>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="gift-box-card">
+            <svg class="gift-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 12V20C20 20.5523 19.5523 21 19 21H5C4.44772 21 4 20.5523 4 20V12" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+                <path d="M22 9C22 9.55228 21.5523 10 21 10H3C2.44772 10 2 9.55228 2 9V7C2 6.44772 2.44772 6 3 6H21C21.5523 6 22 6.44772 22 7V9Z" fill="#3b82f6"/>
+                <path d="M12 21V6" stroke="#ffffff" stroke-width="2"/>
+                <path d="M12 6C12 6 10.5 3 8.5 3C6.5 3 5.5 4.5 6.5 6C7.5 7.5 12 6 12 6Z" fill="#facc15"/>
+                <path d="M12 6C12 6 13.5 3 15.5 3C17.5 3 18.5 4.5 17.5 6C16.5 7.5 12 6 12 6Z" fill="#facc15"/>
+            </svg>
+            <h3 data-i18n="refer_reward">Get ₹20 Per Referral!</h3>
+            <p data-i18n="refer_sub">₹5 Instant + ₹15 when your friend completes tasks for 5 days.</p>
+        </div>
+
+        <!-- 🔥 UPDATED: SPLIT EARNINGS DISPLAY -->
+        <div class="earnings-grid">
+            <div class="total-earnings-card">
+                <div data-i18n="total_ref_earn">Unlocked Earnings</div>
+                <h3 id="totalRefEarnings">₹0.00</h3>
+            </div>
+            <div class="pending-earnings-card">
+                <div data-i18n="pending_ref_earn">Pending (5-Day Rule)</div>
+                <h3 id="pendingRefEarnings">₹0.00</h3>
+            </div>
+        </div>
+
+        <!-- MULTI-TIER REAL-TIME VISUAL NETWORK COUNTER -->
+        <div class="network-dashboard-card">
+            <h4 data-i18n="net_stats">Your Referral Network Stats</h4>
+            <div class="network-grid">
+                <div class="network-tier-box">
+                    <div class="tier-num">Level 1 (₹20)</div>
+                    <div class="tier-count" id="lvl1Count">0</div>
+                </div>
+                <div class="network-tier-box">
+                    <div class="tier-num">Level 2 (₹10)</div>
+                    <div class="tier-count" id="lvl2Count">0</div>
+                </div>
+                <div class="network-tier-box">
+                    <div class="tier-num">Level 3 (₹5)</div>
+                    <div class="tier-count" id="lvl3Count">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="how-it-works-card">
+            <h4 data-i18n="how_works">How it works? 🚀</h4>
+            
+            <div class="step-row">
+                <div class="step-number">1</div>
+                <div class="step-text">
+                    <h5 data-i18n="step1_title">Share your link</h5>
+                    <p data-i18n="step1_desc">Send your invite link to friends.</p>
+                </div>
+            </div>
+
+            <div class="step-row">
+                <div class="step-number">2</div>
+                <div class="step-text">
+                    <h5 data-i18n="step2_title">Friend Signs Up</h5>
+                    <p data-i18n="step2_desc">Get ₹5 Instantly when they register.</p>
+                </div>
+            </div>
+
+            <div class="step-row">
+                <div class="step-number">3</div>
+                <div class="step-text">
+                    <h5 data-i18n="step3_title">Earn Full Reward</h5>
+                    <p id="step3DescText" data-i18n="step3_desc">Get remaining ₹15 when they use app for 5 days. You also earn from their referrals!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="invite-code-section">
+            <label data-i18n="your_code">Your Unique Invite Code</label>
+            <div class="code-container">
+                <div class="code-display" id="inviteCodeText">LOADING...</div>
+                <button class="copy-btn" onclick="copyReferralCode()" data-i18n="btn_copy">Copy</button>
+            </div>
+        </div>
+
+        <button class="invite-now-btn" onclick="shareAppSystem()">
+            <span>📤</span> <span data-i18n="btn_invite">Invite Friends Now</span>
+        </button>
+
+    </div>
+
+    <script>
+        const langData = {
+    "en": {
+        "refer_title": "Refer & Earn", "refer_reward": "Get ₹20 Per Referral!", "refer_sub": "₹5 Instant + ₹15 when your friend completes tasks for 5 days.",
+        "how_works": "How it works? 🚀", "step1_title": "Share your link", "step1_desc": "Send your invite link to friends.",
+        "step2_title": "Friend Signs Up", "step2_desc": "Get ₹5 Instantly when they register.", "step3_title": "Earn Full Reward",
+        "step3_desc": "Get remaining ₹15 when they use app for 5 days. You also earn from their referrals!", "your_code": "Your Unique Invite Code", "btn_copy": "Copy", "btn_invite": "Invite Friends Now",
+        "net_stats": "Your Referral Network Stats", "total_ref_earn": "Unlocked Earnings", "pending_ref_earn": "Pending (5-Day Rule)"
+    },
+    "hi": {
+        "refer_title": "रेफर एंड अर्न", "refer_reward": "प्रत्येक रेफरल पर ₹20 पाएं!", "refer_sub": "₹5 तुरंत + ₹15 जब आपका दोस्त 5 दिन टास्क पूरे करे।",
+        "how_works": "यह कैसे काम करता है? 🚀", "step1_title": "अपनी लिंक शेयर करें", "step1_desc": "अपने दोस्तों को अपनी इनवाइट लिंक भेजें।",
+        "step2_title": "दोस्त साइन-अप करेगा", "step2_desc": "जैसे ही वे रजिस्टर करेंगे, तुरंत ₹5 पाएं।", "step3_title": "पूरा इनाम पाएं",
+        "step3_desc": "बचे हुए ₹15 तब मिलेंगे जब वो 5 दिन ऐप चलाएंगे। आप उनके दोस्तों से भी कमाएंगे!", "your_code": "आपका यूनिक इनवाइट कोड", "btn_copy": "कॉपी", "btn_invite": "दोस्तों को आमंत्रित करें",
+        "net_stats": "नेटवर्क रेफरल आंकड़े", "total_ref_earn": "कुल प्राप्त कमाई", "pending_ref_earn": "पेंडिंग (5 दिन बाद)"
+    },
+    "bn": {
+        "refer_title": "রেফার ও আয়", "refer_reward": "প্রতি রেফারে পাবেন ₹২০!", "refer_sub": "₹৫ সাথে সাথে + ₹১৫ যখন আপনার বন্ধু ৫ দিন টাস্ক করবে।",
+        "how_works": "এটি কিভাবে কাজ করে? 🚀", "step1_title": "আপনার লিঙ্ক শেয়ার করুন", "step1_desc": "বন্ধুদের আপনার ইনভাইট লিঙ্ক পাঠান।",
+        "step2_title": "বন্ধু সাইন-আপ করলে", "step2_desc": "রেজিস্টার করলেই সাথে সাথে পাবেন ₹৫।", "step3_title": "পুরো পুরস্কার জিতুন",
+        "step3_desc": "তারা ৫ দিন অ্যাপ ব্যবহার করলে বাকি ₹১৫ পাবেন। তাদের রেফারেল থেকেও আয় হবে!", "your_code": "আপনার ইউনিক ইনভাইট কোড", "btn_copy": "কপি", "btn_invite": "বন্ধুদের আমন্ত্রণ জানান",
+        "net_stats": "রেফারেল নেটওয়ার্ক স্ট্যাটাস", "total_ref_earn": "মোট প্রাপ্ত আয়", "pending_ref_earn": "পেন্ডিং (৫ দিনের নিয়ম)"
+    },
+    "te": {
+        "refer_title": "రిఫర్ & ఎర్న్", "refer_reward": "ప్రతి రిఫరల్‌కు ₹20 పొందండి!", "refer_sub": "తక్షణమే ₹5 + మీ స్నేహితుడు 5 రోజులు టాస్క్‌లు చేస్తే ₹15.",
+        "how_works": "ఇది ఎలా పనిచేస్తుంది? 🚀", "step1_title": "లింక్‌ను భాగస్వామ్యం చేయండి", "step1_desc": "మీ ఆహ్వాన లింక్‌ను పంపండి.",
+        "step2_title": "స్నేహితుడు సైన్ అప్ చేస్తే", "step2_desc": "నమోదు చేసిన వెంటనే ₹5 పొందండి.", "step3_title": "పూర్తి బహుమతి పొందండి",
+        "step3_desc": "వారు 5 రోజులు యాప్ వాడితే మిగిలిన ₹15 పొందండి. వారి నెట్‌వర్క్ నుండి కూడా సంపాదించండి!", "your_code": "మీ ప్రత్యేక కోడ్", "btn_copy": "కాపీ", "btn_invite": "స్నేహితులను ఆహ్వానించండి",
+        "net_stats": "రిఫరల్ నెట్‌వర్క్ గణాంకాలు", "total_ref_earn": "అన్‌లాక్ చేసిన సంపాదన", "pending_ref_earn": "పెండింగ్ (5-రోజుల నియమం)"
+    },
+    "mr": {
+        "refer_title": "रेफर आणि कमवा", "refer_reward": "प्रत्येक रेफरलवर ₹20 मिळवा!", "refer_sub": "₹5 त्वरित + मित्राने 5 दिवस ॲप वापरल्यावर ₹15.",
+        "how_works": "हे कसे कार्य करते? 🚀", "step1_title": "लिंक शेअर करा", "step1_desc": "तुमच्या मित्रांना आमंत्रित लिंक पाठवा.",
+        "step2_title": "मित्राचे साइन-अप", "step2_desc": "त्यांनी रजिस्टर केल्यावर लगेच ₹5 मिळवा.", "step3_title": "पूर्ण बक्षीस कमवा",
+        "step3_desc": "त्यांनी 5 दिवस ॲप वापरल्यावर उर्वरित ₹15 मिळतील. त्यांच्या मित्रांकडूनही कमवा!", "your_code": "तुमचा युनिक कोड", "btn_copy": "कॉपी", "btn_invite": "मित्रांना आमंत्रित करा",
+        "net_stats": "नेटवर्क आकडेवारी", "total_ref_earn": "एकूण मिळालेली कमाई", "pending_ref_earn": "प्रलंबित (5-दिवसांचा नियम)"
+    },
+    "ta": {
+        "refer_title": "பரிந்துரை & சம்பாதி", "refer_reward": "ஒவ்வொரு பரிந்துரைக்கும் ₹20!", "refer_sub": "உடனடியாக ₹5 + நண்பர் 5 நாட்கள் பயன்படுத்தினால் ₹15.",
+        "how_works": "இது எப்படி வேலை செய்கிறது? 🚀", "step1_title": "இணைப்பைப் பகிரவும்", "step1_desc": "அழைப்பு இணைப்பை அனுப்பவும்.",
+        "step2_title": "நண்பர் பதிவு செய்தால்", "step2_desc": "பதிவு செய்தவுடன் உடனடியாக ₹5 பெறுங்கள்.", "step3_title": "முழு வெகுமதியையும் பெறுங்கள்",
+        "step3_desc": "அவர்கள் 5 நாட்கள் ஆப்ஸைப் பயன்படுத்தினால் மீதமுள்ள ₹15 கிடைக்கும்.", "your_code": "உங்கள் அழைப்புக் குறியீடு", "btn_copy": "நகலெடு", "btn_invite": "நண்பர்களை அழைக்கவும்",
+        "net_stats": "பரிந்துரை நெட்வொர்க்", "total_ref_earn": "மொத்த வருவாய்", "pending_ref_earn": "நிலுவையில் (5 நாள் விதி)"
+    },
+    "ur": {
+        "refer_title": "ریفر اور کمائیں", "refer_reward": "ہر ریفرل پر ₹20 حاصل کریں!", "refer_sub": "فوری ₹5 + جب آپ کا دوست 5 دن استعمال کرے تو ₹15۔",
+        "how_works": "یہ کیسے کام کرتا ہے؟ 🚀", "step1_title": "لنک شیئر کریں", "step1_desc": "دوستوں کو دعوتی لنک بھیجیں۔",
+        "step2_title": "دوست کا سائن اپ", "step2_desc": "رجسٹر ہوتے ہی فوری ₹5 حاصل کریں۔", "step3_title": "مکمل انعام کمائیں",
+        "step3_desc": "بقیہ ₹15 تب ملیں گے جب وہ 5 دن ایپ استعمال کریں۔", "your_code": "آپ کا منفرد دعوتی کوڈ", "btn_copy": "کاپی", "btn_invite": "دوستوں کو مدعو کریں",
+        "net_stats": "نیٹ ورک کے اعدادوشمار", "total_ref_earn": "کل کمائی", "pending_ref_earn": "زیر التوا (5 دن کا اصول)"
+    },
+    "gu": {
+        "refer_title": "રેફર એન્ડ અર્ન", "refer_reward": "પ્રત્યેક રેફરલ પર ₹20 મેળવો!", "refer_sub": "₹5 તરત જ + ₹15 જ્યારે મિત્ર 5 દિવસ એપ્લિકેશન વાપરે.",
+        "how_works": "તે કેવી રીતે કામ કરે છે? 🚀", "step1_title": "લિંક શેર કરો", "step1_desc": "મિત્રોને આમંત્રણ લિંક મોકલો.",
+        "step2_title": "મિત્ર સાઇન અપ કરશે", "step2_desc": "રજીસ્ટર થાય ત્યારે તરત જ ₹5 મેળવો.", "step3_title": "સંપૂર્ણ ઈનામ મેળવો",
+        "step3_desc": "જ્યારે તેઓ 5 દિવસ એપ્લિકેશન ચલાવે ત્યારે બાકીના ₹15 મળશે.", "your_code": "તમારો યુનિક કોડ", "btn_copy": "કોપી", "btn_invite": "મિત્રોને આમંત્રિત કરો",
+        "net_stats": "નેટવર્ક આંકડા", "total_ref_earn": "કુલ કમાણી", "pending_ref_earn": "પેન્ડિંગ (5 દિવસનો નિયમ)"
+    },
+    "es": {
+        "refer_title": "Recomendar y Ganar", "refer_reward": "¡Obtén ₹20 por referencia!", "refer_sub": "₹5 al instante + ₹15 después de 5 días de uso.",
+        "how_works": "¿Cómo funciona? 🚀", "step1_title": "Comparte tu enlace", "step1_desc": "Envía tu enlace de invitación.",
+        "step2_title": "Tu amigo se registra", "step2_desc": "Obtén ₹5 al instante.", "step3_title": "Gana la recompensa total",
+        "step3_desc": "Obtén los ₹15 restantes cuando usen la app por 5 días.", "your_code": "Tu código de invitación", "btn_copy": "Copiar", "btn_invite": "Invitar amigos ahora",
+        "net_stats": "Estadísticas de red", "total_ref_earn": "Ganancias Totales", "pending_ref_earn": "Pendiente (Regla de 5 días)"
+    },
+    "fr": {
+        "refer_title": "Parrainer & Gagner", "refer_reward": "Obtenez ₹20 par parrainage !", "refer_sub": "₹5 instantanément + ₹15 après 5 jours d'utilisation.",
+        "how_works": "Comment ça marche ? 🚀", "step1_title": "Partagez votre lien", "step1_desc": "Envoyez votre lien d'invitation.",
+        "step2_title": "Inscription de l'ami", "step2_desc": "Obtenez ₹5 instantanément.", "step3_title": "Récompense totale",
+        "step3_desc": "Obtenez les ₹15 restants après 5 jours d'utilisation.", "your_code": "Votre code d'invitation", "btn_copy": "Copier", "btn_invite": "Inviter des amis",
+        "net_stats": "Statistiques du réseau", "total_ref_earn": "Gains débloqués", "pending_ref_earn": "En attente (5 jours)"
+    },
+    "ar": {
+        "refer_title": "الإحالة والكسب", "refer_reward": "احصل على ₹20 لكل إحالة!", "refer_sub": "₹5 فوراً + ₹15 بعد 5 أيام من الاستخدام.",
+        "how_works": "كيف يعمل؟ 🚀", "step1_title": "شارك رابطك", "step1_desc": "أرسل رابط الدعوة.",
+        "step2_title": "يسجل صديقك", "step2_desc": "احصل على ₹5 فوراً.", "step3_title": "المكافأة الكاملة",
+        "step3_desc": "احصل على الباقي ₹15 بعد 5 أيام من الاستخدام.", "your_code": "رمز الدعوة الخاص بك", "btn_copy": "نسخ", "btn_invite": "ادعُ الأصدقاء",
+        "net_stats": "إحصائيات الشبكة", "total_ref_earn": "الأرباح المفتوحة", "pending_ref_earn": "قيد الانتظار (5 أيام)"
+    },
+    "pt": {
+        "refer_title": "Indique e Ganhe", "refer_reward": "Ganhe ₹20 por indicação!", "refer_sub": "₹5 na hora + ₹15 após 5 dias de uso.",
+        "how_works": "Como funciona? 🚀", "step1_title": "Compartilhe seu link", "step1_desc": "Envie seu link de convite.",
+        "step2_title": "Seu amigo entra", "step2_desc": "Ganhe ₹5 instantaneamente.", "step3_title": "Recompensa Total",
+        "step3_desc": "Ganhe os ₹15 restantes após 5 dias de uso ativo.", "your_code": "Seu código de convite", "btn_copy": "Copiar", "btn_invite": "Convidar amigos",
+        "net_stats": "Estatísticas da Rede", "total_ref_earn": "Ganhos Totais", "pending_ref_earn": "Pendente (Regra de 5 dias)"
+    },
+    "ru": {
+        "refer_title": "Пригласи и заработай", "refer_reward": "Получите ₹20 за реферала!", "refer_sub": "₹5 сразу + ₹15 после 5 дней использования.",
+        "how_works": "Как это работает? 🚀", "step1_title": "Поделитесь ссылкой", "step1_desc": "Отправьте ссылку-приглашение.",
+        "step2_title": "Друг регистрируется", "step2_desc": "Получите ₹5 мгновенно.", "step3_title": "Полная награда",
+        "step3_desc": "Получите остальные ₹15 после 5 дней использования приложения.", "your_code": "Ваш код", "btn_copy": "Копировать", "btn_invite": "Пригласить друзей",
+        "net_stats": "Статистика сети", "total_ref_earn": "Доступный заработок", "pending_ref_earn": "В ожидании (5 дней)"
+    }
+};
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) { elem.innerText = transObj[key]; }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+    </script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId");
+        
+        let generatedReferralCode = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid) { window.location.href = "index.html"; return; }
+
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            // Fetch user dynamic personal referral code from node
+            database.ref('users/' + uid).on('value', (snap) => {
+                if (snapshotExists(snap)) {
+                    let data = snap.val();
+                    
+                    if(data.referCode) {
+                        generatedReferralCode = data.referCode.toUpperCase();
+                    } else {
+                        let shortName = (data.name || "SHU").substring(0,3).toUpperCase();
+                        let shortUID = uid.substring(uid.length - 4).toUpperCase();
+                        generatedReferralCode = shortName + shortUID;
+                        
+                        database.ref('users/' + uid + '/referCode').set(generatedReferralCode);
+                    }
+                    
+                    document.getElementById("inviteCodeText").innerText = generatedReferralCode;
+
+                    if(generatedReferralCode) {
+                        executeFetchMultiTierNetworkCounts(generatedReferralCode);
+                    }
+                }
+            });
+        });
+
+        function snapshotExists(snap) {
+            return snap && snap.exists();
+        }
+
+        // 🔥 CORE ENGINE: Bug Fixed Multi-Tier Network Counts & Live Earnings Calculator
+        function executeFetchMultiTierNetworkCounts(myCode) {
+            database.ref('users').once('value', (allUsersSnap) => {
+                if(allUsersSnap.exists()) {
+                    const usersMap = allUsersSnap.val();
+                    
+                    let level1Codes = [];
+                    let level2Codes = [];
+                    
+                    let countLvl1 = 0;
+                    let countLvl2 = 0;
+                    let countLvl3 = 0;
+
+                    // 🚨 BUG FIX: Using 'referral_code_used' instead of 'referredBy'
+                    
+                    // Level 1 Processing Loop
+                    for(let userKey in usersMap) {
+                        let singleUser = usersMap[userKey];
+                        if(singleUser.referral_code_used && singleUser.referral_code_used.toUpperCase() === myCode) {
+                            countLvl1++;
+                            if(singleUser.referCode) {
+                                level1Codes.push(singleUser.referCode.toUpperCase());
+                            }
+                        }
+                    }
+
+                    // Level 2 Processing Loop
+                    if(level1Codes.length > 0) {
+                        for(let userKey in usersMap) {
+                            let singleUser = usersMap[userKey];
+                            if(singleUser.referral_code_used && level1Codes.includes(singleUser.referral_code_used.toUpperCase())) {
+                                countLvl2++;
+                                if(singleUser.referCode) {
+                                    level2Codes.push(singleUser.referCode.toUpperCase());
+                                }
+                            }
+                        }
+                    }
+
+                    // Level 3 Processing Loop
+                    if(level2Codes.length > 0) {
+                        for(let userKey in usersMap) {
+                            let singleUser = usersMap[userKey];
+                            if(singleUser.referral_code_used && level2Codes.includes(singleUser.referral_code_used.toUpperCase())) {
+                                countLvl3++;
+                            }
+                        }
+                    }
+
+                    // 🔥 NEW MATH: (Lvl1 Instant: ₹5) | Lvl2: ₹10 | Lvl3: ₹5
+                    // Note: Lvl1 Pending ₹15 is tracked separately in the UI
+                    let instantEarnings = (countLvl1 * 5) + (countLvl2 * 10) + (countLvl3 * 5);
+                    let pendingEarnings = (countLvl1 * 15);
+
+                    // Inject values inside UI dashboard blocks
+                    document.getElementById("lvl1Count").innerText = countLvl1;
+                    document.getElementById("lvl2Count").innerText = countLvl2;
+                    document.getElementById("lvl3Count").innerText = countLvl3;
+                    
+                    document.getElementById("totalRefEarnings").innerText = "₹" + instantEarnings.toFixed(2);
+                    document.getElementById("pendingRefEarnings").innerText = "₹" + pendingEarnings.toFixed(2);
+                }
+            });
+        }
+
+        // Copy Code to Clipboard Feature
+        function copyReferralCode() {
+            if(generatedReferralCode === "" || generatedReferralCode === "LOADING...") return;
+            
+            navigator.clipboard.writeText(generatedReferralCode).then(() => {
+                alert(`📋 Referral Code "${generatedReferralCode}" copied! Share it with your friends.`);
+            });
+        }
+
+        // Native Web Sharing Intent System Launcher
+        function shareAppSystem() {
+            if(!generatedReferralCode || generatedReferralCode === "LOADING...") {
+                alert("Please wait a second, generating your unique code...");
+                return;
+            }
+
+            // Updated Share Message with New Project Link
+            let shareMessage = `🔥 Hey! Download *Dudo App*, play fun games and earn daily cash!\n\n🎁 Use my Invite Code *${generatedReferralCode}* during sign-up to get a special Bonus Reward!\n\n👉 Download Now: https://dudo-63594.web.app/index.html?ref=${generatedReferralCode}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Dudo Invite',
+                    text: shareMessage,
+                }).catch(err => console.log(err));
+            } else {
+                navigator.clipboard.writeText(shareMessage).then(() => {
+                    alert("📤 Invite message with link & code copied to clipboard!\n\nPaste it anywhere on WhatsApp/Telegram to invite your friends.");
+                });
+            }
+        }
+    </script>
+</body>
+</html>

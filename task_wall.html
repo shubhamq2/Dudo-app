@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Task Wall - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        
+        /* Premium Navigation Sync Header */
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3b82f6; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #3b82f6; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); }
+        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 15px auto; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; }
+
+        /* 📢 MULTI-SLOT INCOME ADS SYSTEM */
+        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #3b82f6; margin: 3px 0; }
+
+        /* Task Cards Container Row Style */
+        .task-card-node { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; transition: 0.2s; }
+        .task-meta { text-align: left; display: flex; flex-direction: column; gap: 4px; max-width: 70%; }
+        .task-title { font-size: 14px; font-weight: 800; color: #f8fafc; }
+        .task-desc { font-size: 11px; color: #94a3b8; font-weight: 500; line-height: 1.3; }
+        
+        .task-reward-badge { background: rgba(250, 204, 21, 0.1); border: 1px solid rgba(250, 204, 21, 0.3); color: #facc15; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 900; }
+
+        .action-task-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); text-transform: uppercase; transition: 0.2s; white-space: nowrap; }
+        .action-task-btn:disabled { background: #334155; color: #64748b; box-shadow: none; cursor: not-allowed; }
+
+        /* 🔒 SYSTEM VALIDATION REALTIME PROGRESS POPUP SCREEN */
+        .validation-lock-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
+        .progress-circle-txt { font-size: 48px; font-weight: 900; color: #facc15; margin: 20px 0; text-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+        .overlay-title { font-size: 18px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+
+    <div class="validation-lock-overlay" id="globalVerificationEngineGate">
+        <div style="font-size: 64px;">🛡️</div>
+        <div class="overlay-title">Task Verification Under Progress</div>
+        <p style="color: #94a3b8; font-size: 12px; max-width: 320px; margin-top: 6px; line-height: 1.4;">Do not switch applications or minimize this screen layout. System Monitor validates the stream live bounds frame parameters.</p>
+        <div class="progress-circle-txt" id="liveVerificationTimerDisplay">20s</div>
+        <p style="color: #ef4444; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Window focus checks are fully active...</p>
+    </div>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2>Smart Task Wall</h2>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="ad-banner-slot">
+            <script type="text/javascript">atOptions={'key':'9d8e7e12df3875a6c3846d0cb748a04b','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"></script>
+        </div>
+
+        <div class="task-card-node" id="task_wrapper_0">
+            <div class="task-meta">
+                <span class="task-title">Watch Premium Video Ads 01</span>
+                <span class="task-desc">Stream the video sponsor layout fully and hold target limits for 20 seconds.</span>
+                <div><span class="task-reward-badge">+30 COINS</span></div>
+            </div>
+            <button class="action-task-btn" id="task_trigger_btn_0" onclick="executeTriggerSmartTask(0, 30, 'https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js')">Start ⚡</button>
+        </div>
+
+        <div class="task-card-node" id="task_wrapper_1">
+            <div class="task-meta">
+                <span class="task-title">Visit Sponsored Web Offer 02</span>
+                <span class="task-desc">Explore the partner web portal page completely to receive reward ledger credits.</span>
+                <div><span class="task-reward-badge">+25 COINS</span></div>
+            </div>
+            <button class="action-task-btn" id="task_trigger_btn_1" onclick="executeTriggerSmartTask(1, 25, 'https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js')">Start ⚡</button>
+        </div>
+
+        <div class="ad-banner-slot">
+            <script type="text/javascript">atOptions={'key':'7c12f3875a6c3846d0cb748a04b9d8e','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/7c12f3875a6c3846d0cb748a04b9d8e/invoke.js"></script>
+        </div>
+
+        <div class="task-card-node" id="task_wrapper_2">
+            <div class="task-meta">
+                <span class="task-title">Subscribe & Verification Task 03</span>
+                <span class="task-desc">Open the community distribution network hub structure stream window channels.</span>
+                <div><span class="task-reward-badge">+40 COINS</span></div>
+            </div>
+            <button class="action-task-btn" id="task_trigger_btn_2" onclick="executeTriggerSmartTask(2, 40, 'https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js')">Start ⚡</button>
+        </div>
+
+        <div class="ad-banner-slot">
+            <script type="text/javascript">atOptions={'key':'9d8e7e12df3875a6c3846d0cb748a04b','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"></script>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let liveTickerCountdownValueInt = 20;
+        let totalActiveFocusSecondsInt = 0;
+        let runningTaskEngineInterval = null;
+        let targetTaskExternalWindowHandle = null;
+
+        let activeProcessingTaskIdInt = null;
+        let activeProcessingTaskCoinsRewardValueInt = 0;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            executeCheckLocalTaskCompletionFlags();
+        });
+
+        function executeCheckLocalTaskCompletionFlags() {
+            for(let i = 0; i < 3; i++) {
+                if(localStorage.getItem(`task_completed_flag_${i}`) === "true") {
+                    const btn = document.getElementById(`task_trigger_btn_${i}`);
+                    if(btn) {
+                        btn.disabled = true;
+                        btn.innerText = "Done ✅";
+                        btn.style.background = "#334155";
+                    }
+                }
+            }
+        }
+
+        // 🔒 SMART TASK INTERLOCK MODULE: Launches targeted frame and triggers focus monitoring loop
+        function executeTriggerSmartTask(taskIdInt, rewardCoinsValueInt, targetedPayloadUrlString) {
+            if(localStorage.getItem(`task_completed_flag_${taskIdInt}`) === "true") return;
+
+            activeProcessingTaskIdInt = taskIdInt;
+            activeProcessingTaskCoinsRewardValueInt = rewardCoinsValueInt;
+
+            liveTickerCountdownValueInt = 20;
+            totalActiveFocusSecondsInt = 0;
+
+            // Trigger HUD overlay mask display properties
+            document.getElementById("globalVerificationEngineGate").style.display = "flex";
+            document.getElementById("liveVerificationTimerDisplay").innerText = `${liveTickerCountdownValueInt}s`;
+
+            targetTaskExternalWindowHandle = window.open(targetedPayloadUrlString, '_blank', 'noopener,noreferrer');
+
+            runningTaskEngineInterval = setInterval(() => {
+                // Tracking Vector 1: Premature closure validation filter
+                if(targetTaskExternalWindowHandle && targetTaskExternalWindowHandle.closed) {
+                    clearInterval(runningTaskEngineInterval);
+                    executeRollbackTaskWallHUD();
+                    alert("❌ Verification Interrupted! You closed the resource offer portal page early.");
+                    return;
+                }
+
+                // Tracking Vector 2: Background tab minimizing validation monitor
+                if(!document.hidden) {
+                    if(totalActiveFocusSecondsInt < 19) {
+                        clearInterval(runningTaskEngineInterval);
+                        executeRollbackTaskWallHUD();
+                        alert("❌ System Alert: App focus lost. Keep task layout focused to clear coin payloads.");
+                        return;
+                    }
+                }
+
+                totalActiveFocusSecondsInt++;
+                liveTickerCountdownValueInt--;
+                document.getElementById("liveVerificationTimerDisplay").innerText = `${liveTickerCountdownValueInt}s`;
+
+                if(liveTickerCountdownValueInt <= 0) {
+                    clearInterval(runningTaskEngineInterval);
+                    executeCreditVerifiedTaskCoins();
+                }
+            }, 1000);
+        }
+
+        // 💰 DATA REWARD PIPELINE: Syncs parameters with live tree nodes upon successful validation
+        function executeCreditVerifiedTaskCoins() {
+            database.ref('users/' + uid).once('value').then((snapshot) => {
+                if(snapshot.exists()) {
+                    let baseLedgerCoins = snapshot.val().coins || 0;
+
+                    database.ref('users/' + uid).update({
+                        coins: baseLedgerCoins + activeProcessingTaskCoinsRewardValueInt
+                    }).then(() => {
+                        localStorage.setItem(`task_completed_flag_${activeProcessingTaskIdInt}`, "true");
+                        alert(`🎉 Task Cleared! +${activeProcessingTaskCoinsRewardValueInt} Coins successfully deposited to your profile.`);
+                        executeRollbackTaskWallHUD();
+                        executeCheckLocalTaskCompletionFlags();
+                    });
+                }
+            });
+        }
+
+        function executeRollbackTaskWallHUD() {
+            document.getElementById("globalVerificationEngineGate").style.display = "none";
+        }
+    </script>
+</body>
+</html>

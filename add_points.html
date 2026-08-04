@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Points - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; margin: 0; padding: 0; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
+        
+        /* Premium Core Sync Header */
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3b82f6; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #3b82f6; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); }
+        .header h2 { margin: 0; font-size: 18px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        
+        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #3b82f6; font-weight: bold; cursor: pointer; }
+
+        /* Profile Balance Ribbon */
+        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #3b82f6; padding: 20px; border-radius: 16px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); }
+        .bal-left p { margin: 0 0 5px 0; font-size: 12px; color: #93c5fd; text-transform: uppercase; letter-spacing: 1px; }
+        .bal-left h2 { margin: 0; font-size: 28px; color: #fff; }
+        .bal-right { text-align: right; }
+        .coin-txt { background: rgba(250, 204, 21, 0.1); border: 1px solid rgba(250, 204, 21, 0.4); color: #facc15; padding: 6px 12px; border-radius: 8px; font-size: 16px; font-weight: 900; display: inline-block; }
+
+        /* Ad Banners */
+        .ad-banner { width: 92%; max-width: 440px; min-height: 50px; margin: 15px 0; border-radius: 8px; display: flex; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: #1e293b; border: 1px dashed #3b82f6; }
+
+        /* Method Selection Grid */
+        .block-label { width: 92%; max-width: 440px; font-size: 14px; font-weight: 800; color: #3b82f6; text-transform: uppercase; margin: 20px 0 10px 0; text-align: left; letter-spacing: 0.5px; border-left: 4px solid #3b82f6; padding-left: 8px; }
+        .method-grid { width: 92%; max-width: 440px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; box-sizing: border-box; margin-bottom: 15px; }
+        .method-tab { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 15px 5px; text-align: center; cursor: pointer; font-size: 13px; font-weight: bold; color: #94a3b8; transition: all 0.2s; }
+        .method-tab.active-method { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #fff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); }
+        .method-icon { font-size: 24px; margin-bottom: 8px; }
+
+        /* Dynamic P2P Display Area & QR Code */
+        .p2p-display-area { width: 92%; max-width: 440px; background: linear-gradient(135deg, #0f172a, #1e293b); border: 1px dashed #10b981; padding: 20px; border-radius: 16px; margin-bottom: 15px; text-align: center; position: relative; box-sizing: border-box; }
+        .p2p-display-area h3 { margin: 0 0 5px 0; font-size: 14px; color: #10b981; text-transform: uppercase; }
+        .upi-name { font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
+        .upi-id-txt { font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 1px; word-break: break-all; margin-bottom: 15px; }
+        
+        .qr-box { display: none; margin: 15px auto; padding: 10px; background: #ffffff; border-radius: 12px; width: fit-content; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        #upiQrCodeImage { border-radius: 8px; display: block; }
+        #qrHelpText { font-size: 11px; font-weight: 700; color: #facc15; margin-top: 8px; margin-bottom: 15px; }
+
+        .copy-btn { background: #10b981; color: #fff; border: none; padding: 10px 25px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); text-transform: uppercase; }
+        .copy-btn:active { transform: scale(0.95); }
+
+        /* Quick Amount Chips */
+        .quick-amount-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .amt-chip { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 10px 5px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .amt-chip:active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+        /* Form Inputs */
+        .form-container { width: 92%; max-width: 440px; background: #1e293b; border-radius: 16px; padding: 20px; box-sizing: border-box; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; text-align: left; }
+        .input-group label { font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; }
+        .form-input { background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: #fff; padding: 15px; font-size: 15px; font-weight: 600; outline: none; transition: 0.2s; }
+        .form-input:focus { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+
+        /* Action Prime Button */
+        .action-prime-btn { width: 100%; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; border: none; padding: 16px; border-radius: 50px; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); outline: none; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+        .action-prime-btn:active { transform: scale(0.97); }
+
+        /* Notice Board Security Safe Box */
+        .security-box { width: 92%; max-width: 440px; border: 1px dashed #10b981; background: rgba(16, 185, 129, 0.05); border-radius: 12px; padding: 15px; margin-top: 20px; box-sizing: border-box; font-size: 11px; color: #a7f3d0; line-height: 1.5; text-align: left; }
+        .security-box ul { margin: 8px 0 0 0; padding-left: 15px; }
+        .security-box li { margin-bottom: 5px; }
+
+        /* Custom Alert Popups */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; backdrop-filter: blur(4px); }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; border-radius: 20px; padding: 25px; width: 85%; max-width: 340px; z-index: 1001; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+        .custom-alert.success-border { border-color: #10b981; }
+        .alert-btn { background: #3b82f6; color: white; border: none; padding: 10px 30px; border-radius: 30px; font-weight: bold; margin-top: 15px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+        .custom-alert.success-border .alert-btn { background: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <p id="alertMsgText" style="font-weight: 600; line-height: 1.5; margin: 0; font-size: 15px; color: #e2e8f0;"></p>
+        <button class="alert-btn" onclick="closeDepositAlert()">OK</button>
+    </div>
+
+    <div class="header">
+        <a href="my_points.html" class="back-btn">←</a>
+        <h2 data-i18n="add_pts_title">Add Points</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+        </select>
+    </div>
+
+    <div class="balance-card">
+        <div class="bal-left">
+            <p data-i18n="curr_bal">Current Balance</p>
+            <h2 id="liveBalance">₹0.00</h2>
+        </div>
+        <div class="bal-right">
+            <span class="coin-txt"><span id="liveCoins">0</span> 🪙</span>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+    </div>
+
+    <div class="block-label" data-i18n="sel_method">Select Payment Method</div>
+    
+    <div class="method-grid">
+        <div class="method-tab active-method">
+            <div class="method-icon">📱</div>
+            <div>UPI Transfer</div>
+        </div>
+        <div class="method-tab" onclick="showDepositAlert('err_method')">
+            <div class="method-icon">💳</div>
+            <div>Card / Crypto</div>
+        </div>
+    </div>
+
+    <div class="form-container">
+        
+        <!-- 🔥 DYNAMIC P2P DISPLAY & QR CODE GENERATOR -->
+        <div class="p2p-display-area">
+            <h3 data-i18n="step1">⚡ Step 1: Transfer Funds</h3>
+            <p id="qrHelpText">Enter amount below to auto-generate QR Code</p>
+            
+            <div class="qr-box" id="qrContainer">
+                <img id="upiQrCodeImage" src="" width="150" height="150" alt="UPI QR Code">
+            </div>
+
+            <div class="upi-name" id="displayUpiName">Verified Merchant</div>
+            <div class="upi-id-txt" id="displayUpiId">Loading...</div>
+            <button class="copy-btn" onclick="copyUpiId()" data-i18n="btn_copy">Copy UPI ID 📋</button>
+        </div>
+
+        <h3 style="color:#3b82f6; font-size:14px; text-transform:uppercase; margin-bottom:10px;" data-i18n="step2">📝 Step 2: Submit Details</h3>
+
+        <div class="quick-amount-grid">
+            <div class="amt-chip" onclick="setQuickAmount(50)">₹50</div>
+            <div class="amt-chip" onclick="setQuickAmount(100)">₹100</div>
+            <div class="amt-chip" onclick="setQuickAmount(500)">₹500</div>
+            <div class="amt-chip" onclick="setQuickAmount(1000)">₹1000</div>
+        </div>
+
+        <div class="input-group">
+            <label data-i18n="lbl_amount">Amount Transferred (₹)</label>
+            <input type="number" id="inputAmount" class="form-input" placeholder="e.g. 50" oninput="generateDynamicQRCode()">
+        </div>
+
+        <div class="input-group">
+            <label data-i18n="lbl_utr">Enter 12-Digit UTR / Ref No.</label>
+            <input type="number" id="inputUtr" class="form-input" placeholder="e.g. 312345678901" oninput="if(this.value.length > 12) this.value = this.value.slice(0, 12);">
+        </div>
+
+        <button class="action-prime-btn" id="btnSubmit" onclick="executeP2PDepositRequest()" data-i18n="btn_submit">VERIFY & ADD POINTS</button>
+    </div>
+
+    <div class="ad-banner">
+        <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Superearn"><script src="//data527.click/js/responsive.js" async></script></ins>
+    </div>
+
+    <div class="security-box">
+        <strong>⚠️ <span data-i18n="rules_title">IMPORTANT RULES:</span></strong>
+        <ul>
+            <li data-i18n="rule_1">Minimum add amount is ₹50.</li>
+            <li data-i18n="rule_2">Submit the exact 12-digit UTR/Ref No. from your payment app.</li>
+            <li data-i18n="rule_3">Submitting an invalid or empty UTR will result in account restriction.</li>
+            <li data-i18n="rule_4">Points are added within 5-15 minutes after verification.</li>
+        </ul>
+    </div>
+
+    <script>
+        const langData = {
+            "en": {
+                "add_pts_title": "Add Points", "curr_bal": "Current Balance", "sel_method": "Select Payment Method",
+                "step1": "⚡ Step 1: Transfer Funds", "btn_copy": "Copy UPI ID 📋", "step2": "📝 Step 2: Submit Details",
+                "lbl_amount": "Amount Transferred (₹)", "lbl_utr": "Enter 12-Digit UTR / Ref No.", "btn_submit": "VERIFY & ADD POINTS",
+                "rules_title": "IMPORTANT RULES:", "rule_1": "Minimum add amount is ₹50.", "rule_2": "Submit the exact 12-digit UTR/Ref No.",
+                "rule_3": "Submitting an invalid UTR will result in account restriction.", "rule_4": "Points are added within 5-15 mins.",
+                "err_method": "❌ This payment gateway is currently under maintenance. Please use UPI.", "err_empty": "❌ Please enter a valid amount you transferred.",
+                "err_min": "❌ Minimum Limit is ₹50.", "err_utr": "❌ Please enter the exact 12-Digit UTR / Reference Number.",
+                "success_msg": "✅ Your request is submitted! Agents will verify UTR and credit points soon."
+            },
+            "hi": {
+                "add_pts_title": "पॉइंट्स जोड़ें", "curr_bal": "आपका बैलेंस", "sel_method": "पेमेंट तरीका चुनें",
+                "step1": "⚡ स्टेप 1: पैसे ट्रांसफर करें", "btn_copy": "UPI कॉपी करें 📋", "step2": "📝 स्टेप 2: जानकारी भरें",
+                "lbl_amount": "भेजी गई राशि (₹)", "lbl_utr": "12-अंकों का UTR नंबर डालें", "btn_submit": "वेरीफाई और पॉइंट्स जोड़ें",
+                "rules_title": "जरूरी नियम:", "rule_1": "कम से कम राशि ₹50 है।", "rule_2": "पेमेंट ऐप से सही 12-अंकों का UTR डालें।",
+                "rule_3": "अमान्य UTR डालने पर अकाउंट प्रतिबंधित हो जाएगा।", "rule_4": "वेरिफिकेशन के 5-15 मिनट में पॉइंट्स मिल जाएंगे।",
+                "err_method": "❌ यह पेमेंट गेटवे अभी बंद है। कृपया UPI का उपयोग करें।", "err_empty": "❌ कृपया सही राशि दर्ज करें।",
+                "err_min": "❌ न्यूनतम राशि ₹50 होनी चाहिए।", "err_utr": "❌ कृपया सही 12-अंकों का UTR नंबर डालें।",
+                "success_msg": "✅ आपकी रिक्वेस्ट सबमिट हो गई है! वेरीफाई होने के बाद पॉइंट्स मिल जाएंगे।"
+            }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        function setQuickAmount(val) {
+            document.getElementById("inputAmount").value = val;
+            generateDynamicQRCode(); // Auto update QR when chip is clicked
+        }
+
+        function showDepositAlert(msgKey, isSuccess = false) {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey] || msgKey;
+            const alertBox = document.getElementById("customAlertBox");
+            if(isSuccess) alertBox.classList.add("success-border");
+            else alertBox.classList.remove("success-border");
+
+            document.getElementById("alertMsgText").innerText = msgStr;
+            document.getElementById("alertOverlay").style.display = "block";
+            alertBox.style.display = "block";
+        }
+
+        function closeDepositAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
+        }
+    </script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let currentActiveUpiId = "";
+        let currentActiveUpiName = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || uid === "GuestUser") { window.location.href = "index.html"; return; }
+
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            // Fetch Live Wallet Balance
+            database.ref('users/' + uid).on('value', (snap) => {
+                if(snap.exists()) {
+                    let bal = snap.val().balance || 0;
+                    let coins = snap.val().coins || 0;
+                    document.getElementById("liveBalance").innerText = "₹" + bal.toFixed(2);
+                    document.getElementById("liveCoins").innerText = coins;
+                }
+            });
+
+            // Fetch Dynamic P2P UPI List from Admin Panel
+            database.ref('global_system_runtime_configurations/p2p_upi_list').on('value', (snap) => {
+                if(snap.exists()) {
+                    let upiData = snap.val();
+                    let upiKeys = Object.keys(upiData);
+                    
+                    if(upiKeys.length > 0) {
+                        // Pick a random UPI ID to distribute the load (Rotator Engine)
+                        let randomKey = upiKeys[Math.floor(Math.random() * upiKeys.length)];
+                        let selectedGateway = upiData[randomKey];
+
+                        currentActiveUpiId = selectedGateway.upi_id;
+                        currentActiveUpiName = selectedGateway.name || "Verified Merchant";
+                        
+                        document.getElementById("displayUpiId").innerText = currentActiveUpiId;
+                        document.getElementById("displayUpiName").innerText = currentActiveUpiName;
+                        
+                        // Generate Base QR Code
+                        generateDynamicQRCode();
+                    } else {
+                        setUpiUnavailable();
+                    }
+                } else {
+                    setUpiUnavailable();
+                }
+            });
+        });
+
+        // 🔥 DYNAMIC QR CODE GENERATOR CORE 🔥
+        function generateDynamicQRCode() {
+            if(!currentActiveUpiId) return;
+
+            const amtField = document.getElementById("inputAmount").value.trim();
+            const qrContainer = document.getElementById("qrContainer");
+            const qrImg = document.getElementById("upiQrCodeImage");
+            const helpText = document.getElementById("qrHelpText");
+
+            // Build base UPI String
+            let upiString = `upi://pay?pa=${currentActiveUpiId}&pn=${encodeURIComponent(currentActiveUpiName)}&cu=INR`;
+
+            // If user enters amount, attach it to QR code so it auto-fills in their GPay/PhonePe
+            if(amtField && !isNaN(amtField) && parseFloat(amtField) > 0) {
+                upiString += `&am=${parseFloat(amtField).toFixed(2)}`;
+                helpText.innerText = "Scan to pay exactly ₹" + parseFloat(amtField).toFixed(2);
+                helpText.style.color = "#10b981";
+            } else {
+                helpText.innerText = "Enter amount below to auto-generate QR Code";
+                helpText.style.color = "#facc15";
+            }
+
+            // Using free high-speed QR generator API
+            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+            
+            qrImg.src = qrUrl;
+            qrContainer.style.display = "block";
+        }
+
+        function setUpiUnavailable() {
+            currentActiveUpiId = "";
+            document.getElementById("displayUpiId").innerText = "System Maintenance";
+            document.getElementById("displayUpiName").innerText = "Not Available";
+            document.getElementById("btnSubmit").disabled = true;
+            document.getElementById("btnSubmit").style.background = "#475569";
+            document.getElementById("qrContainer").style.display = "none";
+            document.getElementById("qrHelpText").innerText = "QR Code Currently Unavailable";
+        }
+
+        function copyUpiId() {
+            if(!currentActiveUpiId) return;
+            navigator.clipboard.writeText(currentActiveUpiId).then(() => {
+                alert("📋 UPI ID Copied: " + currentActiveUpiId + "\n\nNow open your UPI App (GPay/PhonePe/Paytm) and transfer the amount.");
+            });
+        }
+
+        function executeP2PDepositRequest() {
+            const amountVal = parseFloat(document.getElementById("inputAmount").value.trim());
+            const utrVal = document.getElementById("inputUtr").value.trim();
+
+            if (!amountVal || isNaN(amountVal)) {
+                showDepositAlert("err_empty");
+                return;
+            }
+
+            if (amountVal < 50) {
+                showDepositAlert("err_min");
+                return;
+            }
+
+            // Strict 12-Digit UTR check
+            if (!utrVal || utrVal.length !== 12 || isNaN(utrVal)) {
+                showDepositAlert("err_utr");
+                return;
+            }
+
+            // Disable button to prevent double clicking
+            document.getElementById("btnSubmit").disabled = true;
+            document.getElementById("btnSubmit").innerText = "SUBMITTING...";
+
+            // Create Unique Request ID
+            let reqId = "DEP-" + Math.floor(100000 + Math.random() * 900000);
+
+            database.ref('deposits/' + reqId).set({
+                uid: uid,
+                amount: amountVal,
+                utr: utrVal,
+                target_upi: currentActiveUpiId,
+                status: 'pending',
+                timestamp: Date.now()
+            }).then(() => {
+                document.getElementById("inputAmount").value = "";
+                document.getElementById("inputUtr").value = "";
+                generateDynamicQRCode(); // Reset QR to base after submit
+                
+                showDepositAlert("success_msg", true);
+                
+                document.getElementById("btnSubmit").disabled = false;
+                let currentLang = localStorage.getItem("selectedLang") || "en";
+                document.getElementById("btnSubmit").innerText = langData[currentLang]["btn_submit"] || "VERIFY & ADD POINTS";
+            }).catch((err) => {
+                alert("Error: " + err.message);
+                document.getElementById("btnSubmit").disabled = false;
+                document.getElementById("btnSubmit").innerText = "VERIFY & ADD POINTS";
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register - DUDO</title>
+    
+    <!-- 🔥 Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <!-- Auto-Login Check -->
+    <script>
+        if(localStorage.getItem("userId")) {
+            window.location.href = "ho.html";
+        }
+    </script>
+
+    <style>
+        /* Premium DUDO Dark Theme */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #060913; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #fff; }
+        
+        .login-container { background: #1e293b; width: 90%; max-width: 400px; border-radius: 20px; padding: 30px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; position: relative; overflow: hidden; }
+        .login-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981); }
+
+        .login-header { text-align: center; margin-bottom: 20px; }
+        .login-header h2 { margin: 0; font-size: 32px; font-weight: 900; color: #fff; letter-spacing: 1px; }
+        .login-header h2 span { color: #06b6d4; }
+        .login-header p { margin: 5px 0 0 0; font-size: 13px; color: #94a3b8; }
+
+        /* Google Button */
+        .google-btn { width: 100%; background: #ffffff; color: #1e293b; border: none; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255,255,255,0.1); transition: 0.2s; margin-bottom: 15px; }
+        .google-btn:active { transform: scale(0.97); }
+        .google-btn img { width: 18px; }
+
+        .divider { display: flex; align-items: center; text-align: center; color: #64748b; font-size: 11px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #334155; }
+        .divider:not(:empty)::before { margin-right: .5em; }
+        .divider:not(:empty)::after { margin-left: .5em; }
+
+        .auth-toggle { display: flex; background: #0f172a; border-radius: 12px; padding: 5px; margin-bottom: 20px; border: 1px solid #334155; }
+        .auth-toggle button { flex: 1; padding: 12px; border: none; background: transparent; color: #94a3b8; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .auth-toggle button.active { background: #3b82f6; color: #fff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px; }
+        .input-group input { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: #fff; padding: 14px; font-size: 14px; outline: none; box-sizing: border-box; transition: 0.2s; }
+        .input-group input:focus { border-color: #06b6d4; box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
+
+        .forgot-pass { text-align: right; margin-bottom: 20px; }
+        .forgot-pass a { color: #06b6d4; font-size: 12px; text-decoration: none; font-weight: bold; transition: 0.2s; }
+        .forgot-pass a:hover { color: #3b82f6; text-decoration: underline; }
+
+        .action-btn { width: 100%; border: none; padding: 16px; border-radius: 50px; font-size: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; color: #fff; }
+        .btn-login { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+        .btn-register { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+        .action-btn:active { transform: scale(0.97); }
+
+        /* 🔥 NEW: Premium Support Button */
+        .support-btn { background: #0f172a; border: 1px solid #334155; color: #cbd5e1; width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
+        .support-btn:hover { border-color: #06b6d4; color: #06b6d4; background: rgba(6, 182, 212, 0.05); }
+
+        .compliance-text { font-size: 10px; text-align: center; margin-top: 15px; color: #64748b; line-height: 1.4; }
+        
+        #recaptcha-container { display: flex; justify-content: center; margin-bottom: 15px; }
+
+        /* Hidden Sections */
+        #otpVerificationBox, #setupProfileScreen { display: none; text-align: center; }
+        .main-auth-box { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        
+        <div class="main-auth-box" id="mainAuthBox">
+            <div class="login-header">
+                <h2>DU<span>DO</span> 🚀</h2>
+                <p>Welcome back to the best reward app!</p>
+            </div>
+
+            <!-- Free Google Login Button -->
+            <button class="google-btn" onclick="loginWithGoogle()" id="googleLoginBtnMain">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G">
+                Fast Login with Google (Free)
+            </button>
+
+            <div class="divider">OR USE MOBILE NUMBER</div>
+
+            <div class="auth-toggle">
+                <button id="tabLogin" class="active" onclick="switchTab('login')">Login</button>
+                <button id="tabRegister" onclick="switchTab('register')">Register</button>
+            </div>
+            
+            <!-- 🟢 1. LOGIN FORM (No OTP, Only Pass = Free) -->
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>Mobile Number</label>
+                    <input type="number" id="loginMobile" placeholder="10-digit mobile number" required>
+                </div>
+                <div class="input-group">
+                    <label>Passcode</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your passcode" required>
+                </div>
+                
+                <div class="forgot-pass">
+                    <a href="support.html">Forgot Passcode?</a>
+                </div>
+                
+                <button type="submit" class="action-btn btn-login">Login Securely</button>
+            </form>
+
+            <!-- 🔵 2. REGISTER FORM (Requires OTP to verify real number) -->
+            <form id="registerForm" style="display: none;">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="Enter your full name" required>
+                </div>
+                <div class="input-group">
+                    <label>Mobile Number (For OTP Verification)</label>
+                    <input type="number" id="regMobile" placeholder="10-digit mobile number" required>
+                </div>
+                <div class="input-group">
+                    <label>Create Passcode (For Future Login)</label>
+                    <input type="password" id="regPassword" placeholder="Create a strong passcode" required>
+                </div>
+                <div class="input-group">
+                    <label>Referral Code (Optional)</label>
+                    <input type="text" id="regReferral" placeholder="Enter friend's invite code">
+                </div>
+                
+                <div id="recaptcha-container"></div>
+                <button type="submit" id="btnSendOtpReg" class="action-btn btn-register">Send OTP & Verify</button>
+                
+                <p class="compliance-text">By registering, you agree to our Terms of Service & Privacy Policy.<br>Invalid numbers or multiple accounts on the same device will lead to account restrictions.</p>
+            </form>
+
+            <button class="support-btn" onclick="window.location.href='support.html'">
+                🎧 Need Help? Contact Customer Support
+            </button>
+        </div>
+
+        <!-- 🟠 OTP VERIFICATION BOX -->
+        <div id="otpVerificationBox">
+            <h3 style="color:#06b6d4; margin-top:0;">📱 Verify Mobile Number</h3>
+            <p style="font-size:13px; color:#94a3b8; margin-bottom: 20px;">We sent a 6-digit OTP to your number to verify it's real.</p>
+            
+            <div class="input-group">
+                <label>Enter 6-Digit OTP</label>
+                <input type="number" id="regOtpCode" placeholder="X X X X X X">
+            </div>
+            
+            <button id="btnVerifyOtp" class="action-btn btn-register" onclick="verifyOtpAndRegister()">Verify & Create Account</button>
+            <button onclick="window.location.reload()" style="background:transparent; border:none; color:#f43f5e; margin-top:15px; font-weight:bold; cursor:pointer;">Cancel / Wrong Number?</button>
+        </div>
+
+        <!-- 🟣 PROFILE SETUP FOR GOOGLE LOGIN -->
+        <div id="setupProfileScreen">
+            <h3 style="color:#10b981; margin-top:0;">🎉 Welcome to Dudo!</h3>
+            <p style="font-size:13px; color:#94a3b8;">Set up your profile to start earning.</p>
+            
+            <div class="input-group" style="text-align: left;">
+                <label>Your Full Name</label>
+                <input type="text" id="googleRegName" placeholder="Enter your name" required>
+            </div>
+            <div class="input-group" style="text-align: left;">
+                <label>Referral Code (Optional)</label>
+                <input type="text" id="googleRegReferral" placeholder="Got an invite code?">
+            </div>
+
+            <button class="action-btn btn-login" onclick="completeGoogleRegistration()">Start Earning Now ➔</button>
+        </div>
+
+    </div>
+
+    <!-- Firebase Init & Auth Logic -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // 🛡️ ANTI-FARMING: Generate & Store Unique Device ID
+        let currentDeviceId = localStorage.getItem("dudo_device_token");
+        if (!currentDeviceId) {
+            currentDeviceId = "DEV_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9).toUpperCase();
+            localStorage.setItem("dudo_device_token", currentDeviceId);
+        }
+
+        // Global Variables for Registration
+        let tempRegData = {};
+        let authenticatedGoogleUser = null;
+
+        // UI Tab Switcher
+        function switchTab(tab) {
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+        }
+
+        // Auto-fill Refer Code from URL Link
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if(refCode) {
+                switchTab('register');
+                document.getElementById("regReferral").value = refCode;
+                document.getElementById("googleRegReferral").value = refCode;
+            }
+        };
+
+        // ==========================================
+        // 1️⃣ NORMAL LOGIN (Only Pass, No OTP Cost)
+        // ==========================================
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const mobile = document.getElementById('loginMobile').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+
+            if (mobile.length !== 10) return alert("Enter a valid 10-digit mobile number!");
+
+            database.ref('users').orderByChild('phone').equalTo(mobile).once('value', snapshot => {
+                if(snapshot.exists()) {
+                    let userFound = false;
+                    snapshot.forEach(childSnapshot => {
+                        let userData = childSnapshot.val();
+                        let userUid = childSnapshot.key;
+
+                        if (userData.password === pass) {
+                            userFound = true;
+                            if(userData.account_security_status_state_flag === 'BANNED_TERMINATED') {
+                                alert("🚨 Your account has been restricted for policy violations.");
+                                return;
+                            }
+                            // Direct Login (Free)
+                            localStorage.setItem("userId", userUid);
+                            window.location.href = "ho.html";
+                        }
+                    });
+
+                    if(!userFound) alert("❌ Incorrect Passcode! If you forgot it, click 'Forgot Passcode?' to contact support.");
+                } else {
+                    alert("⚠️ Account not found. Please Register first.");
+                }
+            });
+        });
+
+        // ==========================================
+        // 2️⃣ REGISTRATION & OTP SENDING
+        // ==========================================
+        function setupRecaptcha() {
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => { }
+                });
+            }
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            tempRegData.name = document.getElementById('regName').value.trim();
+            tempRegData.mobile = document.getElementById('regMobile').value.trim();
+            tempRegData.pass = document.getElementById('regPassword').value.trim();
+            tempRegData.ref = document.getElementById('regReferral').value.trim();
+
+            if (tempRegData.mobile.length !== 10) return alert("❌ Enter a valid 10-digit mobile number!");
+            if (tempRegData.pass.length < 6) return alert("❌ Passcode must be at least 6 characters!");
+            if (tempRegData.mobile === tempRegData.ref) return alert("❌ You cannot use your own number as a referral code!");
+
+            // 1. Check if Mobile already exists in Realtime DB (To save SMS if already registered)
+            database.ref('users').orderByChild('phone').equalTo(tempRegData.mobile).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    alert("⚠️ This mobile number is already registered. Please Login using your passcode.");
+                } else {
+                    // 2. Safe to send OTP
+                    const fullNumber = "+91" + tempRegData.mobile;
+                    setupRecaptcha();
+                    const appVerifier = window.recaptchaVerifier;
+
+                    document.getElementById("btnSendOtpReg").innerText = "Sending SMS...";
+                    
+                    auth.signInWithPhoneNumber(fullNumber, appVerifier)
+                        .then((confirmationResult) => {
+                            window.confirmationResult = confirmationResult;
+                            // Hide forms, show OTP box
+                            document.getElementById("mainAuthBox").style.display = "none";
+                            document.getElementById("otpVerificationBox").style.display = "block";
+                        }).catch((error) => {
+                            document.getElementById("btnSendOtpReg").innerText = "Send OTP & Verify";
+                            alert("OTP Error: " + error.message);
+                            if(window.recaptchaVerifier) { window.recaptchaVerifier.render().then(function(widgetId) { grecaptcha.reset(widgetId); }); }
+                        });
+                }
+            });
+        });
+
+        // ==========================================
+        // 3️⃣ VERIFY OTP & CREATE ACCOUNT
+        // ==========================================
+        function verifyOtpAndRegister() {
+            const code = document.getElementById("regOtpCode").value.trim();
+            if(code.length !== 6) return alert("Enter 6-digit OTP!");
+
+            document.getElementById("btnVerifyOtp").innerText = "Verifying...";
+
+            window.confirmationResult.confirm(code).then((result) => {
+                // OTP VERIFIED SUCCESSFULLY!
+                const uniqueUID = "UID_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5).toUpperCase();
+                const cleanRefCode = tempRegData.ref ? tempRegData.ref.toUpperCase() : "NONE";
+
+                const newUserData = {
+                    name: tempRegData.name,
+                    phone: tempRegData.mobile,
+                    password: tempRegData.pass, // Saved for future Free Login
+                    balance: 0,
+                    coins: 0,
+                    ad_coins: 0,
+                    total_lifetime_coins_earned: 0,
+                    total_referrals: 0,
+                    joined_at: Date.now(),
+                    device_id_token: currentDeviceId,
+                    account_security_status_state_flag: "ACTIVE",
+                    referral_code_used: cleanRefCode
+                };
+
+                database.ref('users/' + uniqueUID).set(newUserData).then(() => {
+                    executeReferralBonusEngine(cleanRefCode);
+                    alert("✅ Account created successfully! You can now login with your Passcode anytime.");
+                    localStorage.setItem("userId", uniqueUID); 
+                    window.location.href = "ho.html"; 
+                }).catch(err => {
+                    alert("Error saving profile: " + err.message);
+                });
+
+            }).catch((error) => {
+                document.getElementById("btnVerifyOtp").innerText = "Verify & Create Account";
+                alert("❌ Invalid OTP! Try again.");
+            });
+        }
+
+        // ==========================================
+        // 4️⃣ GOOGLE LOGIN (Completely Free Alternative)
+        // ==========================================
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        
+        function loginWithGoogle() {
+            document.getElementById("googleLoginBtnMain").innerText = "Redirecting to Google...";
+            auth.signInWithRedirect(googleProvider);
+        }
+
+        // Catch the result when the page reloads after Google Auth
+        auth.getRedirectResult().then((result) => {
+            if (result && result.user) {
+                authenticatedGoogleUser = result.user;
+                
+                // Check if Google User already exists in our Realtime DB
+                database.ref('users/' + authenticatedGoogleUser.uid).once('value', snapshot => {
+                    if (snapshot.exists()) {
+                        let userData = snapshot.val();
+                        if(userData.account_security_status_state_flag === 'BANNED_TERMINATED') {
+                            auth.signOut();
+                            alert("🚨 Your account is restricted!");
+                            return;
+                        }
+                        // Login Success
+                        localStorage.setItem("userId", authenticatedGoogleUser.uid);
+                        window.location.href = "ho.html";
+                    } else {
+                        // New Google User -> Ask for Referral Code
+                        document.getElementById("mainAuthBox").style.display = "none";
+                        document.getElementById("googleRegName").value = authenticatedGoogleUser.displayName || "";
+                        document.getElementById("setupProfileScreen").style.display = "block";
+                    }
+                });
+            }
+        }).catch((error) => {
+            // Ignore cancelled redirects to prevent annoying popups on mobile
+            if (error.code !== 'auth/redirect-cancelled-by-user') {
+                alert("Google Sign-In Failed: " + error.message);
+            }
+        });
+
+        function completeGoogleRegistration() {
+            const name = document.getElementById("googleRegName").value.trim();
+            const ref = document.getElementById("googleRegReferral").value.trim();
+            if(!name) return alert("Please enter your name!");
+
+            const cleanRefCode = ref ? ref.toUpperCase() : "NONE";
+
+            const newUserData = {
+                name: name,
+                phone: "GOOGLE_LOGIN",
+                email: authenticatedGoogleUser.email,
+                password: "GOOGLE_ACCOUNT",
+                balance: 0,
+                coins: 0,
+                ad_coins: 0,
+                total_lifetime_coins_earned: 0,
+                total_referrals: 0,
+                joined_at: Date.now(),
+                device_id_token: currentDeviceId,
+                account_security_status_state_flag: "ACTIVE",
+                referral_code_used: cleanRefCode
+            };
+
+            database.ref('users/' + authenticatedGoogleUser.uid).set(newUserData).then(() => {
+                executeReferralBonusEngine(cleanRefCode);
+                alert("✅ Google Account Setup Successful!");
+                localStorage.setItem("userId", authenticatedGoogleUser.uid); 
+                window.location.href = "ho.html"; 
+            });
+        }
+
+        // ==========================================
+        // 🔥 COMMON REFERRAL ENGINE (₹5 INSTANT)
+        // ==========================================
+        function executeReferralBonusEngine(cleanRefCode) {
+            if (!cleanRefCode || cleanRefCode === "NONE") return;
+            
+            database.ref('users').orderByChild('referCode').equalTo(cleanRefCode).once('value', refSnap => {
+                if(refSnap.exists()) {
+                    refSnap.forEach(refChild => {
+                        let refUid = refChild.key;
+                        let currentBal = parseFloat(refChild.val().balance || 0);
+                        let currentRefs = Number(refChild.val().total_referrals || 0);
+                        
+                        // 💰 Add ₹5 Cash directly to Balance (Not Coins)
+                        database.ref('users/' + refUid).update({
+                            balance: currentBal + 5,
+                            total_referrals: currentRefs + 1
+                        });
+
+                        // 📜 Create Earning History Log
+                        database.ref('users/' + refUid + '/earning_history').push({
+                            activity: `Referral Bonus (Instant Lvl 1)`,
+                            amount: 5,
+                            coins_credited: 0,
+                            timestamp: Date.now()
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

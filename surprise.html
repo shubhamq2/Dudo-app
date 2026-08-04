@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystery Box - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #eab308; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #eab308; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(234, 179, 8, 0.1); }
+        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+
+        /* 📢 AD SLOTS FOR DIRECT REVENUE */
+        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #eab308; margin: 5px 0; }
+
+        /* 🎫 Mega Reward Display Card */
+        .reward-banner-card { background: linear-gradient(135deg, #eab308, #ca8a04); border-radius: 20px; padding: 25px 15px; text-align: center; box-shadow: 0 10px 25px rgba(234, 179, 8, 0.2); color: #0f172a; }
+        .reward-banner-card div { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; }
+        .reward-banner-card h3 { margin: 8px 0; font-size: 32px; font-weight: 900; }
+        .reward-banner-card p { margin: 0; font-size: 13px; font-weight: 700; opacity: 0.8; }
+
+        /* Live Tracker Metrics Box */
+        .pool-tracker-grid { display: flex; gap: 10px; margin-top: 5px; }
+        .tracker-metric-box { flex: 1; background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 14px; text-align: center; }
+        .tracker-metric-box .metric-label { font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+        .tracker-metric-box .metric-value { font-size: 18px; font-weight: 800; color: #ffffff; }
+        .tracker-metric-box .value-gold { color: #eab308; }
+
+        /* Claim Interface Center Card */
+        .entry-pass-card { background: #1e293b; border-radius: 24px; padding: 25px 20px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .pass-cost-badge { display: inline-block; background: rgba(234, 179, 8, 0.1); color: #eab308; padding: 6px 14px; border-radius: 50px; font-size: 13px; font-weight: 800; margin-bottom: 15px; border: 1px solid rgba(234, 179, 8, 0.2); }
+        
+        .buy-action-btn { width: 100%; background: linear-gradient(135deg, #eab308, #ca8a04); color: #0f172a; border: none; padding: 15px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 6px 20px rgba(234, 179, 8, 0.3); cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .buy-action-btn:active { transform: scale(0.97); }
+
+        /* User's Current Live Pass Numbers Array Box */
+        .my-passes-section { background: #111827; border-radius: 14px; padding: 12px; margin-top: 15px; text-align: left; border: 1px solid #1e293b; }
+        .my-passes-title { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .passes-wrapper-flex { display: flex; flex-wrap: wrap; gap: 6px; }
+        .pass-tag-pill { background: #1e293b; color: #eab308; border: 1px solid #334155; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 800; font-family: monospace; }
+        .no-passes-txt { font-size: 12px; color: #475569; font-weight: 600; }
+
+        /* Custom Modern Alert Modal Popup style */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 365px; text-align: center; }
+        .custom-alert.success-border { border-color: #10b981; }
+        .custom-alert h4 { margin: 0 0 10px 0; font-size: 20px; color: #ef4444; font-weight: 900; }
+        .custom-alert.success-border h4 { color: #10b981; }
+        .custom-alert p { margin: 0 0 20px 0; font-size: 14px; color: #cbd5e1; font-weight: 600; line-height: 1.5; }
+        .custom-alert button { background: #ef4444; border: none; color: white; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .custom-alert.success-border button { background: #10b981; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <h4 id="alertHeader">ALERT</h4>
+        <p id="alertMessage">Message</p>
+        <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2>Mystery Box</h2>
+    </div>
+
+    <div class="main-container">
+        
+        <!-- 📢 TOP BANNER INCOME AD -->
+        <div class="ad-banner-slot" id="luckyAdSlot1">
+            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+        </div>
+
+        <!-- Grand Reward Presentation Banner -->
+        <div class="reward-banner-card">
+            <div>🔥 Weekly Mystery Reward 🔥</div>
+            <h3>🎁 SURPRISE COINS</h3>
+            <p>More Entry Passes = Higher Chances!</p>
+        </div>
+
+        <!-- Real-time Global Counters Tracker Grid -->
+        <div class="pool-tracker-grid">
+            <div class="tracker-metric-box">
+                <div class="metric-label">Total Participants</div>
+                <div class="metric-value" id="globalPoolSold">0</div>
+            </div>
+            <div class="tracker-metric-box">
+                <div class="metric-label">Your Entry Passes</div>
+                <div class="metric-value value-gold" id="myPassesCount">0</div>
+            </div>
+        </div>
+
+        <!-- Claim Terminal Card -->
+        <div class="entry-pass-card">
+            <div class="pass-cost-badge">🎫 1 Entry Pass = 50 Coins</div>
+            <button class="buy-action-btn" onclick="executeClaimEntryPass()">Claim Entry Pass 🎟️</button>
+            
+            <!-- User Personal Purchased List Sub-Box -->
+            <div class="my-passes-section">
+                <div class="my-passes-title">Your Active Pass Codes</div>
+                <div class="passes-wrapper-flex" id="myActivePassesBox">
+                    <span class="no-passes-txt">You don't hold any passes for this week yet.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📢 BOTTOM BANNER INCOME AD -->
+        <div class="ad-banner-slot" id="luckyAdSlot2">
+            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let userMasterCoinsCounter = 0;
+        const singlePassCostInt = 50;
+        let myCurrentPassesList = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            executeStartLivePoolSyncModules();
+            executeListenForRewardResult();
+            
+            // Sync Admin Banners
+            database.ref('app_files_deep_config/lucky_box').on('value', (snap) => {
+                if(snap.exists()) {
+                    let conf = snap.val();
+                    if(conf.banner_1) { let s1 = document.getElementById("luckyAdSlot1"); if(s1) { s1.innerHTML = conf.banner_1; runScripts(s1); } }
+                    if(conf.banner_2) { let s2 = document.getElementById("luckyAdSlot2"); if(s2) { s2.innerHTML = conf.banner_2; runScripts(s2); } }
+                }
+            });
+        });
+
+        function runScripts(container) {
+            let scripts = container.getElementsByTagName("script");
+            for (let i = 0; i < scripts.length; i++) {
+                let sNode = document.createElement("script");
+                if (scripts[i].src) sNode.src = scripts[i].src;
+                else sNode.text = scripts[i].text;
+                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
+            }
+        }
+
+        function executeStartLivePoolSyncModules() {
+            database.ref('users/' + uid + '/coins').on('value', (snap) => {
+                userMasterCoinsCounter = snap.exists() ? snap.val() : 0;
+            });
+
+            // Linked to Admin Panel's Tracker (Keep database keys intact)
+            database.ref('lottery_bids_tracker').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const allPassesMap = snapshot.val();
+                    const totalSoldSize = Object.keys(allPassesMap).length;
+                    document.getElementById("globalPoolSold").innerText = totalSoldSize;
+
+                    myCurrentPassesList = [];
+                    for (let passKey in allPassesMap) {
+                        if (allPassesMap[passKey].uid === uid) {
+                            myCurrentPassesList.push(allPassesMap[passKey].ticket_id);
+                        }
+                    }
+
+                    document.getElementById("myPassesCount").innerText = myCurrentPassesList.length;
+                    const wrapper = document.getElementById("myActivePassesBox");
+                    wrapper.innerHTML = "";
+
+                    if (myCurrentPassesList.length > 0) {
+                        myCurrentPassesList.forEach(code => {
+                            let pill = document.createElement("span");
+                            pill.className = "pass-tag-pill";
+                            pill.innerText = "🎁 " + code;
+                            wrapper.appendChild(pill);
+                        });
+                    } else {
+                        wrapper.innerHTML = `<span class="no-passes-txt">You don't hold any passes for this week yet.</span>`;
+                    }
+                } else {
+                    document.getElementById("globalPoolSold").innerText = "0";
+                    document.getElementById("myPassesCount").innerText = "0";
+                    document.getElementById("myActivePassesBox").innerHTML = `<span class="no-passes-txt">You don't hold any passes for this week yet.</span>`;
+                }
+            });
+        }
+
+        function executeClaimEntryPass() {
+            if (userMasterCoinsCounter < singlePassCostInt) {
+                showCustomAlert("❌ INSUFFICIENT COINS", "Not enough coins! Complete more tasks to earn 50 coins.", false);
+                return;
+            }
+
+            const randomCodeInt = Math.floor(1000 + Math.random() * 9000);
+            const charactersString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const randomChar1 = charactersString.charAt(Math.floor(Math.random() * 26));
+            const randomChar2 = charactersString.charAt(Math.floor(Math.random() * 26));
+            const cleanGeneratedPassCode = `SE-PASS-${randomCodeInt}-${randomChar1}${randomChar2}`;
+
+            let dynamicPostDeductionCoinsValue = userMasterCoinsCounter - singlePassCostInt;
+
+            database.ref('users/' + uid).update({
+                coins: dynamicPostDeductionCoinsValue
+            }).then(() => {
+                // Connected to Admin Panel Node (Do not change node name)
+                const poolItemRef = database.ref('lottery_bids_tracker').push();
+                poolItemRef.set({
+                    uid: uid,
+                    ticket_id: cleanGeneratedPassCode,
+                    userName: localStorage.getItem("userName") || "Player",
+                    item: "Weekly Mystery Pass",
+                    coins_spent: singlePassCostInt,
+                    valid_until: "Coming Sunday",
+                    timestamp: Date.now()
+                }).then(() => {
+                    showCustomAlert("🎉 PASS CLAIMED", `Pass Code ${cleanGeneratedPassCode} acquired successfully! Keep playing to increase your chances.`, true);
+                });
+            }).catch(error => {
+                console.error("Reward pipeline transaction failed:", error);
+            });
+        }
+
+        // 🔥 REAL-TIME DRAW DETECTOR ENGINE: Listens for Admin Winner Broadcast
+        function executeListenForRewardResult() {
+            // Admin Panel sends winning log directly to user's earning history
+            database.ref('users/' + uid + '/earning_history').orderByChild('timestamp').limitToLast(1).on('value', (snap) => {
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        let d = child.val();
+                        // Ensuring compatibility with old and new admin panels
+                        if(d.activity === 'Lottery Winner Prize' || d.activity === 'Mega Reward Winner') {
+                            let lastAck = localStorage.getItem("ack_mystery_win_time") || 0;
+                            if(d.timestamp > lastAck) {
+                                showCustomAlert(
+                                    "🏆 WINNER ANNOUNCED!",
+                                    `🎉 CONGRATULATIONS! You are the Mega Winner of this week's Mystery Box! ${d.coins_credited} COINS have been credited to your wallet successfully.`,
+                                    true
+                                );
+                                localStorage.setItem("ack_mystery_win_time", d.timestamp);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function showCustomAlert(headerText, messageText, isSuccess = false) {
+            const alertBox = document.getElementById("customAlertBox");
+            if(isSuccess) alertBox.classList.add("success-border");
+            else alertBox.classList.remove("success-border");
+
+            document.getElementById("alertHeader").innerText = headerText;
+            document.getElementById("alertMessage").innerText = messageText;
+            document.getElementById("alertOverlay").style.display = "block";
+            alertBox.style.display = "block";
+        }
+
+        function closeCustomAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
+        }
+    </script>
+</body>
+</html>

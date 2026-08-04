@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; margin: 0; padding: 0; color: #1e293b; }
+        
+        .header { width: 100%; background: #ffffff; padding: 15px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #1e293b; text-decoration: none; padding: 5px 10px; margin-right: 15px; }
+        .header h2 { margin: 0; font-size: 20px; font-weight: 800; color: #0f172a; flex-grow: 1; }
+        
+        .tab-navigation-bar { display: flex; background: #e2e8f0; border-radius: 8px; padding: 4px; margin: 15px auto; width: 92%; max-width: 460px; box-sizing: border-box; gap: 2px; }
+        .tab-btn { flex: 1; background: transparent; border: none; padding: 10px 4px; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; cursor: pointer; border-radius: 6px; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn.active-tab { background: #ffffff; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .history-feed-container { width: 92%; max-width: 460px; margin: 0 auto 20px auto; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; }
+        
+        .history-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-sizing: border-box; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        
+        .badge-tag { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
+        .badge-withdrawal { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .badge-deposit { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .badge-bonus { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .badge-admin { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+        
+        .amount-delta-ticker { position: absolute; top: 16px; right: 16px; font-size: 18px; font-weight: bold; text-align: right; }
+        .delta-positive { color: #10b981; } /* GREEN COLOR FOR ADDED COINS */
+        .delta-negative { color: #ef4444; } /* RED COLOR FOR DEDUCTED COINS */
+        .delta-admin { color: #a855f7; }
+
+        .meta-property-line { display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin: 5px 0; line-height: 1.4; }
+        .meta-property-line span strong { color: #334155; }
+        
+        /* 🔥 UPGRADED: Detail Tracking Source Box */
+        .source-detail-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-top: 12px; }
+        .source-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+        .source-row:last-child { margin-bottom: 0; }
+        .source-icon { font-size: 16px; }
+        .source-text-block { display: flex; flex-direction: column; }
+        .source-label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .source-value { font-size: 13px; font-weight: 700; color: #0f172a; }
+
+        /* Admin / Rejection Note styling */
+        .admin-note-box { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 12px; color: #b45309; line-height: 1.4; text-align: left; }
+        .admin-note-box strong { color: #92400e; font-weight: 800; }
+        .rejection-note-box { background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 12px; color: #dc2626; line-height: 1.4; text-align: left; }
+        .rejection-note-box strong { color: #b91c1c; font-weight: 700; }
+
+        .nested-code-box { background: #f1f5f9; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #475569; font-family: monospace; word-break: break-all; border: 1px solid #e2e8f0; margin-top: 10px; }
+        .empty-history-txt { font-size: 13px; color: #94a3b8; text-align: center; margin-top: 40px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2>Transaction History</h2>
+    </div>
+
+    <div class="tab-navigation-bar">
+        <!-- Play Store Safe Tab Names -->
+        <button class="tab-btn active-tab" id="btnTabAll" onclick="executeFilterHistoryFeed('all')">All Logs</button>
+        <button class="tab-btn" id="btnTabDeposit" onclick="executeFilterHistoryFeed('deposit')">Credits</button>
+        <button class="tab-btn" id="btnTabBonus" onclick="executeFilterHistoryFeed('bonus')">Rewards</button>
+        <button class="tab-btn" id="btnTabWithdrawal" onclick="executeFilterHistoryFeed('withdrawal')">Redeemed</button>
+    </div>
+
+    <div class="history-feed-container" id="historyDynamicFeedBox">
+        <p class="empty-history-txt">Syncing verified transaction history logs...</p>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let localHistoryMasterCacheArray = [];
+        let currentActiveFilterType = "all";
+
+        let rawRequestsDataMap = {};
+        let rawDepositsDataMap = {};
+        let rawEarningHistoryMap = {}; // For tracking internal game/ad earnings
+
+        document.addEventListener("DOMContentLoaded", () => {
+            triggerLoadAndNormalizeTransactionHistory();
+        });
+
+        function triggerLoadAndNormalizeTransactionHistory() {
+            let requestsRef = database.ref('requests').orderByChild('uid').equalTo(uid);
+            let depositsRef = database.ref('deposits').orderByChild('uid').equalTo(uid);
+            let earningHistoryRef = database.ref('users/' + uid + '/earning_history'); // Hooks into micro-tasks
+
+            function executeProcessAndCompileUniqueFeed() {
+                let combinedUniqueKeysMap = {};
+
+                // Process Withdrawals and general requests
+                for (let txnKey in rawRequestsDataMap) {
+                    combinedUniqueKeysMap[txnKey] = executeTranslateNodeMetadata(txnKey, rawRequestsDataMap[txnKey], 'requests');
+                }
+
+                // Process External Deposits / Payments
+                for (let txnKey in rawDepositsDataMap) {
+                    let translatedDeposit = executeTranslateNodeMetadata(txnKey, rawDepositsDataMap[txnKey], 'deposits');
+                    if (combinedUniqueKeysMap[txnKey]) {
+                        if (translatedDeposit.status !== 'PENDING' && combinedUniqueKeysMap[txnKey].status === 'PENDING') {
+                            combinedUniqueKeysMap[txnKey] = translatedDeposit;
+                        }
+                    } else {
+                        combinedUniqueKeysMap[txnKey] = translatedDeposit;
+                    }
+                }
+
+                // Process Micro-Task Earnings (Games, Ads, Admin Bonus)
+                for (let txnKey in rawEarningHistoryMap) {
+                    combinedUniqueKeysMap[txnKey] = executeTranslateNodeMetadata(txnKey, rawEarningHistoryMap[txnKey], 'earning_history');
+                }
+
+                localHistoryMasterCacheArray = [];
+                for (let txnKey in combinedUniqueKeysMap) {
+                    localHistoryMasterCacheArray.push(combinedUniqueKeysMap[txnKey]);
+                }
+
+                localHistoryMasterCacheArray.sort((a, b) => b.rawTimestamp - a.rawTimestamp);
+                executeRenderHistoryFeedDisplay();
+            }
+
+            requestsRef.on('value', (snapshot) => {
+                rawRequestsDataMap = snapshot.exists() ? snapshot.val() : {};
+                executeProcessAndCompileUniqueFeed();
+            });
+
+            depositsRef.on('value', (snapshot) => {
+                rawDepositsDataMap = snapshot.exists() ? snapshot.val() : {};
+                executeProcessAndCompileUniqueFeed();
+            });
+
+            earningHistoryRef.on('value', (snapshot) => {
+                rawEarningHistoryMap = snapshot.exists() ? snapshot.val() : {};
+                executeProcessAndCompileUniqueFeed();
+            });
+        }
+
+        // 🔥 UPGRADED DEEP-TRACKING TRANSLATOR ENGINE (Safe Wording & Smart Colors)
+        function executeTranslateNodeMetadata(txnKey, node, originNodeString) {
+            let rawType = (node.type || node.Type || "").toString().replace(/\s+/g, '').toLowerCase();
+            let rawStatus = (node.status || node.Status || "pending").toString().replace(/\s+/g, '').toLowerCase();
+            let taskDetails = (node.task_details || node.details || node.activity || "").toString().toLowerCase();
+            
+            let displayTitle = "Task Reward";
+            let displayCategory = "bonus";
+            let displayBadgeClass = "badge-bonus";
+            let amountPrefixSign = "+";
+            let deltaStyleClass = "delta-positive";
+            
+            let sourceOriginName = "System Default";
+            let sourceIcon = "⚡";
+            let rewardType = "Coins / Wallet Balance";
+
+            let isExplicitDeposit = (rawType === "paymenttask" || rawType === "deposit");
+            let isExplicitWithdrawal = (rawType === "receive" || rawType === "withdrawal");
+
+            let isDeposit = isExplicitDeposit || (originNodeString === 'deposits');
+            let isWithdrawal = isExplicitWithdrawal || (originNodeString === 'requests' && !isExplicitDeposit);
+
+            if (isDeposit && originNodeString !== 'earning_history') {
+                displayTitle = "Points Credited";
+                displayCategory = "deposit";
+                displayBadgeClass = "badge-deposit";
+                amountPrefixSign = "+";
+                deltaStyleClass = "delta-positive";
+                sourceOriginName = "Account Top-up";
+                sourceIcon = "💳";
+                rewardType = "Wallet Credit";
+            }
+            else if (isWithdrawal && originNodeString !== 'earning_history') {
+                displayTitle = "Reward Redeemed (" + (node.gateway || "WALLET").toUpperCase() + ")";
+                displayCategory = "withdrawal";
+                displayBadgeClass = "badge-withdrawal";
+                amountPrefixSign = "-";
+                deltaStyleClass = "delta-negative";
+                sourceOriginName = "User Redemption Request";
+                sourceIcon = "🎁";
+                rewardType = "Reward Transfer";
+            }
+            else {
+                // Detailed Deep Parsing for Games, Ads & Admin Bonus
+                displayCategory = "bonus";
+                displayBadgeClass = "badge-bonus";
+                amountPrefixSign = "+";
+                deltaStyleClass = "delta-positive";
+                rewardType = "In-App Reward";
+                
+                if (taskDetails.includes("admin") || rawType.includes("admin")) {
+                    displayTitle = "Admin Special Bonus";
+                    displayBadgeClass = "badge-admin";
+                    deltaStyleClass = "delta-admin";
+                    sourceOriginName = "System Administrator (Manual Credit)";
+                    sourceIcon = "👨‍💻";
+                    rewardType = "Direct Account Credit";
+                } else if (taskDetails.includes("spin") || rawType.includes("spin")) {
+                    displayTitle = "Lucky Spin Wheel Reward";
+                    sourceOriginName = "Spin & Win Game";
+                    sourceIcon = "🎡";
+                } else if (taskDetails.includes("pool") || rawType.includes("pool")) {
+                    displayTitle = "Multiplayer Pool Winnings";
+                    sourceOriginName = "4-Player Pool Racing";
+                    sourceIcon = "🎱";
+                } else if (taskDetails.includes("dash") || taskDetails.includes("arcade")) {
+                    displayTitle = "Arcade High Score Reward";
+                    sourceOriginName = "Square Dash / Neon Dash";
+                    sourceIcon = "🎮";
+                } else if (taskDetails.includes("timewall") || rawType.includes("timewall")) {
+                    displayTitle = "TimeWall Offerwall Completion";
+                    sourceOriginName = "TimeWall Network";
+                    sourceIcon = "⏱️";
+                } else if (taskDetails.includes("survey") || rawType.includes("cpx")) {
+                    displayTitle = "Survey Completion Reward";
+                    sourceOriginName = "CPX / BitLabs Surveys";
+                    sourceIcon = "📊";
+                } else if (taskDetails.includes("ad") || taskDetails.includes("click") || rawType.includes("ad")) {
+                    displayTitle = "Ad View / Click Reward";
+                    sourceOriginName = "Media Monetization Network";
+                    sourceIcon = "📢";
+                } else if (taskDetails.includes("daily") || rawType.includes("daily")) {
+                    displayTitle = "Daily Streak Bonus";
+                    sourceOriginName = "Daily Check-in System";
+                    sourceIcon = "🎁";
+                } else if (taskDetails.includes("scratch") || rawType.includes("scratch")) {
+                    displayTitle = "Lucky Scratch Card";
+                    sourceOriginName = "Scratch & Win Module";
+                    sourceIcon = "🎟️";
+                } else if (taskDetails.includes("marketplace") || taskDetails.includes("pass")) {
+                    displayTitle = "Marketplace Redemption";
+                    sourceOriginName = "Pass Unlock Event";
+                    sourceIcon = "🛒";
+                } else if (node.activity) {
+                    displayTitle = node.activity; 
+                    sourceOriginName = "In-App Activity Tracker";
+                    sourceIcon = "⚡";
+                } else {
+                    displayTitle = node.taskName || node.task_name || "Micro-Task Completed";
+                    sourceOriginName = "General Activity / Offer";
+                }
+            }
+            
+            // 🔥 SMART DEDUCTION COLOR & SIGN LOGIC
+            let rawAmt = node.amount;
+            if(!rawAmt && node.coins_credited) {
+                rawAmt = node.coins_credited / 100; // Assuming 100 coins = 1 Rupee base conversion for UI
+            }
+            
+            let numericAmt = parseFloat(rawAmt || 0);
+
+            // Check if amount is negative (Deduction/Purchase)
+            if (numericAmt < 0) {
+                amountPrefixSign = "-";
+                deltaStyleClass = "delta-negative"; // Turns RED
+                numericAmt = Math.abs(numericAmt); // Removes the minus sign to prevent double negatives like --1.00
+            }
+
+            let formattedAmountValue = numericAmt.toFixed(2);
+            
+            let displayDateString = node.timestamp ? new Date(node.timestamp).toLocaleString() : "Recent Sync Process";
+            let dynamicAdminNote = node.admin_note || node.message || null;
+            
+            // Status normalizer
+            let normalizedDisplayStatus = "PENDING";
+            if (rawStatus === "approved" || rawStatus === "success" || rawStatus === "successful" || originNodeString === 'earning_history') {
+                normalizedDisplayStatus = "SUCCESSFUL";
+            } else if (rawStatus === "rejected" || rawStatus === "failed" || rawStatus === "declined") {
+                normalizedDisplayStatus = "DECLINED";
+            }
+            
+            return {
+                title: displayTitle,
+                category: displayCategory,
+                badgeClass: displayBadgeClass,
+                amountSign: amountPrefixSign,
+                amountValue: formattedAmountValue,
+                deltaClass: deltaStyleClass,
+                date: displayDateString,
+                status: normalizedDisplayStatus,
+                adminCode: txnKey || "TXN-AUTO-LEDGER",
+                extraDetails: node.userInputDetails || node.details || node.utr || node.upi || "Verified Activity Payload",
+                rawTimestamp: node.timestamp || 0,
+                adminNote: dynamicAdminNote,
+                sourceOrigin: sourceOriginName,
+                sourceIcon: sourceIcon,
+                rewardType: rewardType
+            };
+        }
+
+        function executeRenderHistoryFeedDisplay() {
+            let container = document.getElementById("historyDynamicFeedBox");
+            container.innerHTML = "";
+
+            let filteredArray = localHistoryMasterCacheArray.filter(item => {
+                if (currentActiveFilterType === "all") return true;
+                return item.category === currentActiveFilterType;
+            });
+
+            if (filteredArray.length === 0) {
+                container.innerHTML = `<p class="empty-history-txt">No transaction items found under this category.</p>`;
+                return;
+            }
+
+            filteredArray.forEach(item => {
+                let card = document.createElement("div");
+                card.className = "history-card";
+                
+                let statusColor = "#f59e0b"; 
+                if (item.status === 'SUCCESSFUL') statusColor = "#10b981"; 
+                if (item.status === 'DECLINED') statusColor = "#ef4444"; 
+
+                let noteHtml = "";
+                if (item.status === 'DECLINED' && item.adminNote) {
+                    noteHtml = `
+                        <div class="rejection-note-box">
+                            ⚠️ <strong>Declined Reason:</strong> ${item.adminNote}
+                        </div>
+                    `;
+                } 
+                else if (item.badgeClass === 'badge-admin' && item.adminNote) {
+                    noteHtml = `
+                        <div class="admin-note-box">
+                            💬 <strong>Message from Admin:</strong> ${item.adminNote}
+                        </div>
+                    `;
+                }
+
+                // Show safe category names in badges
+                let safeCategoryName = item.category;
+                if(item.category === 'deposit') safeCategoryName = 'Credit';
+                if(item.category === 'withdrawal') safeCategoryName = 'Redeemed';
+                if(item.category === 'bonus') safeCategoryName = (item.badgeClass === 'badge-admin' ? 'Admin Gift' : 'Task Reward');
+
+                card.innerHTML = `
+                    <div class="badge-tag ${item.badgeClass}">
+                        ${safeCategoryName}
+                    </div>
+                    <div class="amount-delta-ticker ${item.deltaClass}">
+                        ${item.amountSign}₹${item.amountValue}
+                    </div>
+                    
+                    <h4 style="margin: 0 0 10px 0; font-size:15px; font-weight:800; color:#0f172a; max-width:75%;">${item.title}</h4>
+                    
+                    <div class="source-detail-box">
+                        <div class="source-row">
+                            <div class="source-icon">${item.sourceIcon}</div>
+                            <div class="source-text-block">
+                                <span class="source-label">Origin Network / Method</span>
+                                <span class="source-value">${item.sourceOrigin}</span>
+                            </div>
+                        </div>
+                        <div class="source-row" style="margin-top:4px;">
+                            <div class="source-icon">💵</div>
+                            <div class="source-text-block">
+                                <span class="source-label">Asset Transfer Type</span>
+                                <span class="source-value">${item.rewardType}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="meta-property-line" style="margin-top:12px;">
+                        <span>Execution Date:</span>
+                        <span><strong>${item.date}</strong></span>
+                    </div>
+                    
+                    <div class="meta-property-line">
+                        <span>Details / Dest:</span>
+                        <span style="max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align:right;">
+                            <strong>${item.extraDetails}</strong>
+                        </span>
+                    </div>
+
+                    <div class="meta-property-line" style="margin-top:8px;">
+                        <span>Transaction Status:</span>
+                        <span style="font-weight:900; color: ${statusColor}; letter-spacing:0.5px;">${item.status}</span>
+                    </div>
+
+                    ${noteHtml}
+
+                    <div class="nested-code-box">
+                        🔑 Ref: <strong>${item.adminCode}</strong>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function executeFilterHistoryFeed(targetTypeString) {
+            currentActiveFilterType = targetTypeString;
+            
+            document.getElementById("btnTabAll").classList.remove("active-tab");
+            document.getElementById("btnTabDeposit").classList.remove("active-tab");
+            document.getElementById("btnTabBonus").classList.remove("active-tab");
+            document.getElementById("btnTabWithdrawal").classList.remove("active-tab");
+
+            if(targetTypeString === 'all') document.getElementById("btnTabAll").classList.add("active-tab");
+            if(targetTypeString === 'deposit') document.getElementById("btnTabDeposit").classList.add("active-tab");
+            if(targetTypeString === 'bonus') document.getElementById("btnTabBonus").classList.add("active-tab");
+            if(targetTypeString === 'withdrawal') document.getElementById("btnTabWithdrawal").classList.add("active-tab");
+
+            executeRenderHistoryFeedDisplay();
+        }
+    </script>
+</body>
+</html>

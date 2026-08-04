@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubh Tyohar Wish - DUDO</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --theme-accent: #facc15; 
+            --bg-overlay: rgba(15, 23, 42, 0.85);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f172a;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 15px; overflow-x: hidden; text-align: center;
+        }
+
+        .bg-dark-tint {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-overlay); z-index: 0; pointer-events: none;
+        }
+
+        /* 🎵 MUSIC TOGGLE BUTTON */
+        #musicToggleBtn {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            background: rgba(0, 0, 0, 0.6); border: 2px solid var(--theme-accent);
+            color: #fff; font-size: 20px; width: 45px; height: 45px;
+            border-radius: 50%; display: none; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 0 15px rgba(250, 204, 21, 0.5);
+            transition: 0.3s;
+        }
+        #musicToggleBtn:active { transform: scale(0.9); }
+
+        /* 🪄 CELEBRATION FALLING EMOJIS CONTAINER */
+        #fallingEmojisContainer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 1; overflow: hidden;
+        }
+        .falling-emoji {
+            position: absolute; top: -50px; opacity: 0.7; z-index: 1; pointer-events: none;
+            animation-name: fallAnimation; animation-timing-function: linear; animation-iteration-count: 1;
+        }
+        @keyframes fallAnimation { to { transform: translateY(110vh) rotate(360deg); } }
+
+        /* 🎁 MAGIC UNBOXING OVERLAY */
+        #unboxingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.98); z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(10px); cursor: pointer;
+        }
+        .gift-box-anim { font-size: 90px; animation: giftBounce 1.2s infinite alternate ease-in-out; filter: drop-shadow(0 0 25px var(--theme-accent)); }
+        @keyframes giftBounce { 0% { transform: scale(1) rotate(-5deg); } 100% { transform: scale(1.15) rotate(5deg); } }
+        .tap-open-txt { margin-top: 25px; font-size: 20px; font-weight: 900; color: var(--theme-accent); text-transform: uppercase; letter-spacing: 1px; animation: pulseText 1s infinite alternate; }
+        @keyframes pulseText { 0% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        /* 2 BANNER AD SLOTS ONLY */
+        .ad-banner-slot {
+            width: 100%; max-width: 440px; min-height: 50px;
+            background: rgba(0, 0, 0, 0.6); border: 1px dashed var(--theme-accent);
+            border-radius: 12px; margin: 10px 0; display: flex; justify-content: center;
+            align-items: center; overflow: hidden; z-index: 10; box-sizing: border-box;
+        }
+
+        /* 👑 EMOJI BORDER WRAPPER */
+        .card-emoji-wrapper {
+            position: relative; z-index: 10;
+            padding: 18px; border-radius: 30px; box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 15px; width: 100%; max-width: 440px;
+            display: none; animation: cardAppear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* MAIN GREETING CARD */
+        .main-card {
+            background-color: rgba(0, 0, 0, 0.65); border-radius: 20px;
+            padding: 30px 20px; width: 100%; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        @keyframes cardAppear { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .festival-icon { font-size: 55px; margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--theme-accent)); animation: floatIcon 2s infinite alternate; }
+        @keyframes floatIcon { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+
+        /* 📸 SENDER PHOTO FRAME */
+        .sender-photo-frame {
+            width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--theme-accent); padding: 3px;
+            background: rgba(255,255,255,0.1); margin: 0 auto 15px auto; display: none;
+            box-shadow: 0 0 20px var(--theme-accent); object-fit: cover;
+        }
+
+        .sender-tag { font-size: 14px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .sender-name { font-size: 34px; font-weight: 900; color: var(--theme-accent); text-transform: uppercase; text-shadow: 0 0 20px var(--theme-accent), 0 2px 5px #000; margin: 8px 0 15px 0; line-height: 1.1; }
+        
+        /* ⏳ ADVANCE COUNTDOWN TIMER STYLES */
+        #advanceSection { display: none; margin-bottom: 15px; }
+        .advance-badge { background: #ef4444; color: #fff; font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 900; text-transform: uppercase; display: inline-block; margin-bottom: 8px; animation: pulseBadge 1s infinite alternate; box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+        @keyframes pulseBadge { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+        .countdown-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 5px; }
+        .cd-box { background: rgba(0,0,0,0.5); border: 1.5px solid var(--theme-accent); padding: 8px 5px; border-radius: 8px; min-width: 55px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .cd-num { font-size: 20px; font-weight: 900; color: #fff; text-shadow: 0 0 5px var(--theme-accent); }
+        .cd-label { font-size: 9px; color: #cbd5e1; text-transform: uppercase; font-weight: bold; margin-top: 2px; }
+
+        .wishing-msg { font-size: 19px; line-height: 1.5; color: #f8fafc; font-weight: 700; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .festival-highlight { color: #fff; font-size: 28px; font-weight: 900; display: inline-block; text-shadow: 0 0 15px var(--theme-accent), 0 2px 5px #000; background: var(--theme-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .firework-btn { background: linear-gradient(135deg, var(--theme-accent), #ef4444); color: #fff; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5); margin-bottom: 20px; text-transform: uppercase; transition: 0.2s; }
+        .firework-btn:active { transform: scale(0.95); }
+
+        /* 📱 DUDO PROMO BOX */
+        .DUDO-promo-box { background: rgba(0,0,0,0.7); border: 1.5px solid var(--theme-accent); border-radius: 16px; padding: 15px; margin: 15px 0; text-align: left; box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
+        .promo-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .promo-logo { width: 38px; height: 38px; background: linear-gradient(135deg, var(--theme-accent), #d97706); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .promo-title { font-size: 17px; font-weight: 900; color: #fff; text-shadow: 0 0 5px var(--theme-accent); }
+        .promo-desc { font-size: 13px; color: #e2e8f0; line-height: 1.4; margin-bottom: 10px; }
+        .promo-features { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px; color: var(--theme-accent); font-weight: 800; margin-bottom: 12px; text-shadow: 0 1px 2px #000; }
+        .download-app-btn { display: block; width: 100%; background: linear-gradient(135deg, var(--theme-accent), #d97706); color: #000; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: 900; font-size: 14px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4); }
+
+        /* 📸 SHARE & PHOTO UPLOAD SECTION */
+        .share-section { border-top: 1px dashed rgba(255, 255, 255, 0.5); padding-top: 20px; margin-top: 15px; }
+        .input-box { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.6); color: #fff; font-size: 15px; margin-bottom: 10px; outline: none; text-align: center; font-weight: 700; transition: 0.3s; }
+        .input-box:focus { border-color: var(--theme-accent); box-shadow: 0 0 15px rgba(250, 204, 21, 0.2); }
+        
+        .photo-upload-wrapper { position: relative; margin-bottom: 15px; }
+        .file-input-hidden { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .custom-file-btn { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; background: rgba(0,0,0,0.5); border: 2px dashed var(--theme-accent); color: var(--theme-accent); padding: 12px; border-radius: 12px; font-weight: 800; font-size: 14px; text-shadow: 0 1px 2px #000; }
+        
+        /* LIVE PHOTO PREVIEW STYLING */
+        #livePhotoPreview { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-accent); object-fit: cover; margin: 10px auto; display: none; box-shadow: 0 0 15px var(--theme-accent); }
+
+        /* SHARE BUTTONS GRID */
+        .share-buttons-grid { display: flex; gap: 10px; margin-top: 10px; }
+        .whatsapp-share-btn { flex: 2; background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; border: none; padding: 15px; border-radius: 50px; font-size: 14px; font-weight: 900; cursor: pointer; box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; }
+        .whatsapp-share-btn:active { transform: scale(0.96); }
+        
+        .copy-link-btn { flex: 1; background: rgba(255, 255, 255, 0.1); border: 2px solid #fff; color: #fff; border-radius: 50px; font-size: 14px; font-weight: 900; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; transition: 0.2s; }
+        .copy-link-btn:active { transform: scale(0.96); background: #fff; color: #000; }
+        
+        #loadingSpinner { display: none; font-size: 12px; color: var(--theme-accent); font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- 🎵 HIDDEN AUDIO PLAYER -->
+    <audio id="bgMusic" loop>
+        <!-- Audio source will be injected by Admin Panel or default can be set here -->
+    </audio>
+    <div id="musicToggleBtn" onclick="toggleMusic()">🔊</div>
+
+    <div class="bg-dark-tint" id="bgTint"></div>
+    <div class="festive-bg-decor"></div>
+    <div id="fallingEmojisContainer"></div>
+
+    <!-- 🎁 MAGIC UNBOXING SCREEN -->
+    <div id="unboxingOverlay" onclick="openSurpriseEnvelope()">
+        <div class="gift-box-anim" id="envIcon">🧧</div>
+        <div class="tap-open-txt">✨ Tap To Open Surprise ✨</div>
+    </div>
+
+    <!-- 1. TOP BANNER AD -->
+    <div class="ad-banner-slot" id="greetingAdTop">
+        <span style="font-size: 10px; color: #64748b;">[ Adsterra Banner Slot 1 ]</span>
+    </div>
+
+    <!-- 👑 DYNAMIC EMOJI BORDER WRAPPER -->
+    <div class="card-emoji-wrapper" id="cardEmojiWrapper">
+        <div class="main-card" id="greetingMainCard">
+            <!-- 📸 User's Photo Display -->
+            <img id="displaySenderPhoto" class="sender-photo-frame" src="" alt="Sender Photo">
+            
+            <div class="festival-icon" id="festIcon">🪔</div>
+            <div class="sender-tag">Khaas Sandesh From:</div>
+            <div class="sender-name" id="displaySenderName">DUDO</div>
+
+            <!-- ⏳ ADVANCE COUNTDOWN TIMER -->
+            <div id="advanceSection">
+                <div class="advance-badge">Advance Mein!</div>
+                <div class="countdown-container">
+                    <div class="cd-box"><div class="cd-num" id="cdDays">0</div><div class="cd-label">Din</div></div>
+                    <div class="cd-box"><div class="cd-num" id="cdHours">0</div><div class="cd-label">Ghante</div></div>
+                    <div class="cd-box"><div class="cd-num" id="cdMins">0</div><div class="cd-label">Minute</div></div>
+                    <div class="cd-box"><div class="cd-num" id="cdSecs">0</div><div class="cd-label">Second</div></div>
+                </div>
+            </div>
+
+            <div class="wishing-msg">
+                Aapko Aur Aapke Poore Pariwar Ko <br>
+                <span class="festival-highlight" id="displayFestivalName">Shubh Tyohar</span> <br>
+                Ki Hardik Shubhkamnayein! 🎉✨
+            </div>
+
+            <button class="firework-btn" onclick="triggerFireworks()">🎉 Phodien Patakhe</button>
+
+            <!-- 🚀 DYNAMIC DUDO PROMO BOX -->
+            <div class="DUDO-promo-box">
+                <div class="promo-header">
+                    <div class="promo-logo">💰</div>
+                    <div>
+                        <div class="promo-title" id="dynPromoTitle">DUDO App</div>
+                        <div style="font-size: 10px; color: #cbd5e1; font-weight: bold;" id="dynPromoSub">Daily Cash & Rewards App</div>
+                    </div>
+                </div>
+                <div class="promo-desc" id="dynPromoDesc">Iss tyohar par ghar baithe daily bonus, games, aur easy tasks karke paise jeetien!</div>
+                <div class="promo-features" id="dynPromoFeatures">
+                    <span>⚡ Instant UPI Payout</span>
+                    <span>🎡 Daily Lucky Spin</span>
+                    <span>🎁 Daily Check-in</span>
+                    <span>🎮 Play & Win</span>
+                </div>
+                <a href="index.html" class="download-app-btn" id="dynDownloadBtn">📲 Download App Now</a>
+            </div>
+
+            <!-- 📸 SHARE & PHOTO UPLOAD SECTION -->
+            <div class="share-section">
+                <p style="font-size: 13px; color: #fff; margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px #000;">
+                    Apne Naam Aur Photo Ke Sath Bhejein:
+                </p>
+                
+                <input type="text" id="userCustomName" class="input-box" placeholder="✏️ Apna Naam Yahan Likhein...">
+                
+                <div class="photo-upload-wrapper">
+                    <div class="custom-file-btn" id="fileBtnUI">📸 Apni Photo Lagayein (Optional)</div>
+                    <input type="file" id="userPhotoInput" class="file-input-hidden" accept="image/*" onchange="updateFileNameAndPreview()">
+                </div>
+
+                <!-- LIVE PHOTO PREVIEW -->
+                <img id="livePhotoPreview" src="" alt="Preview">
+
+                <div id="loadingSpinner">⏳ Photo lag rahi hai... Kripya Rukein...</div>
+
+                <div class="share-buttons-grid">
+                    <button class="whatsapp-share-btn" id="btnShare" onclick="generateAndShareLink('whatsapp')">
+                        <span style="font-size: 18px;">📲</span> WhatsApp
+                    </button>
+                    <button class="copy-link-btn" id="btnCopy" onclick="generateAndShareLink('copy')">
+                        🔗 Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. BOTTOM BANNER AD -->
+    <div class="ad-banner-slot" id="greetingAdBottom">
+        <span style="font-size: 10px; color: #64748b;">[ Adsterra Banner Slot 2 ]</span>
+    </div>
+
+    <script>
+        // FIREBASE INITIALIZATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const storage = firebase.storage();
+
+        let fallInterval;
+        let countdownTimer;
+        let isMusicPlaying = false;
+
+        // 🎵 MUSIC CONTROL LOGIC
+        function toggleMusic() {
+            const music = document.getElementById("bgMusic");
+            const btn = document.getElementById("musicToggleBtn");
+            if (isMusicPlaying) {
+                music.pause();
+                btn.innerHTML = "🔇";
+                isMusicPlaying = false;
+            } else {
+                music.play().catch(e => console.log("Audio play blocked", e));
+                btn.innerHTML = "🔊";
+                isMusicPlaying = true;
+            }
+        }
+
+        // 1. FIREWORKS EFFECT & UNBOXING
+        function triggerFireworks() {
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 }, colors: ['#facc15', '#ec4899', '#3b82f6', '#10b981'] });
+                setTimeout(() => {
+                    confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#facc15', '#ec4899'] });
+                    confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#facc15', '#3b82f6'] });
+                }, 300);
+            }
+        }
+
+        function openSurpriseEnvelope() {
+            document.getElementById("unboxingOverlay").style.display = "none";
+            document.getElementById("cardEmojiWrapper").style.display = "block";
+            
+            // Show music button and try to play
+            const music = document.getElementById("bgMusic");
+            if(music.src && music.src !== window.location.href) {
+                document.getElementById("musicToggleBtn").style.display = "flex";
+                music.play().then(() => {
+                    isMusicPlaying = true;
+                }).catch(e => console.log("Music play pending user interaction"));
+            }
+
+            triggerFireworks();
+        }
+
+        // 🔥 SMART PHOTO SIZE VALIDATOR & PREVIEW
+        function updateFileNameAndPreview() {
+            const input = document.getElementById("userPhotoInput");
+            if(input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // ⚠️ Strict 2MB Size Limit Check to save Firebase Storage
+                if(file.size > 2 * 1024 * 1024) {
+                    alert("⚠️ Photo ka size bahut bada hai (2MB limit). Kripya koi dusri ya choti photo chunein!");
+                    input.value = ""; // Clear the file
+                    document.getElementById("livePhotoPreview").style.display = "none";
+                    document.getElementById("fileBtnUI").innerHTML = "📸 Apni Photo Lagayein (Optional)";
+                    document.getElementById("fileBtnUI").style.color = "var(--theme-accent)";
+                    document.getElementById("fileBtnUI").style.borderColor = "var(--theme-accent)";
+                    return;
+                }
+
+                document.getElementById("fileBtnUI").innerHTML = `✅ Photo Set: ${file.name.substring(0,10)}...`;
+                document.getElementById("fileBtnUI").style.color = "#10b981";
+                document.getElementById("fileBtnUI").style.borderColor = "#10b981";
+
+                // Show Live Image Preview instantly
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewObj = document.getElementById("livePhotoPreview");
+                    previewObj.src = e.target.result;
+                    previewObj.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateEmojiBorder(emoji) {
+            if(!emoji) emoji = "✨";
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34"><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-size="22">${emoji}</text></svg>`;
+            const encoded = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+            const wrapper = document.getElementById("cardEmojiWrapper");
+            wrapper.style.backgroundImage = `url('${encoded}')`;
+            wrapper.style.backgroundRepeat = "round";
+        }
+
+        function startFallingEmojis(emoji) {
+            if(!emoji) emoji = "✨";
+            clearInterval(fallInterval);
+            document.getElementById("fallingEmojisContainer").innerHTML = "";
+            fallInterval = setInterval(() => {
+                const el = document.createElement("div");
+                el.innerText = emoji;
+                el.className = "falling-emoji";
+                el.style.left = Math.random() * 100 + "vw";
+                el.style.fontSize = (Math.random() * 20 + 15) + "px";
+                el.style.animationDuration = (Math.random() * 3 + 4) + "s";
+                document.getElementById("fallingEmojisContainer").appendChild(el);
+                setTimeout(() => el.remove(), 7000);
+            }, 400); 
+        }
+
+        // ⏳ ADVANCE COUNTDOWN LOGIC
+        function startCountdown(targetDateStr) {
+            clearInterval(countdownTimer);
+            let safeDateStr = targetDateStr.replace(' ', 'T');
+            const targetDate = new Date(safeDateStr).getTime();
+            
+            if (isNaN(targetDate)) { document.getElementById("advanceSection").style.display = "none"; return; }
+
+            countdownTimer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownTimer);
+                    document.getElementById("advanceSection").style.display = "none";
+                    return;
+                }
+
+                document.getElementById("advanceSection").style.display = "block";
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("cdDays").innerText = days;
+                document.getElementById("cdHours").innerText = hours;
+                document.getElementById("cdMins").innerText = minutes;
+                document.getElementById("cdSecs").innerText = seconds;
+            }, 1000);
+        }
+
+        // 3. READ URL PARAMS & ADMIN PANEL CONFIGS
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const nameParam = urlParams.get('name');
+            const festParam = urlParams.get('fest');
+            const imgParam = urlParams.get('img'); 
+
+            if (nameParam) document.getElementById("displaySenderName").innerText = decodeURIComponent(nameParam.replace(/\+/g, ' '));
+            
+            // 📸 DISPLAY PHOTO IF IT EXISTS IN LINK
+            if (imgParam) {
+                const photoFrame = document.getElementById("displaySenderPhoto");
+                photoFrame.src = decodeURIComponent(imgParam);
+                photoFrame.style.display = "block";
+            }
+
+            if (festParam) {
+                const cleanFest = decodeURIComponent(festParam.replace(/\+/g, ' '));
+                document.getElementById("displayFestivalName").innerText = cleanFest;
+                setFestivalIcons(cleanFest);
+            }
+
+            // DYNAMIC ADMIN PANEL SYNC
+            database.ref('app_files_deep_config/greeting_page').on('value', (snap) => {
+                if(snap.exists()) {
+                    let c = snap.val();
+                    
+                    if(c.theme_bg_image) {
+                        document.body.style.backgroundImage = `url('${c.theme_bg_image}')`;
+                        document.getElementById("bgTint").style.background = "rgba(0,0,0,0.65)";
+                    }
+                    if(c.card_inner_bg) {
+                        const card = document.getElementById("greetingMainCard");
+                        card.style.background = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${c.card_inner_bg}')`;
+                        card.style.backgroundSize = "cover";
+                        card.style.backgroundPosition = "center";
+                    }
+                    if(c.theme_color) document.documentElement.style.setProperty('--theme-accent', c.theme_color);
+
+                    // 🎵 Fetch Background Music URL from Admin Panel (if added later)
+                    if(c.audio_url) {
+                        document.getElementById("bgMusic").src = c.audio_url;
+                    }
+
+                    let displayEmoji = c.border_emoji || "✨";
+                    updateEmojiBorder(displayEmoji);
+                    startFallingEmojis(displayEmoji);
+
+                    if(c.festival_date) {
+                        startCountdown(c.festival_date);
+                    } else {
+                        document.getElementById("advanceSection").style.display = "none";
+                    }
+
+                    if(c.festival_name && !festParam) {
+                        document.getElementById("displayFestivalName").innerText = c.festival_name;
+                        setFestivalIcons(c.festival_name);
+                    }
+                    if(c.promo_title) document.getElementById("dynPromoTitle").innerText = c.promo_title;
+                    if(c.promo_desc) document.getElementById("dynPromoDesc").innerText = c.promo_desc;
+                    if(c.app_download_url) document.getElementById("dynDownloadBtn").href = c.app_download_url;
+                    
+                    if(c.banner_1) { let topSlot = document.getElementById("greetingAdTop"); topSlot.innerHTML = c.banner_1; runScripts(topSlot); }
+                    if(c.banner_2) { let btmSlot = document.getElementById("greetingAdBottom"); btmSlot.innerHTML = c.banner_2; runScripts(btmSlot); }
+                }
+            });
+        });
+
+        function setFestivalIcons(festName) {
+            const iconEl = document.getElementById("festIcon");
+            const envEl = document.getElementById("envIcon");
+            const fLower = festName.toLowerCase();
+            
+            if(fLower.includes("holi")) { iconEl.innerText = "🎨"; envEl.innerText = "🎉"; }
+            else if(fLower.includes("diwali") || fLower.includes("deepawali")) { iconEl.innerText = "🪔"; envEl.innerText = "🧧"; }
+            else if(fLower.includes("eid")) { iconEl.innerText = "🌙"; envEl.innerText = "🎁"; }
+            else if(fLower.includes("independence") || fLower.includes("republic") || fLower.includes("azadi")) { iconEl.innerText = "🇮🇳"; envEl.innerText = "💌"; }
+            else if(fLower.includes("rakhi") || fLower.includes("raksha")) { iconEl.innerText = "🧿"; envEl.innerText = "🎁"; }
+            else if(fLower.includes("navratri") || fLower.includes("durga")) { iconEl.innerText = "🔱"; envEl.innerText = "🌺"; }
+            else { iconEl.innerText = "🎉"; envEl.innerText = "🎁"; }
+        }
+
+        function runScripts(container) {
+            let scripts = container.getElementsByTagName("script");
+            for (let i = 0; i < scripts.length; i++) {
+                let sNode = document.createElement("script");
+                if (scripts[i].src) sNode.src = scripts[i].src;
+                else sNode.text = scripts[i].text;
+                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
+            }
+        }
+
+        // 📈 INCREASE ANALYTICS COUNTER ON SHARE
+        function recordViralShareEvent() {
+            database.ref('platform_analytics/festival_shares_count').once('value').then(snap => {
+                let current = snap.val() || 0;
+                database.ref('platform_analytics/festival_shares_count').set(current + 1);
+            });
+        }
+
+        // 4. PHOTO UPLOAD & MULTI-PLATFORM SHARE ENGINE
+        function generateAndShareLink(platform) {
+            const nameInput = document.getElementById("userCustomName").value.trim();
+            if (!nameInput) { alert("⚠️ Kripya apna naam enter karein!"); return; }
+
+            const currentFestival = document.getElementById("displayFestivalName").innerText;
+            const baseUrl = window.location.href.split('?')[0]; 
+            const photoInput = document.getElementById("userPhotoInput");
+            
+            const btnWa = document.getElementById("btnShare");
+            const btnCopy = document.getElementById("btnCopy");
+            const loader = document.getElementById("loadingSpinner");
+
+            recordViralShareEvent(); // 📈 Record share in Admin Panel
+
+            if (photoInput.files && photoInput.files[0]) {
+                const file = photoInput.files[0];
+                btnWa.style.display = "none"; btnCopy.style.display = "none";
+                loader.style.display = "block"; 
+
+                const storageRef = storage.ref();
+                const imageRef = storageRef.child('wishes_photos/' + Date.now() + '_' + file.name);
+
+                imageRef.put(file).then(snapshot => {
+                    snapshot.ref.getDownloadURL().then(downloadURL => {
+                        const generatedLink = `${baseUrl}?name=${encodeURIComponent(nameInput)}&fest=${encodeURIComponent(currentFestival)}&img=${encodeURIComponent(downloadURL)}`;
+                        executeShareAction(platform, nameInput, generatedLink);
+                        
+                        btnWa.style.display = "flex"; btnCopy.style.display = "flex"; 
+                        loader.style.display = "none";
+                    });
+                }).catch(error => {
+                    alert("⚠️ Photo upload fail ho gaya. Kripya choti size ki photo chunein ya bina photo ke bhejein.");
+                    btnWa.style.display = "flex"; btnCopy.style.display = "flex"; 
+                    loader.style.display = "none";
+                });
+            } else {
+                const generatedLink = `${baseUrl}?name=${encodeURIComponent(nameInput)}&fest=${encodeURIComponent(currentFestival)}`;
+                executeShareAction(platform, nameInput, generatedLink);
+            }
+        }
+
+        function executeShareAction(platform, name, finalUrl) {
+            const shareText = `*${name}* ne aapke liye ek khaas festival surprise lifafa 🎁 bheja hai!\n\nJaldi se Magic Envelope kholkar dekhein (aur apna photo bhi lagayein): 👇\n${finalUrl}`;
+            
+            if(platform === 'whatsapp') {
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+                window.open(whatsappUrl, '_blank');
+            } else if (platform === 'copy') {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    document.getElementById("btnCopy").innerHTML = "✅ Copied!";
+                    setTimeout(() => { document.getElementById("btnCopy").innerHTML = "🔗 Copy"; }, 2000);
+                }).catch(err => {
+                    alert("Copy fail ho gaya, kripya link ko manually copy karein: \n\n" + finalUrl);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

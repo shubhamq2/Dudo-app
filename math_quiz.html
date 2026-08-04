@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quiz - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        
+        /* Premium Sync Header */
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3b82f6; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #3b82f6; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); }
+        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        
+        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #3b82f6; font-weight: bold; cursor: pointer; }
+
+        /* Profile Balance Ribbon */
+        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, #0f172a, #1e293b); border: 2px solid #3b82f6; padding: 12px 20px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .balance-card span { font-size: 16px; }
+        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+
+        /* 🔥 DYNAMIC STREAK LEVEL MULTIPLIER RIBBON */
+        .multiplier-streak-ribbon { width: 92%; max-width: 440px; background: #1e293b; border: 1px dashed #fbbf24; padding: 10px 15px; border-radius: 10px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; font-size: 12px; font-weight: 800; color: #fbbf24; }
+        .multiplier-badge { background: #fbbf24; color: #0f172a; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+
+        /* 4-Banners Ads Layout Mapped */
+        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
+        .ad-slot-banner { width: 100%; min-height: 50px; background: #1e293b; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #3b82f6; box-sizing: border-box; }
+
+        /* Main Quiz Card Box */
+        .quiz-main-card { width: 92%; max-width: 440px; background: #1e293b; border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        
+        /* 🔥 UPGRADED: Modern Interactive Question Box display */
+        .question-display-box { background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 16px; padding: 30px 20px; font-size: 38px; font-weight: 900; color: #fbbf24; border: 2px solid #a855f7; margin: 20px 0; letter-spacing: 3px; box-shadow: inset 0 0 20px rgba(168,85,247,0.2), 0 5px 15px rgba(0,0,0,0.3); text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+
+        /* 🔥 UPGRADED: Modern Input Grouping Field */
+        .answer-input { width: 100%; background: #0f172a; border: 2px solid #3b82f6; border-radius: 14px; color: #fff; padding: 18px; font-size: 22px; font-weight: 800; text-align: center; outline: none; box-sizing: border-box; margin-bottom: 20px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .answer-input:focus { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+
+        /* Action Status Button */
+        .status-btn { width: 100%; background: #3b82f6; color: #fff; border: none; padding: 15px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); outline: none; cursor: pointer; transition: 0.2s; }
+        .status-btn:active:not(:disabled) { transform: scale(0.97); }
+        .status-btn:disabled { background: #475569; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+        /* Notice Board Security Safe Box */
+        .security-box { width: 92%; max-width: 440px; border: 1px dashed #3b82f6; background: rgba(59, 130, 246, 0.05); border-radius: 12px; padding: 12px 15px; margin-top: 15px; box-sizing: border-box; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; margin-bottom: 15px; }
+
+        /* Custom Modern Alert Modal Popup style */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; width: 80%; max-width: 350px; text-align: center; }
+        .custom-alert.success-border { border-color: #10b981; }
+        .custom-alert p { margin: 0 0 15px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
+        .custom-alert button { background: #ef4444; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .custom-alert.success-border button { background: #10b981; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <p id="alertMessage">Message</p>
+        <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <div class="header">
+        <a href="extra_bonus.html" class="back-btn">←</a>
+        <h2 data-i18n="mq_title">Math Quiz</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
+    </div>
+
+    <div class="balance-card">
+        <span id="liveUserBalance">₹0.00</span>
+        <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
+    </div>
+
+    <div class="multiplier-streak-ribbon">
+        <span id="quizStreakCountDisplay">🔥 STREAK CHECK: 0 CORRECT</span>
+        <span class="multiplier-badge" id="quizBonusLabelDisplay">1X MULTIPLIER</span>
+    </div>
+
+    <!-- 📢 ADMIN CONNECTED TOP BANNERS -->
+    <div class="ad-container-block">
+        <div class="ad-slot-banner" id="mathAdSlot1">
+            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
+        </div>
+        <div class="ad-slot-banner" id="mathAdSlot2">
+            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
+        </div>
+    </div>
+
+    <div class="quiz-main-card">
+        <h3 style="margin:0; font-size: 20px; color: #3b82f6;" data-i18n="mq_h3">Solve Arithmetic</h3>
+        <p style="font-size: 13px; color:#94a3b8; margin: 5px 0 15px 0;" data-i18n="mq_p">Solve the simple math equation below to credit instant rewards token!</p>
+        
+        <div class="question-display-box" id="mathQuestionString">0 + 0</div>
+
+        <input type="number" id="quizAnswerInput" class="answer-input" placeholder="YOUR ANSWER">
+
+        <button class="status-btn" id="quizSubmitBtn" onclick="verifyQuizAnswerSubmit()" data-i18n="mq_btn">SUBMIT ANSWER</button>
+    </div>
+
+    <!-- 📢 ADMIN CONNECTED BOTTOM BANNERS -->
+    <div class="ad-container-block">
+        <div class="ad-slot-banner" id="mathAdSlot3">
+            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        </div>
+        <div class="ad-slot-banner" id="mathAdSlot4">
+            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        </div>
+    </div>
+
+    <div class="security-box">
+        <span>🔒</span>
+        <span data-i18n="mq_security">System monitor is currently logging operations. Entering an incorrect solution or bypassing the 25-seconds ad check voids the ledger transaction events.</span>
+    </div>
+
+    <script>
+        const langData = {
+            "en": { "mq_title": "Math Quiz", "mq_h3": "Solve Arithmetic", "mq_p": "Solve the simple math equation below to credit instant rewards token!", "mq_btn": "SUBMIT ANSWER", "mq_security": "System monitor is currently logging operations. Entering an incorrect solution or skipping the 25-seconds ad check voids the transaction.", "err_wrong": "❌ Wrong Answer! Try solving carefully next time.", "err_early": "❌ Verification Failed! You closed the sponsor tab early.", "err_invalid": "❌ System Alert: Rapid app switching blocked. Stay on the ad tab for 25s.", "err_success": "🎉 Correct! Coins added to your account.", "wait_txt": "Verifying ad view... " },
+            "hi": { "mq_title": "मैथ क्विज़", "mq_h3": "अंकगणित हल करें", "mq_p": "तुरंत कॉइन्स क्रेडिट करने के लिए नीचे दिए गए सरल गणित समीकरण को हल करें!", "mq_btn": "उत्तर सबमिट करें", "mq_security": "सिस्टम मॉनिटर वर्तमान में ऑपरेशन्स लॉग कर रहा है। गलत उत्तर देने या 25 सेकंड की विज्ञापन जांच को छोड़ने से ट्रांजैक्शन रद्द हो जाएगा।", "err_wrong": "❌ गलत उत्तर! अगली बार ध्यान से हल करने का प्रयास करें।", "err_early": "❌ सत्यापन विफल! आपने स्पॉन्सर टैब को बहुत जल्दी बंद कर दिया।", "err_invalid": "❌ सिस्टम अलर्ट: ऐप बदलना ब्लॉक किया गया। कृपया 25 सेकंड तक एड पेज पर बने रहें।", "err_success": "🎉 सही उत्तर! आपके खाते में कॉइन्स जोड़ दिए गए हैं।", "wait_txt": "विज्ञापन सत्यापित हो रहा है... " },
+            "bn": { "mq_title": "গণিত কুইজ", "mq_h3": "পাটিগণিত সমাধান করুন", "mq_p": "তাত্ক্ষণিক কয়েন পেতে নিচের সমীকরণটি সমাধান করুন!", "mq_btn": "উত্তর জমা দিন", "mq_security": "সিস্টেম মনিটর কাজ করছে। ভুল উত্তর বা বিজ্ঞাপন এড়িয়ে গেলে ট্রানজেকশন বাতিল হবে।", "err_wrong": "❌ ভুল উত্তর! আবার চেষ্টা করুন।", "err_early": "❌ যাচাইকরণ ব্যর্থ! স্পনসর ট্যাব আগে বন্ধ করা হয়েছে।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: ২৫ সেকেন্ড অ্যাড পেজে থাকুন।", "err_success": "🎉 সঠিক উত্তর! আপনার অ্যাকাউন্টে কয়েন যোগ হয়েছে।", "wait_txt": "যাচাই করা হচ্ছে... " }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+    </script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let computedCorrectAnswer = 0;
+        let consecutiveCorrectAnswersCount = 0;
+        let activeAdminSmartlinkUrl = "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+
+        // 🔥 CONNECT BANNERS AND TASKS SMARTLINK DIRECT TO FIREBASE ADMIN CONTROL NODES
+        database.ref('global_system_runtime_configurations').on('value', (snap) => {
+            if(snap.exists()) {
+                let conf = snap.val();
+                if(conf.watch_ads_configuration && conf.watch_ads_configuration.global_smartlink) {
+                    activeAdminSmartlinkUrl = conf.watch_ads_configuration.global_smartlink;
+                }
+                if(conf.watch_ads_banner_slots) {
+                    let b = conf.watch_ads_banner_slots;
+                    if (b.slot1_html) { let s1 = document.getElementById("mathAdSlot1"); if(s1) { s1.innerHTML = b.slot1_html; runScripts(s1); } }
+                    if (b.slot2_html) { let s2 = document.getElementById("mathAdSlot2"); if(s2) { s2.innerHTML = b.slot2_html; runScripts(s2); } }
+                    if (b.slot3_html) { let s3 = document.getElementById("mathAdSlot3"); if(s3) { s3.innerHTML = b.slot3_html; runScripts(s3); } }
+                    if (b.slot4_html) { let s4 = document.getElementById("mathAdSlot4"); if(s4) { s4.innerHTML = b.slot4_html; runScripts(s4); } }
+                }
+            }
+        });
+
+        function runScripts(container) {
+            let scripts = container.getElementsByTagName("script");
+            for (let i = 0; i < scripts.length; i++) {
+                let sNode = document.createElement("script");
+                if (scripts[i].src) sNode.src = scripts[i].src;
+                else sNode.text = scripts[i].text;
+                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            database.ref('users/' + uid).on('value', (snap) => {
+                if(snap.exists()) {
+                    let d = snap.val();
+                    document.getElementById("liveUserCoins").innerText = d.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (d.balance || 0).toFixed(2);
+                }
+            });
+
+            generateNewMathQuestion();
+        });
+
+        function generateNewMathQuestion() {
+            let num1 = Math.floor(Math.random() * 20) + 1; 
+            let num2 = Math.floor(Math.random() * 10) + 1; 
+            const operators = ['+', '-', '*'];
+            let selectedOp = operators[Math.floor(Math.random() * operators.length)];
+
+            if (selectedOp === '+') { computedCorrectAnswer = num1 + num2; }
+            else if (selectedOp === '-') { computedCorrectAnswer = num1 - num2; }
+            else if (selectedOp === '*') { computedCorrectAnswer = num1 * num2; }
+
+            document.getElementById("mathQuestionString").innerText = `${num1} ${selectedOp} ${num2}`;
+            document.getElementById("quizAnswerInput").value = "";
+        }
+
+        function showCustomAlert(msgKey, isSuccess = false) {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let msg = langData[currentLang][msgKey] || langData["en"][msgKey];
+            const alertBox = document.getElementById("customAlertBox");
+            if(isSuccess) alertBox.classList.add("success-border");
+            else alertBox.classList.remove("success-border");
+
+            document.getElementById("alertMessage").innerText = msg;
+            document.getElementById("alertOverlay").style.display = "block";
+            alertBox.style.display = "block";
+        }
+
+        function closeCustomAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
+        }
+
+        let platformTimer = null;
+        let countdownTime = 25;
+        let targetWindow = null;
+        let totalSecondsOpen = 0;
+
+        // 🔥 ADDED TAB TRACKER 
+        window.hasMainTabHidden = false;
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                window.hasMainTabHidden = true;
+            }
+        });
+
+        function verifyQuizAnswerSubmit() {
+            const userAnswer = parseInt(document.getElementById("quizAnswerInput").value.trim());
+            const btn = document.getElementById("quizSubmitBtn");
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+
+            if (isNaN(userAnswer)) return;
+
+            if (userAnswer !== computedCorrectAnswer) {
+                consecutiveCorrectAnswersCount = 0;
+                executeUpdateStreakVisualInterface();
+                showCustomAlert("err_wrong");
+                generateNewMathQuestion();
+                return;
+            }
+
+            countdownTime = 25;
+            totalSecondsOpen = 0;
+            window.hasMainTabHidden = false; // Reset tracker
+            btn.disabled = true;
+
+            let baseWaitTxt = langData[currentLang]["wait_txt"] || langData["en"]["wait_txt"];
+            btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
+
+            targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+
+            platformTimer = setInterval(() => {
+                if (targetWindow && targetWindow.closed) {
+                    clearInterval(platformTimer);
+                    resetQuizSubmitButton();
+                    showCustomAlert("err_early");
+                    return;
+                }
+
+                // Check if they successfully went to the ad tab and came back too early
+                if (!document.hidden && window.hasMainTabHidden) {
+                    if (totalSecondsOpen < 24) {
+                        clearInterval(platformTimer);
+                        resetQuizSubmitButton();
+                        showCustomAlert("err_invalid");
+                        return;
+                    }
+                }
+
+                totalSecondsOpen++;
+                countdownTime--;
+                btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
+
+                if (countdownTime <= 0) {
+                    clearInterval(platformTimer);
+                    btn.innerText = "...";
+
+                    consecutiveCorrectAnswersCount++;
+                    
+                    let currentPayoutCoins = 10;
+                    if(consecutiveCorrectAnswersCount >= 5) {
+                        currentPayoutCoins = 20; // 2x Boost applied!
+                    }
+                    let monetizedValue = currentPayoutCoins / 100;
+
+                    database.ref('users/' + uid).once('value').then((snapshot) => {
+                        if (snapshot.exists()) {
+                            let oldCoins = snapshot.val().coins || 0;
+                            let oldBalance = snapshot.val().balance || 0;
+
+                            database.ref('users/' + uid).update({
+                                coins: oldCoins + currentPayoutCoins,
+                                balance: oldBalance + monetizedValue
+                            }).then(() => {
+                                resetQuizSubmitButton();
+                                executeUpdateStreakVisualInterface();
+                                generateNewMathQuestion();
+                                showCustomAlert("err_success", true);
+
+                                // 🔥 SYNC LOG DATA WITH BACKEND HOME CHECKLIST PROGRESS BAR (t8 node)
+                                let currentDailyList = snapshot.val().completed_daily_tasks_array_node || [];
+                                if(!currentDailyList.includes("t8")) {
+                                    currentDailyList.push("t8");
+                                    database.ref('users/' + uid).update({ completed_daily_tasks_array_node: currentDailyList });
+                                }
+                            });
+                        }
+                    });
+                }
+            }, 1000);
+        }
+
+        function executeUpdateStreakVisualInterface() {
+            document.getElementById("quizStreakCountDisplay").innerText = `🔥 STREAK CHECK: ${consecutiveCorrectAnswersCount} CORRECT`;
+            
+            if(consecutiveCorrectAnswersCount >= 5) {
+                document.getElementById("quizBonusLabelDisplay").innerText = "2X MULTIPLIER ACTIVE";
+                document.getElementById("quizBonusLabelDisplay").style.background = "#10b981";
+                document.getElementById("quizBonusLabelDisplay").style.color = "#fff";
+            } else {
+                document.getElementById("quizBonusLabelDisplay").innerText = "1X MULTIPLIER";
+                document.getElementById("quizBonusLabelDisplay").style.background = "#fbbf24";
+                document.getElementById("quizBonusLabelDisplay").style.color = "#0f172a";
+            }
+        }
+
+        function resetQuizSubmitButton() {
+            const btn = document.getElementById("quizSubmitBtn");
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            btn.disabled = false;
+            btn.innerText = langData[currentLang]["mq_btn"] || "SUBMIT ANSWER";
+        }
+    </script>
+</body>
+</html>

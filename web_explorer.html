@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Tasks - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        
+        /* Premium Sync Header */
+        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #f59e0b; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #f59e0b; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(245, 158, 11, 0.1); }
+        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+
+        /* 📢 AD CONFIGURATION: TOP INCOME SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #f59e0b; margin: 5px 0; }
+
+        /* Terminal Controller Card */
+        .task-card { background: #1e293b; border-radius: 24px; padding: 25px 20px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .task-card h3 { margin: 0 0 8px 0; font-size: 19px; color: #f59e0b; font-weight: 800; }
+        .task-card p { margin: 0 0 20px 0; font-size: 13px; color: #94a3b8; font-weight: 500; line-height: 1.5; }
+
+        /* Custom Action Launch Button Layout */
+        .launch-loop-btn { width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #0f172a; border: none; padding: 15px; border-radius: 50px; font-size: 15px; font-weight: bold; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); cursor: pointer; text-transform: uppercase; font-weight: 800; transition: 0.2s; }
+        .launch-loop-btn:active { transform: scale(0.98); }
+
+        /* Dynamic Verification Sub-Box Panel */
+        .verification-node-panel { display: none; background: #111827; border-radius: 16px; padding: 18px; border: 1px dashed #ef4444; margin-top: 15px; text-align: center; }
+        .verification-node-panel h4 { margin: 0 0 5px 0; font-size: 14px; color: #ef4444; font-weight: 800; }
+        .task-timer-clock { font-size: 24px; font-weight: 900; color: #facc15; margin: 5px 0; }
+
+        .claim-payout-btn { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); text-transform: uppercase; margin-top: 10px; display: none; }
+
+        .security-box { border: 1px dashed #f59e0b; background: rgba(245, 158, 11, 0.03); border-radius: 12px; padding: 12px 15px; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="home.html" class="back-btn">←</a>
+        <h2>Web Tasks</h2>
+    </div>
+
+    <div class="main-container">
+        
+        <!-- 📢 TOP BANNER INCOME AD -->
+        <div class="ad-banner-slot">
+            <script type="text/javascript">atOptions={'key':'9d8e7e12df3875a6c3846d0cb748a04b','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"></script>
+        </div>
+
+        <div class="task-card">
+            <h3>Premium Web Offers</h3>
+            <p>Open the web stream engine below, navigate through the landing description, and clear the validation window check to claim high-yield tokens.</p>
+
+            <button class="launch-loop-btn" id="startTaskBtn" onclick="executeStartTaskSequence()">Open Web Stream 🌐</button>
+
+            <!-- Dynamic Verification Mask Panel -->
+            <div class="verification-node-panel" id="taskVerificationBox">
+                <h4 id="statusLabelTxt">Tracking Web Stream...</h4>
+                <div class="task-timer-clock" id="taskCountdownClock">30s</div>
+                <p style="font-size: 11px; color: #64748b; margin: 0;" id="statusSubDesc">Complete the target interaction on the external landing page. Keep this app window active.</p>
+                
+                <button class="claim-payout-btn" id="claimTaskRewardBtn" onclick="executeCreditTaskTokens()">Claim Reward Coins 🎁</button>
+            </div>
+        </div>
+
+        <!-- 📢 BOTTOM BANNER INCOME AD -->
+        <div class="ad-banner-slot">
+            <script type="text/javascript">atOptions={'key':'7c12f3875a6c3846d0cb748a04b9d8e','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/7c12f3875a6c3846d0cb748a04b9d8e/invoke.js"></script>
+        </div>
+
+        <div class="security-box">
+            <span>🛡️</span>
+            <span>System validation protocols are monitoring this active tab process. Invalid app switching or split interface modes voids execution loops instantly.</span>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let taskCountdownInt = 30; // 30 seconds strict traffic validation tracking
+        let totalSecondsActiveInt = 0;
+        let taskTimerInterval = null;
+        let externalTargetWindow = null;
+        const taskRewardCoinsValue = 50; // Higher reward for double validation loop
+
+        // 🔥 ADDED SYSTEM TAB TRACKER 
+        window.hasMainTabHidden = false;
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                window.hasMainTabHidden = true;
+            }
+        });
+
+        function executeStartTaskSequence() {
+            // Target Adsterra Link or Sponsor URL
+            const TARGET_TASK_URL = "https://www.highperformanceformat.com/7c12f3875a6c3846d0cb748a04b9d8e/invoke.js";
+
+            taskCountdownInt = 30;
+            totalSecondsActiveInt = 0;
+            window.hasMainTabHidden = false; // Reset Tracker
+
+            document.getElementById("startTaskBtn").style.display = "none";
+            document.getElementById("taskVerificationBox").style.display = "block";
+            document.getElementById("taskCountdownClock").style.display = "block";
+            document.getElementById("claimTaskRewardBtn").style.display = "none";
+            document.getElementById("statusLabelTxt").innerText = "Tracking Web Stream...";
+            document.getElementById("statusLabelTxt").style.color = "#ef4444";
+            document.getElementById("taskVerificationBox").style.borderColor = "#ef4444";
+
+            // Fire secure window target redirect loop
+            externalTargetWindow = window.open(TARGET_TASK_URL, '_blank', 'noopener,noreferrer');
+
+            taskTimerInterval = setInterval(() => {
+                // Check 1: Tab closed early guard
+                if(externalTargetWindow && externalTargetWindow.closed) {
+                    clearInterval(taskTimerInterval);
+                    resetTaskDashboard();
+                    alert("❌ Validation Failed! You closed the verification landing stream early.");
+                    return;
+                }
+
+                // Check 2: App Switching Protection Check
+                if(!document.hidden && window.hasMainTabHidden) {
+                    if(totalSecondsActiveInt < 29) {
+                        clearInterval(taskTimerInterval);
+                        resetTaskDashboard();
+                        alert("❌ System Alert! Keep the landing browser active for 30 seconds.");
+                        return;
+                    }
+                }
+
+                totalSecondsActiveInt++;
+                taskCountdownInt--;
+                document.getElementById("taskCountdownClock").innerText = `${taskCountdownInt}s`;
+
+                if(taskCountdownInt <= 0) {
+                    clearInterval(taskTimerInterval);
+                    
+                    document.getElementById("taskCountdownClock").style.display = "none";
+                    document.getElementById("statusLabelTxt").innerText = "✅ WEB INTERACTION VERIFIED!";
+                    document.getElementById("statusLabelTxt").style.color = "#10b981";
+                    document.getElementById("taskVerificationBox").style.borderColor = "#10b981";
+                    document.getElementById("claimTaskRewardBtn").style.display = "block";
+                }
+            }, 1000);
+        }
+
+        function executeCreditTaskTokens() {
+            database.ref('users/' + uid).once('value').then((snapshot) => {
+                if(snapshot.exists()) {
+                    let oldCoins = snapshot.val().coins || 0;
+                    
+                    database.ref('users/' + uid).update({
+                        coins: oldCoins + taskRewardCoinsValue
+                    }).then(() => {
+                        alert(`🎉 Validation Success! +${taskRewardCoinsValue} Coins successfully credited to your wallet.`);
+                        
+                        // Add to history
+                        database.ref('users/' + uid + '/earning_history').push({
+                            activity: `Premium Web Task Completed`,
+                            coins_credited: taskRewardCoinsValue,
+                            timestamp: Date.now()
+                        });
+
+                        resetTaskDashboard();
+                    });
+                }
+            });
+        }
+
+        function resetTaskDashboard() {
+            document.getElementById("startTaskBtn").style.display = "block";
+            document.getElementById("taskVerificationBox").style.display = "none";
+        }
+    </script>
+</body>
+</html>

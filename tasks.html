@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Zone - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; padding-bottom: 30px; }
+        
+        /* Premium Header */
+        .header { width: 100%; background: #1e293b; padding: 12px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3b82f6; }
+        .back-btn { font-size: 20px; font-weight: bold; color: #3b82f6; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); }
+        .header-controls { display: flex; gap: 12px; align-items: center; }
+        
+        /* Language Dropdown */
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; outline: none; font-size: 13px; background: #1e293b; color: #fff; font-weight: bold; cursor: pointer; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 15px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+        .section-headline { font-size: 14px; font-weight: 800; color: #3b82f6; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 5px; margin-bottom: 5px; text-align: left; width: 100%; }
+
+        /* Grid Framework Matching Screen Exactly */
+        .networks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .network-card { background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px; box-sizing: border-box; }
+        .network-card:active { transform: scale(0.95); background: #24344d; }
+        
+        .card-badge { position: absolute; top: 10px; right: 10px; font-size: 8px; font-weight: 900; color: #fff; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; }
+        .badge-popular { background: #3b82f6; }
+        .badge-hot { background: #f97316; }
+        .badge-autopay { background: #10b981; }
+
+        .network-icon { font-size: 42px; margin-bottom: 8px; }
+        .network-title { font-size: 15px; font-weight: 800; color: #fff; margin: 0 0 4px 0; }
+        .network-desc { font-size: 11px; color: #94a3b8; margin: 0; font-weight: 500; }
+
+        /* 📢 4 LIVE DYNAMIC ADMIN ADS SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #3b82f6; margin: 5px 0; box-sizing: border-box; }
+
+        /* 🎬 MULTI-OPTION POPUP MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .modal-card { width: 100%; max-width: 360px; background: #1e293b; border-radius: 24px; border: 1px solid #475569; padding: 20px; box-sizing: border-box; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center; animation: zoomIn 0.3s ease; }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-title { font-size: 17px; font-weight: 800; color: #fff; margin: 0 0 5px 0; }
+        .modal-subtitle { font-size: 11px; color: #94a3b8; margin: 0 0 20px 0; }
+
+        .video-option-btn { width: 100%; background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 14px; color: #fff; text-align: left; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; transition: 0.2s; position: relative; }
+        .video-option-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .video-option-btn:active:not(:disabled) { background: #1e293b; border-color: #3b82f6; }
+        .option-meta { display: flex; flex-direction: column; gap: 2px; }
+        .option-reward { font-size: 11px; color: #facc15; font-weight: 800; background: rgba(250, 204, 21, 0.1); padding: 3px 8px; border-radius: 6px; }
+
+        .close-modal-btn { background: none; border: none; color: #ef4444; font-size: 13px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- 🎬 MULTI-OPTION POPUP MODAL -->
+    <div class="modal-overlay" id="videoOptionsModal">
+        <div class="modal-card">
+            <div class="modal-title" id="currentNetworkName">Video Servers</div>
+            <div class="modal-subtitle" data-i18n="select_channel">Select a video channel to stream and earn coins</div>
+            
+            <div id="optionsContainer"></div>
+
+            <button class="close-modal-btn" onclick="closeVideoOptionsModal()">Close Menu ×</button>
+        </div>
+    </div>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn">←</a>
+        <h2 data-i18n="watch_ads" style="margin:0; font-size:20px; flex-grow:1; text-align:center;">Video Zone</h2>
+        <div class="header-controls">
+            <select class="custom-lang-select notranslate" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">English</option><option value="hi">हिंदी (HI)</option><option value="bn">বাংলা (BN)</option>
+                <option value="te">తెలుగు (TE)</option><option value="mr">मराठी (MR)</option><option value="ta">தமிழ் (TA)</option>
+                <option value="ur">اردو (UR)</option><option value="gu">ગુજરાતી (GU)</option><option value="es">Español (ES)</option>
+                <option value="fr">Français (FR)</option><option value="ar">عربي (AR)</option><option value="pt">Português (PT)</option>
+                <option value="ru">Русский (RU)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <!-- 📢 AD SLOT 1 (Dynamic Wrapper Node) -->
+        <div class="ad-banner-slot" id="adSlot1">
+            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        </div>
+
+        <div class="section-headline" data-i18n="watch_earn_networks">Media Networks</div>
+
+        <div class="networks-grid">
+            <div class="network-card" onclick="openVideoOptions('adscend', '🎬')">
+                <div class="card-badge badge-popular">Popular</div>
+                <div class="network-icon">🎬</div>
+                <h3 class="network-title">Adscend Media</h3>
+                <p class="network-desc" data-i18n="unlimited_desc">Unlimited Videos</p>
+            </div>
+
+            <div class="network-card" onclick="openVideoOptions('lootably', '🔥')">
+                <div class="card-badge badge-hot">Hot</div>
+                <div class="network-icon">🔥</div>
+                <h3 class="network-title">Lootably</h3>
+                <p class="network-desc" data-i18n="unlimited_desc">Unlimited Videos</p>
+            </div>
+        </div>
+
+        <!-- 📢 AD SLOT 2 -->
+        <div class="ad-banner-slot" id="adSlot2">
+            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+        </div>
+
+        <div class="networks-grid">
+            <div class="network-card" onclick="openVideoOptions('hideout', '📺')">
+                <div class="card-badge badge-autopay">Auto-Pay</div>
+                <div class="network-icon">📺</div>
+                <h3 class="network-title">Hideout.tv</h3>
+                <p class="network-desc" data-i18n="premium_video_desc">Premium Videos</p>
+            </div>
+
+            <div class="network-card" onclick="openVideoOptions('timewall', '⚡')">
+                <div class="network-icon">⚡</div>
+                <h3 class="network-title">Timewall Clicks</h3>
+                <p class="network-desc" data-i18n="short_ads_desc">Short 10s Clips</p>
+            </div>
+        </div>
+
+        <!-- 📢 AD SLOT 3 -->
+        <div class="ad-banner-slot" id="adSlot3">
+            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+        </div>
+
+        <div class="networks-grid">
+            <div class="network-card" onclick="openVideoOptions('notik', '📱')">
+                <div class="network-icon">📱</div>
+                <h3 class="network-title">Notik Me</h3>
+                <p class="network-desc" data-i18n="short_ads_desc">Short 10s Clips</p>
+            </div>
+
+            <div class="network-card" onclick="openVideoOptions('monlix', '🚀')">
+                <div class="network-icon">🚀</div>
+                <h3 class="network-title">Monlix Videos</h3>
+                <p class="network-desc" data-i18n="high_paying_desc">High Yield Media</p>
+            </div>
+        </div>
+
+        <!-- 📢 AD SLOT 4 -->
+        <div class="ad-banner-slot" id="adSlot4">
+            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        let adServerLinksConfig = {
+            adscend: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
+            lootably: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
+            hideout: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
+            timewall: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
+            notik: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
+            monlix: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" }
+        };
+
+        // ⚡ ADMIN VIDEO CHANNELS LISTENER ROUTINE
+        database.ref('global_system_runtime_configurations/watch_ads_configuration').on('value', (snap) => {
+            if (snap.exists()) {
+                let dbData = snap.val();
+                Object.keys(adServerLinksConfig).forEach(netKey => {
+                    if (dbData[netKey]) {
+                        if (dbData[netKey].srv1) adServerLinksConfig[netKey].srv1 = dbData[netKey].srv1;
+                        if (dbData[netKey].srv2) adServerLinksConfig[netKey].srv2 = dbData[netKey].srv2;
+                        if (dbData[netKey].srv3) adServerLinksConfig[netKey].srv3 = dbData[netKey].srv3;
+                    }
+                });
+            }
+        });
+
+        // ⚡ NEW FEATURE: 4 BANNERS AD SLOTS DYNAMIC ADMIN SYNC OVERRIDE
+        database.ref('global_system_runtime_configurations/watch_ads_banner_slots').on('value', (snap) => {
+            if (snap.exists()) {
+                let banners = snap.val();
+                
+                // Dynamic script injection logic for live cross-network banner switches
+                if (banners.slot1_html) {
+                    let s1 = document.getElementById("adSlot1");
+                    if (s1) { s1.innerHTML = banners.slot1_html; executeScriptsInsideContainer(s1); }
+                }
+                if (banners.slot2_html) {
+                    let s2 = document.getElementById("adSlot2");
+                    if (s2) { s2.innerHTML = banners.slot2_html; executeScriptsInsideContainer(s2); }
+                }
+                if (banners.slot3_html) {
+                    let s3 = document.getElementById("adSlot3");
+                    if (s3) { s3.innerHTML = banners.slot3_html; executeScriptsInsideContainer(s3); }
+                }
+                if (banners.slot4_html) {
+                    let s4 = document.getElementById("adSlot4");
+                    if (s4) { s4.innerHTML = banners.slot4_html; executeScriptsInsideContainer(s4); }
+                }
+            }
+        });
+
+        // Helper framework to ensure loaded admin script tags execute smoothly
+        function executeScriptsInsideContainer(container) {
+            let scripts = container.getElementsByTagName("script");
+            for (let i = 0; i < scripts.length; i++) {
+                let scriptNode = document.createElement("script");
+                if (scripts[i].src) {
+                    scriptNode.src = scripts[i].src;
+                } else {
+                    scriptNode.text = scripts[i].text;
+                }
+                scripts[i].parentNode.replaceChild(scriptNode, scripts[i]);
+            }
+        }
+
+        let activeWatchSession = null;
+
+        // FULL 13 LANGUAGES TRANSLATIONS MATRIX REGISTER (Google Safe Mode)
+        const langData = {
+            "en": {
+                "watch_ads": "Video Zone", "watch_earn_networks": "Media Networks", "unlimited_desc": "Unlimited Videos",
+                "premium_video_desc": "Premium Videos", "short_ads_desc": "Short 10s Clips", "high_paying_desc": "High Yield Media",
+                "select_channel": "Select a video channel to stream and earn coins", "verifying": "Verifying stream integrity..."
+            },
+            "hi": {
+                "watch_ads": "वीडियो ज़ोन", "watch_earn_networks": "मीडिया नेटवर्क", "unlimited_desc": "असीमित वीडियो",
+                "premium_video_desc": "प्रीमियम वीडियो", "short_ads_desc": "छोटे 10s क्लिप्स", "high_paying_desc": "प्रीमियम मीडिया",
+                "select_channel": "सिक्के कमाने के लिए एक वीडियो चैनल चुनें", "verifying": "सत्यापन चल रहा है..."
+            },
+            "bn": {
+                "watch_ads": "ভিডিও জোন", "watch_earn_networks": "মিডিয়া নেটওয়ার্ক", "unlimited_desc": "আনলিমিটেড ভিডিও",
+                "premium_video_desc": "প্রিমিয়াম ভিডিও", "short_ads_desc": "ছোট 10s ক্লিপ", "high_paying_desc": "উচ্চ মানের মিডিয়া",
+                "select_channel": "কয়েন উপার্জন করতে একটি ভিডিও চ্যানেল নির্বাচন করুন", "verifying": "যাচাই করা হচ্ছে..."
+            },
+            "te": {
+                "watch_ads": "వీడియో జోన్", "watch_earn_networks": "మీడియా నెట్‌వర్క్స్", "unlimited_desc": "అపరిమిత వీడియోలు",
+                "premium_video_desc": "ప్రీమియం వీడియోలు", "short_ads_desc": "చిన్న 10s క్లిప్‌లు", "high_paying_desc": "హై యీల్డ్ మీడియా",
+                "select_channel": "నాణేలను సంపాదించడానికి వీడియో ఛానెల్‌ని ఎంచుకోండి", "verifying": "ధృవీకరిస్తోంది..."
+            },
+            "mr": {
+                "watch_ads": "व्हिडिओ झोन", "watch_earn_networks": "मीडिया नेटवर्क्स", "unlimited_desc": "अमर्यादित व्हिडिओ",
+                "premium_video_desc": "प्रीमियम व्हिडिओ", "short_ads_desc": "लहान 10s क्लिप्स", "high_paying_desc": "हाय यील्ड मीडिया",
+                "select_channel": "नाणी मिळवण्यासाठी एक व्हिडिओ चॅनेल निवडा", "verifying": "पडताळणी सुरू आहे..."
+            },
+            "ta": {
+                "watch_ads": "வீடியோ மண்டலம்", "watch_earn_networks": "மீடியா நெட்வொர்க்குகள்", "unlimited_desc": "வரம்பற்ற வீடியோக்கள்",
+                "premium_video_desc": "பிரீமியம் வீடியோக்கள்", "short_ads_desc": "குறுகிய 10s கிளிப்புகள்", "high_paying_desc": "உயர் மகசூல் மீடியா",
+                "select_channel": "நாணயங்களை சம்பாதிக்க வீடியோ சேனலைத் தேர்ந்தெடுக்கவும்", "verifying": "சரிபார்க்கிறது..."
+            },
+            "ur": {
+                "watch_ads": "ویڈیو زون", "watch_earn_networks": "میڈیا نیٹ ورکس", "unlimited_desc": "لامحدود ویڈیوز",
+                "premium_video_desc": "پریمیم ویڈیوز", "short_ads_desc": "مختصر 10s کلپس", "high_paying_desc": "ہائی ییلڈ میڈیا",
+                "select_channel": "سکے کمانے کے لیے ویڈیو چینل منتخب کریں", "verifying": "تصدیق ہو رہی ہے..."
+            },
+            "gu": {
+                "watch_ads": "વિડિઓ ઝોન", "watch_earn_networks": "મીડિયા નેટવર્ક્સ", "unlimited_desc": "અમર્યાદિત વિડિઓઝ",
+                "premium_video_desc": "પ્રીમિયમ વિડિઓઝ", "short_ads_desc": "ટૂંકી 10s ક્લિપ્સ", "high_paying_desc": "હાઇ યીલ્ડ મીડિયા",
+                "select_channel": "સિક્કા કમાવવા માટે વિડિઓ ચેનલ પસંદ કરો", "verifying": "ચકાસણી ચાલુ છે..."
+            },
+            "es": {
+                "watch_ads": "Zona de Video", "watch_earn_networks": "Redes de Medios", "unlimited_desc": "Videos Ilimitados",
+                "premium_video_desc": "Videos Premium", "short_ads_desc": "Clips Cortos de 10s", "high_paying_desc": "Medios de Alto Rendimiento",
+                "select_channel": "Seleccione un canal de video para transmitir y ganar monedas", "verifying": "Verificando integridad..."
+            },
+            "fr": {
+                "watch_ads": "Zone Vidéo", "watch_earn_networks": "Réseaux Médias", "unlimited_desc": "Vidéos Illimitées",
+                "premium_video_desc": "Vidéos Premium", "short_ads_desc": "Clips Courts de 10s", "high_paying_desc": "Médias à Haut Rendement",
+                "select_channel": "Sélectionnez une chaîne vidéo pour diffuser et gagner des pièces", "verifying": "Vérification en cours..."
+            },
+            "ar": {
+                "watch_ads": "منطقة الفيديو", "watch_earn_networks": "شبكات الوسائط", "unlimited_desc": "فيديوهات غير محدودة",
+                "premium_video_desc": "فيديوهات مميزة", "short_ads_desc": "مقاطع قصيرة 10 ثوانٍ", "high_paying_desc": "وسائط عالية العائد",
+                "select_channel": "اختر قناة فيديو للمشاهدة وكسب العملات", "verifying": "جاري التحقق..."
+            },
+            "pt": {
+                "watch_ads": "Zona de Vídeo", "watch_earn_networks": "Redes de Mídia", "unlimited_desc": "Vídeos Ilimitados",
+                "premium_video_desc": "Vídeos Premium", "short_ads_desc": "Clipes Curtos de 10s", "high_paying_desc": "Mídia de Alto Rendimento",
+                "select_channel": "Selecione um canal de vídeo para assistir e ganhar moedas", "verifying": "Verificando integridade..."
+            },
+            "ru": {
+                "watch_ads": "Видео Зона", "watch_earn_networks": "Медиа Сети", "unlimited_desc": "Безлимитные видео",
+                "premium_video_desc": "Премиум Видео", "short_ads_desc": "Короткие 10с Клипы", "high_paying_desc": "Высокодоходные Медиа",
+                "select_channel": "Выберите видеоканал для просмотра и заработка монет", "verifying": "Проверка подлинности..."
+            }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) { elem.innerText = transObj[key]; }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        function openVideoOptions(networkName, icon) {
+            let prettyName = networkName.charAt(0).toUpperCase() + networkName.slice(1) + " Media";
+            if(networkName === 'timewall') prettyName = "Timewall Clicks";
+            if(networkName === 'notik') prettyName = "Notik Me";
+            if(networkName === 'hideout') prettyName = "Hideout.tv";
+            if(networkName === 'monlix') prettyName = "Monlix Videos";
+
+            document.getElementById("currentNetworkName").innerText = `${icon} ${prettyName}`;
+            const container = document.getElementById("optionsContainer");
+            container.innerHTML = ""; 
+
+            const serverOptions = [
+                { id: "srv1", title: "Server 1: Premium Stream", reward: 15 },
+                { id: "srv2", title: "Server 2: Flash High-Yield", reward: 12 },
+                { id: "srv3", title: "Server 3: Booster Feed", reward: 10 }
+            ];
+
+            serverOptions.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "video-option-btn";
+                btn.id = `btn_${opt.id}`;
+                btn.innerHTML = `
+                    <div class="option-meta">
+                        <span>${opt.title}</span>
+                        <span style="font-size:10px; color:#64748b; font-weight:500;" id="sub_${opt.id}">Stream video and claim coins</span>
+                    </div>
+                    <span class="option-reward">+${opt.reward} 🪙</span>
+                `;
+                btn.onclick = () => {
+                    triggerSecureAdStream(networkName, opt.id, opt.title, opt.reward);
+                };
+                container.appendChild(btn);
+            });
+
+            document.getElementById("videoOptionsModal").style.display = "flex";
+        }
+
+        function triggerVideoSessionTimeoutFallback(network, serverId, serverTitle) {
+            setTimeout(() => {
+                if (activeWatchSession && activeWatchSession.serverId === serverId) {
+                    evaluateRewardValidation(network, serverId, serverTitle);
+                }
+            }, 15000); 
+        }
+
+        function triggerSecureAdStream(network, serverId, serverTitle, rewardAmt) {
+            activeWatchSession = {
+                network: network,
+                serverId: serverId,
+                startTime: Date.now(),
+                isValid: true,
+                reward: rewardAmt
+            };
+
+            const targetBtn = document.getElementById(`btn_${serverId}`);
+            const targetSubText = document.getElementById(`sub_${serverId}`);
+            if (targetBtn) targetBtn.disabled = true;
+
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let verifyText = langData[currentLang] ? langData[currentLang]["verifying"] : "Verifying...";
+            if (targetSubText) targetSubText.innerText = verifyText;
+
+            triggerVideoSessionTimeoutFallback(network, serverId, serverTitle);
+
+            let finalTargetAdUrl = adServerLinksConfig[network][serverId];
+            window.open(finalTargetAdUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        function evaluateRewardValidation(network, serverId, serverTitle) {
+            const targetBtn = document.getElementById(`btn_${serverId}`);
+            const targetSubText = document.getElementById(`sub_${serverId}`);
+            
+            if (targetBtn) targetBtn.disabled = false;
+            if (targetSubText) targetSubText.innerText = "Stream video and claim coins";
+
+            if (!activeWatchSession) return;
+
+            let finalCoinsReward = activeWatchSession.reward;
+
+            database.ref('users/' + uid).once('value').then((snap) => {
+                if (snap.exists()) {
+                    let oldCoins = snap.val().coins || 0;
+                    let oldBal = snap.val().balance || 0;
+                    let newCoins = oldCoins + finalCoinsReward;
+                    let newBal = oldBal + (finalCoinsReward / 100); 
+
+                    database.ref('users/' + uid).update({
+                        coins: newCoins,
+                        balance: newBal
+                    }).then(() => {
+                        alert(`🎉 Success! You earned +${finalCoinsReward} Coins from ${serverTitle}`);
+                        
+                        database.ref('users/' + uid + '/earning_history').push({
+                            activity: `Streamed Media: ${network.toUpperCase()} - ${serverTitle}`,
+                            coins_credited: finalCoinsReward,
+                            timestamp: Date.now()
+                        });
+                    });
+                }
+            });
+
+            activeWatchSession = null;
+        }
+
+        function closeVideoOptionsModal() {
+            document.getElementById("videoOptionsModal").style.display = "none";
+            activeWatchSession = null;
+        }
+    </script>
+</body>
+</html>

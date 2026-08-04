@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support - Dudo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; margin: 0; padding: 0; color: #1e293b; padding-bottom: 40px; text-align: center; }
+        
+        /* HEADER MATCHED TO SCREENSHOT */
+        .header { width: 100%; background: #ffffff; padding: 15px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .back-btn { font-size: 16px; font-weight: bold; color: #1e293b; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .header h2 { margin: 0; font-size: 20px; color: #1e293b; font-weight: 700; flex-grow: 1; text-align: center; margin-right: 40px; }
+        
+        .custom-lang-select { padding: 5px 10px; border-radius: 6px; border: 1px solid #cbd5e1; outline: none; font-size: 13px; background: #fff; color: #334155; font-weight: 600; cursor: pointer; }
+
+        .main-container { width: 92%; max-width: 400px; margin: 0 auto; box-sizing: border-box; }
+
+        /* HEADPHONES TOP ARTWORK */
+        .support-hero { margin: 25px 0 15px 0; }
+        .headphone-icon { width: 75px; height: 75px; margin-bottom: 10px; }
+        .support-hero h3 { margin: 0; font-size: 22px; color: #1e293b; font-weight: 700; }
+        .support-hero p { margin: 8px 0 0 0; font-size: 14px; color: #64748b; line-height: 1.5; padding: 0 10px; }
+
+        /* SUPPORT CHANNELS CARDS */
+        .support-card { background: #ffffff; border-radius: 16px; padding: 18px 20px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; text-decoration: none; color: inherit; text-align: left; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01); transition: transform 0.2s; }
+        .support-card:active { transform: scale(0.98); }
+        
+        .card-left { display: flex; align-items: center; gap: 15px; }
+        .icon-circle { width: 46px; height: 46px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; }
+        .icon-whatsapp { background: #e8f5e9; color: #2e7d32; }
+        .icon-telegram { background: #e1f5fe; color: #0288d1; }
+        
+        .card-details h4 { margin: 0; font-size: 16px; color: #0f172a; font-weight: 700; }
+        .card-details p { margin: 3px 0 0 0; font-size: 12px; color: #64748b; font-weight: 500; }
+        .arrow-right { color: #cbd5e1; font-weight: bold; font-size: 18px; }
+
+        /* 🔥 IN-APP TICKET RAISE FORM STYLING */
+        .ticket-box { background: #ffffff; border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0; text-align: left; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01); }
+        .ticket-box h4 { margin: 0 0 12px 0; font-size: 16px; color: #0f172a; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .ticket-input, .ticket-textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 13px; margin-bottom: 10px; box-sizing: border-box; outline: none; background: #f8fafc; font-family: inherit; }
+        .ticket-textarea { height: 80px; resize: none; }
+        .ticket-submit-btn { width: 100%; background: #2563eb; color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .ticket-submit-btn:active { background: #1d4ed8; }
+
+        /* 🔥 NEW: USER TICKETS LIST STYLING */
+        .my-tickets-container { margin-bottom: 25px; text-align: left; display: none; }
+        .my-tickets-container h4 { font-size: 16px; color: #1e293b; font-weight: 800; margin: 0 0 12px 0; }
+        .user-ticket-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .admin-reply-box { background: #f0fdf4; border-left: 4px solid #10b981; padding: 10px; margin-top: 10px; border-radius: 0 8px 8px 0; font-size: 12px; color: #064e3b; line-height: 1.4; }
+
+        /* FAQ SECTION LOOK MATCHED TO IMAGE */
+        .faq-title { font-size: 19px; color: #1e293b; font-weight: 700; text-align: left; margin: 30px 0 15px 0; }
+        .faq-list { display: flex; flex-direction: column; gap: 15px; }
+        
+        .faq-card { background: #ffffff; border-radius: 14px; padding: 20px; text-align: left; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .faq-card h5 { margin: 0 0 8px 0; font-size: 14px; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .faq-card p { margin: 0; font-size: 13px; color: #475569; line-height: 1.5; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="profile.html" class="back-btn">← <span data-i18n="btn_back">Back</span></a>
+        <h2 data-i18n="support_title">Help Center</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="support-hero">
+            <svg class="headphone-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 14V11C21 6.02944 16.9706 2 12 2C7.02944 2 3 6.02944 3 11V14" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+                <rect x="2" y="13" width="4" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="18" y="13" width="4" height="6" rx="2" fill="#3b82f6"/>
+                <path d="M6 16C6 14.8954 6.89543 14 8 14H10V18H8C6.89543 18 6 17.1046 6 16Z" fill="#1d4ed8"/>
+                <path d="M18 16C18 17.1046 17.1046 18 16 18H14V14H16C17.1046 14 18 14.8954 18 16Z" fill="#1d4ed8"/>
+            </svg>
+            <h3 data-i18n="how_help">How can we help you?</h3>
+            <p data-i18n="hero_desc">Our support team is available 24/7 to solve your problems.</p>
+        </div>
+
+        <!-- 🔥 IN-APP TICKET SUBMISSION BOX -->
+        <div class="ticket-box">
+            <h4 data-i18n="ticket_box_title">🎫 Send Message to support Desk</h4>
+            <input type="text" id="ticketSubject" class="ticket-input" placeholder="Subject / Issue Type (e.g. Withdrawal Problem)">
+            <textarea id="ticketMessage" class="ticket-textarea" placeholder="Describe your issue in detail..."></textarea>
+            <button class="ticket-submit-btn" onclick="submitUserHelpTicket()" data-i18n="ticket_btn">Submit Ticket</button>
+        </div>
+
+        <!-- 🔥 NEW: MY TICKETS LIST DISPLAY -->
+        <div class="my-tickets-container" id="myTicketsSection">
+            <h4>📝 My Recent Tickets</h4>
+            <div id="myTicketsList"></div>
+        </div>
+
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hello%20Dudo%20Support,%20I%20need%20help!" class="support-card" target="_blank">
+            <div class="card-left">
+                <div class="icon-circle icon-whatsapp">💬</div>
+                <div class="card-details">
+                    <h4 data-i18n="wa_title">WhatsApp Chat</h4>
+                    <p data-i18n="wa_desc">Instant reply (10 AM - 6 PM)</p>
+                </div>
+            </div>
+            <div class="arrow-right">❯</div>
+        </a>
+
+        <a href="https://t.me/your_telegram_username" class="support-card" target="_blank">
+            <div class="card-left">
+                <div class="icon-circle icon-telegram">✈️</div>
+                <div class="card-details">
+                    <h4 data-i18n="tg_title">Telegram Support</h4>
+                    <p data-i18n="tg_desc">Resolution within 2 hours</p>
+                </div>
+            </div>
+            <div class="arrow-right">❯</div>
+        </a>
+
+        <div class="faq-title" data-i18n="faq_header">Frequently Asked Questions</div>
+        
+        <div class="faq-list">
+            <div class="faq-card">
+                <h5 data-i18n="q1">1. How long does the payment take?</h5>
+                <p data-i18n="a1">After submitting a withdrawal request, the money is transferred to your UPI account within 2 to 24 hours.</p>
+            </div>
+
+            <div class="faq-card">
+                <h5 data-i18n="q2">2. Why is Add Money showing pending?</h5>
+                <p data-i18n="a2">For security reasons, the admin manually verifies the UTR. This can take 10 to 30 minutes.</p>
+            </div>
+
+            <div class="faq-card">
+                <h5 data-i18n="q3">3. How do I get the referral bonus?</h5>
+                <p data-i18n="a3">When your friend creates a new account using your code, you instantly get ₹50 and your friend gets ₹10 bonus.</p>
+            </div>
+
+            <div class="faq-card">
+                <h5 data-i18n="q4">4. Why does a transaction get declined?</h5>
+                <p data-i18n="a4">Requests are declined if an incorrect 12-digit UTR number is entered or if the submission is non-compliant.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
+            authDomain: "dudo-63594.firebaseapp.com",
+            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
+            projectId: "dudo-63594",
+            storageBucket: "dudo-63594.firebasestorage.app",
+            messagingSenderId: "732244407571",
+            appId: "1:732244407571:web:d08486136dea6190de96e6",
+            measurementId: "G-H6VVEXCD54"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        // 🔥 SUBMIT TICKET FUNCTION TO FIREBASE
+        function submitUserHelpTicket() {
+            const subject = document.getElementById("ticketSubject").value.trim();
+            const message = document.getElementById("ticketMessage").value.trim();
+
+            if(!subject || !message) {
+                alert("⚠️ Please enter both subject and message before submitting.");
+                return;
+            }
+
+            const ticketId = "TICK-" + Date.now();
+            database.ref('user_support_tickets/' + ticketId).set({
+                ticket_id: ticketId,
+                uid: uid,
+                user_name: localStorage.getItem("userName") || "Player",
+                subject: subject,
+                message: message,
+                status: "Pending",
+                timestamp: Date.now()
+            }).then(() => {
+                alert("✅ Support Ticket Submitted Successfully! Our team will resolve it soon.");
+                document.getElementById("ticketSubject").value = "";
+                document.getElementById("ticketMessage").value = "";
+            }).catch(err => {
+                alert("❌ Failed to submit ticket. Please try again.");
+            });
+        }
+
+        const langData = {
+            "en": {
+                "btn_back": "Back", "support_title": "Help Center", "how_help": "How can we help you?", "hero_desc": "Our support team is available 24/7 to solve your problems.",
+                "wa_title": "WhatsApp Chat", "wa_desc": "Instant reply (10 AM - 6 PM)", "tg_title": "Telegram Support", "tg_desc": "Resolution within 2 hours",
+                "faq_header": "Frequently Asked Questions",
+                "q1": "1. How long does the payment take?", "a1": "After submitting a withdrawal request, the money is transferred to your UPI account within 2 to 24 hours.",
+                "q2": "2. Why is Add Money showing pending?", "a2": "For security reasons, the admin manually verifies the UTR. This can take 10 to 30 minutes.",
+                "q3": "3. How do I get the referral bonus?", "a3": "When your friend creates a new account using your code, you instantly get ₹50 and your friend gets ₹10 bonus.",
+                "q4": "4. Why does a transaction get declined?", "a4": "Requests are declined if an incorrect 12-digit UTR number is entered or if the submission is non-compliant.",
+                "ticket_box_title": "🎫 Send Message to Support Desk", "ticket_btn": "Submit Ticket"
+            },
+            "hi": {
+                "btn_back": "पीछे", "support_title": "सहायता केंद्र", "how_help": "हम आपकी क्या सहायता कर सकते हैं?", "hero_desc": "हमारी सहायता टीम आपकी समस्याओं को हल करने के लिए 24/7 उपलब्ध है।",
+                "wa_title": "WhatsApp चैट Support", "wa_desc": "तुरंत प्रतिक्रिया (सुबह 10 - शाम 6 बजे)", "tg_title": "Telegram सपोर्ट", "tg_desc": "2 घंटे के भीतर समाधान",
+                "faq_header": "अक्सर पूछे जाने वाले प्रश्न (FAQ)",
+                "q1": "1. पेमेंट कितने समय में आती है?", "a1": "विड्रॉल रिक्वेस्ट लगाने के बाद 2 से 24 घंटे के भीतर पैसा आपके UPI अकाउंट में ट्रांसफर कर दिया जाता है।",
+                "q2": "2. ऐड मनी पेंडिंग क्यों दिखा रहा है?", "a2": "सुरक्षा कारणों से एडमिन मैन्युअल रूप से UTR की जांच करते हैं। इसमें 10 से 30 minute का समय लग सकता है।",
+                "q3": "3. रेफरल बोनस कैसे मिलता है?", "a3": "जब आपका दोस्त आपके कोड से नया अकाउंट बनाएगा, तो आपको तुरंत ₹50 और आपके दोस्त को ₹10 बोनस मिलेगा।",
+                "q4": "4. ट्रांजैक्शन अस्वीकार क्यों हो जाता है?", "a4": "गलत 12-अंकीय UTR नंबर दर्ज करने या अनुचित जानकारी जमा करने पर रिक्वेस्ट को अस्वीकार कर दिया जाता है।",
+                "ticket_box_title": "🎫 एडमिन डेस्क को संदेश भेजें", "ticket_btn": "टिकट सबमिट करें"
+            },
+            "bn": {
+                "btn_back": "পেছনে", "support_title": "সহায়তা কেন্দ্র", "how_help": "আমরা কীভাবে সাহায্য করতে পারি?", "hero_desc": "আমাদের টিম আপনার সমস্যা সমাধানের জন্য ২৪/৭ উপলব্ধ রয়েছে।",
+                "wa_title": "WhatsApp চ্যাট", "wa_desc": "তাত্ক্ষণিক উত্তর (সকাল ১০ - সন্ধ্যা ৬ টা)", "tg_title": "Telegram সাপোর্ট", "tg_desc": "২ ঘণ্টার মধ্যে সমাধান",
+                "faq_header": "সচরাচর জিজ্ঞাস্য প্রশ্নাবলী",
+                "q1": "১. পেমেন্ট আসতে কত সময় লাগে?", "a1": "উত্তোলনের অনুরোধ করার পর ২ থেকে ২৪ ঘণ্টার মধ্যে টাকা আপনার UPI অ্যাকাউন্টে চলে যায়।",
+                "q2": "২. অ্যাড মানি পেন্ডিং দেখাচ্ছে কেন?", "a2": "সুরক্ষার কারণে অ্যাডমিন ম্যানুয়ালি UTR চেক করেন। এতে ১০ থেকে ৩০ মিনিট সময় লাগতে পারে।",
+                "q3": "৩. রেফারেল বোনাস কীভাবে পাব?", "a3": "আপনার বন্ধু আপনার কোড দিয়ে অ্যাকাউন্ট খুললে আপনি instantly ₹৫০ এবং আপনার বন্ধু ₹১০ বোনাস পাবেন।",
+                "q4": "৪. লেনদেন কেন বাতিল হয়?", "a4": "ভুল ১২-ডিজিটের UTR নম্বর দিলে বা অবৈধ তথ্য সাবমিট করলে রিকোয়েস্ট বাতিল করা হয়।",
+                "ticket_box_title": "🎫 অ্যাডমিন ডেস্কে মেসেজ পাঠান", "ticket_btn": "টিকিট জমা দিন"
+            },
+            "te": {
+                "btn_back": "వెనుకకు", "support_title": "సహాయ కేంద్రం", "how_help": "మేము మీకు ఎలా సహాయం చేయగలం?", "hero_desc": "మీ సమస్యలను పరిష్కరించడానికి మా సహాయ బృందం 24/7 అందుబాటులో ఉంది.",
+                "wa_title": "WhatsApp చాట్", "wa_desc": "తక్షణ ప్రతిస్పందన (10 AM - 6 PM)", "tg_title": "Telegram మద్దతు", "tg_desc": "2 గంటల లోపు పరిష్కారం",
+                "faq_header": "తరచుగా అడిగే ప్రశ్నలు",
+                "q1": "1. పేమెంట్ రావడానికి ఎంత సమయం పడుతుంది?", "a1": "విత్‌డ్రా అభ్యర్థన సమర్పించిన తర్వాత 2 నుండి 24 గంటల లోపు డబ్బు మీ UPI ఖాతాకు బదిలీ చేయబడుతుంది.",
+                "q2": "2. యాడ్ మనీ పెండింగ్‌లో ఎందుకు చూపిస్తోంది?", "a2": "భద్రతా కారణాల వల్ల అడ్మిన్ UTRని మాన్యువల్‌గా వెరిఫై చేస్తారు. దీనికి 10 నుండి 30 నిమిషాలు పట్టవచ్చు.",
+                "q3": "3. రిఫరల్ బోనస్ ఎలా వస్తుంది?", "a3": "మీ స్నేహితుడు మీ కోడ్‌ని ఉపయోగించి కొత్త ఖాతాను సృష్టించినప్పుడు, మీకు తక్షణమే ₹50 మరియు మీ స్నేహితుడికి ₹10 బోనస్ లభిస్తుంది.",
+                "q4": "4. లావాదేవీ ఎందుకు తిరస్కరించబడుతుంది?", "a4": "తప్పు 12-అంకెల UTR నంబర్ నమోదు చేసినా లేదా అనధికారిక వివరాలు సమర్పించినా అభ్యర్థనలు తిరస్కరించబడతాయి.",
+                "ticket_box_title": "🎫 అడ్మిన్ డెస్క్‌కి సందేశం పంపండి", "ticket_btn": "టికెట్ సమర్పించండి"
+            },
+            "mr": {
+                "btn_back": "मागे", "support_title": "मदत केंद्र", "how_help": "आम्ही तुम्हाला कशी मदत करू शकतो?", "hero_desc": "तुमच्या समस्या सोडवण्यासाठी आमची मदत टीम 24/7 उपलब्ध आहे.",
+                "wa_title": "WhatsApp चॅट", "wa_desc": "त्वरित उत्तर (सकाळी १० - संध्याकाळी ६)", "tg_title": "Telegram सपोर्ट", "tg_desc": "२ तासांच्या आत निवारण",
+                "faq_header": "सतत विचारले जाणारे प्रश्न",
+                "q1": "1. पेमेंट मिळायला किती वेळ लागतो?", "a1": "पैसे काढण्याची विनंती केल्यानंतर २ ते २४ तासांच्या आत पैसे तुमच्या UPI खात्यात जमा होतात.",
+                "q2": "2. ॲड मनी पेंडिंग का दाखवत आहे?", "a2": "सुरक्षेच्या कारणास्तव ॲडमिन मॅन्युअली UTR तपासतात. यासाठी १० ते ३0 मिनिटे लागू शकतात.",
+                "q3": "3. रेफरल বোনस कसा मिळतो?", "a3": "जेव्हा तुमचा मित्र तुमचा कोड वापरून नवीन खाते तयार करतो, तेव्हा तुम्हाला त्वरित ₹५० आणि तुमच्या मित्राला ₹१० बोनस मिळतो.",
+                "q4": "4. व्यवहार का नाकारला जातो?", "a4": "चुकीचा १२-अंकी UTR नंबर टाकल्यास किंवा चुकीची माहिती दिल्यास विनंती नाकारली जाते.",
+                "ticket_box_title": "🎫 अ‍ॅडमिन डेस्कला संदेश पाठवा", "ticket_btn": "तिकीट सबमिट करा"
+            },
+            "ta": {
+                "btn_back": "பின்னால்", "support_title": "உதவி மையம்", "how_help": "நாங்கள் உங்களுக்கு எவ்வாறு உதவலாம்?", "hero_desc": "உங்கள் பிரச்சனைகளைத் தீர்க்க எங்கள் உதவிக்குழு 24/7 உள்ளது.",
+                "wa_title": "WhatsApp அரட்டை", "wa_desc": "உடனடி பதில் (காலை 10 - மாலை 6 மணி)", "tg_title": "Telegram ஆதரவு", "tg_desc": "2 மணி நேரத்திற்குள் தீர்வு",
+                "faq_header": "அடிக்கடி கேட்கப்படும் கேள்விகள்",
+                "q1": "1. பணம் வர எவ்வளவு நேரம் ஆகும்?", "a1": "பணம் எடுக்கும் கோரிக்கையைச் சமர்ப்பித்த 2 முதல் 24 மணி நேரத்திற்குள் பணம் உங்கள் UPI கணக்கிற்கு மாற்றப்படும்.",
+                "q2": "2. பணம் சேர்த்தல் ஏன் நிலுவையில் உள்ளது?", "a2": "பாதுகாப்பு காரணங்களுக்காக அட்மின் UTR ஐ கைமுறையாக சரிபார்க்கிறார். இதற்கு 10 முதல் 30 நிமிடங்கள் ஆகலாம்.",
+                "q3": "3. பரிந்துரை போனஸ் எனக்கு எப்படி கிடைக்கும்?", "a3": "உங்கள் நண்பர் உங்கள் குறியீட்டைப் பயன்படுத்தி புதிய கணக்கை உருவாக்கும்போது, உங்களுக்கு உடனடியாக ₹50 மற்றும் உங்கள் நண்பருக்கு ₹10 போனஸ் கிடைக்கும்.",
+                "q4": "4. பரிவர்த்தனை ஏன் நிராகரிக்கப்படுகிறது?", "a4": "தவறான 12-இலக்க UTR எண்ணை உள்ளிட்டாலோ அல்லது தவறான தகவல்களை அளித்தாலோ கோரிக்கைகள் நிராகரிக்கப்படும்.",
+                "ticket_box_title": "🎫 நிர்வாக desk-க்கு செய்தி அனுப்பவும்", "ticket_btn": "டிக்கெட் சமர்ப்பிக்கவும்"
+            },
+            "ur": {
+                "btn_back": "پیچھے", "support_title": "امدادی مرکز", "how_help": "ہم آپ کی کیا مدد کر سکتے ہیں؟", "hero_desc": "ہماری سپورٹ ٹیم آپ کے مسائل حل کرنے کے لیے 24/7 دستیاب ہے۔",
+                "wa_title": "WhatsApp چیٹ", "wa_desc": "فوری جواب (صبح 10 تا شام 6 بجے)", "tg_title": "Telegram سپورٹ", "tg_desc": "2 گھنٹے کے اندر حل",
+                "faq_header": "عام طور پر پوچھے گئے سوالات",
+                "q1": "1. پیمنٹ کتنے وقت میں آتی ہے؟", "a1": "رقم نکالنے کی درخواست کے بعد 2 سے 24 گھنٹے کے اندر پیسہ آپ کے UPI اکاؤنٹ میں آ جاتا ہے۔",
+                "q2": "2. ایڈ منی پینڈنگ کیوں دکھا رہا ہے؟", "a2": "سیکیورٹی وجوہات کی بناء پر ایڈمن دستی طور پر UTR چیک کرتے ہیں۔ اس میں 10 سے 30 منٹ لگ سکتے ہیں۔",
+                "q3": "3. ریفرل بونس کیسے ملتا ہے؟", "a3": "جب آپ کا دوست آپ کے کوڈ سے نیا اکاؤنٹ بنائے گا، تو آپ کو فوری ₹50 اور آپ کے دوست کو ₹10 بونس ملے گا۔",
+                "q4": "4. ٹرانزیکشن مسترد کیوں ہوتی ہے؟", "a4": "غلط 12 ہندسوں کا UTR نمبر ڈالنے یا غلط معلومات جمع کرانے پر درخواست مسترد کر دی جاتی ہے۔",
+                "ticket_box_title": "🎫 ایڈمن ڈیسک کو پیغام بھیجیں", "ticket_btn": "ٹکٹ جمع کریں"
+            },
+            "gu": {
+                "btn_back": "પાછળ", "support_title": "સહાયતા કેન્દ્ર", "how_help": "અમે તમને કેવી રીતે મદદ કરી શકીએ?", "hero_desc": "અમારી સપોર્ટ ટીમ તમારી સમસ્યાઓ હલ કરવા માટે 24/7 ઉપલબ્ધ છે.",
+                "wa_title": "WhatsApp ચેટ", "wa_desc": "ત્વરિત જવાબ (સવારે 10 - સાંજે 6)", "tg_title": "Telegram સપોર્ટ", "tg_desc": "2 કલાકની અંદર ઉકેલ",
+                "faq_header": "વારંવાર પૂછાતા પ્રશ્નો",
+                "q1": "1. પેમેન્ટ કેટલા સમયમાં આવે છે?", "a1": "ઉપાડની વિનંતી સબમિટ કર્યા પછી 2 થી 24 કલાકની અંદર પૈસા તમારા UPI ખાતામાં ટ્રાન્સફર થાય છે.",
+                "q2": "2. એડ મની પેન્ડિંગ કેમ બતાવે છે?", "a2": "સુરક્ષા કારણોસર એડમિન મેન્યુઅલી UTR ચેક કરે છે. આમાં 10 થી 30 મિનિટ લાગી શકે છે.",
+                "q3": "3. રેફરલ બોનસ કેવી રીતે મળે?", "a3": "જ્યારે તમારો મિત્ર તમારા કોડથી નવું એકાઉન્ટ બનાવશે, ત્યારે તમને તરત જ ₹50 અને તમારા મિત્રને ₹10 બોનસ મળશે.",
+                "q4": "4. ટ્રાન્ઝેક્શન કેમ નકારવામાં આવે છે?", "a4": "ખોટો 12-આંકડાનો UTR નંબર દાખલ કરવાથી કે અયોગ્ય માહિતી આપવાથી વિનંતી નકારવામાં આવે છે.",
+                "ticket_box_title": "🎫 એડમિન ડેસ્કને સંદેશ મોકલો", "ticket_btn": "ટિકિટ સબમિટ કરો"
+            },
+            "es": {
+                "btn_back": "Atrás", "support_title": "Centro de Ayuda", "how_help": "¿Cómo podemos ayudarte?", "hero_desc": "Nuestro equipo está disponible 24/7 para resolver tus problemas.",
+                "wa_title": "Chat de WhatsApp", "wa_desc": "Respuesta instantánea (10 AM - 6 PM)", "tg_title": "Soporte de Telegram", "tg_desc": "Resolución en menos de 2 horas",
+                "faq_header": "Preguntas Frecuentes",
+                "q1": "1. ¿Cuánto tarda el pago?", "a1": "El dinero se transfiere a su cuenta UPI dentro de las 2 a 24 horas posteriores a la solicitud.",
+                "q2": "2. ¿Por qué agregar dinero aparece pendiente?", "a2": "El administrador verifica manualmente el UTR por seguridad. Tarda de 10 a 30 minutos.",
+                "q3": "3. ¿Cómo obtengo el bono por recomendación?", "a3": "Cuando tu amigo se registra con tu código, obtienes ₹50 al instante y tu amigo recibe ₹10.",
+                "q4": "4. ¿Por qué se declina una transacción?", "a4": "Se declina si el número UTR de 12 dígitos es incorrecto o si se envía información no válida.",
+                "ticket_box_title": "🎫 Enviar mensaje al administrador", "ticket_btn": "Enviar Ticket"
+            },
+            "fr": {
+                "btn_back": "Retour", "support_title": "Centre d'Aide", "how_help": "Comment pouvons-nous vous aider ?", "hero_desc": "Notre équipe est disponible 24/7 pour résoudre vos problèmes.",
+                "wa_title": "Chat WhatsApp", "wa_desc": "Réponse instantanée (10h - 18h)", "tg_title": "Support Telegram", "tg_desc": "Résolution en moins de 2 heures",
+                "faq_header": "Foire Aux Questions",
+                "q1": "1. Combien de temps prend le paiement ?", "a1": "L'argent est transféré sur votre compte UPI dans un délai de 2 à 24 heures après la demande.",
+                "q2": "2. Pourquoi l'ajout d'argent est en attente ?", "a2": "L'administrateur vérifie manuellement l'UTR pour des raisons de sécurité. Cela prend 10 à 30 minutes.",
+                "q3": "3. Comment obtenir le bonus de parrainage ?", "a3": "Lorsque votre ami s'inscrit avec votre code, vous obtenez ₹50 instantanément et votre ami reçoit ₹10.",
+                "q4": "4. Pourquoi une transaction est-elle déclinée ?", "a4": "Elle est déclinée si le numéro UTR à 12 chiffres est incorrect ou si les informations soumises ne sont pas conformes.",
+                "ticket_box_title": "🎫 Envoyer un message à l'admin", "ticket_btn": "Soumettre le ticket"
+            },
+            "ar": {
+                "btn_back": "رجوع", "support_title": "مركز الدعم", "how_help": "كيف يمكننا مساعدتك؟", "hero_desc": "فريق الدعم لدينا متاح 24/7 لحل مشاكلك.",
+                "wa_title": "دردشة WhatsApp", "wa_desc": "رد فوري (10 صباحاً - 6 مساءً)", "tg_title": "دعم Telegram", "tg_desc": "حل المشكلة في غضون ساعتين",
+                "faq_header": "الأسئلة الشائعة",
+                "q1": "1. كم من الوقت يستغرق وصول الدفع؟", "a1": "يتم تحويل الأموال إلى حساب UPI الخاص بك في غضون 2 إلى 24 ساعة من طلب السحب.",
+                "q2": "2. لماذا تظهر عملية إضافة الأموال معلقة؟", "a2": "يقوم المسؤول بالتحقق من رقم UTR يدوياً لأسباب أمنية. يستغرق ذلك من 10 إلى 30 دقيقة.",
+                "q3": "3. كيف أحصل على مكافأة الإحالة؟", "a3": "عندما ينشئ صديقك حساباً برمزك، تحصل فوراً على ₹50 ويحصل صديقك على مكافأة بقيمة ₹10.",
+                "q4": "4. لماذا يتم رفض المعاملة؟", "a4": "يتم رفض الطلب إذا تم إدخال رقم UTR خاطئ أو عند تقديم معلومات غير صحيحة.",
+                "ticket_box_title": "🎫 إرسال رسالة إلى إدارة الدعم", "ticket_btn": "إرسال التذكرة"
+            },
+            "pt": {
+                "btn_back": "Voltar", "support_title": "Centro de Ajuda", "how_help": "Como podemos ajudar?", "hero_desc": "Nosso equipe de suporte está disponível 24/7 para resolver seus problemas.",
+                "wa_title": "Chat do WhatsApp", "wa_desc": "Resposta instantânea (10h às 18h)", "tg_title": "Suporte do Telegram", "tg_desc": "Resolução em até 2 horas",
+                "faq_header": "Perguntas Frequentes",
+                "q1": "1. Quanto tempo demora o pagamento?", "a1": "O dinheiro é transferido para sua conta UPI dentro de 2 a 24 horas após a solicitação.",
+                "q2": "2. Por que a adição de saldo aparece pendente?", "a2": "O administrador verifica manualmente o UTR por segurança. Isso leva de 10 a 30 minutos.",
+                "q3": "3. Como ganho o bônus de indicação?", "a3": "Quando seu amigo cria uma conta com seu código, você ganha ₹50 instantaneamente e ele ganha ₹10.",
+                "q4": "4. Por que uma transação é recusada?", "a4": "É recusada se o número UTR de 12 dígitos estiver incorreto ou se o envio não estiver em conformidade.",
+                "ticket_box_title": "🎫 Enviar mensagem para o suporte", "ticket_btn": "Enviar Ticket"
+            },
+            "ru": {
+                "btn_back": "Назад", "support_title": "Служба поддержки", "how_help": "Чем мы можем помочь?", "hero_desc": "Наша команда поддержки доступна 24/7 для решения ваших проблем.",
+                "wa_title": "Чат в WhatsApp", "wa_desc": "Мгновенный ответ (с 10:00 до 18:00)", "tg_title": "Поддержка в Telegram", "tg_desc": "Решение в течение 2 часов",
+                "faq_header": "Часто задаваемые вопросы",
+                "q1": "1. Как скоро приходят выплаты?", "a1": "Деньги переводятся на ваш счет UPI в течение 2–24 часов после подачи запроса.",
+                "q2": "2. Почему пополнение баланса в ожидании?", "a2": "В целях безопасности администратор проверяет UTR вручную. Это занимает от 10 до 30 минут.",
+                "q3": "3. Как получить реферальный бонус?", "a3": "Когда ваш друг регистрируется по вашему коду, вы мгновенно получаете ₹50, а ваш друг — ₹10.",
+                "q4": "4. Почему транзакция отклоняется?", "a4": "Запрос отклоняется, если указан неверный 12-значный номер UTR или если предоставленные данные недействительны.",
+                "ticket_box_title": "🎫 Отправить сообщение админу", "ticket_btn": "Отправить тикет"
+            }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) { elem.innerText = transObj[key]; }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            // 🔥 FETCH AND DISPLAY MY TICKETS AND ADMIN REPLIES
+            if(uid && uid !== "GuestUser") {
+                database.ref('user_support_tickets').orderByChild('uid').equalTo(uid).on('value', (snap) => {
+                    const listDiv = document.getElementById("myTicketsList");
+                    const sectionDiv = document.getElementById("myTicketsSection");
+                    listDiv.innerHTML = "";
+                    
+                    if(snap.exists()){
+                        sectionDiv.style.display = "block";
+                        let ticketsArray = [];
+                        snap.forEach(child => { ticketsArray.push(child.val()); });
+                        ticketsArray.reverse(); // Dikhane ke liye latest upar
+
+                        ticketsArray.forEach(t => {
+                            let statusColor = t.status === 'Resolved' ? '#10b981' : '#f59e0b';
+                            let replyHtml = t.admin_reply ? `<div class="admin-reply-box"><b>👑 Admin Reply:</b><br>${t.admin_reply}</div>` : '';
+                            
+                            listDiv.innerHTML += `
+                                <div class="user-ticket-card">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                        <span style="font-size:10px; color:#64748b; font-weight:bold;">${new Date(t.timestamp).toLocaleString()}</span>
+                                        <span style="font-size:11px; font-weight:800; color:${statusColor}; text-transform:uppercase;">${t.status}</span>
+                                    </div>
+                                    <div style="font-size:14px; font-weight:bold; color:#0f172a; margin-bottom:4px;">${t.subject}</div>
+                                    <div style="font-size:13px; color:#475569; margin-bottom:8px;">${t.message}</div>
+                                    ${replyHtml}
+                                </div>
+                            `;
+                        });
+                    } else {
+                        sectionDiv.style.display = "none";
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
