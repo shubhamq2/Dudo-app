@@ -57,16 +57,13 @@
         .btn-register { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
         .action-btn:active { transform: scale(0.97); }
 
-        /* 🔥 NEW: Premium Support Button */
         .support-btn { background: #0f172a; border: 1px solid #334155; color: #cbd5e1; width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
         .support-btn:hover { border-color: #06b6d4; color: #06b6d4; background: rgba(6, 182, 212, 0.05); }
 
         .compliance-text { font-size: 10px; text-align: center; margin-top: 15px; color: #64748b; line-height: 1.4; }
-        
-        #recaptcha-container { display: flex; justify-content: center; margin-bottom: 15px; }
 
         /* Hidden Sections */
-        #otpVerificationBox, #setupProfileScreen { display: none; text-align: center; }
+        #setupProfileScreen { display: none; text-align: center; }
         .main-auth-box { display: block; }
     </style>
 </head>
@@ -83,57 +80,56 @@
             <!-- Free Google Login Button -->
             <button class="google-btn" onclick="loginWithGoogle()" id="googleLoginBtnMain">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G">
-                Fast Login with Google (Free)
+                Fast Login with Google
             </button>
 
-            <div class="divider">OR USE MOBILE NUMBER</div>
+            <div class="divider">OR USE EMAIL ADDRESS</div>
 
             <div class="auth-toggle">
                 <button id="tabLogin" class="active" onclick="switchTab('login')">Login</button>
                 <button id="tabRegister" onclick="switchTab('register')">Register</button>
             </div>
             
-            <!-- 🟢 1. LOGIN FORM (No OTP, Only Pass = Free) -->
+            <!-- 🟢 1. LOGIN FORM (Email + Password) -->
             <form id="loginForm">
                 <div class="input-group">
-                    <label>Mobile Number</label>
-                    <input type="number" id="loginMobile" placeholder="10-digit mobile number" required>
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
                 </div>
                 <div class="input-group">
-                    <label>Passcode</label>
-                    <input type="password" id="loginPassword" placeholder="Enter your passcode" required>
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
                 </div>
                 
                 <div class="forgot-pass">
-                    <a href="support.html">Forgot Passcode?</a>
+                    <a href="support.html">Forgot Password?</a>
                 </div>
                 
-                <button type="submit" class="action-btn btn-login">Login Securely</button>
+                <button type="submit" class="action-btn btn-login" id="btnLogin">Login Securely</button>
             </form>
 
-            <!-- 🔵 2. REGISTER FORM (Requires OTP to verify real number) -->
+            <!-- 🔵 2. REGISTER FORM (Email + Password + Name + Referral) -->
             <form id="registerForm" style="display: none;">
                 <div class="input-group">
                     <label>Full Name</label>
                     <input type="text" id="regName" placeholder="Enter your full name" required>
                 </div>
                 <div class="input-group">
-                    <label>Mobile Number (For OTP Verification)</label>
-                    <input type="number" id="regMobile" placeholder="10-digit mobile number" required>
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" placeholder="Enter your email" required>
                 </div>
                 <div class="input-group">
-                    <label>Create Passcode (For Future Login)</label>
-                    <input type="password" id="regPassword" placeholder="Create a strong passcode" required>
+                    <label>Create Password</label>
+                    <input type="password" id="regPassword" placeholder="Create a strong password (min 6 chars)" required>
                 </div>
                 <div class="input-group">
                     <label>Referral Code (Optional)</label>
                     <input type="text" id="regReferral" placeholder="Enter friend's invite code">
                 </div>
                 
-                <div id="recaptcha-container"></div>
-                <button type="submit" id="btnSendOtpReg" class="action-btn btn-register">Send OTP & Verify</button>
+                <button type="submit" id="btnRegister" class="action-btn btn-register">Create Account</button>
                 
-                <p class="compliance-text">By registering, you agree to our Terms of Service & Privacy Policy.<br>Invalid numbers or multiple accounts on the same device will lead to account restrictions.</p>
+                <p class="compliance-text">By registering, you agree to our Terms of Service & Privacy Policy.<br>Multiple accounts on the same device will lead to account restrictions.</p>
             </form>
 
             <button class="support-btn" onclick="window.location.href='support.html'">
@@ -141,24 +137,10 @@
             </button>
         </div>
 
-        <!-- 🟠 OTP VERIFICATION BOX -->
-        <div id="otpVerificationBox">
-            <h3 style="color:#06b6d4; margin-top:0;">📱 Verify Mobile Number</h3>
-            <p style="font-size:13px; color:#94a3b8; margin-bottom: 20px;">We sent a 6-digit OTP to your number to verify it's real.</p>
-            
-            <div class="input-group">
-                <label>Enter 6-Digit OTP</label>
-                <input type="number" id="regOtpCode" placeholder="X X X X X X">
-            </div>
-            
-            <button id="btnVerifyOtp" class="action-btn btn-register" onclick="verifyOtpAndRegister()">Verify & Create Account</button>
-            <button onclick="window.location.reload()" style="background:transparent; border:none; color:#f43f5e; margin-top:15px; font-weight:bold; cursor:pointer;">Cancel / Wrong Number?</button>
-        </div>
-
         <!-- 🟣 PROFILE SETUP FOR GOOGLE LOGIN -->
         <div id="setupProfileScreen">
             <h3 style="color:#10b981; margin-top:0;">🎉 Welcome to Dudo!</h3>
-            <p style="font-size:13px; color:#94a3b8;">Set up your profile to start earning.</p>
+            <p style="font-size:13px; color:#94a3b8;">Set up your profile to start rewards.</p>
             
             <div class="input-group" style="text-align: left;">
                 <label>Your Full Name</label>
@@ -169,7 +151,7 @@
                 <input type="text" id="googleRegReferral" placeholder="Got an invite code?">
             </div>
 
-            <button class="action-btn btn-login" onclick="completeGoogleRegistration()">Start Earning Now ➔</button>
+            <button class="action-btn btn-login" onclick="completeGoogleRegistration()">Start Earn rewards Now ➔</button>
         </div>
 
     </div>
@@ -198,8 +180,6 @@
             localStorage.setItem("dudo_device_token", currentDeviceId);
         }
 
-        // Global Variables for Registration
-        let tempRegData = {};
         let authenticatedGoogleUser = null;
 
         // UI Tab Switcher
@@ -222,138 +202,94 @@
         };
 
         // ==========================================
-        // 1️⃣ NORMAL LOGIN (Only Pass, No OTP Cost)
+        // 1️⃣ EMAIL LOGIN
         // ==========================================
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const mobile = document.getElementById('loginMobile').value.trim();
+            const email = document.getElementById('loginEmail').value.trim();
             const pass = document.getElementById('loginPassword').value.trim();
 
-            if (mobile.length !== 10) return alert("Enter a valid 10-digit mobile number!");
+            document.getElementById('btnLogin').innerText = "Authenticating...";
 
-            database.ref('users').orderByChild('phone').equalTo(mobile).once('value', snapshot => {
-                if(snapshot.exists()) {
-                    let userFound = false;
-                    snapshot.forEach(childSnapshot => {
-                        let userData = childSnapshot.val();
-                        let userUid = childSnapshot.key;
-
-                        if (userData.password === pass) {
-                            userFound = true;
+            auth.signInWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    database.ref('users/' + user.uid).once('value', snapshot => {
+                        if(snapshot.exists()) {
+                            let userData = snapshot.val();
                             if(userData.account_security_status_state_flag === 'BANNED_TERMINATED') {
+                                auth.signOut();
+                                document.getElementById('btnLogin').innerText = "Login Securely";
                                 alert("🚨 Your account has been restricted for policy violations.");
                                 return;
                             }
-                            // Direct Login (Free)
-                            localStorage.setItem("userId", userUid);
+                            localStorage.setItem("userId", user.uid);
+                            window.location.href = "ho.html";
+                        } else {
+                            localStorage.setItem("userId", user.uid);
                             window.location.href = "ho.html";
                         }
                     });
-
-                    if(!userFound) alert("❌ Incorrect Passcode! If you forgot it, click 'Forgot Passcode?' to contact support.");
-                } else {
-                    alert("⚠️ Account not found. Please Register first.");
-                }
-            });
+                })
+                .catch((error) => {
+                    document.getElementById('btnLogin').innerText = "Login Securely";
+                    alert("❌ Login Failed: " + error.message);
+                });
         });
 
         // ==========================================
-        // 2️⃣ REGISTRATION & OTP SENDING
+        // 2️⃣ EMAIL REGISTRATION
         // ==========================================
-        function setupRecaptcha() {
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                    'size': 'invisible',
-                    'callback': (response) => { }
-                });
-            }
-        }
-
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            tempRegData.name = document.getElementById('regName').value.trim();
-            tempRegData.mobile = document.getElementById('regMobile').value.trim();
-            tempRegData.pass = document.getElementById('regPassword').value.trim();
-            tempRegData.ref = document.getElementById('regReferral').value.trim();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const pass = document.getElementById('regPassword').value.trim();
+            const ref = document.getElementById('regReferral').value.trim();
 
-            if (tempRegData.mobile.length !== 10) return alert("❌ Enter a valid 10-digit mobile number!");
-            if (tempRegData.pass.length < 6) return alert("❌ Passcode must be at least 6 characters!");
-            if (tempRegData.mobile === tempRegData.ref) return alert("❌ You cannot use your own number as a referral code!");
+            if (pass.length < 6) return alert("❌ Password must be at least 6 characters!");
 
-            // 1. Check if Mobile already exists in Realtime DB (To save SMS if already registered)
-            database.ref('users').orderByChild('phone').equalTo(tempRegData.mobile).once('value', snapshot => {
-                if (snapshot.exists()) {
-                    alert("⚠️ This mobile number is already registered. Please Login using your passcode.");
-                } else {
-                    // 2. Safe to send OTP
-                    const fullNumber = "+91" + tempRegData.mobile;
-                    setupRecaptcha();
-                    const appVerifier = window.recaptchaVerifier;
+            document.getElementById('btnRegister').innerText = "Creating Account...";
 
-                    document.getElementById("btnSendOtpReg").innerText = "Sending SMS...";
-                    
-                    auth.signInWithPhoneNumber(fullNumber, appVerifier)
-                        .then((confirmationResult) => {
-                            window.confirmationResult = confirmationResult;
-                            // Hide forms, show OTP box
-                            document.getElementById("mainAuthBox").style.display = "none";
-                            document.getElementById("otpVerificationBox").style.display = "block";
-                        }).catch((error) => {
-                            document.getElementById("btnSendOtpReg").innerText = "Send OTP & Verify";
-                            alert("OTP Error: " + error.message);
-                            if(window.recaptchaVerifier) { window.recaptchaVerifier.render().then(function(widgetId) { grecaptcha.reset(widgetId); }); }
-                        });
-                }
-            });
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    const cleanRefCode = ref ? ref.toUpperCase() : "NONE";
+
+                    const newUserData = {
+                        name: name,
+                        email: email,
+                        phone: "EMAIL_LOGIN",
+                        password: pass,
+                        balance: 0,
+                        coins: 0,
+                        ad_coins: 0,
+                        total_lifetime_coins_earned: 0,
+                        total_referrals: 0,
+                        joined_at: Date.now(),
+                        device_id_token: currentDeviceId,
+                        account_security_status_state_flag: "ACTIVE",
+                        referral_code_used: cleanRefCode
+                    };
+
+                    database.ref('users/' + user.uid).set(newUserData).then(() => {
+                        executeReferralBonusEngine(cleanRefCode);
+                        alert("✅ Account created successfully!");
+                        localStorage.setItem("userId", user.uid); 
+                        window.location.href = "ho.html"; 
+                    }).catch(err => {
+                        alert("Error saving profile: " + err.message);
+                    });
+                })
+                .catch((error) => {
+                    document.getElementById('btnRegister').innerText = "Create Account";
+                    alert("❌ Registration Error: " + error.message);
+                });
         });
 
         // ==========================================
-        // 3️⃣ VERIFY OTP & CREATE ACCOUNT
-        // ==========================================
-        function verifyOtpAndRegister() {
-            const code = document.getElementById("regOtpCode").value.trim();
-            if(code.length !== 6) return alert("Enter 6-digit OTP!");
-
-            document.getElementById("btnVerifyOtp").innerText = "Verifying...";
-
-            window.confirmationResult.confirm(code).then((result) => {
-                // OTP VERIFIED SUCCESSFULLY!
-                const uniqueUID = "UID_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5).toUpperCase();
-                const cleanRefCode = tempRegData.ref ? tempRegData.ref.toUpperCase() : "NONE";
-
-                const newUserData = {
-                    name: tempRegData.name,
-                    phone: tempRegData.mobile,
-                    password: tempRegData.pass, // Saved for future Free Login
-                    balance: 0,
-                    coins: 0,
-                    ad_coins: 0,
-                    total_lifetime_coins_earned: 0,
-                    total_referrals: 0,
-                    joined_at: Date.now(),
-                    device_id_token: currentDeviceId,
-                    account_security_status_state_flag: "ACTIVE",
-                    referral_code_used: cleanRefCode
-                };
-
-                database.ref('users/' + uniqueUID).set(newUserData).then(() => {
-                    executeReferralBonusEngine(cleanRefCode);
-                    alert("✅ Account created successfully! You can now login with your Passcode anytime.");
-                    localStorage.setItem("userId", uniqueUID); 
-                    window.location.href = "ho.html"; 
-                }).catch(err => {
-                    alert("Error saving profile: " + err.message);
-                });
-
-            }).catch((error) => {
-                document.getElementById("btnVerifyOtp").innerText = "Verify & Create Account";
-                alert("❌ Invalid OTP! Try again.");
-            });
-        }
-
-        // ==========================================
-        // 4️⃣ GOOGLE LOGIN (Completely Free Alternative)
+        // 3️⃣ GOOGLE LOGIN (Redirect Method)
         // ==========================================
         const googleProvider = new firebase.auth.GoogleAuthProvider();
         
@@ -362,12 +298,11 @@
             auth.signInWithRedirect(googleProvider);
         }
 
-        // Catch the result when the page reloads after Google Auth
+        // Catch the result when page reloads from Google Auth
         auth.getRedirectResult().then((result) => {
             if (result && result.user) {
                 authenticatedGoogleUser = result.user;
                 
-                // Check if Google User already exists in our Realtime DB
                 database.ref('users/' + authenticatedGoogleUser.uid).once('value', snapshot => {
                     if (snapshot.exists()) {
                         let userData = snapshot.val();
@@ -376,11 +311,9 @@
                             alert("🚨 Your account is restricted!");
                             return;
                         }
-                        // Login Success
                         localStorage.setItem("userId", authenticatedGoogleUser.uid);
                         window.location.href = "ho.html";
                     } else {
-                        // New Google User -> Ask for Referral Code
                         document.getElementById("mainAuthBox").style.display = "none";
                         document.getElementById("googleRegName").value = authenticatedGoogleUser.displayName || "";
                         document.getElementById("setupProfileScreen").style.display = "block";
@@ -388,7 +321,6 @@
                 });
             }
         }).catch((error) => {
-            // Ignore cancelled redirects to prevent annoying popups on mobile
             if (error.code !== 'auth/redirect-cancelled-by-user') {
                 alert("Google Sign-In Failed: " + error.message);
             }
@@ -438,13 +370,11 @@
                         let currentBal = parseFloat(refChild.val().balance || 0);
                         let currentRefs = Number(refChild.val().total_referrals || 0);
                         
-                        // 💰 Add ₹5 Cash directly to Balance (Not Coins)
                         database.ref('users/' + refUid).update({
                             balance: currentBal + 5,
                             total_referrals: currentRefs + 1
                         });
 
-                        // 📜 Create Earning History Log
                         database.ref('users/' + refUid + '/earning_history').push({
                             activity: `Referral Bonus (Instant Lvl 1)`,
                             amount: 5,
@@ -457,4 +387,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
