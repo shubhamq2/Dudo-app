@@ -11,7 +11,7 @@ app.use(cors());
 const JWT_SECRET = "DUDO_SUPER_SECRET_KEY_2026";
 
 // MongoDB URL (Render Environment Variable se lega)
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://dudoreward_db_user:B7gqC2r3suuJLAAN@cluster0.abcde.mongodb.net/dudodb?retryWrites=true&w=majority";
+const MONGO_URI = "mongodb+srv://dudoreward_db_user:B7gqC2r3suuJLAAN@cluster0.abcde.mongodb.net/dudodb?retryWrites=true&w=majority";
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected Successfully!"))
