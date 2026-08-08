@@ -1,120 +1,33 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const JWT_SECRET = "DUDO_SUPER_SECRET_KEY_2026";
+// Naya Connection URL (Render Environment Variable ya Direct Fallback)
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://dudoreward_db_user:DudoPass12345@cluster0.ejzasaj.mongodb.net/dudodb?retryWrites=true&w=majority";
 
-// MongoDB URL (Render Environment Variable se lega)
-const MONGO_URI = process.env.MONGO_URI;
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected Successfully!"))
-  .catch(err => logSystemError("Database Connection Failed", err));
+// MongoDB Connection with Timeout Options
+mongoose.connect(MONGO_URI, {
+  serverSelectionTimeoutMS: 5000 // 5 second timeout limit
+})
+.then(() => console.log("✅ MongoDB Connected Successfully!"))
+.catch(err => console.error("❌ Database Connection Error:", err.message));
 
-// Database Schemas
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  balance: { type: Number, default: 0 },
-  coins: { type: Number, default: 0 },
-  accountStatus: { type: String, default: "ACTIVE" },
-  referralCode: { type: String },
-  deviceId: { type: String },
-  joinedAt: { type: Date, default: Date.now }
+app.get('/', (req, res) => {
+  res.send("Dudo Backend Server is Live!");
 });
 
-const errorLogSchema = new mongoose.Schema({
-  title: String,
-  errorDetails: String,
-  timestamp: { type: Date, default: Date.now }
-});
-
-const User = mongoose.model('User', userSchema);
-const SystemErrorLog = mongoose.model('SystemErrorLog', errorLogSchema);
-
-// Admin Diagnostic Logging Function
-async function logSystemError(title, error) {
-  try {
-    const errorText = typeof error === 'object' ? JSON.stringify(error, Object.getOwnPropertyNames(error)) : String(error);
-    await SystemErrorLog.create({ title, errorDetails: errorText });
-    console.error(`[ADMIN DIAGNOSTIC LOGGED]: ${title}`, error);
-  } catch (e) {
-    console.error("Failed to write to Error Log DB", e);
-  }
-}
-
-// 🟢 REGISTER API
-app.post('/api/register', async (req, res) => {
-  try {
-    const { name, email, password, referralCode, deviceId } = req.body;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ success: false, message: "Email already registered" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      referralCode,
-      deviceId
-    });
-
-    await newUser.save();
-    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '30d' });
-
-    res.json({ success: true, token, userId: newUser._id });
-  } catch (error) {
-    logSystemError("Registration Failure", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
-
-// 🟢 LOGIN API
-app.post('/api/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({ success: false, message: "User not found" });
-    }
-
-    if (user.accountStatus === 'BANNED_TERMINATED') {
-      return res.status(403).json({ success: false, message: "Account Restricted" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ success: false, message: "Invalid Password" });
-    }
-
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '30d' });
-    res.json({ success: true, token, userId: user._id, balance: user.balance, coins: user.coins });
-  } catch (error) {
-    logSystemError("Login Failure", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
-
-// 🟢 ADMIN DIAGNOSTICS & SYSTEM HEALTH ENDPOINT
-app.get('/api/admin/system-health-logs', async (req, res) => {
-  try {
-    const logs = await SystemErrorLog.find().sort({ timestamp: -1 }).limit(50);
-    const totalUsers = await User.countDocuments();
-    res.json({ success: true, totalUsers, systemLogs: logs });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+app.get('/api/admin/system-health-logs', (req, res) => {
+  const isConnected = mongoose.connection.readyState === 1;
+  res.json({
+    success: true,
+    dbStatus: isConnected ? "CONNECTED" : "DISCONNECTED",
+    message: isConnected ? "Database Working Smoothly" : "Database not connected yet"
+  });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 DUDO Backend Live on Port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server Running on Port ${PORT}`));
