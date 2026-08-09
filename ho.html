@@ -9,10 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -71,11 +67,6 @@
 
         .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
 
-        /* 📡 Traffic Monitor Pill */
-        .live-traffic-monitor-pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; color: var(--accent-green); margin-top: 18px; margin-bottom: 8px; box-shadow: 0 4px 15px rgba(16,185,129,0.1); }
-        .glowing-pulse-dot { width: 8px; height: 8px; background-color: var(--accent-green); border-radius: 50%; animation: pulseOpacity 1.5s infinite; box-shadow: 0 0 8px var(--accent-green); }
-        @keyframes pulseOpacity { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
-
         /* 💳 Balance Card */
         .wallet-card { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e293b 100%); color: white; width: 90%; max-width: 420px; padding: 22px; border-radius: 24px; margin-top: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); box-sizing: border-box; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.15); }
         .wallet-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 60%); pointer-events: none; }
@@ -108,7 +99,7 @@
         .milestone-tag { position: absolute; top: -23px; font-size: 9.5px; font-weight: 800; color: var(--accent-gold); white-space: nowrap; transform: translateX(-50%); }
 
         .checklist-container { margin-top: 10px; max-height: 0px; overflow-y: auto; overflow-x: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .checklist-container.expanded { max-height: 220px; }
+        .checklist-container.expanded { max-height: 260px; }
         .task-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 11px 14px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
         .task-info { display: flex; align-items: center; gap: 10px; }
         .task-checkbox { width: 17px; height: 17px; accent-color: var(--accent-green); pointer-events: none; }
@@ -127,13 +118,13 @@
         .play-surprise-btn { background: #ffffff; color: #6366f1; border: none; padding: 12px 25px; border-radius: 50px; font-size: 14px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.2s; }
         .play-surprise-btn:active { transform: scale(0.96); }
 
-        /* 📢 Ads Banner */
-        .ad-banner { width: 90%; max-width: 420px; min-height: 50px; margin: 15px 0; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.12); }
+        /* 📢 Banner Ad Containers */
+        .ad-banner { width: 90%; max-width: 420px; min-height: 54px; margin: 16px 0; border-radius: 14px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.18); backdrop-filter: blur(8px); z-index: 10; }
 
         /* Section Titles */
         .section-title { width: 90%; max-width: 420px; margin: 20px 0 12px 0; font-size: 15px; color: var(--text-main); font-weight: 800; text-align: left; }
 
-        /* 🎯 Variant 1 Glass Cards & Grids */
+        /* Grids & Cards */
         .grid-container { width: 90%; max-width: 420px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px; }
         
         .zone-card {
@@ -182,7 +173,7 @@
         .rank-user-info { display: flex; align-items: center; gap: 10px; color: #e2e8f0; }
         .winner-prize-tag { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); font-size: 11.5px; font-weight: 800; padding: 4px 10px; border-radius: 12px; }
 
-        /* 📱 5-BUTTON FLOATING GLASS BOTTOM NAVIGATION BAR */
+        /* 📱 5-BUTTON FLOATING BOTTOM NAVIGATION BAR (ADMIN DYNAMIC) */
         .bottom-nav {
             position: fixed;
             bottom: 14px;
@@ -215,11 +206,12 @@
             transition: 0.2s;
             flex: 1;
             text-align: center;
+            cursor: pointer;
         }
         .nav-item i { font-size: 17px; }
         .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.2); }
 
-        /* Modals & Overlays */
+        /* Overlays & Modals */
         .system-restrict-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; color: #fff; backdrop-filter: blur(10px); background: rgba(15, 23, 42, 0.95); }
         .urgent-task-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px); }
         .urgent-card { background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 2px solid var(--accent-pink); border-radius: 20px; width: 100%; max-width: 340px; padding: 25px 20px; text-align: center; }
@@ -228,7 +220,6 @@
         .notif-center-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1001; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
         .notif-center-card { background: #1e293b; border-radius: 20px; width: 100%; max-width: 400px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; max-height: 80vh; }
         .notif-item { background: rgba(0,0,0,0.25); border-left: 4px solid var(--primary-blue); padding: 12px; border-radius: 8px; position: relative; margin-bottom: 8px; }
-        .notif-item.urgent { border-left-color: var(--accent-pink); }
 
         #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid var(--accent-pink); padding: 20px; border-radius: 15px; z-index: 2000; width: 80%; max-width: 340px; text-align: center; }
@@ -239,32 +230,19 @@
 </head>
 <body>
 
-    <!-- 🌐 OFFLINE BLOCKER SCREEN -->
+    <!-- 🌐 OFFLINE SCREEN -->
     <div id="globalOfflineWarningOverlay">
         <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
-        <h2 style="color: var(--accent-pink); font-size: 20px; font-weight: 900; text-transform: uppercase; margin: 0 0 10px 0;">No Internet Connection</h2>
-        <p style="color: var(--text-sub); font-size: 13px; line-height: 1.5; margin: 0 0 20px 0;">Internet connection lost. Please enable your <b>Mobile Data</b> or <b>Wi-Fi</b> to continue.</p>
-        <button onclick="window.location.reload()" style="background: var(--accent-pink); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; width: 100%;">Retry Connection</button>
+        <h2 style="color: var(--accent-pink); font-size: 20px; font-weight: 900; text-transform: uppercase;">No Internet Connection</h2>
+        <p style="color: var(--text-sub); font-size: 13px; margin: 10px 0 20px 0;">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--accent-pink); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;">Retry Connection</button>
     </div>
 
-    <!-- 🚨 GLOBAL ADMIN CONTROL SHIELDS -->
+    <!-- 🚨 ADMIN RESTRICT OVERLAY -->
     <div class="system-restrict-overlay" id="interceptorMaintenanceScreenOverlay">
         <div style="font-size:60px; margin-bottom:15px;">🛠️</div>
         <h3 style="font-weight:900; margin-bottom:6px; font-size: 22px;">Under Maintenance</h3>
         <p style="font-size:14px; color:var(--text-sub);">App is under temporary updates synchronization.<br>We will be back live shortly.</p>
-    </div>
-
-    <div class="system-restrict-overlay" id="interceptorNetworkShieldOverlay">
-        <div style="font-size:60px; margin-bottom:15px;">🚫</div>
-        <h3 style="font-weight:900; margin-bottom:6px; font-size: 22px;">Unsupported Network</h3>
-        <p style="font-size:14px; color:#fca5a5;">Unauthorized network routing or VPN detected.</p>
-    </div>
-
-    <div class="system-restrict-overlay" id="interceptorForceBuildUpgradeOverlay">
-        <div style="font-size:60px; margin-bottom:15px;">🛰️</div>
-        <h3 style="font-weight:900; margin-bottom:6px; font-size: 22px;">Update Required</h3>
-        <p style="font-size:14px; color:var(--text-sub);">Your current application build version is deprecated.</p>
-        <button onclick="executeForceBuildRedirectDownloadUrlActionPath()" style="background: var(--accent-green); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 15px;">UPDATE BUILD NOW</button>
     </div>
 
     <div class="overlay" id="alertOverlay"></div>
@@ -277,14 +255,14 @@
     <div class="urgent-task-modal" id="urgentTaskModalOverlay">
         <div class="urgent-card">
             <div style="font-size: 50px; margin-bottom: 10px;">🚨</div>
-            <h3 id="urgentTaskTitle" style="color:#fca5a5; font-size:20px; font-weight:900;">High Paying Task!</h3>
-            <p id="urgentTaskDesc" style="color:#fecaca; font-size:13px; margin: 8px 0 20px 0;">Complete this new urgent offer to earn extra coins!</p>
-            <button class="urgent-btn" id="urgentTaskBtn">GO TO TASK NOW</button>
+            <h3 id="urgentTaskTitle" style="color:#fca5a5; font-size:20px; font-weight:900;">High Paying Offer!</h3>
+            <p id="urgentTaskDesc" style="color:#fecaca; font-size:13px; margin: 8px 0 20px 0;">Complete this new urgent offer to earn extra points!</p>
+            <button class="urgent-btn" id="urgentTaskBtn">GO TO OFFER NOW</button>
             <button onclick="closeUrgentTask()" style="background:transparent; border:none; color:#fca5a5; margin-top:15px; font-size:12px; cursor:pointer; text-decoration:underline;">Skip for now</button>
         </div>
     </div>
 
-    <!-- 🔔 NOTIFICATION CENTER MODAL -->
+    <!-- 🔔 NOTIFICATION MODAL -->
     <div class="notif-center-modal" id="notificationCenterModal">
         <div class="notif-center-card">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:15px;">
@@ -300,7 +278,7 @@
         </div>
     </div>
 
-    <!-- 👑 Top Bar -->
+    <!-- 👑 Header Bar -->
     <div class="header">
         <h2 class="notranslate">Dudo</h2>
         <div class="header-controls">
@@ -317,35 +295,29 @@
         </div>
     </div>
 
-    <!-- 📡 Live Traffic Monitor -->
-    <div class="live-traffic-monitor-pill">
-        <div class="glowing-pulse-dot"></div>
-        <span>Online Users: <b id="lblLiveOnlineCalculatedTrafficCounter">1,065</b></span>
-    </div>
-
-    <!-- 💳 Glass Balance Card -->
+    <!-- 💳 Balance Card -->
     <div class="wallet-card">
         <p data-i18n="total_balance">My Balance</p>
         <h1 class="notranslate" id="liveBalance">₹ 0.00</h1>
-        <div class="coins-display"><span class="notranslate">🪙</span> <span id="liveCoins" class="notranslate">0</span> <span data-i18n="coins">Coins</span></div>
+        <div class="coins-display"><span class="notranslate">🪙</span> <span id="liveCoins" class="notranslate">0</span> <span data-i18n="coins">Points</span></div>
         <div class="wallet-buttons-row">
             <button class="ledger-btn" id="mod_my_points" onclick="window.location.href='my_points.html'" data-i18n="withdraw_btn">My Ledger</button>
             <button class="ledger-btn" id="mod_add_points" onclick="window.location.href='add_points.html'" style="display:none; background:#ffffff; color:#4CAF50;">+ Add Points</button>
         </div>
     </div>
 
-    <!-- 🟢 Live Payout Marquee Stream -->
+    <!-- 🟢 Marquee Ticker -->
     <div class="reward-ticker-wrapper">
         <div class="ticker-badge-live">LIVE</div>
         <div class="marquee-container-box">
-            <div id="livePayoutStream">Loading recent rewards...</div>
+            <div id="livePayoutStream"><span>• Rakesh redeemed ₹50 success</span><span>• Neha redeemed ₹200 success</span></div>
         </div>
     </div>
 
     <!-- 🎯 Daily Tasks Progress Card -->
     <div class="task-progress-card">
         <div class="progress-header">
-            <div class="progress-title">Daily Tasks Done: <span id="doneCount">0</span>/8</div>
+            <div class="progress-title">Daily Activities Done: <span id="doneCount">0</span>/8</div>
             <div class="next-reward-hint" id="rewardHint">Complete tasks to unlock bonus!</div>
         </div>
         <div class="progress-track">
@@ -361,7 +333,7 @@
     </div>
 
     <!-- 🎁 Surprise Box -->
-    <div class="surprise-box-card" id="mod_surprise_box" style="display: none;">
+    <div class="surprise-box-card" id="mod_surprise_box">
         <div class="surprise-badge">🎁 SURPRISE REWARD</div>
         <div class="surprise-content">
             <div class="winner-label">Last Winner: <span id="lwWinnerNameDisplay">Loading...</span></div>
@@ -370,8 +342,8 @@
         <button class="play-surprise-btn" onclick="window.location.href='surprise.html'">Open Surprise Box ➔</button>
     </div>
 
-    <!-- Ad Banner 1 -->
-    <div class="ad-banner">
+    <!-- 📢 Banner Ad Slot 1 -->
+    <div class="ad-banner" id="bannerSlot1">
         <script type="text/javascript">
             atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
@@ -379,30 +351,31 @@
     </div>
 
     <!-- Section 1 -->
-    <div class="section-title" data-i18n="earning_zones">Earning Zones</div>
+    <div class="section-title" data-i18n="earning_zones">Reward Zones</div>
 
     <div class="grid-container">
         <a href="daily.html" class="zone-card" id="mod_daily">
             <div class="zone-icon">🎁</div>
             <h3 style="color:var(--accent-green);" data-i18n="daily_checkin">Daily Check-in</h3>
-            <p data-i18n="daily_desc">Earn Coins everyday</p>
+            <p data-i18n="daily_desc">Earn Points everyday</p>
         </a>
         <a href="tasks.html" class="zone-card" id="mod_tasks">
             <div class="zone-icon">📺</div>
-            <h3 style="color:var(--primary-blue);" data-i18n="watch_ads">Video Zone</h3>
+            <h3 style="color:var(--primary-blue);" data-i18n="watch_ads">Video Offers</h3>
             <p data-i18n="watch_desc">Watch clips & earn</p>
         </a>
     </div>
 
-    <div class="ad-banner">
-        <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+    <!-- 📢 Banner Ad Slot 2 -->
+    <div class="ad-banner" id="bannerSlot2">
+        <ins style="width:320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
     </div>
 
     <!-- Section 2 -->
     <div class="grid-container">
         <a href="apptesting.html" class="zone-card" id="mod_apptesting">
             <div class="zone-icon">📱</div>
-            <h3 style="color:#e91e63;" data-i18n="app_testing">App Testing</h3>
+            <h3 style="color:#e91e63;" data-i18n="app_testing">App Experience</h3>
             <p data-i18n="app_desc">Premium Rewards</p>
         </a>
         <a href="social.html" class="zone-card" id="mod_social">
@@ -410,10 +383,6 @@
             <h3 style="color:#009688;" data-i18n="social_tasks">Social Tasks</h3>
             <p data-i18n="social_desc">Watch & Comment</p>
         </a>
-    </div>
-
-    <div class="ad-banner">
-        <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
     </div>
 
     <!-- Section 3 -->
@@ -426,12 +395,16 @@
         <a href="monetag.html" class="zone-card" id="mod_monetag" style="border-color: rgba(245, 158, 11, 0.3);">
             <div class="zone-icon">🚀</div>
             <h3 style="color: var(--accent-gold);">Monetag Tasks</h3>
-            <p>Smartlink & Video Ads</p>
+            <p>Smartlink & Video Offers</p>
         </a>
     </div>
 
-    <div class="ad-banner">
-        <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+    <!-- 📢 Banner Ad Slot 3 -->
+    <div class="ad-banner" id="bannerSlot3">
+        <script type="text/javascript">
+            atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
     </div>
 
     <!-- Section 4 -->
@@ -463,18 +436,18 @@
     </div>
 
     <!-- Section 6: Micro Tasks -->
-    <div class="section-title" style="color: var(--accent-cyan);">Premium Micro Tasks</div>
+    <div class="section-title" style="color: var(--accent-cyan);">Micro Activities</div>
 
     <div class="grid-container">
         <a href="article.html" class="zone-card" id="mod_article">
             <div class="zone-badge badge-hot">AdSense</div>
             <div class="zone-icon">📰</div>
             <h3 style="color: var(--accent-cyan);">Read Articles</h3>
-            <p>Read 30s & Earn Coins</p>
+            <p>Read & Explore</p>
         </a>
         <a href="1v1.html" class="zone-card" id="mod_1v1">
             <div class="zone-icon">⚔️</div>
-            <h3 style="color: var(--accent-gold);">Coin Battle</h3>
+            <h3 style="color: var(--accent-gold);">Point Battle</h3>
             <p>Play matches to win</p>
         </a>
     </div>
@@ -498,7 +471,8 @@
         </a>
     </div>
 
-    <div class="ad-banner">
+    <!-- 📢 Banner Ad Slot 4 -->
+    <div class="ad-banner" id="bannerSlot4">
         <script type="text/javascript">
             atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
@@ -523,7 +497,7 @@
         </div>
         <div class="mini-box" id="mod_top_rewards" onclick="window.location.href='top_rewards.html'">
             <div class="mini-icon">⚡</div>
-            <p class="mini-title" data-i18n="clickearn">Instant Coins</p>
+            <p class="mini-title" data-i18n="clickearn">Instant Points</p>
             <p class="mini-reward" data-i18n="instant_coin">Instant 5 🪙</p>
         </div>
     </div>
@@ -541,11 +515,9 @@
         </div>
     </div>
 
-    <div class="ad-banner">
-        <script type="text/javascript">
-            atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        </script>
-        <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+    <!-- 📢 Banner Ad Slot 5 -->
+    <div class="ad-banner" id="bannerSlot5">
+        <ins style="width:320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
     </div>
 
     <div class="section-title" style="color: var(--accent-pink);">Dudo Games Zone</div>
@@ -554,7 +526,7 @@
         <a href="game.html" class="zone-card" id="mod_square_dash">
             <div class="zone-icon">🎯</div>
             <h3 style="color: var(--accent-pink);">Square Dash</h3>
-            <p>Play game & earn coins</p>
+            <p>Play game & earn points</p>
         </a>
         <a href="pool.html" class="zone-card" id="mod_pool">
             <div class="zone-badge" style="background:var(--accent-green);">POOL</div>
@@ -562,32 +534,23 @@
             <h3 style="color: var(--accent-green);">4-Player Pool</h3>
             <p>Play pool & earn rewards</p>
         </a>
-        <a href="esports_zone.html" class="zone-card" id="mod_esports_zone" style="display:none;">
-            <div class="zone-icon">🎮</div>
-            <h3 style="color: var(--accent-gold);">Esports Zone</h3>
-            <p>Join Custom Rooms</p>
-        </a>
     </div>
-
-    <!-- Dynamic Admin Modules Container -->
-    <div class="section-title" id="dynamicSectionTitle" style="display:none; color: var(--accent-purple);">New Discoveries</div>
-    <div class="grid-container" id="dynamicAdminModulesContainer"></div>
 
     <!-- Winners Podium -->
     <div class="winners-podium-container" id="anchor_retention">
         <h3 class="podium-title" id="lblWinnerSectionHeadline">Winners</h3>
         <div style="display:flex; flex-direction:column;">
             <div class="winner-rank-row">
-                <div class="rank-user-info"><span>🥇</span> <div><b>1st:</b> <span id="lblWinnerRank1Name">Loading...</span></div></div>
-                <div class="winner-prize-tag" id="lblWinnerRank1Prize">+0 Coins</div>
+                <div class="rank-user-info"><span>🥇</span> <div><b>1st:</b> <span id="lblWinnerRank1Name">Shubham Singh</span></div></div>
+                <div class="winner-prize-tag" id="lblWinnerRank1Prize">+10,000 Points</div>
             </div>
             <div class="winner-rank-row">
-                <div class="rank-user-info"><span>🥈</span> <div><b>2nd:</b> <span id="lblWinnerRank2Name">Loading...</span></div></div>
-                <div class="winner-prize-tag" id="lblWinnerRank2Prize">+0 Coins</div>
+                <div class="rank-user-info"><span>🥈</span> <div><b>2nd:</b> <span id="lblWinnerRank2Name">Aman Verma</span></div></div>
+                <div class="winner-prize-tag" id="lblWinnerRank2Prize">+5,000 Points</div>
             </div>
             <div class="winner-rank-row">
-                <div class="rank-user-info"><span>🥉</span> <div><b>3rd:</b> <span id="lblWinnerRank3Name">Loading...</span></div></div>
-                <div class="winner-prize-tag" id="lblWinnerRank3Prize">+0 Coins</div>
+                <div class="rank-user-info"><span>🥉</span> <div><b>3rd:</b> <span id="lblWinnerRank3Name">Rahul Kumar</span></div></div>
+                <div class="winner-prize-tag" id="lblWinnerRank3Prize">+2,500 Points</div>
             </div>
         </div>
     </div>
@@ -596,59 +559,51 @@
         <p>Powered by <span style="color:var(--accent-green); font-weight:900;">Shubham</span> || <span style="color:var(--primary-blue); font-weight:900;">tvtune</span></p>
     </div>
 
-    <!-- 📱 5-BUTTON FLOATING BOTTOM NAVIGATION BAR -->
-    <div class="bottom-nav">
-        <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="tasks.html" class="nav-item"><i class="fa-solid fa-fire"></i>Offerwall</a>
-        <a href="daily.html" class="nav-item"><i class="fa-solid fa-gift"></i>Daily Coin</a>
-        <a href="leaderboard.html" class="nav-item"><i class="fa-solid fa-trophy"></i>Leaders</a>
-        <a href="my_points.html" class="nav-item"><i class="fa-solid fa-wallet"></i>My Vault</a>
+    <!-- 📱 5-BUTTON FLOATING BOTTOM NAVIGATION BAR (ADMIN CONTROLLED) -->
+    <div class="bottom-nav" id="bottomNavContainer">
+        <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="tasks.html" class="nav-item"><i class="fa-solid fa-fire"></i><span>Offerwall</span></a>
+        <a href="daily.html" class="nav-item"><i class="fa-solid fa-gift"></i><span>Daily</span></a>
+        <a href="leaderboard.html" class="nav-item"><i class="fa-solid fa-trophy"></i><span>Leaders</span></a>
+        <a href="my_points.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span>Vault</span></a>
     </div>
 
-    <!-- 🟢 PURANE CODE KA EXACT SCRIPT LOGIC (FIREBASE CONNECTED) -->
+    <!-- 🟢 SCRIPT ENGINE (PURE NODE.JS API & RENDER SERVER BACKEND) -->
     <script>
+    const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+    const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
     function checkUserNetworkStatusConnection() {
         const overlayNode = document.getElementById("globalOfflineWarningOverlay");
         if (!navigator.onLine) { if (overlayNode) overlayNode.style.display = "flex"; } 
         else { if (overlayNode) overlayNode.style.display = "none"; }
     }
 
-    window.addEventListener('online', () => {
-        const overlayNode = document.getElementById("globalOfflineWarningOverlay");
-        if (overlayNode) overlayNode.style.display = "none";
-    });
-
-    window.addEventListener('offline', () => {
-        const overlayNode = document.getElementById("globalOfflineWarningOverlay");
-        if (overlayNode) overlayNode.style.display = "flex";
-    });
-
-    window.addEventListener("DOMContentLoaded", () => {
-        checkUserNetworkStatusConnection();
-    });
+    window.addEventListener('online', checkUserNetworkStatusConnection);
+    window.addEventListener('offline', checkUserNetworkStatusConnection);
 
     const langData = {
         "en": {
-            "total_balance": "My Balance", "coins": "Coins", "withdraw_btn": "My Rewards", "earning_zones": "Earning Zones",
-            "daily_checkin": "Daily Check-in", "daily_desc": "Earn Coins everyday", "watch_ads": "Video Zone", "watch_desc": "Watch clips & earn",
-            "app_testing": "App Testing", "app_desc": "Premium Rewards", "social_tasks": "Social Tasks", "social_desc": "Watch & Comment",
+            "total_balance": "My Balance", "coins": "Points", "withdraw_btn": "My Rewards", "earning_zones": "Reward Zones",
+            "daily_checkin": "Daily Check-in", "daily_desc": "Earn Points everyday", "watch_ads": "Video Offers", "watch_desc": "Watch clips & earn",
+            "app_testing": "App Experience", "app_desc": "Premium Rewards", "social_tasks": "Social Tasks", "social_desc": "Watch & Comment",
             "mega_offers": "Premium Offers", "mega_desc": "CPA Offers", "extra_bonus": "Extra Bonus", "extra_desc": "Games & Promo",
-            "spin_win": "Spin & Win", "spin_desc": "Spin & win daily", "quick_tasks": "Quick Tasks",
-            "cpx_survey": "CPX Surveys", "up_to_50": "Up to 50 🪙", "click_earn": "Instant Coins", "instant_coin": "Instant 5 🪙",
+            "spin_win": "Spin & Win", "spin_desc": "Spin wheel daily", "quick_tasks": "Quick Tasks",
+            "cpx_survey": "CPX Surveys", "up_to_50": "Up to 50 🪙", "click_earn": "Instant Points", "instant_coin": "Instant 5 🪙",
             "time_wall": "Timewall Clicks", "easy_tasks": "Easy Tasks", "bitlabs": "Bitlabs Offer", "high_pay": "High Paying",
             "show_tasks_btn": "Show Tasks", "hide_tasks_btn": "Hide Tasks"
         },
         "hi": {
-            "total_balance": "मेरा बैलेंस", "coins": "सिक्के", "withdraw_btn": "मेरे रिवॉर्ड", "earning_zones": "कमाई के तरीके",
-            "daily_checkin": "दैनिक चेक-इन", "daily_desc": "रोजाना सिक्के कमाएं", "watch_ads": "वीडियो ज़ोन", "watch_desc": "वीडियो देखें और कमाएं",
-            "app_testing": "ऐप टेस्टिंग", "app_desc": "प्रीमियम रिवॉर्ड", "social_tasks": "सोशल टास्क", "social_desc": "देखें और कमेंट करें",
+            "total_balance": "मेरा बैलेंस", "coins": "पॉइंट्स", "withdraw_btn": "मेरे रिवॉर्ड", "earning_zones": "रिवॉर्ड तरीके",
+            "daily_checkin": "दैनिक चेक-इन", "daily_desc": "रोजाना पॉइंट्स जमा करें", "watch_ads": "वीडियो ऑफर्स", "watch_desc": "वीडियो देखें और जमा करें",
+            "app_testing": "ऐप एक्सपीरियंस", "app_desc": "प्रीमियम रिवॉर्ड", "social_tasks": "सोशल टास्क", "social_desc": "देखें और शेयर करें",
             "mega_offers": "प्रीमियम ऑफर्स", "mega_desc": "ऐप इंस्टॉल ऑफर्स", "extra_bonus": "अतिरिक्त बोनस", "extra_desc": "गेम और प्रोमो",
             "spin_win": "स्पिन और विन", "spin_desc": "रोजाना घुमाएं", "quick_tasks": "क्विक टास्क",
-            "cpx_survey": "CPX सर्वे", "up_to_50": "50 🪙 तक", "click_earn": "इंस्टेंट कॉइन्स", "instant_coin": "तुरंत 5 🪙",
+            "cpx_survey": "CPX सर्वे", "up_to_50": "50 🪙 तक", "click_earn": "इंस्टेंट पॉइंट्स", "instant_coin": "तुरंत 5 🪙",
             "time_wall": "Timewall टास्क", "easy_tasks": "आसान टास्क", "bitlabs": "Bitlabs ऑफर", "high_pay": "ज्यादा कमाई",
             "show_tasks_btn": "टास्क दिखाएं", "hide_tasks_btn": "टास्क छुपाएं"
         },
-        "bn": {
+         "bn": {
             "total_balance": "মোট ব্যালেন্স", "coins": "কয়েন", "withdraw_btn": "আমার রিওয়ার্ড", "earning_zones": "উপার্জন অঞ্চল",
             "daily_checkin": "দৈনিক চেক-ইন", "daily_desc": "প্রতিদিন কয়েন উপার্জন করুন", "watch_ads": "ভিডিও জোন", "watch_desc": "ভিডিও দেখে আয় করুন",
             "app_testing": "অ্যাপ টেস্টিং", "app_desc": "প্রিমিয়াম রিওয়ার্ড", "social_tasks": "সোশ্যাল টাস্ক", "social_desc": "দেখুন এবং মন্তব্য করুন",
@@ -770,22 +725,6 @@
         document.getElementById("appLanguage").value = langCode;
     }
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-        authDomain: "dudo-63594.firebaseapp.com",
-        databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-        projectId: "dudo-63594",
-        storageBucket: "dudo-63594.firebasestorage.app",
-        messagingSenderId: "732244407571",
-        appId: "1:732244407571:web:d08486136dea6190de96e6",
-        measurementId: "G-H6VVEXCD54"
-    };
-    
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-    const database = firebase.database();
-    const uid = localStorage.getItem("userId");
-
-    // ======= 📊 DAILY CHECKLIST TASK SHEETS REGISTER =======
     const dailyTasksList = [
         { id: "t1", text: "Watch Video Ad 1", coins: 10 },
         { id: "t2", text: "Watch Video Ad 2", coins: 10 },
@@ -817,231 +756,57 @@
         }
     }
 
-    // 🔔 NOTIFICATION SYSTEM WITH LOCAL DELETE LOGIC
-    let globalFetchedNotifsData = {};
+    async function loadUserProfileAPI() {
+        const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
-    function renderNotificationsListUI() {
-        const listContainer = document.getElementById("notifListContainer");
-        const badge = document.getElementById("notifUnreadBadge");
-        if (!listContainer) return;
-        
-        listContainer.innerHTML = "";
-        let unreadCount = 0;
-        let viewedIds = JSON.parse(localStorage.getItem("viewed_notifications") || "[]");
-        let deletedNotifsArray = JSON.parse(localStorage.getItem("user_deleted_notifs") || "[]");
-        let hasVisible = false;
-
-        let keys = Object.keys(globalFetchedNotifsData).reverse();
-        keys.forEach(key => {
-            if (!deletedNotifsArray.includes(key)) {
-                hasVisible = true;
-                let n = globalFetchedNotifsData[key];
-                if (!viewedIds.includes(key)) unreadCount++;
-                let styleClass = n.type === "urgent" ? "urgent" : "";
-
-                listContainer.innerHTML += `
-                    <div class="notif-item ${styleClass}">
-                        <button onclick="deleteSingleNotification('${key}')" style="position:absolute; top:8px; right:8px; background:none; border:none; color:#ef4444; cursor:pointer; font-size:14px;">🗑️</button>
-                        <h4 style="margin:0 0 4px 0; font-size:13.5px; color:#fff;">${n.title}</h4>
-                        <p style="margin:0; font-size:12px; color:var(--text-sub);">${n.message}</p>
-                    </div>
-                `;
-            }
-        });
-
-        if (!hasVisible) {
-            listContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub); font-size:13px;">🎉 All caught up!<br><small>No new notifications right now.</small></div>`;
+        if (!userId || !token) {
+            window.location.href = "index.html";
+            return;
         }
 
-        badge.innerText = unreadCount;
-        badge.style.display = unreadCount > 0 ? "flex" : "none";
-        window.latestNotificationIds = keys;
-    }
-
-    window.deleteSingleNotification = function(notifKey) {
-        let deleted = JSON.parse(localStorage.getItem("user_deleted_notifs") || "[]");
-        if (!deleted.includes(notifKey)) { deleted.push(notifKey); localStorage.setItem("user_deleted_notifs", JSON.stringify(deleted)); }
-        renderNotificationsListUI(); 
-    };
-
-    window.clearAllNotifications = function() {
-        let deleted = JSON.parse(localStorage.getItem("user_deleted_notifs") || "[]");
-        Object.keys(globalFetchedNotifsData).forEach(key => { if (!deleted.includes(key)) deleted.push(key); });
-        localStorage.setItem("user_deleted_notifs", JSON.stringify(deleted));
-        renderNotificationsListUI(); 
-    };
-
-    function openNotificationCenter() {
-        document.getElementById("notificationCenterModal").style.display = "flex";
-        if(window.latestNotificationIds) { localStorage.setItem("viewed_notifications", JSON.stringify(window.latestNotificationIds)); }
-        document.getElementById("notifUnreadBadge").style.display = "none";
-        renderNotificationsListUI();
-    }
-
-    function closeNotificationCenter() { document.getElementById("notificationCenterModal").style.display = "none"; }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        // 🔥 PURANA EXACT MODULE TOGGLE ENGINE (CONNECTS TO ADMIN PANEL)
-        database.ref('global_system_runtime_configurations/module_toggles').on('value', (snap) => {
-            let toggles = snap.val() || {};
-            const allModules = [
-                'add_points', 'my_points', 'daily', 'tasks', 'apptesting', 'social', 
-                'monlix', 'monetag', 'adgem', 'greeting', 'mega_offers', 'extra_bonus', 
-                'article', '1v1', 'hourly_key', 'special_missions', 'spin', 'cpx', 
-                'top_rewards', 'timewall', 'bitlabs', 'square_dash', 'pool', 
-                'esports_zone', 'lucky_box', 'web_explorer', 'surprise_box'
-            ];
-            const dangerModules = ['add_points', 'esports_zone', 'special_missions', 'web_explorer', 'lucky_box', 'surprise_box'];
-
-            allModules.forEach(mod => {
-                let el = document.getElementById('mod_' + mod);
-                if(el) {
-                    if (dangerModules.includes(mod)) {
-                        let dbToggleKey = (mod === 'surprise_box') ? 'lucky_box' : mod;
-                        el.style.display = (toggles[dbToggleKey] === true) ? '' : 'none';
-                    } else {
-                        el.style.display = (toggles[mod] === false) ? 'none' : '';
-                    }
-                }
+        try {
+            const response = await fetch(`${API_BASE_URL}/user/${userId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-        });
+            const data = await response.json();
 
-// 2. 🟢 ONLINE USERS AUTOMATED FLUCTUATION LOGIC (FIXED)
-database.ref('global_system_runtime_configurations/fake_online_count').on('value', (snap) => {
-    // Admin Panel se aayi hui value ko base banayein (Default: 1065)
-    let currentAdminBaseCount = snap.exists() ? parseInt(snap.val()) : 1065;
-    if (isNaN(currentAdminBaseCount)) currentAdminBaseCount = 1065;
-    
-    // Purane timer loop को clear karein taaki multiple loops overlap na ho
-    if (window.onlineUsersTimerLoop) {
-        clearInterval(window.onlineUsersTimerLoop);
-    }
-    
-    // Admin dwara set ki gayi exact value ko screen par turant dikhayein
-    let liveDisplayCounter = currentAdminBaseCount;
-    const counterElement = document.getElementById("lblLiveOnlineCalculatedTrafficCounter");
-    if (counterElement) {
-        counterElement.innerText = liveDisplayCounter.toLocaleString();
-    }
-    
-    // Usi Admin number ke aas-paas natural fluctuation karein (+/- 4)
-    window.onlineUsersTimerLoop = setInterval(() => {
-        let dynamicChange = Math.floor(Math.random() * 9) - 4; // -40 se +40 tak
-        liveDisplayCounter = liveDisplayCounter + dynamicChange;
-        
-        // Target se 50 se zyada door jaane par admin base par reset karein
-        if (Math.abs(liveDisplayCounter - currentAdminBaseCount) > 50) {
-            liveDisplayCounter = currentAdminBaseCount;
-        }
-        
-        if (counterElement) {
-            counterElement.innerText = liveDisplayCounter.toLocaleString();
-        }
-    }, 2500);
-});
+            if (data.success && data.user) {
+                document.getElementById("liveBalance").innerText = "₹ " + (data.user.balance || 0).toFixed(2);
+                document.getElementById("liveCoins").innerText = data.user.coins || 0;
 
-        // 🟢 PURANA EXACT MARQUEE TICKER FEED
-        database.ref('incentives_popup_array_feed_source').on('value', (snap) => {
-            let marqueeContainer = document.getElementById("livePayoutStream");
-            if (!marqueeContainer) return;
-            if (snap.exists()) {
-                let feedDataArray = snap.val() || [];
-                if (feedDataArray.length > 0) {
-                    marqueeContainer.innerHTML = "";
-                    feedDataArray.forEach(payoutString => { marqueeContainer.innerHTML += `<span>• ${payoutString} reward redeemed</span>`; });
-                } else {
-                    marqueeContainer.innerHTML = `<span>• Sudhir - ₹500 Reward redeemed</span><span>• Manav - ₹500 Reward redeemed</span>`;
+                if (data.user.profile_pic) {
+                    document.getElementById("homeProfileIcon").innerHTML = `<img src="${data.user.profile_pic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                 }
-            } else {
-                marqueeContainer.innerHTML = `<span>• Rakesh redeemed ₹50 success</span><span>• Neha redeemed ₹200 success</span>`;
+
+                executeRealtimeChecklistEvaluation(data.user, data.user.completed_daily_tasks || []);
             }
+        } catch (err) {
+            console.log("Offline mode or cache fallback");
+        }
+    }
 
-            setTimeout(() => {
-                let textWidth = marqueeContainer.offsetWidth; 
-                let speedConstant = 60;
-                let calculatedDuration = textWidth / speedConstant;
-                marqueeContainer.style.animation = "none";
-                marqueeContainer.offsetHeight; 
-                marqueeContainer.style.animation = `smoothMarqueeLoop ${calculatedDuration}s linear infinite`;
-            }, 100);
-        });
+    async function loadAdminDynamicNavButtons() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/app-config/nav-buttons`);
+            const data = await res.json();
 
-        // 🟢 PURANA EXACT WINNERS PODIUM
-        database.ref('global_system_runtime_configurations/leaderboard_winners_podium').on('value', (snap) => {
-            if (snap.exists()) {
-                let podiumData = snap.val();
-                if (podiumData.rank1_name) document.getElementById("lblWinnerRank1Name").innerText = podiumData.rank1_name;
-                if (podiumData.rank1_prize) document.getElementById("lblWinnerRank1Prize").innerText = "+" + podiumData.rank1_prize + " Coins";
-                if (podiumData.rank2_name) document.getElementById("lblWinnerRank2Name").innerText = podiumData.rank2_name;
-                if (podiumData.rank2_prize) document.getElementById("lblWinnerRank2Prize").innerText = "+" + podiumData.rank2_prize + " Coins";
-                if (podiumData.rank3_name) document.getElementById("lblWinnerRank3Name").innerText = podiumData.rank3_name;
-                if (podiumData.rank3_prize) document.getElementById("lblWinnerRank3Prize").innerText = "+" + podiumData.rank3_prize + " Coins";
-            } else {
-                document.getElementById("lblWinnerRank1Name").innerText = "Shubham Singh";
-                document.getElementById("lblWinnerRank1Prize").innerText = "+10,000 Coins";
-                document.getElementById("lblWinnerRank2Name").innerText = "Aman Verma";
-                document.getElementById("lblWinnerRank2Prize").innerText = "+5,000 Coins";
-                document.getElementById("lblWinnerRank3Name").innerText = "Rahul Kumar";
-                document.getElementById("lblWinnerRank3Prize").innerText = "+2,500 Coins";
+            if (data.success && data.navButtons && data.navButtons.length === 5) {
+                const container = document.getElementById("bottomNavContainer");
+                container.innerHTML = "";
+
+                data.navButtons.forEach((btn, idx) => {
+                    const a = document.createElement("a");
+                    a.className = `nav-item ${idx === 0 ? 'active' : ''}`;
+                    a.onclick = () => window.location.href = btn.targetUrl;
+                    a.innerHTML = `<i class="${btn.iconClass || 'fa-solid fa-star'}"></i><span>${btn.label}</span>`;
+                    container.appendChild(a);
+                });
             }
-        });
-
-        // Hardware Ban Shield
-        database.ref('users/' + uid + '/account_security_status_state_flag').on('value', (snap) => {
-            if (snap.exists() && snap.val() === "BANNED_TERMINATED") {
-                document.body.innerHTML = `<div style="background:#0b0f19; width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-align:center; padding:20px;"><div style="font-size:60px; margin-bottom:15px;">🚫</div><h1 style="color:#f43f5e; margin:0 0 10px 0;">Account Restricted</h1><p style="color:#94a3b8; font-size:14px;">Access restricted due to policy violations.</p></div>`;
-                localStorage.removeItem("userId");
-            }
-        });
-
-        if (!uid) { window.location.href = "index.html"; return; }
-        changeLanguage(localStorage.getItem("selectedLang") || "en");
-
-        // Balance & Daily Tasks Progress Listener
-        database.ref('users/' + uid).on('value', (snap) => {
-            if (snap.exists()) {
-                let bal = snap.val().balance || 0;
-                let coins = snap.val().coins || 0;
-                document.getElementById("liveBalance").innerText = "₹ " + bal.toFixed(2);
-                document.getElementById("liveCoins").innerText = coins;
-                if (snap.val().profile_pic) {
-                    document.getElementById("homeProfileIcon").innerHTML = `<img src="${snap.val().profile_pic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                }
-                let completedTasksArray = snap.val().completed_daily_tasks_array_node || [];
-                executeRealtimeChecklistEvaluation(snap.val(), completedTasksArray);
-            }
-        });
-
-        // Urgent Task Listener
-        database.ref('global_system_runtime_configurations/urgent_task').on('value', (snap) => {
-            let urgentModal = document.getElementById("urgentTaskModalOverlay");
-            if (snap.exists() && snap.val().is_active === true) {
-                let task = snap.val();
-                document.getElementById("urgentTaskTitle").innerText = task.title || "Urgent Task!";
-                document.getElementById("urgentTaskDesc").innerText = task.desc || "Complete this now!";
-                document.getElementById("urgentTaskBtn").onclick = function() { window.location.href = task.url; };
-                urgentModal.style.display = "flex";
-            } else { urgentModal.style.display = "none"; }
-        });
-
-        // Notification List Listener
-        database.ref('global_system_runtime_configurations/notification_list').on('value', (snap) => {
-            globalFetchedNotifsData = snap.exists() ? snap.val() : {};
-            renderNotificationsListUI();
-        });
-
-        // Lottery Winner Listener
-        database.ref('global_system_runtime_configurations/latest_lottery_winner').on('value', (snap) => {
-            if (snap.exists()) {
-                let w = snap.val();
-                document.getElementById("lwWinnerNameDisplay").innerText = w.name || "Player";
-                document.getElementById("lwWinnerTicketDisplay").innerText = `Pass: #${w.ticket_id || 'N/A'}`;
-            }
-        });
-    });
-
-    function closeUrgentTask() { document.getElementById("urgentTaskModalOverlay").style.display = "none"; }
-    function closeCustomAlert() { document.getElementById("customAlertBox").style.display = "none"; document.getElementById("alertOverlay").style.display = "none"; }
+        } catch (e) {
+            console.log("Using default bottom nav");
+        }
+    }
 
     function executeRealtimeChecklistEvaluation(uData, completedTaskIds) {
         const container = document.getElementById("dailyChecklistHTML");
@@ -1076,6 +841,18 @@ database.ref('global_system_runtime_configurations/fake_online_count').on('value
         if (doneCount >= 5) document.getElementById("mNode2").classList.add("achieved");
         if (doneCount >= 8) document.getElementById("mNode3").classList.add("achieved");
     }
+
+    function closeUrgentTask() { document.getElementById("urgentTaskModalOverlay").style.display = "none"; }
+    function closeCustomAlert() { document.getElementById("customAlertBox").style.display = "none"; document.getElementById("alertOverlay").style.display = "none"; }
+    function openNotificationCenter() { document.getElementById("notificationCenterModal").style.display = "flex"; }
+    function closeNotificationCenter() { document.getElementById("notificationCenterModal").style.display = "none"; }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        checkUserNetworkStatusConnection();
+        changeLanguage(localStorage.getItem("selectedLang") || "en");
+        loadUserProfileAPI();
+        loadAdminDynamicNavButtons();
+    });
     </script>
 </body>
 </html>
