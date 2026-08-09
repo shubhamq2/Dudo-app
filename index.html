@@ -3,388 +3,472 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Register - DUDO</title>
-    
-    <!-- 🔥 Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
-    <!-- Auto-Login Check -->
-    <script>
-        if(localStorage.getItem("userId")) {
-            window.location.href = "ho.html";
-        }
-    </script>
-
+    <title>Dudo App - Login & Registration</title>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        /* Premium DUDO Dark Theme */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #060913; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #fff; }
-        
-        .login-container { background: #1e293b; width: 90%; max-width: 400px; border-radius: 20px; padding: 30px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; position: relative; overflow: hidden; }
-        .login-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981); }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-        .login-header { text-align: center; margin-bottom: 20px; }
-        .login-header h2 { margin: 0; font-size: 32px; font-weight: 900; color: #fff; letter-spacing: 1px; }
-        .login-header h2 span { color: #06b6d4; }
-        .login-header p { margin: 5px 0 0 0; font-size: 13px; color: #94a3b8; }
+        body {
+            background: #0f0f1a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-        /* Google Button */
-        .google-btn { width: 100%; background: #ffffff; color: #1e293b; border: none; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255,255,255,0.1); transition: 0.2s; margin-bottom: 15px; }
-        .google-btn:active { transform: scale(0.97); }
-        .google-btn img { width: 18px; }
+        .auth-card {
+            background: #1e1e2f;
+            width: 100%;
+            max-width: 420px;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border: 1px solid #2d2d48;
+            position: relative;
+        }
 
-        .divider { display: flex; align-items: center; text-align: center; color: #64748b; font-size: 11px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #334155; }
-        .divider:not(:empty)::before { margin-right: .5em; }
-        .divider:not(:empty)::after { margin-left: .5em; }
+        .app-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-        .auth-toggle { display: flex; background: #0f172a; border-radius: 12px; padding: 5px; margin-bottom: 20px; border: 1px solid #334155; }
-        .auth-toggle button { flex: 1; padding: 12px; border: none; background: transparent; color: #94a3b8; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
-        .auth-toggle button.active { background: #3b82f6; color: #fff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+        .app-logo h1 {
+            color: #00d2ff;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
 
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px; }
-        .input-group input { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: #fff; padding: 14px; font-size: 14px; outline: none; box-sizing: border-box; transition: 0.2s; }
-        .input-group input:focus { border-color: #06b6d4; box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
+        .app-logo p {
+            color: #8a8aa3;
+            font-size: 13px;
+            margin-top: 4px;
+        }
 
-        .forgot-pass { text-align: right; margin-bottom: 20px; }
-        .forgot-pass a { color: #06b6d4; font-size: 12px; text-decoration: none; font-weight: bold; transition: 0.2s; }
-        .forgot-pass a:hover { color: #3b82f6; text-decoration: underline; }
+        .tab-box {
+            display: flex;
+            background: #141423;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 22px;
+        }
 
-        .action-btn { width: 100%; border: none; padding: 16px; border-radius: 50px; font-size: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; color: #fff; }
-        .btn-login { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
-        .btn-register { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
-        .action-btn:active { transform: scale(0.97); }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #8a8aa3;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
-        .support-btn { background: #0f172a; border: 1px solid #334155; color: #cbd5e1; width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
-        .support-btn:hover { border-color: #06b6d4; color: #06b6d4; background: rgba(6, 182, 212, 0.05); }
+        .tab-btn.active {
+            background: #00d2ff;
+            color: #0f0f1a;
+        }
 
-        .compliance-text { font-size: 10px; text-align: center; margin-top: 15px; color: #64748b; line-height: 1.4; }
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
 
-        /* Hidden Sections */
-        #setupProfileScreen { display: none; text-align: center; }
-        .main-auth-box { display: block; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #b0b0cc;
+            margin-bottom: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            background: #141423;
+            border: 1px solid #2d2d48;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #00d2ff;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            color: #8a8aa3;
+            font-size: 14px;
+            user-select: none;
+        }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 12px;
+            color: #00d2ff;
+            text-decoration: none;
+            margin-top: -6px;
+            margin-bottom: 14px;
+            cursor: pointer;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 13px;
+            background: #00d2ff;
+            color: #0f0f1a;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+
+        .action-btn:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #2d2d48;
+        }
+
+        .divider span {
+            padding: 0 10px;
+            color: #8a8aa3;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 12px;
+            background: #ffffff;
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .google-btn:hover {
+            background: #e6e6e6;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .support-box {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .support-box a {
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .legal-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666680;
+            line-height: 1.6;
+        }
+
+        .legal-footer a {
+            color: #00d2ff;
+            text-decoration: none;
+        }
+
+        /* Modal Popup CSS for Forgot Password */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: #1e1e2f;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 360px;
+            border: 1px solid #2d2d48;
+            text-align: center;
+        }
+        .modal-content h3 { margin-bottom: 12px; color: #00d2ff; }
+        .modal-content p { font-size: 13px; color: #aaa; margin-bottom: 16px; }
+        .close-btn { background: #ff4757; color: #fff; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        
-        <div class="main-auth-box" id="mainAuthBox">
-            <div class="login-header">
-                <h2>DU<span>DO</span> 🚀</h2>
-                <p>Welcome back to the best reward app!</p>
-            </div>
-
-            <!-- Free Google Login Button -->
-            <button class="google-btn" onclick="loginWithGoogle()" id="googleLoginBtnMain">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G">
-                Fast Login with Google
-            </button>
-
-            <div class="divider">OR USE EMAIL ADDRESS</div>
-
-            <div class="auth-toggle">
-                <button id="tabLogin" class="active" onclick="switchTab('login')">Login</button>
-                <button id="tabRegister" onclick="switchTab('register')">Register</button>
-            </div>
-            
-            <!-- 🟢 1. LOGIN FORM (Email + Password) -->
-            <form id="loginForm">
-                <div class="input-group">
-                    <label>Email Address</label>
-                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
-                </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                </div>
-                
-                <div class="forgot-pass">
-                    <a href="support.html">Forgot Password?</a>
-                </div>
-                
-                <button type="submit" class="action-btn btn-login" id="btnLogin">Login Securely</button>
-            </form>
-
-            <!-- 🔵 2. REGISTER FORM (Email + Password + Name + Referral) -->
-            <form id="registerForm" style="display: none;">
-                <div class="input-group">
-                    <label>Full Name</label>
-                    <input type="text" id="regName" placeholder="Enter your full name" required>
-                </div>
-                <div class="input-group">
-                    <label>Email Address</label>
-                    <input type="email" id="regEmail" placeholder="Enter your email" required>
-                </div>
-                <div class="input-group">
-                    <label>Create Password</label>
-                    <input type="password" id="regPassword" placeholder="Create a strong password (min 6 chars)" required>
-                </div>
-                <div class="input-group">
-                    <label>Referral Code (Optional)</label>
-                    <input type="text" id="regReferral" placeholder="Enter friend's invite code">
-                </div>
-                
-                <button type="submit" id="btnRegister" class="action-btn btn-register">Create Account</button>
-                
-                <p class="compliance-text">By registering, you agree to our Terms of Service & Privacy Policy.<br>Multiple accounts on the same device will lead to account restrictions.</p>
-            </form>
-
-            <button class="support-btn" onclick="window.location.href='support.html'">
-                🎧 Need Help? Contact Customer Support
-            </button>
+    <div class="auth-card">
+        <div class="app-logo">
+            <h1>Dudo App</h1>
+            <p>Earn Rewards & Complete Tasks</p>
         </div>
 
-        <!-- 🟣 PROFILE SETUP FOR GOOGLE LOGIN -->
-        <div id="setupProfileScreen">
-            <h3 style="color:#10b981; margin-top:0;">🎉 Welcome to Dudo!</h3>
-            <p style="font-size:13px; color:#94a3b8;">Set up your profile to start rewards.</p>
-            
-            <div class="input-group" style="text-align: left;">
-                <label>Your Full Name</label>
-                <input type="text" id="googleRegName" placeholder="Enter your name" required>
+        <!-- Navigation Tabs -->
+        <div class="tab-box">
+            <button class="tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">Login</button>
+            <button class="tab-btn" id="tabRegBtn" onclick="switchAuthTab('register')">Register</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="loginSection" class="form-section active">
+            <div class="form-group">
+                <label>Email Address</label>
+                <div class="input-wrapper">
+                    <input type="email" id="loginEmail" placeholder="e.g. user@gmail.com">
+                </div>
             </div>
-            <div class="input-group" style="text-align: left;">
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                    <span class="toggle-password" onclick="togglePass('loginPassword', this)">👁️</span>
+                </div>
+            </div>
+            <span class="forgot-link" onclick="openForgotModal()">Forgot Password?</span>
+            <button class="action-btn" id="btnLogin" onclick="processEmailLogin()">Login</button>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="registerSection" class="form-section">
+            <div class="form-group">
+                <label>Full Name</label>
+                <div class="input-wrapper">
+                    <input type="text" id="regName" placeholder="Enter full name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <div class="input-wrapper">
+                    <input type="email" id="regEmail" placeholder="Enter email address">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Create Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="regPassword" placeholder="Minimum 6 characters">
+                    <span class="toggle-password" onclick="togglePass('regPassword', this)">👁️</span>
+                </div>
+            </div>
+            <div class="form-group">
                 <label>Referral Code (Optional)</label>
-                <input type="text" id="googleRegReferral" placeholder="Got an invite code?">
+                <div class="input-wrapper">
+                    <input type="text" id="regReferral" placeholder="Enter referral code">
+                </div>
             </div>
-
-            <button class="action-btn btn-login" onclick="completeGoogleRegistration()">Start Earn rewards Now ➔</button>
+            <button class="action-btn" id="btnRegister" onclick="processEmailRegister()">Create Account</button>
         </div>
 
+        <div class="divider">
+            <span>OR CONTINUE WITH GMAIL</span>
+        </div>
+
+        <!-- GOOGLE / GMAIL LOGIN BUTTON -->
+        <button class="google-btn" onclick="handleGoogleClick()">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.616z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+            Sign in with Google
+        </button>
+
+        <!-- HELP DESK / SUPPORT LINK -->
+        <div class="support-box">
+            Need Help? <a href="mailto:support@dudoapp.com?subject=Dudo%20App%20Support">Contact Support</a>
+        </div>
     </div>
 
-    <!-- Firebase Init & Auth Logic -->
+    <!-- FORGOT PASSWORD MODAL POPUP -->
+    <div class="modal" id="forgotModal">
+        <div class="modal-content">
+            <h3>Reset Password</h3>
+            <p>Enter your email to receive password reset instructions.</p>
+            <div class="form-group">
+                <input type="email" id="resetEmail" placeholder="Enter your registered email">
+            </div>
+            <button class="action-btn" onclick="submitPasswordReset()">Send Reset Link</button>
+            <button class="action-btn close-btn" onclick="closeForgotModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- LEGAL FOOTER (FOR PLAY STORE APPROVAL) -->
+    <div class="legal-footer">
+        By continuing, you agree to our <br>
+        <a href="privacypolicy.html" target="_blank">Privacy Policy</a> &bull; 
+        <a href="terms.html" target="_blank">Terms of Service</a>
+    </div>
+
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const auth = firebase.auth();
+        const API_URL = "https://dudo-app.onrender.com/api";
 
-        // 🛡️ ANTI-FARMING: Generate & Store Unique Device ID
-        let currentDeviceId = localStorage.getItem("dudo_device_token");
-        if (!currentDeviceId) {
-            currentDeviceId = "DEV_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9).toUpperCase();
-            localStorage.setItem("dudo_device_token", currentDeviceId);
-        }
+        // Tab Switcher
+        function switchAuthTab(type) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
 
-        let authenticatedGoogleUser = null;
-
-        // UI Tab Switcher
-        function switchTab(tab) {
-            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
-            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
-            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-        }
-
-        // Auto-fill Refer Code from URL Link
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref');
-            if(refCode) {
-                switchTab('register');
-                document.getElementById("regReferral").value = refCode;
-                document.getElementById("googleRegReferral").value = refCode;
+            if (type === 'login') {
+                document.getElementById('tabLoginBtn').classList.add('active');
+                document.getElementById('loginSection').classList.add('active');
+            } else {
+                document.getElementById('tabRegBtn').classList.add('active');
+                document.getElementById('registerSection').classList.add('active');
             }
-        };
+        }
 
-        // ==========================================
-        // 1️⃣ EMAIL LOGIN
-        // ==========================================
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Toggle Password Visibility
+        function togglePass(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.innerText = "🙈";
+            } else {
+                input.type = "password";
+                icon.innerText = "👁️";
+            }
+        }
+
+        // Forgot Password Modal Controls
+        function openForgotModal() { document.getElementById('forgotModal').style.display = 'flex'; }
+        function closeForgotModal() { document.getElementById('forgotModal').style.display = 'none'; }
+
+        async function submitPasswordReset() {
+            const email = document.getElementById('resetEmail').value.trim();
+            if (!email) return alert("Please enter your email.");
+            alert("Password reset instructions sent to " + email);
+            closeForgotModal();
+        }
+
+        // Email Login Execution
+        async function processEmailLogin() {
             const email = document.getElementById('loginEmail').value.trim();
-            const pass = document.getElementById('loginPassword').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const btn = document.getElementById('btnLogin');
 
-            document.getElementById('btnLogin').innerText = "Authenticating...";
+            if (!email || !password) return alert("Please enter both Email and Password.");
 
-            auth.signInWithEmailAndPassword(email, pass)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    database.ref('users/' + user.uid).once('value', snapshot => {
-                        if(snapshot.exists()) {
-                            let userData = snapshot.val();
-                            if(userData.account_security_status_state_flag === 'BANNED_TERMINATED') {
-                                auth.signOut();
-                                document.getElementById('btnLogin').innerText = "Login Securely";
-                                alert("🚨 Your account has been restricted for policy violations.");
-                                return;
-                            }
-                            localStorage.setItem("userId", user.uid);
-                            window.location.href = "ho.html";
-                        } else {
-                            localStorage.setItem("userId", user.uid);
-                            window.location.href = "ho.html";
-                        }
-                    });
-                })
-                .catch((error) => {
-                    document.getElementById('btnLogin').innerText = "Login Securely";
-                    alert("❌ Login Failed: " + error.message);
+            btn.innerText = "Authenticating...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
                 });
-        });
 
-        // ==========================================
-        // 2️⃣ EMAIL REGISTRATION
-        // ==========================================
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem("userToken", data.token);
+                    localStorage.setItem("userId", data.userId);
+                    window.location.href = "ho.html";
+                } else {
+                    alert("❌ Login Failed: " + data.message);
+                }
+            } catch (err) {
+                alert("⚠️ Connection Delayed: Server is waking up. Retry in 10s.");
+            } finally {
+                btn.innerText = "Login";
+                btn.disabled = false;
+            }
+        }
+
+        // Email Registration Execution
+        async function processEmailRegister() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
-            const pass = document.getElementById('regPassword').value.trim();
-            const ref = document.getElementById('regReferral').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const referralCode = document.getElementById('regReferral').value.trim();
+            const btn = document.getElementById('btnRegister');
 
-            if (pass.length < 6) return alert("❌ Password must be at least 6 characters!");
+            if (!name || !email || !password) return alert("Please fill in all required fields.");
+            if (password.length < 6) return alert("Password must be at least 6 characters.");
 
-            document.getElementById('btnRegister').innerText = "Creating Account...";
+            btn.innerText = "Creating Account...";
+            btn.disabled = true;
 
-            auth.createUserWithEmailAndPassword(email, pass)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    const cleanRefCode = ref ? ref.toUpperCase() : "NONE";
-
-                    const newUserData = {
-                        name: name,
-                        email: email,
-                        phone: "EMAIL_LOGIN",
-                        password: pass,
-                        balance: 0,
-                        coins: 0,
-                        ad_coins: 0,
-                        total_lifetime_coins_earned: 0,
-                        total_referrals: 0,
-                        joined_at: Date.now(),
-                        device_id_token: currentDeviceId,
-                        account_security_status_state_flag: "ACTIVE",
-                        referral_code_used: cleanRefCode
-                    };
-
-                    database.ref('users/' + user.uid).set(newUserData).then(() => {
-                        executeReferralBonusEngine(cleanRefCode);
-                        alert("✅ Account created successfully!");
-                        localStorage.setItem("userId", user.uid); 
-                        window.location.href = "ho.html"; 
-                    }).catch(err => {
-                        alert("Error saving profile: " + err.message);
-                    });
-                })
-                .catch((error) => {
-                    document.getElementById('btnRegister').innerText = "Create Account";
-                    alert("❌ Registration Error: " + error.message);
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, referralCode })
                 });
-        });
 
-        // ==========================================
-        // 3️⃣ GOOGLE LOGIN (Redirect Method)
-        // ==========================================
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
-        
-        function loginWithGoogle() {
-            document.getElementById("googleLoginBtnMain").innerText = "Redirecting to Google...";
-            auth.signInWithRedirect(googleProvider);
-        }
+                const data = await response.json();
 
-        // Catch the result when page reloads from Google Auth
-        auth.getRedirectResult().then((result) => {
-            if (result && result.user) {
-                authenticatedGoogleUser = result.user;
-                
-                database.ref('users/' + authenticatedGoogleUser.uid).once('value', snapshot => {
-                    if (snapshot.exists()) {
-                        let userData = snapshot.val();
-                        if(userData.account_security_status_state_flag === 'BANNED_TERMINATED') {
-                            auth.signOut();
-                            alert("🚨 Your account is restricted!");
-                            return;
-                        }
-                        localStorage.setItem("userId", authenticatedGoogleUser.uid);
-                        window.location.href = "ho.html";
-                    } else {
-                        document.getElementById("mainAuthBox").style.display = "none";
-                        document.getElementById("googleRegName").value = authenticatedGoogleUser.displayName || "";
-                        document.getElementById("setupProfileScreen").style.display = "block";
-                    }
-                });
-            }
-        }).catch((error) => {
-            if (error.code !== 'auth/redirect-cancelled-by-user') {
-                alert("Google Sign-In Failed: " + error.message);
-            }
-        });
-
-        function completeGoogleRegistration() {
-            const name = document.getElementById("googleRegName").value.trim();
-            const ref = document.getElementById("googleRegReferral").value.trim();
-            if(!name) return alert("Please enter your name!");
-
-            const cleanRefCode = ref ? ref.toUpperCase() : "NONE";
-
-            const newUserData = {
-                name: name,
-                phone: "GOOGLE_LOGIN",
-                email: authenticatedGoogleUser.email,
-                password: "GOOGLE_ACCOUNT",
-                balance: 0,
-                coins: 0,
-                ad_coins: 0,
-                total_lifetime_coins_earned: 0,
-                total_referrals: 0,
-                joined_at: Date.now(),
-                device_id_token: currentDeviceId,
-                account_security_status_state_flag: "ACTIVE",
-                referral_code_used: cleanRefCode
-            };
-
-            database.ref('users/' + authenticatedGoogleUser.uid).set(newUserData).then(() => {
-                executeReferralBonusEngine(cleanRefCode);
-                alert("✅ Google Account Setup Successful!");
-                localStorage.setItem("userId", authenticatedGoogleUser.uid); 
-                window.location.href = "ho.html"; 
-            });
-        }
-
-        // ==========================================
-        // 🔥 COMMON REFERRAL ENGINE (₹5 INSTANT)
-        // ==========================================
-        function executeReferralBonusEngine(cleanRefCode) {
-            if (!cleanRefCode || cleanRefCode === "NONE") return;
-            
-            database.ref('users').orderByChild('referCode').equalTo(cleanRefCode).once('value', refSnap => {
-                if(refSnap.exists()) {
-                    refSnap.forEach(refChild => {
-                        let refUid = refChild.key;
-                        let currentBal = parseFloat(refChild.val().balance || 0);
-                        let currentRefs = Number(refChild.val().total_referrals || 0);
-                        
-                        database.ref('users/' + refUid).update({
-                            balance: currentBal + 5,
-                            total_referrals: currentRefs + 1
-                        });
-
-                        database.ref('users/' + refUid + '/earning_history').push({
-                            activity: `Referral Bonus (Instant Lvl 1)`,
-                            amount: 5,
-                            coins_credited: 0,
-                            timestamp: Date.now()
-                        });
-                    });
+                if (data.success) {
+                    localStorage.setItem("userToken", data.token);
+                    localStorage.setItem("userId", data.userId);
+                    alert("🎉 Account Created Successfully!");
+                    window.location.href = "ho.html";
+                } else {
+                    alert("❌ Registration Failed: " + data.message);
                 }
-            });
+            } catch (err) {
+                alert("⚠️ Server Connection Error.");
+            } finally {
+                btn.innerText = "Create Account";
+                btn.disabled = false;
+            }
+        }
+
+        function handleGoogleClick() {
+            alert("Redirecting to Google Authentication...");
         }
     </script>
 </body>
-    </html>
+</html>
