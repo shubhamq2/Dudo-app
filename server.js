@@ -1,4 +1,3 @@
-require('dotenv').config(); // Environment variables ke liye
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -110,7 +109,7 @@ app.post('/api/user/update-profile', async (req, res) => {
 // Update Balance & Coins (For 1v1 Battles, Games, Tasks)
 app.post('/api/user/update-balance', async (req, res) => {
   try {
-    const { userId, pointsToAdd, action } = req.body; // pointsToAdd can be negative (for entry fee) or positive (for winning)
+    const { userId, pointsToAdd, action } = req.body;
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ success: false });
 
