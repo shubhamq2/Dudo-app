@@ -4,61 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdGem Games - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-pink: #ef4444;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
         
         /* Premium Sync Header (AdGem Theme - Indigo) */
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3f51b5; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #3f51b5; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(63, 81, 181, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-left: 20px; }
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3f51b5; backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: #3f51b5; text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(63, 81, 181, 0.15); transition: 0.2s; }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-left: 20px; letter-spacing: 0.5px; }
         
-        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #3f51b5; font-weight: bold; cursor: pointer; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: #3f51b5; font-weight: bold; cursor: pointer; }
 
         /* Profile Balance Ribbon */
-        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, #0f172a, #1e293b); border: 2px solid #3f51b5; padding: 12px 20px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .balance-card span { font-size: 16px; }
-        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid #3f51b5; padding: 15px 20px; border-radius: 16px; margin-top: 18px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(63, 81, 181, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; }
 
         /* Banner Ads Slots */
-        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
-        .ad-slot-banner { width: 100%; min-height: 60px; background: #1e293b; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #3f51b5; box-sizing: border-box; }
+        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(63, 81, 181, 0.4); box-sizing: border-box; }
 
         /* Grid Layout Components */
-        .section-label { width: 92%; max-width: 440px; font-size: 13px; font-weight: 800; color: #3f51b5; text-transform: uppercase; letter-spacing: 0.8px; margin: 15px 0 8px 0; text-align: left; }
-        .grid-container { width: 92%; max-width: 440px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; box-sizing: border-box; margin-bottom: 15px; }
+        .section-label { width: 92%; max-width: 440px; font-size: 13.5px; font-weight: 800; color: #3f51b5; text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 10px 0; text-align: left; }
+        .grid-container { width: 92%; max-width: 440px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; box-sizing: border-box; margin-bottom: 18px; }
         
-        .zone-card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 20px 10px; text-align: center; color: #fff; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-decoration: none; }
-        .zone-card:active { transform: scale(0.96); border-color: #3f51b5; }
-        .zone-badge { position: absolute; top: 8px; right: 8px; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 20px; text-transform: uppercase; color: #fff; }
-        .badge-top { background: #ef4444; }
-        .badge-popular { background: #06b6d4; }
-        .badge-new { background: #10b981; }
+        .zone-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 12px; text-align: center; color: #fff; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.3); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-decoration: none; transition: 0.2s; backdrop-filter: blur(10px); }
+        .zone-card:active { transform: scale(0.96); border-color: #3f51b5; box-shadow: 0 4px 10px rgba(63, 81, 181, 0.4); }
+        .zone-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; color: #fff; }
+        .badge-top { background: var(--accent-pink); }
+        .badge-popular { background: var(--accent-cyan); }
+        .badge-new { background: var(--accent-green); }
         
-        .zone-icon { font-size: 32px; margin-bottom: 8px; }
-        .zone-card h3 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
-        .zone-card p { margin: 4px 0 0 0; font-size: 11px; color: #94a3b8; }
+        .zone-icon { font-size: 34px; margin-bottom: 10px; }
+        .zone-card h3 { margin: 0; font-size: 14.5px; font-weight: 800; color: #fff; }
+        .zone-card p { margin: 5px 0 0 0; font-size: 11.5px; color: var(--text-sub); }
 
         /* Notice Board Security Safe Box */
-        .security-box { width: 92%; max-width: 440px; border: 1px dashed #3f51b5; background: rgba(63, 81, 181, 0.05); border-radius: 12px; padding: 12px 15px; box-sizing: border-box; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; margin-bottom: 15px; }
+        .security-box { width: 92%; max-width: 440px; border: 1px dashed #3f51b5; background: rgba(63, 81, 181, 0.08); border-radius: 14px; padding: 15px 18px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-top: 15px; font-weight: 600; }
 
         /* Custom Modern Alert Modal Popup style */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; width: 80%; max-width: 350px; text-align: center; }
-        .custom-alert.success-border { border-color: #10b981; }
-        .custom-alert p { margin: 0 0 15px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
-        .custom-alert button { background: #ef4444; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .custom-alert.success-border button { background: #10b981; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
 
         /* 🎬 PREMIUM MODAL FOR ADGEM TASK INSTRUCTIONS */
-        .modal-overlay-adgem { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1001; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
-        .modal-card-adgem { width: 100%; max-width: 360px; background: #1e293b; border-radius: 24px; border: 1px solid #475569; padding: 25px 20px; box-sizing: border-box; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center; }
-        .modal-title-adgem { font-size: 18px; font-weight: 800; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .modal-desc-adgem { font-size: 13px; color: #cbd5e1; margin: 0 0 20px 0; text-align: left; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid #334155; line-height: 1.6; }
-        .adgem-action-btn { width: 100%; background: linear-gradient(to right, #3f51b5, #303f9f); color: #fff; border: none; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
-        .adgem-action-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #334155; }
-        .close-adgem-modal { background: none; border: none; color: #ef4444; font-size: 13px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 15px; padding: 5px 10px; display: inline-block; }
+        .modal-overlay-adgem { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.9); z-index: 1001; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
+        .modal-card-adgem { width: 100%; max-width: 380px; background: var(--card-bg); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); padding: 25px 20px; box-sizing: border-box; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; }
+        .modal-title-adgem { font-size: 19px; font-weight: 900; color: #fff; margin: 0 0 15px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .modal-desc-adgem { font-size: 13.5px; color: #cbd5e1; margin: 0 0 22px 0; text-align: left; background: rgba(0,0,0,0.3); padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.6; }
+        .adgem-action-btn { width: 100%; background: linear-gradient(135deg, #3f51b5, #1e3a8a); color: #fff; border: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4); }
+        .adgem-action-btn:active:not(:disabled) { transform: scale(0.96); }
+        .adgem-action-btn:disabled { opacity: 0.6; cursor: not-allowed; background: #475569; box-shadow: none; }
+        .close-adgem-modal { background: none; border: none; color: var(--accent-pink); font-size: 13.5px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 18px; padding: 8px 15px; display: inline-block; transition: 0.2s; }
+        .close-adgem-modal:active { background: rgba(239, 68, 68, 0.1); border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -69,7 +86,7 @@
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
-    <!-- 🎬 PREMIUM DIJAIN: ADGEM TASK DESCRIPTION POPUP -->
+    <!-- 🎬 PREMIUM DESIGN: ADGEM TASK DESCRIPTION POPUP -->
     <div class="modal-overlay-adgem" id="adgemInstructionModal">
         <div class="modal-card-adgem">
             <div class="modal-title-adgem" id="modalTaskTitle">🎮 AdGem Offer</div>
@@ -82,14 +99,13 @@
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="ag_title">AdGem Games</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
             <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
             <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option><option value="ru">RU</option>
         </select>
     </div>
 
@@ -100,13 +116,11 @@
     
     <div class="ad-container-block">
         <!-- 📢 AD SLOT 1 -->
-        <div class="ad-slot-banner" id="adgemAdSlot1">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
         <!-- 📢 AD SLOT 2 -->
-        <div class="ad-slot-banner" id="adgemAdSlot2">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
     <div class="section-label" data-i18n="ag_label1">High Paying Game Offers</div>
@@ -158,41 +172,207 @@
 
     <div class="ad-container-block">
         <!-- 📢 AD SLOT 3 -->
-        <div class="ad-slot-banner" id="adgemAdSlot3">
-            <script type="text/javascript">atOptions = {'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
         <!-- 📢 AD SLOT 4 -->
-        <div class="ad-slot-banner" id="adgemAdSlot4">
-            <script type="text/javascript">atOptions = {'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
     <div class="security-box">
-        <span>🔒</span>
-        <span data-i18n="ag_security">AdGem strictly monitors for unauthorized activity. Using emulators, VPNs or multiple accounts will result in permanent account restriction and zero payout.</span>
+        <span style="font-size: 18px;">🔒</span>
+        <span data-i18n="ag_security">AdGem uses advanced tracking to verify tasks. Please complete the offers honestly. Using emulators, VPNs, or skipping steps will void your reward.</span>
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
-        const langData = {
-            "en": { "ag_title": "AdGem Games", "ag_label1": "High Paying Game Offers", "ag_label2": "Extra Micro Offers", "ag_games": "Play Games", "ag_games_desc": "Reach level & win big", "ag_apps": "Quick Apps", "ag_apps_desc": "Download & Open", "ag_survey": "Surveys", "ag_survey_desc": "Share your opinion", "ag_web": "Web Tasks", "ag_web_desc": "Register to earn", "ag_quizzes": "Brain Quizzes", "ag_quizzes_desc": "100% Score reward", "ag_premium": "Exclusive", "ag_premium_desc": "Secret VIP offers", "ag_top": "Highest Pay", "ag_pop": "Popular", "ag_new": "Easy", "ag_security": "AdGem strictly monitors for unauthorized activity. Using emulators, VPNs or multiple accounts will result in permanent account restriction and zero payout.", "err_early": "❌ Offer Cancelled! You left the game wall before 25 seconds.", "err_invalid": "❌ System Alert: Rapid tab switching detected. Stay on the game page.", "err_success": "🎉 Offer Initialized! 40 Coins added via ", "verifying": "Verifying sync... ", "start_task": "Start Playing (25s)",
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+       const langData = {
+            "en": { 
+                "ag_title": "AdGem Games", "ag_label1": "High Paying Game Offers", "ag_label2": "Extra Micro Offers", 
+                "ag_games": "Play Games", "ag_games_desc": "Reach level & win big", "ag_apps": "Quick Apps", "ag_apps_desc": "Download & Open", 
+                "ag_survey": "Surveys", "ag_survey_desc": "Share your opinion", "ag_web": "Web Tasks", "ag_web_desc": "Register to earn", 
+                "ag_quizzes": "Brain Quizzes", "ag_quizzes_desc": "100% Score reward", "ag_premium": "Exclusive", "ag_premium_desc": "Secret VIP offers", 
+                "ag_top": "Highest Pay", "ag_pop": "Popular", "ag_new": "Easy", 
+                "ag_security": "AdGem uses advanced tracking to verify tasks. Please complete the offers honestly. Using emulators, VPNs, or skipping steps will void your reward.", 
+                "err_early": "❌ Offer Incomplete! Please spend the required time on the offer page to claim your reward.", 
+                "err_invalid": "❌ Tracking Interrupted: Rapid tab switching detected. Please stay on the game page.", 
+                "err_success": "🎉 Offer Initialized! 40 Points added via ", "verifying": "Verifying sync... ", "start_task": "Start Playing (25s)",
                 "inst_games": "👉 <b>STEPS TO EARN:</b><br>1. Click the button to enter AdGem Game Wall.<br>2. Select a game and install it on your device.<br>3. Play and reach the required level to get rewarded.<br><br>⚠️ <i>Note: Only first-time installs of the game are eligible for rewards.</i>",
                 "inst_apps": "👉 <b>STEPS TO EARN:</b><br>1. Open the App Offerwall.<br>2. Install the app and open it for at least 3 minutes.<br>3. Wait on the tracking page for 25 seconds first.<br><br>⚠️ <i>Note: Re-installing old apps will fail the tracking system.</i>",
                 "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Click below to load the AdGem Offer.<br>2. Complete the required actions properly.<br>3. Stay active for 25 seconds to register your click.<br><br>⚠️ <i>Note: Genuine task completion ensures high payouts.</i>"
             },
-            "hi": { "ag_title": "एडजेम गेम्स", "ag_label1": "हाई पेइंग गेम्स", "ag_label2": "माइक्रो ऑफर्स", "ag_games": "गेम्स खेलें", "ag_games_desc": "लेवल पार करें और जीतें", "ag_apps": "क्विक ऐप्स", "ag_apps_desc": "डाउनलोड करें", "ag_survey": "सर्वेक्षण", "ag_survey_desc": "अपनी राय दें", "ag_web": "वेब टास्क", "ag_web_desc": "रजिस्टर करके कमाएं", "ag_quizzes": "ब्रेन क्विज़", "ag_quizzes_desc": "100% स्कोर पर इनाम", "ag_premium": "एक्सक्लूसिव", "ag_premium_desc": "सीक्रेट VIP ऑफर्स", "ag_top": "सबसे ज्यादा", "ag_pop": "लोकप्रिय", "ag_new": "आसान", "ag_security": "एडजेम असामान्य गतिविधि को मॉनिटर करता है। एमुलेटर या VPN का इस्तेमाल करने पर अकाउंट प्रतिबंधित हो जाएगा।", "err_early": "❌ ऑफर रद्द! आप 25 सेकंड से पहले बाहर आ गए।", "err_invalid": "❌ सिस्टम अलर्ट: बहुत जल्दी ऐप बदला गया। गेम पेज पर बने रहें।", "err_success": "🎉 टास्क शुरू हुआ! आपके वॉलेट में 40 कॉइन्स जोड़ दिए गए हैं: ", "verifying": "सिंक हो रहा है... ", "start_task": "खेलना शुरू करें (25s)",
+            "hi": { 
+                "ag_title": "एडजेम गेम्स", "ag_label1": "हाई पेइंग गेम्स", "ag_label2": "माइक्रो ऑफर्स", 
+                "ag_games": "गेम्स खेलें", "ag_games_desc": "लेवल पार करें और जीतें", "ag_apps": "क्विक ऐप्स", "ag_apps_desc": "डाउनलोड करें", 
+                "ag_survey": "सर्वेक्षण", "ag_survey_desc": "अपनी राय दें", "ag_web": "वेब टास्क", "ag_web_desc": "रजिस्टर करके कमाएं", 
+                "ag_quizzes": "ब्रेन क्विज़", "ag_quizzes_desc": "100% स्कोर पर इनाम", "ag_premium": "एक्सक्लूसिव", "ag_premium_desc": "सीक्रेट VIP ऑफर्स", 
+                "ag_top": "सबसे ज्यादा", "ag_pop": "लोकप्रिय", "ag_new": "आसान", 
+                "ag_security": "एडजेम ट्रैकिंग का इस्तेमाल करता है। कृपया ईमानदारी से टास्क पूरे करें। एमुलेटर या VPN का इस्तेमाल करने पर इनाम नहीं मिलेगा।", 
+                "err_early": "❌ ऑफर पूरा नहीं हुआ! कृपया इनाम पाने के लिए पेज पर आवश्यक समय बिताएं।", 
+                "err_invalid": "❌ ट्रैकिंग रद्द: कृपया गेम पेज पर ही रहें।", 
+                "err_success": "🎉 टास्क शुरू हुआ! आपके वॉलेट में 40 पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "सिंक हो रहा है... ", "start_task": "खेलना शुरू करें (25s)",
                 "inst_games": "👉 <b>पूरा करने के नियम:</b><br>1. एडजेम गेम वॉल खोलने के लिए क्लिक करें।<br>2. एक गेम चुनें और इंस्टॉल करें।<br>3. आवश्यक लेवल तक खेलें और इनाम जीतें।<br><br>⚠️ <i>ध्यान दें: केवल पहली बार इंस्टॉल करने पर ही पैसे मिलेंगे।</i>",
                 "inst_apps": "👉 <b>पूरा करने के नियम:</b><br>1. ऐप ऑफरवॉल खोलें।<br>2. ऐप इंस्टॉल करें और 3 मिनट तक इस्तेमाल करें।<br>3. ट्रैकिंग सिंक होने के लिए पहले 25 सेकंड इंतज़ार करें।<br><br>⚠️ <i>ध्यान दें: पुरानी ऐप्स को दोबारा इंस्टॉल करने पर कोई पैसा नहीं मिलेगा।</i>",
                 "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. एडजेम ऑफर लोड करने के लिए नीचे क्लिक करें।<br>2. आवश्यक काम सही ढंग से पूरा करें।<br>3. अपना क्लिक रजिस्टर करने के लिए 25 सेकंड तक रुकें।"
             },
-            "bn": { "ag_title": "অ্যাডজেম গেমস", "ag_label1": "হাই পেয়িং গেমস", "ag_label2": "মাইক্রো অফার", "ag_games": "গেম খেলুন", "ag_games_desc": "লেভেল পার করুন", "ag_apps": "কুইক অ্যাপস", "ag_apps_desc": "ডাউনলোড করুন", "ag_survey": "জরিপ", "ag_survey_desc": "মতামত দিন", "ag_web": "ওয়েব টাস্ক", "ag_web_desc": "রেজিস্টার করুন", "ag_quizzes": "ব্রেইন কুইজ", "ag_quizzes_desc": "১০০% স্কোরে इनाम", "ag_premium": "এক্সক্লুসিভ", "ag_premium_desc": "ভিআইপি অফার", "ag_top": "সর্বোচ্চ", "ag_pop": "জনপ্রিয়", "ag_new": "সহজ", "ag_security": "অ্যাডজেম অননুমোদিত কার্যকলাপ মনিটর করে। ভিপিএন ব্যবহার করলে অ্যাকাউন্ট সীমাবদ্ধ হবে।", "err_early": "❌ অফার বাতিল! ২৫ সেকেন্ডের আগে বন্ধ করেছেন।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: গেম পেজে থাকুন।", "err_success": "🎉 টাস্ক শুরু হয়েছে! ৪০ কয়েন যোগ করা হয়েছে: ", "verifying": "সিঙ্ক হচ্ছে... ", "start_task": "খেলা শুরু করুন (25s)",
+            "bn": { 
+                "ag_title": "অ্যাডজেম গেমস", "ag_label1": "হাই পেয়িং গেমস", "ag_label2": "মাইক্রো অফার", 
+                "ag_games": "গেম খেলুন", "ag_games_desc": "লেভেল পার করুন", "ag_apps": "কুইক অ্যাপস", "ag_apps_desc": "ডাউনলোড করুন", 
+                "ag_survey": "জরিপ", "ag_survey_desc": "মতামত দিন", "ag_web": "ওয়েব টাস্ক", "ag_web_desc": "রেজিস্টার করুন", 
+                "ag_quizzes": "ব্রেইন কুইজ", "ag_quizzes_desc": "১০০% স্কোরে इनाम", "ag_premium": "এক্সক্লুসিভ", "ag_premium_desc": "ভিআইপি অফার", 
+                "ag_top": "সর্বোচ্চ", "ag_pop": "জনপ্রিয়", "ag_new": "সহজ", 
+                "ag_security": "অ্যাডজেম ট্র্যাকিং ব্যবহার করে। সততার সাথে টাস্ক পূরণ করুন। ভিপিএন ব্যবহার করলে পয়েন্ট পাবেন না।", 
+                "err_early": "❌ অফার অসম্পূর্ণ! পুরস্কার পেতে পেজে আরও সময় দিন।", 
+                "err_invalid": "❌ সিস্টেম অ্যালার্ট: গেম পেজেই থাকুন।", 
+                "err_success": "🎉 টাস্ক শুরু হয়েছে! ৪০ পয়েন্ট যোগ করা হয়েছে: ", "verifying": "সিঙ্ক হচ্ছে... ", "start_task": "খেলা শুরু করুন (25s)",
                 "inst_games": "👉 <b>নির্দেশনা:</b><br>১. গেম ওয়াল খুলতে ক্লিক করুন।<br>২. গেম খেলুন এবং লেভেলে পৌঁছান।<br><br>⚠️ <i>প্রথমবার ইনস্টল করলেই কেবল পুরস্কার পাবেন।</i>",
-                "inst_apps": "👉 <b>নির্দেশনা:</b><br>১. অ্যাপ ইনস্টল করুন।<br>২. অন্তত ২৫ সেকেন্ড অপেক্ষা করুন।",
+                "inst_apps": "👉 <b>নির্দেশনা:</b><br>১. অ্যাপ ইনস্টল করুন এবং ৩ মিনিট ব্যবহার করুন।<br>২. প্রথমে ২৫ সেকেন্ড অপেক্ষা করুন।",
                 "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. অফার খুলতে ক্লিক করুন।<br>২. নিয়ম মেনে কাজ করুন।<br>৩. ২৫ সেকেন্ড অপেক্ষা করুন।"
+            },
+            "te": { 
+                "ag_title": "యాడ్జెం గేమ్స్", "ag_label1": "ఎక్కువ చెల్లించే గేమ్స్", "ag_label2": "మైక్రో ఆఫర్‌లు", 
+                "ag_games": "గేమ్స్ ఆడండి", "ag_games_desc": "స్థాయి చేరుకోండి", "ag_apps": "క్విక్ యాప్స్", "ag_apps_desc": "డౌన్‌లోడ్ చేయండి", 
+                "ag_survey": "సర్వేలు", "ag_survey_desc": "మీ అభిప్రాయం", "ag_web": "వెబ్ పనులు", "ag_web_desc": "నమోదు చేయండి", 
+                "ag_quizzes": "క్విజ్‌లు", "ag_quizzes_desc": "100% స్కోర్", "ag_premium": "ఎక్స్‌క్లూజివ్", "ag_premium_desc": "VIP ఆఫర్‌లు", 
+                "ag_top": "అత్యధికం", "ag_pop": "పాపులర్", "ag_new": "సులభం", 
+                "ag_security": "దయచేసి టాస్క్‌లను నిజాయితీగా పూర్తి చేయండి. VPN వాడితే పాయింట్లు రావు.", 
+                "err_early": "❌ ఆఫర్ అసంపూర్ణం! దయచేసి పేజీలో సమయం గడపండి.", 
+                "err_invalid": "❌ దయచేసి గేమ్ పేజీలోనే ఉండండి.", 
+                "err_success": "🎉 ఆఫర్ ప్రారంభించబడింది! 40 పాయింట్లు జోడించబడ్డాయి: ", "verifying": "సింక్ అవుతోంది... ", "start_task": "ప్రారంభించండి (25s)",
+                "inst_games": "👉 <b>నియమాలు:</b><br>1. గేమ్ వాల్ తెరవండి.<br>2. గేమ్ ఆడి లెవెల్ చేరుకోండి.<br>⚠️ <i>మొదటిసారి ఇన్‌స్టాల్ చేస్తేనే రివార్డ్ వస్తుంది.</i>",
+                "inst_apps": "👉 <b>నియమాలు:</b><br>1. యాప్ ఇన్‌స్టాల్ చేసి 3 నిమిషాలు వాడండి.<br>2. ముందుగా 25 సెకన్లు వేచి ఉండండి.",
+                "inst_generic": "👉 <b>నియమాలు:</b><br>1. ఆఫర్ తెరవండి.<br>2. పని పూర్తి చేయండి.<br>3. 25 సెకన్లు వేచి ఉండండి."
+            },
+            "mr": { 
+                "ag_title": "अॅडजेम गेम्स", "ag_label1": "हाय पेइंग गेम्स", "ag_label2": "मायक्रो ऑफर्स", 
+                "ag_games": "गेम्स खेळा", "ag_games_desc": "लेव्हल गाठा", "ag_apps": "क्विक अॅप्स", "ag_apps_desc": "डाउनलोड करा", 
+                "ag_survey": "सर्वेक्षण", "ag_survey_desc": "मत द्या", "ag_web": "वेब टास्क", "ag_web_desc": "रजिस्टर करा", 
+                "ag_quizzes": "ब्रेन क्विझ", "ag_quizzes_desc": "100% स्कोअर", "ag_premium": "विशेष", "ag_premium_desc": "VIP ऑफर्स", 
+                "ag_top": "सर्वोच्च", "ag_pop": "लोकप्रिय", "ag_new": "सोपे", 
+                "ag_security": "कृपया प्रामाणिकपणे टास्क पूर्ण करा. VPN वापरल्यास पॉइंट्स मिळणार नाहीत.", 
+                "err_early": "❌ ऑफर अपूर्ण! कृपया पेजवर वेळ घालवा.", 
+                "err_invalid": "❌ कृपया गेम पेजवरच राहा.", 
+                "err_success": "🎉 ऑफर सुरू! 40 पॉइंट्स जोडले गेले: ", "verifying": "सिंक होत आहे... ", "start_task": "खेळायला सुरुवात करा (25s)",
+                "inst_games": "👉 <b>नियम:</b><br>1. गेम वॉल उघडा.<br>2. गेम खेळून लेव्हल गाठा.<br>⚠️ <i>पहिल्यांदाच इन्स्टॉल केल्यावर रिवॉर्ड मिळेल.</i>",
+                "inst_apps": "👉 <b>नियम:</b><br>1. अॅप इन्स्टॉल करून 3 मिनिटे वापरा.<br>2. आधी 25 सेकंद थांबा.",
+                "inst_generic": "👉 <b>नियम:</b><br>1. ऑफर उघडा.<br>2. काम पूर्ण करा.<br>3. 25 सेकंद थांबा."
+            },
+            "ta": { 
+                "ag_title": "AdGem விளையாட்டுகள்", "ag_label1": "அதிக வருமானம் தரும் விளையாட்டுகள்", "ag_label2": "சிறிய சலுகைகள்", 
+                "ag_games": "விளையாடு", "ag_games_desc": "நிலை அடைந்து வெல்", "ag_apps": "விரைவான செயலிகள்", "ag_apps_desc": "பதிவிறக்கு", 
+                "ag_survey": "ஆய்வுகள்", "ag_survey_desc": "கருத்து கூறு", "ag_web": "வலைப் பணிகள்", "ag_web_desc": "பதிவு செய்", 
+                "ag_quizzes": "வினாடி வினா", "ag_quizzes_desc": "100% மதிப்பெண்", "ag_premium": "சிறப்பு", "ag_premium_desc": "VIP சலுகைகள்", 
+                "ag_top": "அதிகபட்சம்", "ag_pop": "பிரபலமானவை", "ag_new": "எளிதானது", 
+                "ag_security": "பணிகளை நேர்மையாக முடிக்கவும். VPN பயன்படுத்தினால் புள்ளிகள் கிடைக்காது.", 
+                "err_early": "❌ சலுகை முற்றுபெறவில்லை! பக்கத்தில் நேரத்தை செலவிடவும்.", 
+                "err_invalid": "❌ விளையாட்டுப் பக்கத்திலேயே இருக்கவும்.", 
+                "err_success": "🎉 சலுகை தொடங்கியது! 40 புள்ளிகள் சேர்க்கப்பட்டன: ", "verifying": "சரிபார்க்கிறது... ", "start_task": "தொடங்கு (25s)",
+                "inst_games": "👉 <b>விதிகள்:</b><br>1. கேம் வாலைத் திறக்கவும.<br>2. நிலை அடையவும்.<br>⚠️ <i>முதல் முறை மட்டுமே புள்ளிகள் கிடைக்கும்.</i>",
+                "inst_apps": "👉 <b>விதிகள்:</b><br>1. செயலியை பதிவிறக்கம் செய்து 3 நிமிடம் பயன்படுத்தவும்.<br>2. 25 விநாடிகள் காத்திருக்கவும்.",
+                "inst_generic": "👉 <b>விதிகள்:</b><br>1. சலுகையைத் திறக்கவும்.<br>2. பணியை முடிக்கவும்.<br>3. 25 விநாடிகள் காத்திருக்கவும்."
+            },
+            "ur": { 
+                "ag_title": "ایڈجیم گیمز", "ag_label1": "زیادہ کمانے والے گیمز", "ag_label2": "مائیکرو آفرز", 
+                "ag_games": "گیمز کھیلیں", "ag_games_desc": "لیول پار کریں", "ag_apps": "ایپس ڈاؤن لوڈ", "ag_apps_desc": "ڈاؤن لوڈ اور اوپن", 
+                "ag_survey": "سروے", "ag_survey_desc": "اپنی رائے دیں", "ag_web": "ویب ٹاسک", "ag_web_desc": "رجسٹر کریں", 
+                "ag_quizzes": "کوئز", "ag_quizzes_desc": "100٪ سکور کا انعام", "ag_premium": "خاص", "ag_premium_desc": "وی آئی پی آفرز", 
+                "ag_top": "سب سے زیادہ", "ag_pop": "مقبول", "ag_new": "آسان", 
+                "ag_security": "ایمانداری سے ٹاسک مکمل کریں۔ وی پی این استعمال کرنے پر انعام نہیں ملے گا۔", 
+                "err_early": "❌ آفر نامکمل! براہ کرم صفحے پر وقت گزاریں۔", 
+                "err_invalid": "❌ براہ کرم گیم پیج پر رہیں۔", 
+                "err_success": "🎉 آفر شروع! 40 پوائنٹس شامل کر دیے گئے: ", "verifying": "تصدیق ہو رہی ہے... ", "start_task": "شروع کریں (25s)",
+                "inst_games": "👉 <b>قواعد:</b><br>1. گیم وال کھولیں۔<br>2. مطلوبہ لیول تک کھیلیں۔<br>⚠️ <i>صرف پہلی بار انسٹال کرنے پر انعام ملے گا۔</i>",
+                "inst_apps": "👉 <b>قواعد:</b><br>1. ایپ انسٹال کریں اور 3 منٹ تک استعمال کریں۔<br>2. پہلے 25 سیکنڈ انتظار کریں۔",
+                "inst_generic": "👉 <b>قواعد:</b><br>1. آفر کھولیں۔<br>2. ٹاسک مکمل کریں۔<br>3. 25 سیکنڈ انتظار کریں۔"
+            },
+            "gu": { 
+                "ag_title": "એડજેમ ગેમ્સ", "ag_label1": "હાઇ પેઇંગ ગેમ્સ", "ag_label2": "માઇક્રો ઓફર્સ", 
+                "ag_games": "ગેમ્સ રમો", "ag_games_desc": "લેવલ પાર કરો", "ag_apps": "ક્વિક એપ્સ", "ag_apps_desc": "ડાઉનલોડ કરો", 
+                "ag_survey": "સર્વેક્ષણ", "ag_survey_desc": "તમારો અભિપ્રાય આપો", "ag_web": "વેબ ટાસ્ક", "ag_web_desc": "રજિસ્ટર કરો", 
+                "ag_quizzes": "ક્વિઝ", "ag_quizzes_desc": "100% સ્કોર", "ag_premium": "ખાસ", "ag_premium_desc": "VIP ઓફર્સ", 
+                "ag_top": "સૌથી વધુ", "ag_pop": "લોકપ્રિય", "ag_new": "સરળ", 
+                "ag_security": "કૃપા કરીને પ્રામાણિકપણે કાર્યો પૂર્ણ કરો. VPN નો ઉપયોગ કરવાથી ઇનામ મળશે નહીં.", 
+                "err_early": "❌ ઓફર અધૂરી! કૃપા કરીને પેજ પર સમય વિતાવો.", 
+                "err_invalid": "❌ કૃપા કરીને ગેમ પેજ પર જ રહો.", 
+                "err_success": "🎉 ઓફર શરૂ! 40 પોઇન્ટ્સ ઉમેરવામાં આવ્યા: ", "verifying": "ચકાસણી... ", "start_task": "શરૂ કરો (25s)",
+                "inst_games": "👉 <b>નિયમો:</b><br>1. ગેમ વોલ ખોલો.<br>2. ગેમ રમીને લેવલ સુધી પહોંચો.<br>⚠️ <i>ફક્ત પ્રથમ વખત ઇન્સ્ટોલ કરવાથી જ ઇનામ મળશે.</i>",
+                "inst_apps": "👉 <b>નિયમો:</b><br>1. એપ ઇન્સ્ટોલ કરીને 3 મિનિટ માટે વાપરો.<br>2. પહેલા 25 સેકન્ડ રાહ જુઓ.",
+                "inst_generic": "👉 <b>નિયમો:</b><br>1. ઓફર ખોલો.<br>2. કાર્ય પૂર્ણ કરો.<br>3. 25 સેકન્ડ રાહ જુઓ."
+            },
+            "es": { 
+                "ag_title": "Juegos AdGem", "ag_label1": "Altas Recompensas", "ag_label2": "Micro Ofertas", 
+                "ag_games": "Jugar Juegos", "ag_games_desc": "Alcanza el nivel", "ag_apps": "Apps Rápidas", "ag_apps_desc": "Descargar", 
+                "ag_survey": "Encuestas", "ag_survey_desc": "Tu opinión", "ag_web": "Tareas Web", "ag_web_desc": "Regístrate", 
+                "ag_quizzes": "Quizzes", "ag_quizzes_desc": "100% Puntuación", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP", 
+                "ag_top": "Top", "ag_pop": "Popular", "ag_new": "Fácil", 
+                "ag_security": "Completa las tareas honestamente. Usar VPN anulará tu recompensa.", 
+                "err_early": "❌ ¡Incompleto! Pasa más tiempo en la página.", 
+                "err_invalid": "❌ Quédate en la página del juego.", 
+                "err_success": "🎉 ¡Oferta iniciada! 40 Puntos añadidos: ", "verifying": "Verificando... ", "start_task": "Comenzar (25s)",
+                "inst_games": "👉 <b>PASOS:</b><br>1. Abre el muro de juegos.<br>2. Alcanza el nivel requerido.<br>⚠️ <i>Solo para nuevas instalaciones.</i>",
+                "inst_apps": "👉 <b>PASOS:</b><br>1. Instala la app y úsala 3 minutos.<br>2. Espera 25 segundos primero.",
+                "inst_generic": "👉 <b>PASOS:</b><br>1. Abre la oferta.<br>2. Completa la tarea.<br>3. Espera 25 segundos."
+            },
+            "fr": { 
+                "ag_title": "Jeux AdGem", "ag_label1": "Hautes Récompenses", "ag_label2": "Micro Offres", 
+                "ag_games": "Jouer", "ag_games_desc": "Atteindre le niveau", "ag_apps": "Apps Rapides", "ag_apps_desc": "Télécharger", 
+                "ag_survey": "Sondages", "ag_survey_desc": "Votre avis", "ag_web": "Tâches Web", "ag_web_desc": "S'inscrire", 
+                "ag_quizzes": "Quiz", "ag_quizzes_desc": "Score 100%", "ag_premium": "Exclusif", "ag_premium_desc": "Offres VIP", 
+                "ag_top": "Top", "ag_pop": "Populaire", "ag_new": "Facile", 
+                "ag_security": "Complétez honnêtement. L'utilisation d'un VPN annulera votre récompense.", 
+                "err_early": "❌ Incomplet ! Passez plus de temps sur la page.", 
+                "err_invalid": "❌ Restez sur la page du jeu.", 
+                "err_success": "🎉 Offre lancée ! 40 Points ajoutés: ", "verifying": "Vérification... ", "start_task": "Commencer (25s)",
+                "inst_games": "👉 <b>ÉTAPES:</b><br>1. Ouvrez le mur de jeux.<br>2. Atteignez le niveau requis.<br>⚠️ <i>Pour les nouvelles installations uniquement.</i>",
+                "inst_apps": "👉 <b>ÉTAPES:</b><br>1. Installez et utilisez 3 minutes.<br>2. Attendez 25 secondes d'abord.",
+                "inst_generic": "👉 <b>ÉTAPES:</b><br>1. Ouvrez l'offre.<br>2. Complétez la tâche.<br>3. Attendez 25 secondes."
+            },
+            "ar": { 
+                "ag_title": "ألعاب AdGem", "ag_label1": "ألعاب ذات دفع عالي", "ag_label2": "عروض صغيرة", 
+                "ag_games": "العب الألعاب", "ag_games_desc": "الوصول إلى المستوى", "ag_apps": "تطبيقات سريعة", "ag_apps_desc": "تحميل", 
+                "ag_survey": "استطلاعات", "ag_survey_desc": "رأيك", "ag_web": "مهام الويب", "ag_web_desc": "سجل لتربح", 
+                "ag_quizzes": "اختبارات", "ag_quizzes_desc": "درجة 100%", "ag_premium": "حصري", "ag_premium_desc": "عروض VIP", 
+                "ag_top": "الأعلى", "ag_pop": "شائع", "ag_new": "سهل", 
+                "ag_security": "أكمل المهام بصدق. استخدام VPN سيلغي مكافأتك.", 
+                "err_early": "❌ غير مكتمل! يرجى قضاء المزيد من الوقت.", 
+                "err_invalid": "❌ يرجى البقاء في صفحة اللعبة.", 
+                "err_success": "🎉 بدأت العرض! تم إضافة 40 نقطة: ", "verifying": "جارِ التحقق... ", "start_task": "ابدأ (25s)",
+                "inst_games": "👉 <b>الخطوات:</b><br>1. افتح جدار الألعاب.<br>2. العب للوصول للمستوى.<br>⚠️ <i>للتحميلات الجديدة فقط.</i>",
+                "inst_apps": "👉 <b>الخطوات:</b><br>1. قم بتثبيت التطبيق واستخدمه لـ 3 دقائق.<br>2. انتظر 25 ثانية أولاً.",
+                "inst_generic": "👉 <b>الخطوات:</b><br>1. افتح العرض.<br>2. أكمل المهمة.<br>3. انتظر 25 ثانية."
+            },
+            "pt": { 
+                "ag_title": "Jogos AdGem", "ag_label1": "Altas Recompensas", "ag_label2": "Micro Ofertas", 
+                "ag_games": "Jogar", "ag_games_desc": "Alcance o nível", "ag_apps": "Apps Rápidos", "ag_apps_desc": "Baixar", 
+                "ag_survey": "Pesquisas", "ag_survey_desc": "Sua opinião", "ag_web": "Tarefas Web", "ag_web_desc": "Registrar", 
+                "ag_quizzes": "Quizzes", "ag_quizzes_desc": "100% Pontuação", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP", 
+                "ag_top": "Topo", "ag_pop": "Popular", "ag_new": "Fácil", 
+                "ag_security": "Complete honestamente. O uso de VPN anulará sua recompensa.", 
+                "err_early": "❌ Incompleto! Passe mais tempo na página.", 
+                "err_invalid": "❌ Fique na página do jogo.", 
+                "err_success": "🎉 Oferta iniciada! 40 Pontos adicionados: ", "verifying": "Verificando... ", "start_task": "Começar (25s)",
+                "inst_games": "👉 <b>PASSOS:</b><br>1. Abra a parede de jogos.<br>2. Alcance o nível exigido.<br>⚠️ <i>Apenas para novas instalações.</i>",
+                "inst_apps": "👉 <b>PASSOS:</b><br>1. Instale e use por 3 minutos.<br>2. Aguarde 25 segundos primeiro.",
+                "inst_generic": "👉 <b>PASSOS:</b><br>1. Abra a oferta.<br>2. Complete a tarefa.<br>3. Aguarde 25 segundos."
+            },
+            "ru": { 
+                "ag_title": "Игры AdGem", "ag_label1": "Высокая оплата", "ag_label2": "Микро офферы", 
+                "ag_games": "Играть", "ag_games_desc": "Достигни уровня", "ag_apps": "Приложения", "ag_apps_desc": "Скачать", 
+                "ag_survey": "Опросы", "ag_survey_desc": "Ваше мнение", "ag_web": "Веб задания", "ag_web_desc": "Регистрация", 
+                "ag_quizzes": "Викторины", "ag_quizzes_desc": "100% Счет", "ag_premium": "Эксклюзив", "ag_premium_desc": "VIP офферы", 
+                "ag_top": "Топ", "ag_pop": "Популярно", "ag_new": "Легко", 
+                "ag_security": "Выполняйте задания честно. Использование VPN аннулирует награду.", 
+                "err_early": "❌ Не завершено! Проведите больше времени на странице.", 
+                "err_invalid": "❌ Оставайтесь на странице игры.", 
+                "err_success": "🎉 Оффер начат! Добавлено 40 очков: ", "verifying": "Проверка... ", "start_task": "Начать (25s)",
+                "inst_games": "👉 <b>ШАГИ:</b><br>1. Откройте стену игр.<br>2. Достигните нужного уровня.<br>⚠️ <i>Только для новых установок.</i>",
+                "inst_apps": "👉 <b>ШАГИ:</b><br>1. Установите и используйте 3 минуты.<br>2. Сначала подождите 25 секунд.",
+                "inst_generic": "👉 <b>ШАГИ:</b><br>1. Откройте оффер.<br>2. Выполните задание.<br>3. Подождите 25 секунд."
             }
         };
-
         function changeLanguage(langCode) {
             localStorage.setItem("selectedLang", langCode);
             const transObj = langData[langCode] || langData["en"];
@@ -202,25 +382,11 @@
             });
             document.getElementById("appLanguage").value = langCode;
         }
-    </script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
-        // 🔥 DYNAMIC ROUTING MAP FOR ALL 6 ADGEM AD CATEGORIES Control Room Binding
+        // 🔥 DYNAMIC ROUTING MAP FOR ALL ADGEM CATEGORIES (Fetched from Admin)
         let adgemLinksAdminConfig = {
             games: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
             apps: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
@@ -230,51 +396,50 @@
             premium: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
         };
 
-        // Connects to Firebase global smartlink nodes (Supports AdGem Specific Links)
-        database.ref('global_system_runtime_configurations/watch_ads_configuration').on('value', (snap) => {
-            if (snap.exists()) {
-                let dbData = snap.val();
-                Object.keys(adgemLinksAdminConfig).forEach(key => {
-                    if (dbData[`adgem_${key}`]) adgemLinksAdminConfig[key] = dbData[`adgem_${key}`];
-                    // Fallback to global link if specific format link is missing
-                    else if (dbData.global_smartlink) adgemLinksAdminConfig[key] = dbData.global_smartlink;
-                });
-            }
-        });
-
-        // 4 Banners dynamic layout injector safely matching framework
-        database.ref('global_system_runtime_configurations/watch_ads_banner_slots').on('value', (snap) => {
-            if (snap.exists()) {
-                let banners = snap.val();
-                if (banners.slot1_html && banners.slot1_html.trim() !== "") { let s1 = document.getElementById("adgemAdSlot1"); if (s1) { s1.innerHTML = banners.slot1_html; runScripts(s1); } }
-                if (banners.slot2_html && banners.slot2_html.trim() !== "") { let s2 = document.getElementById("adgemAdSlot2"); if (s2) { s2.innerHTML = banners.slot2_html; runScripts(s2); } }
-                if (banners.slot3_html && banners.slot3_html.trim() !== "") { let s3 = document.getElementById("adgemAdSlot3"); if (s3) { s3.innerHTML = banners.slot3_html; runScripts(s3); } }
-                if (banners.slot4_html && banners.slot4_html.trim() !== "") { let s4 = document.getElementById("adgemAdSlot4"); if (s4) { s4.innerHTML = banners.slot4_html; runScripts(s4); } }
-            }
-        });
-
-        function runScripts(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
-            }
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            database.ref('users/' + uid).on('value', (snap) => {
-                if(snap.exists()) {
-                    let d = snap.val();
-                    document.getElementById("liveUserCoins").innerText = d.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (d.balance || 0).toFixed(2);
-                }
-            });
+            fetchDataFromAdminServer();
         });
+
+        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch Profile Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // 2. Fetch Admin Banners and Smartlinks
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    // Inject Dynamic Banners
+                    if (confData.banners) {
+                        for(let i=1; i<=4; i++) {
+                            let slot = document.getElementById(`adminBannerSlot${i}`);
+                            if(slot && confData.banners[i-1]) slot.innerHTML = confData.banners[i-1];
+                        }
+                    }
+                    // Setup Smartlinks
+                    if (confData.globalSmartlink) {
+                        Object.keys(adgemLinksAdminConfig).forEach(key => {
+                            adgemLinksAdminConfig[key] = confData.globalSmartlink;
+                        });
+                    }
+                }
+            } catch (err) {
+                console.log("Using default cached configuration.");
+            }
+        }
 
         // 🔥 STATE VEHICLE PARAMETERS FOR ACTIVE TASK VIEWPORT
         let currentActiveTaskKey = "";
@@ -285,8 +450,7 @@
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let langBlock = langData[currentLang] || langData["en"];
-            let translatedMsg = langBlock[msgKey] || langData["en"][msgKey];
+            let translatedMsg = langData[currentLang][msgKey] || langData["en"][msgKey];
 
             const alertBox = document.getElementById("customAlertBox");
             const overlay = document.getElementById("alertOverlay");
@@ -311,7 +475,6 @@
 
             document.getElementById("modalTaskTitle").innerHTML = `${icon} ${prettyTitle}`;
             
-            // Map individual instructional arrays dynamically
             let instructionHTMLKey = `inst_${taskKey}`;
             if (taskKey !== 'games' && taskKey !== 'apps') {
                 instructionHTMLKey = "inst_generic";
@@ -331,17 +494,14 @@
             activeWatchSession = null;
         }
 
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC (25 SECONDS)
         function executeAdgemTaskRedirection() {
             let taskKey = currentActiveTaskKey;
-            activeWatchSession = {
-                taskKey: taskKey,
-                isValid: true
-            };
+            activeWatchSession = { taskKey: taskKey, isValid: true };
 
             const startBtn = document.getElementById("btnStartAdgemTask");
             let lang = localStorage.getItem("selectedLang") || "en";
-            let transObj = langData[lang] || langData["en"];
-            let verifyText = transObj["verifying"] || "Verifying sync... ";
+            let verifyText = langData[lang]["verifying"] || "Verifying sync... ";
 
             startBtn.disabled = true;
 
@@ -349,7 +509,6 @@
             let targetDestinationUrl = adgemLinksAdminConfig[taskKey];
             targetWindow = window.open(targetDestinationUrl, '_blank', 'noopener,noreferrer');
 
-            // 🚀 SYSTEM TIMER SHIELD LOGIC (25 SECONDS)
             let countdownTime = 25;
             totalSecondsOpen = 0;
             
@@ -359,7 +518,7 @@
                 countdownTime--;
                 startBtn.innerText = `${verifyText}(${countdownTime}s)`;
 
-                // Validation Check 1: User closed tab early before 25s execution
+                // Safe Validation 1: User closed tab early before 25s execution
                 if (targetWindow && targetWindow.closed) {
                     clearInterval(offerTimer);
                     closeAdgemInstructionModal();
@@ -368,7 +527,7 @@
                     return;
                 }
 
-                // Validation Check 2: Invalid rapid app swapping shield
+                // Safe Validation 2: Invalid rapid app swapping shield
                 if (!document.hidden) {
                     if (totalSecondsOpen < 24) { 
                         clearInterval(offerTimer);
@@ -388,44 +547,35 @@
             }, 1000);
         }
 
-        function evaluateAdgemTaskReward(taskKey) {
+        // 💰 REWARD SYNC API
+        async function evaluateAdgemTaskReward(taskKey) {
             document.getElementById("adgemInstructionModal").style.display = "none";
             if (!activeWatchSession || !activeWatchSession.isValid) { activeWatchSession = null; return; }
 
             let nameDisplay = taskKey.toUpperCase();
 
-            // Safe Database Ledger Transaction
-            database.ref('users/' + uid).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    let oldCoins = snapshot.val().coins || 0;
-                    let oldBalance = snapshot.val().balance || 0;
-
-                    database.ref('users/' + uid).update({
-                        coins: oldCoins + 40,  // AdGem Engagement base 40 Coins 
-                        balance: oldBalance + 0.40
-                    }).then(() => {
-                        showCustomAlert("err_success", nameDisplay, true);
-                        
-                        // 🔥 SYNC BACK TO DAILY CHECKIN LOG BAR TASK ENGINE (t2 for AdGem Watch/Engagement)
-                        database.ref('users/' + uid).once('value').then((freshSnap) => {
-                            if(freshSnap.exists()) {
-                                let currentDailyList = freshSnap.val().completed_daily_tasks_array_node || [];
-                                if(!currentDailyList.includes("t2")) {
-                                    currentDailyList.push("t2");
-                                    database.ref('users/' + uid).update({ completed_daily_tasks_array_node: currentDailyList });
-                                }
-                            }
-                        });
-
-                        // Push ledger details to history matrix
-                        database.ref('users/' + uid + '/earning_history').push({
-                            activity: `AdGem Offer Initialized: ${nameDisplay}`,
-                            coins_credited: 40,
-                            timestamp: Date.now()
-                        });
-                    });
+            try {
+                // Call API to add 40 Points and Sync Daily Task 't2'
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: 40, 
+                        action: `adgem_${nameDisplay}`,
+                        syncTask: "t2" // Tells backend to complete task 't2'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById("liveUserCoins").innerText = data.newCoins;
+                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
+                    showCustomAlert("err_success", nameDisplay, true);
                 }
-            });
+            } catch (err) {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            }
 
             activeWatchSession = null;
         }
