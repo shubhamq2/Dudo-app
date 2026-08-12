@@ -4,58 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extra Bonus - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #131926; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-pink: #ec4899;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%), radial-gradient(circle at 90% 80%, rgba(251, 133, 0, 0.08) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
         
         /* Premium Corporate Sync Header */
-        .header { width: 100%; background: #1e2538; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #6366f1; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #a855f7; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(168, 85, 247, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; }
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-purple); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-purple); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(168, 85, 247, 0.15); transition: 0.2s; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
-        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #a855f7; font-weight: bold; cursor: pointer; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-purple); font-weight: bold; cursor: pointer; }
 
         /* Profile Balance Ribbon - Purple Layout Mapped */
-        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, #6b21a8, #4c1d95); border: 1px solid #a855f7; padding: 15px 20px; border-radius: 16px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
-        .balance-card span { font-size: 18px; }
-        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(107, 33, 168, 0.9), rgba(76, 29, 149, 0.9)); border: 1px solid var(--accent-purple); padding: 18px 20px; border-radius: 16px; margin-top: 18px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 10px 25px rgba(168, 85, 247, 0.3); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 12px; }
 
         /* 👑 EXACT ORIGINAL PROMO CODE GRADIENT CONTAINER BLOCK */
-        .promo-gradient-box { width: 92%; max-width: 440px; background: linear-gradient(to bottom, #ffb703, #fb8500); border-radius: 20px; padding: 25px 20px; margin-top: 20px; box-sizing: border-box; box-shadow: 0 10px 25px rgba(251, 133, 0, 0.3); text-align: center; }
-        .promo-gradient-box h3 { margin: 0 0 6px 0; font-size: 22px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .promo-gradient-box p { margin: 0 0 18px 0; font-size: 12px; color: #fff; font-weight: 600; opacity: 0.9; }
-        .promo-input-row { display: flex; background: #ffffff; border-radius: 12px; padding: 5px; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-        .promo-input { flex: 1; border: none; background: transparent; padding: 12px; font-size: 15px; font-weight: 700; color: #1e293b; outline: none; text-transform: uppercase; text-align: center; }
-        .promo-input::placeholder { color: #94a3b8; font-weight: 600; }
-        .promo-apply-btn { background: #1e2538; color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .promo-apply-btn:active { transform: scale(0.97); }
+        .promo-gradient-box { width: 92%; max-width: 440px; background: linear-gradient(135deg, #ffb703, #fb8500); border-radius: 20px; padding: 25px 20px; margin-top: 20px; box-sizing: border-box; box-shadow: 0 12px 30px rgba(251, 133, 0, 0.4); text-align: center; position: relative; overflow: hidden; }
+        .promo-gradient-box::before { content: '🎁'; position: absolute; top: -10px; right: -10px; font-size: 80px; opacity: 0.15; transform: rotate(15deg); }
+        .promo-gradient-box h3 { margin: 0 0 8px 0; font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); position: relative; z-index: 2; }
+        .promo-gradient-box p { margin: 0 0 20px 0; font-size: 13px; color: #fff; font-weight: 600; opacity: 0.95; position: relative; z-index: 2; line-height: 1.4; }
+        .promo-input-row { display: flex; background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 6px; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; z-index: 2; }
+        .promo-input { flex: 1; border: none; background: transparent; padding: 14px; font-size: 16px; font-weight: 800; color: #0f172a; outline: none; text-transform: uppercase; text-align: center; letter-spacing: 1px; }
+        .promo-input::placeholder { color: #94a3b8; font-weight: 700; letter-spacing: 0px; }
+        .promo-apply-btn { background: #0f172a; color: #fff; border: none; padding: 14px 28px; border-radius: 12px; font-size: 14px; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; }
+        .promo-apply-btn:active:not(:disabled) { transform: scale(0.95); background: var(--primary-blue); }
+        .promo-apply-btn:disabled { background: #64748b; cursor: not-allowed; }
 
         /* Double Ad Banners (Total 4 Ads Slots Mapped) */
-        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 50px; background: #1e2538; border-radius: 10px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #334155; box-sizing: border-box; }
+        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 18px 0; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); box-sizing: border-box; }
 
         /* Fun & Earn Grid (2x2 Structure Elements) */
-        .section-label { width: 92%; max-width: 440px; font-size: 14px; font-weight: 800; color: #c084fc; text-transform: uppercase; letter-spacing: 0.8px; margin: 15px 0 10px 0; text-align: left; }
+        .section-label { width: 92%; max-width: 440px; font-size: 14.5px; font-weight: 900; color: var(--accent-purple); text-transform: uppercase; letter-spacing: 0.8px; margin: 15px 0 12px 0; text-align: left; border-left: 4px solid var(--accent-purple); padding-left: 10px; }
         .grid-container { width: 92%; max-width: 440px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; box-sizing: border-box; margin-bottom: 20px; }
         
-        .zone-card { background: #1e2538; border: 1px solid #2e374d; border-radius: 20px; padding: 22px 12px; text-align: center; color: #fff; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.15); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-decoration: none; transition: transform 0.2s; }
-        .zone-card:active { transform: scale(0.96); }
-        .zone-badge { position: absolute; top: 10px; right: 10px; font-size: 8px; font-weight: 900; padding: 3px 8px; border-radius: 20px; color: #fff; text-transform: uppercase; }
-        .badge-hot { background: #ef4444; }
-        .badge-win { background: #a855f7; }
+        .zone-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 25px 12px; text-align: center; color: #fff; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-decoration: none; transition: 0.2s; backdrop-filter: blur(10px); }
+        .zone-card:active { transform: scale(0.95); border-color: var(--accent-purple); }
+        .zone-badge { position: absolute; top: 10px; right: 10px; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 20px; color: #fff; text-transform: uppercase; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .badge-hot { background: var(--accent-pink); }
+        .badge-win { background: var(--primary-blue); }
         
-        .zone-icon { font-size: 34px; margin-bottom: 8px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
-        .zone-card h3 { margin: 0; font-size: 15px; font-weight: 700; color: #fff; }
-        .zone-card p { margin: 4px 0 0 0; font-size: 11px; color: #94a3b8; }
+        .zone-icon { font-size: 38px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(255,255,255,0.2)); }
+        .zone-card h3 { margin: 0; font-size: 15px; font-weight: 800; color: #fff; }
+        .zone-card p { margin: 5px 0 0 0; font-size: 11.5px; color: var(--text-sub); font-weight: 600; }
 
         /* Custom Alert Popup Styles Mapped */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e2538; border: 2px solid #fb8500; padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 1000; width: 80%; max-width: 345px; text-align: center; }
-        .custom-alert.success-border { border-color: #22c55e; }
-        .custom-alert p { margin: 0 0 20px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
-        .custom-alert button { background: linear-gradient(to right, #ffb703, #fb8500); border: none; color: white; padding: 10px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(251,133,0,0.3); }
-        .custom-alert.success-border button { background: #22c55e; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--warning); padding: 25px; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 20px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: linear-gradient(135deg, #ffb703, #fb8500); border: none; color: white; padding: 12px 35px; border-radius: 50px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 6px 15px rgba(251,133,0,0.4); text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 15px rgba(16,185,129,0.4); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
@@ -67,7 +86,7 @@
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="eb_title">Extra Bonus</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
@@ -85,24 +104,22 @@
 
     <div class="promo-gradient-box">
         <h3 data-i18n="eb_promo_title">PROMO CODE</h3>
-        <p data-i18n="eb_promo_desc">Enter exclusive code from our videos to get free coins!</p>
+        <p data-i18n="eb_promo_desc">Enter exclusive code from our videos to get free points!</p>
         <div class="promo-input-row">
             <input type="text" id="promoCodeInput" class="promo-input" placeholder="ENTER CODE" autocorrect="off" autocapitalize="characters">
-            <button class="promo-apply-btn" onclick="applyAdminPromoCode()" data-i18n="eb_apply">APPLY</button>
+            <button class="promo-apply-btn" id="promoBtn" onclick="applyNodePromoCode()" data-i18n="eb_apply">APPLY</button>
         </div>
     </div>
 
     <!-- 📢 AD CONTEXT TOP BANNER SLOT (MAPPED SAFELY TO PANEL) -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="extraAdSlot1">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
-        <div class="ad-slot-banner" id="extraAdSlot2">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
-    <div class="section-label" data-i18n="eb_zone_title">Fun & Earn Zone</div>
+    <div class="section-label" data-i18n="eb_zone_title">Fun & coins Zone</div>
 
     <div class="grid-container">
         
@@ -136,31 +153,32 @@
 
     <!-- 📢 AD CONTEXT BOTTOM BANNER SLOT (MAPPED SAFELY TO PANEL) -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="extraAdSlot3">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
-        <div class="ad-slot-banner" id="extraAdSlot4">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "eb_title": "Extra Bonus", "eb_promo_title": "PROMO CODE", "eb_promo_desc": "Enter exclusive code from our videos to get free coins!", "eb_apply": "APPLY", "eb_zone_title": "Fun & Earn Zone", "eb_scratch": "Scratch Card", "eb_scratch_desc": "Scratch & win daily", "eb_math": "Math Quiz", "eb_math_desc": "Solve & Earn coins", "eb_refer": "Refer & Earn", "eb_refer_desc": "Invite your friends", "eb_captcha": "Captcha Type", "eb_captcha_desc": "Type words fast", "code_empty": "Please enter a promo code first!", "code_invalid": "❌ Invalid or already used code!", "code_success": "🎉 Success! Promo code applied. Coins added." },
-            "hi": { "eb_title": "एक्स्ट्रा बोनस", "eb_promo_title": "प्रोमो कोड", "eb_promo_desc": "फ्री कॉइन्स पाने के लिए हमारे वीडियो से विशेष कोड दर्ज करें!", "eb_apply": "लागू करें", "eb_zone_title": "फन और अर्न ज़ोन", "eb_scratch": "स्क्रैच कार्ड", "eb_scratch_desc": "रोजाना स्क्रैच करें और जीतें", "eb_math": "मैथ क्विज़", "eb_math_desc": "हल करें और कॉइन्स कमाएं", "eb_refer": "रेफर और कमाएं", "eb_refer_desc": "अपने दोस्तों को आमंत्रित करें", "eb_captcha": "कैप्चा टाइप", "eb_captcha_desc": "तेजी से शब्द टाइप करें", "code_empty": "कृपया पहले एक प्रोमो कोड दर्ज करें!", "code_invalid": "❌ अमान्य या पहले से उपयोग किया गया कोड!", "code_success": "🎉 सफलता! प्रोमो कोड लागू हो गया। कॉइन्स जोड़े गए।" },
-            "bn": { "eb_title": "অতিরিক্ত বোনাস", "eb_promo_title": "প্রোমো কোড", "eb_promo_desc": "ফ্রি কয়েন পেতে আমাদের ভিডিও থেকে বিশেষ কোড লিখুন!", "eb_apply": "প্রয়োগ করুন", "eb_zone_title": "ফান ও আর্ন জোন", "eb_scratch": "স্ক্র্যাচ কার্ড", "eb_scratch_desc": "প্রতিদিন স্ক্র্যাচ করে জিতুন", "eb_math": "গণিত কুইজ", "eb_math_desc": "সমাধান করুন এবং কয়েন আয় করুন", "eb_refer": "রেফার ও আর্ন", "eb_refer_desc": "আপনার বন্ধুদের আমন্ত্রণ জানান", "eb_captcha": "ক্যাপচা টাইপ", "eb_captcha_desc": "দ্রুত শব্দ টাইপ করুন", "code_empty": "অনুগ্রহ করে প্রথমে একটি প্রমো কোড দিন!", "code_invalid": "❌ অবৈধ বা ইতিমধ্যে ব্যবহৃত কোড!", "code_success": "🎉 সফল! প্রমো কোড প্রয়োগ করা হয়েছে। কয়েন যোগ হয়েছে।" },
-            "te": { "eb_title": "ఎక్స్‌ట్రా బోనస్", "eb_promo_title": "ప్రోమో కోడ్", "eb_promo_desc": "ఉచిత కాయిన్స్ పొందడానికి మా వీడియోల నుండి ప్రత్యేక కోడ్‌ను నమోదు చేయండి!", "eb_apply": "అప్లై చేయి", "eb_zone_title": "ఫన్ & ఎర్న్ జోన్", "eb_scratch": "స్క్రాచ్ కార్డ్", "eb_scratch_desc": "రోజువారీ స్క్రాచ్ చేసి గెలవండి", "eb_math": "మ్యాథ్ క్విజ్", "eb_math_desc": "పరిష్కరించి కాయిన్స్ సంపాదించండి", "eb_refer": "రెఫర్ & ఎర్న్", "eb_refer_desc": "మీ స్నేహితులను ఆహ్వానించండి", "eb_captcha": "క్యాప్చా టైప్", "eb_captcha_desc": "పదాలను వేగంగా టైప్ చేయండి", "code_empty": "దయచేసి ముందుగా ప్రోమో కోడ్‌ని నమోదు చేయండి!", "code_invalid": "❌ చెల్లని లేదా ఇప్పటికే ఉపయోగించిన కోడ్!", "code_success": "🎉 విజయం! ప్రోమో కోడ్ వర్తించబడింది. కాయిన్స్ జోడించబడ్డాయి." },
-            "mr": { "eb_title": "अतिरिक्त बोनस", "eb_promo_title": "प्रोमो कोड", "eb_promo_desc": "फ्री कॉइन्स मिळवण्यासाठी आमच्या व्हिडिओमधील विशेष कोड टाका!", "eb_apply": "लागू करा", "eb_zone_title": "फन आणि अर्न झोन", "eb_scratch": "स्क्रॅच कार्ड", "eb_scratch_desc": "रोज स्क्रॅच करा आणि जिंका", "eb_math": "मॅथ क्विझ", "eb_math_desc": "सोडवा आणि कॉइन्स कमवा", "eb_refer": "रेफर आणि कमवा", "eb_refer_desc": "मित्रांना आमंत्रित करा", "eb_captcha": "कॅप्चा टाईप", "eb_captcha_desc": "वेगाने शब्द टाईप करा", "code_empty": "कृपया आधी प्रोमो कोड टाका!", "code_invalid": "❌ अमान्य या आधीच वापरलेला कोड!", "code_success": "🎉 यशस्वी! प्रोमो कोड लागू झाला. कॉइन्स जोडले गेले." },
-            "ta": { "eb_title": "கூடுதல் போனஸ்", "eb_promo_title": "புரொமோ கோட்", "eb_promo_desc": "இலவச நாணயங்களைப் பெற எங்கள் வீடியோக்களிலிருந்து சிறப்பு குறியீட்டை உள்ளிடவும்!", "eb_apply": "பயன்படுத்து", "eb_zone_title": "ஃபன் & எர்ன் மண்டலம்", "eb_scratch": "ஸ்கிராட்ச் கார்டு", "eb_scratch_desc": "தினமும் ஸ்கிராட்ச் செய்து வெல்லுங்கள்", "eb_math": "கணித வினாடி வினா", "eb_math_desc": "தீர்த்து நாணயங்களைச் சம்பாதிக்கவும்", "eb_refer": "ரெஃபர் & எர்ன்", "eb_refer_desc": "நண்பர்களை அழைக்கவும்", "eb_captcha": "கேப்ட்சா வகை", "eb_captcha_desc": "வார்த்தைகளை வேகமாக தட்டச்சு செய்யவும்", "code_empty": "தயவுசெய்து முதலில் புரொமோ கோடை உள்ளிடவும்!", "code_invalid": "❌ தவறான அல்லது ஏற்கனவே பயன்படுத்தப்பட்ட குறியீடு!", "code_success": "🎉 வெற்றி! புரொமோ கோட் பயன்படுத்தப்பட்டது. நாணயங்கள் சேர்க்கப்பட்டன." },
-            "ur": { "eb_title": "اضافی بونس", "eb_promo_title": "پرومو کوڈ", "eb_promo_desc": "مفت کوائنز حاصل کرنے کے لیے ہماری ویڈیوز سے خصوصی کوڈ درج کریں!", "eb_apply": "اپلائی کریں", "eb_zone_title": "فن اور ارن زون", "eb_scratch": "اسکریچ کارڈ", "eb_scratch_desc": "روزانہ اسکریچ کریں اور جیتیں", "eb_math": "میتھ کوئز", "eb_math_desc": "حل کریں اور کوائنز کمائیں", "eb_refer": "ریفر اور کمائیں", "eb_refer_desc": "دوستوں کو دعوت دیں", "eb_captcha": "کیپچا ٹائپ", "eb_captcha_desc": "الفاظ تیزی سے ٹائپ کریں", "code_empty": "براہ کرم پہلے پرومو کوڈ درج کریں!", "code_invalid": "❌ غلط یا پہلے سے استعمال شدہ کوڈ!", "code_success": "🎉 کامیابی! پرومو کوڈ لاگو ہو گیا۔ کوائنز شامل کر دیے گئے۔" },
-            "gu": { "eb_title": "વધારાનું બોનસ", "eb_promo_title": "પ્રોમો કોડ", "eb_promo_desc": "મફત સિક્કા મેળવવા માટે અમારા વિડિઓઝમાંથી વિશેષ કોડ દાખલ કરો!", "eb_apply": "લાગુ કરો", "eb_zone_title": "ફન અને અર્ન ઝોન", "eb_scratch": "સ્ક્રેચ કાર્ડ", "eb_scratch_desc": "રોજ સ્ક્રેચ કરો અને જીતો", "eb_math": "મેથ ક્વિઝ", "eb_math_desc": "ઉકેલો અને કોઈન્સ કમાઓ", "eb_refer": "રેફર અને અર્ન", "eb_refer_desc": "મિત્રોને આમંત્રિત કરો", "eb_captcha": "કેપ્ચા ટાઇપ", "eb_captcha_desc": "ઝડપથી શબ્દો ટાઇપ કરો", "code_empty": "કૃપા કરીને પહેલા પ્રોમો કોડ દાખલ કરો!", "code_invalid": "❌ અમાન્ય અથવા પહેલાથી વપરાયેલો કોડ!", "code_success": "🎉 સફળ! પ્રોમો કોડ લાગુ થયો. કોઈન્સ ઉમેરાયા." },
-            "es": { "eb_title": "Bono Extra", "eb_promo_title": "CÓDIGO PROMO", "eb_promo_desc": "¡Ingresa el código exclusivo de nuestros videos para obtener monedas gratis!", "eb_apply": "APLICAR", "eb_zone_title": "Zona de Diversión y Ganancia", "eb_scratch": "Tarjetas Rasca", "eb_scratch_desc": "Rasca y gana diariamente", "eb_math": "Quiz de Matemáticas", "eb_math_desc": "Resuelve y gana monedas", "eb_refer": "Referir y Ganar", "eb_refer_desc": "Invita a tus amigos", "eb_captcha": "Tipo Captcha", "eb_captcha_desc": "Escribe palabras rápido", "code_empty": "¡Por favor ingrese un código primero!", "code_invalid": "❌ ¡Código inválido o ya utilizado!", "code_success": "🎉 ¡Éxito! Código aplicado. Monedas añadidas." },
-            "fr": { "eb_title": "Bonus Extra", "eb_promo_title": "CODE PROMO", "eb_promo_desc": "Entrez le code exclusif de nos vidéos pour obtenir des pièces gratuites !", "eb_apply": "APPLIQUER", "eb_zone_title": "Zone Fun & Gains", "eb_scratch": "Carte à Gratter", "eb_scratch_desc": "Grattez et gagnez tous les jours", "eb_math": "Quiz de Maths", "eb_math_desc": "Résolvez et gagnez des pièces", "eb_refer": "Parrainer & Gagner", "eb_refer_desc": "Invitez vos amis", "eb_captcha": "Type Captcha", "eb_captcha_desc": "Tapez les mots vite", "code_empty": "Veuillez entrer un code promo d'abord !", "code_invalid": "❌ Code invalide ou déjà utilisé !", "code_success": "🎉 Succès ! Code promo appliqué. Pièces ajoutées." },
-            "ar": { "eb_title": "مكافأة إضافية", "eb_promo_title": "كود الترويج", "eb_promo_desc": "أدخل الكود الحصري من فيديوهاتنا للحصول على عملات مجانية!", "eb_apply": "تطبيق", "eb_zone_title": "منطقة المرح والكسب", "eb_scratch": "بطاقة الخدش", "eb_scratch_desc": "اخدش واربح يومياً", "eb_math": "مسابقة الرياضيات", "eb_math_desc": "حل واكسب العملات", "eb_refer": "الإحالة والكسب", "eb_refer_desc": "دعوة أصدقائك", "eb_captcha": "كتابة الكابتشا", "eb_captcha_desc": "اكتب الكلمات بسرعة", "code_empty": "يرجى إدخال كود الترويج أولاً!", "code_invalid": "❌ الكود غير صحيح أو مستخدم بالفعل!", "code_success": "🎉 نجاح! تم تطبيق الكود وإضافة العملات." },
-            "pt": { "eb_title": "Bônus Extra", "eb_promo_title": "CÓDIGO PROMO", "eb_promo_desc": "Insira o código exclusivo dos nossos vídeos para ganhar moedas grátis!", "eb_apply": "APLICAR", "eb_zone_title": "Zona de Diversão & Ganho", "eb_scratch": "Raspadinha", "eb_scratch_desc": "Raspe e ganhe diariamente", "eb_math": "Quiz de Matemática", "eb_math_desc": "Resolva e ganhe moedas", "eb_refer": "Indique & Ganhe", "eb_refer_desc": "Convide seus amigos", "eb_captcha": "Digitar Captcha", "eb_captcha_desc": "Digite palavras rápido", "code_empty": "Por favor, insira um código primeiro!", "code_invalid": "❌ Código inválido ou já utilizado!", "code_success": "🎉 Sucesso! Código aplicado. Moedas adicionadas." },
-            "ru": { "eb_title": "Экстра Бонус", "eb_promo_title": "ПРОМОКОД", "eb_promo_desc": "Введите эксклюзивный код из видео, чтобы получить монеты!", "eb_apply": "ПРИМЕНИТЬ", "eb_zone_title": "Зона Развлечений и Заработка", "eb_scratch": "Скретч-Карта", "eb_scratch_desc": "Стирайте и выигрывайте", "eb_math": "Математический Квиз", "eb_math_desc": "Решайте и зарабатывайте", "eb_refer": "Реферальная Система", "eb_refer_desc": "Приглашайте друзей", "eb_captcha": "Ввод Капчи", "eb_captcha_desc": "Печатайте слова быстро", "code_empty": "Пожалуйста, сначала введите промокод!", "code_invalid": "❌ Неверный или уже использованный код!", "code_success": "🎉 Успешно! Промокод применен. Монеты добавлены." }
+            "en": { "eb_title": "Extra Bonus", "eb_promo_title": "PROMO CODE", "eb_promo_desc": "Enter exclusive code from our videos to get free points!", "eb_apply": "APPLY", "eb_zone_title": "Fun & Earn Zone", "eb_scratch": "Scratch Card", "eb_scratch_desc": "Scratch & win daily", "eb_math": "Math Quiz", "eb_math_desc": "Solve & Earn points", "eb_refer": "Refer & Earn", "eb_refer_desc": "Invite your friends", "eb_captcha": "Captcha Type", "eb_captcha_desc": "Type words fast", "code_empty": "Please enter a promo code first!", "code_invalid": "❌ Invalid or expired code. Please check your spelling.", "code_used": "⚠️ You have already claimed this promo code.", "code_limit": "⏳ The maximum claim limit for this code has been reached.", "code_success": "🎉 Success! Promo code applied. Points added.", "err_server": "⚠️ Connection error. Please try again later." },
+            "hi": { "eb_title": "एक्स्ट्रा बोनस", "eb_promo_title": "प्रोमो कोड", "eb_promo_desc": "फ्री पॉइंट्स पाने के लिए हमारे वीडियो से विशेष कोड दर्ज करें!", "eb_apply": "लागू करें", "eb_zone_title": "फन और अर्न ज़ोन", "eb_scratch": "स्क्रैच कार्ड", "eb_scratch_desc": "रोजाना स्क्रैच करें और जीतें", "eb_math": "मैथ क्विज़", "eb_math_desc": "हल करें और पॉइंट्स कमाएं", "eb_refer": "रेफर और कमाएं", "eb_refer_desc": "अपने दोस्तों को आमंत्रित करें", "eb_captcha": "कैप्चा टाइप", "eb_captcha_desc": "तेजी से शब्द टाइप करें", "code_empty": "कृपया पहले एक प्रोमो कोड दर्ज करें!", "code_invalid": "❌ अमान्य या एक्सपायर कोड। कृपया स्पेलिंग चेक करें।", "code_used": "⚠️ आप इस प्रोमो कोड का पहले ही उपयोग कर चुके हैं।", "code_limit": "⏳ इस कोड की अधिकतम उपयोग सीमा पार हो गई है।", "code_success": "🎉 सफलता! प्रोमो कोड लागू हो गया। पॉइंट्स जोड़े गए।", "err_server": "⚠️ नेटवर्क समस्या। कृपया बाद में प्रयास करें।" },
+            "bn": { "eb_title": "অতিরিক্ত বোনাস", "eb_promo_title": "প্রোমো কোড", "eb_promo_desc": "ফ্রি পয়েন্ট পেতে আমাদের ভিডিও থেকে বিশেষ কোড লিখুন!", "eb_apply": "প্রয়োগ করুন", "eb_zone_title": "ফান ও আর্ন জোন", "eb_scratch": "স্ক্র্যাচ কার্ড", "eb_scratch_desc": "প্রতিদিন স্ক্র্যাচ করে জিতুন", "eb_math": "গণিত কুইজ", "eb_math_desc": "সমাধান করুন এবং পয়েন্ট আয় করুন", "eb_refer": "রেফার ও আর্ন", "eb_refer_desc": "আপনার বন্ধুদের আমন্ত্রণ জানান", "eb_captcha": "ক্যাপচা টাইপ", "eb_captcha_desc": "দ্রুত শব্দ টাইপ করুন", "code_empty": "প্রথমে একটি প্রমো কোড দিন!", "code_invalid": "❌ অবৈধ বা মেয়াদোত্তীর্ণ কোড!", "code_used": "⚠️ আপনি ইতিমধ্যে এই কোডটি ব্যবহার করেছেন।", "code_limit": "⏳ এই কোডের লিমিট শেষ হয়ে গেছে।", "code_success": "🎉 সফল! প্রমো কোড প্রয়োগ করা হয়েছে।", "err_server": "⚠️ সার্ভার সমস্যা। আবার চেষ্টা করুন।" },
+            "te": { "eb_title": "ఎక్స్‌ట్రా బోనస్", "eb_promo_title": "ప్రోమో కోడ్", "eb_promo_desc": "ఉచిత పాయింట్లు పొందడానికి వీడియోల నుండి కోడ్‌ను నమోదు చేయండి!", "eb_apply": "అప్లై చేయి", "eb_zone_title": "ఫన్ & ఎర్న్ జోన్", "eb_scratch": "స్క్రాచ్ కార్డ్", "eb_scratch_desc": "రోజువారీ గెలవండి", "eb_math": "మ్యాథ్ క్విజ్", "eb_math_desc": "పరిష్కరించి పాయింట్లు పొందండి", "eb_refer": "రెఫర్ & ఎర్న్", "eb_refer_desc": "స్నేహితులను ఆహ్వానించండి", "eb_captcha": "క్యాప్చా టైప్", "eb_captcha_desc": "వేగంగా టైప్ చేయండి", "code_empty": "దయచేసి కోడ్‌ని నమోదు చేయండి!", "code_invalid": "❌ చెల్లని కోడ్. సరిచూసుకోండి.", "code_used": "⚠️ మీరు ఇప్పటికే ఈ కోడ్‌ని ఉపయోగించారు.", "code_limit": "⏳ ఈ కోడ్ గరిష్ట పరిమితి ముగిసింది.", "code_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి.", "err_server": "⚠️ సర్వర్ సమస్య. మళ్లీ ప్రయత్నించండి." },
+            "mr": { "eb_title": "अतिरिक्त बोनस", "eb_promo_title": "प्रोमो कोड", "eb_promo_desc": "फ्री पॉइंट्स मिळवण्यासाठी व्हिडिओमधील विशेष कोड टाका!", "eb_apply": "लागू करा", "eb_zone_title": "फन आणि अर्न झोन", "eb_scratch": "स्क्रॅच कार्ड", "eb_scratch_desc": "रोज स्क्रॅच करा आणि जिंका", "eb_math": "मॅथ क्विझ", "eb_math_desc": "सोडवा आणि पॉइंट्स कमवा", "eb_refer": "रेफर आणि कमवा", "eb_refer_desc": "मित्रांना आमंत्रित करा", "eb_captcha": "कॅप्चा टाईप", "eb_captcha_desc": "वेगाने शब्द टाईप करा", "code_empty": "कृपया आधी कोड टाका!", "code_invalid": "❌ अमान्य किंवा कालबाह्य कोड!", "code_used": "⚠️ तुम्ही हा कोड आधीच वापरला आहे.", "code_limit": "⏳ या कोडची मर्यादा संपली आहे.", "code_success": "🎉 यशस्वी! प्रोमो कोड लागू झाला.", "err_server": "⚠️ सर्व्हर समस्या. नंतर प्रयत्न करा." },
+            "ta": { "eb_title": "கூடுதல் போனஸ்", "eb_promo_title": "புரொமோ கோட்", "eb_apply": "பயன்படுத்து", "eb_zone_title": "ஃபன் & எர்ன்", "eb_scratch": "ஸ்கிராட்ச் கார்டு", "eb_scratch_desc": "தினமும் வெல்லுங்கள்", "eb_math": "கணித வினாடி வினா", "eb_math_desc": "சம்பாதிக்கவும்", "eb_refer": "ரெஃபர் & எர்ன்", "eb_refer_desc": "நண்பர்களை அழைக்கவும்", "eb_captcha": "கேப்ட்சா", "eb_captcha_desc": "வேகமாக தட்டச்சு செய்யவும்", "code_empty": "குறியீட்டை உள்ளிடவும்!", "code_invalid": "❌ தவறான குறியீடு!", "code_used": "⚠️ ஏற்கனவே பயன்படுத்தப்பட்டது.", "code_limit": "⏳ வரம்பு முடிந்தது.", "code_success": "🎉 வெற்றி! புள்ளிகள் சேர்க்கப்பட்டன.", "err_server": "⚠️ சர்வர் பிழை." },
+            "ur": { "eb_title": "اضافی بونس", "eb_promo_title": "پرومو کوڈ", "eb_apply": "اپلائی کریں", "eb_zone_title": "فن اور ارن", "eb_scratch": "اسکریچ کارڈ", "eb_scratch_desc": "روزانہ جیتیں", "eb_math": "میتھ کوئز", "eb_math_desc": "پوائنٹس کمائیں", "eb_refer": "ریفر اور کمائیں", "eb_refer_desc": "دوستوں کو دعوت دیں", "eb_captcha": "کیپچا ٹائپ", "eb_captcha_desc": "تیزی سے ٹائپ کریں", "code_empty": "پہلے کوڈ درج کریں!", "code_invalid": "❌ غلط کوڈ!", "code_used": "⚠️ آپ پہلے ہی استعمال کر چکے ہیں۔", "code_limit": "⏳ حد ختم ہو چکی ہے۔", "code_success": "🎉 کامیابی! پوائنٹس شامل ہو گئے۔", "err_server": "⚠️ سرور کا مسئلہ۔" },
+            "gu": { "eb_title": "વધારાનું બોનસ", "eb_promo_title": "પ્રોમો કોડ", "eb_apply": "લાગુ કરો", "eb_zone_title": "ફન અને અર્ન", "eb_scratch": "સ્ક્રેચ કાર્ડ", "eb_scratch_desc": "રોજ જીતો", "eb_math": "મેથ ક્વિઝ", "eb_math_desc": "પોઇન્ટ્સ કમાઓ", "eb_refer": "રેફર અને અર્ન", "eb_refer_desc": "મિત્રોને આમંત્રિત કરો", "eb_captcha": "કેપ્ચા ટાઇપ", "eb_captcha_desc": "ઝડપથી ટાઇપ કરો", "code_empty": "પહેલા કોડ દાખલ કરો!", "code_invalid": "❌ અમાન્ય કોડ!", "code_used": "⚠️ તમે પહેલાથી જ ઉપયોગ કર્યો છે.", "code_limit": "⏳ મર્યાદા પૂર્ણ થઈ ગઈ છે.", "code_success": "🎉 સફળ! પોઇન્ટ્સ ઉમેરાયા.", "err_server": "⚠️ સર્વર સમસ્યા." },
+            "es": { "eb_title": "Bono Extra", "eb_promo_title": "CÓDIGO PROMO", "eb_promo_desc": "¡Ingresa el código exclusivo para obtener puntos gratis!", "eb_apply": "APLICAR", "eb_zone_title": "Zona de Diversión", "eb_scratch": "Tarjetas Rasca", "eb_scratch_desc": "Rasca y gana", "eb_math": "Quiz de Mate", "eb_math_desc": "Resuelve y gana", "eb_refer": "Referir y Ganar", "eb_refer_desc": "Invita amigos", "eb_captcha": "Tipo Captcha", "eb_captcha_desc": "Escribe rápido", "code_empty": "¡Ingrese un código primero!", "code_invalid": "❌ ¡Código inválido o expirado!", "code_used": "⚠️ Ya has reclamado este código.", "code_limit": "⏳ El límite para este código se ha alcanzado.", "code_success": "🎉 ¡Éxito! Puntos añadidos.", "err_server": "⚠️ Error de conexión." },
+            "fr": { "eb_title": "Bonus Extra", "eb_promo_title": "CODE PROMO", "eb_promo_desc": "Entrez le code exclusif pour obtenir des points !", "eb_apply": "APPLIQUER", "eb_zone_title": "Zone Fun", "eb_scratch": "Carte à Gratter", "eb_scratch_desc": "Grattez et gagnez", "eb_math": "Quiz de Maths", "eb_math_desc": "Gagnez des points", "eb_refer": "Parrainer", "eb_refer_desc": "Invitez vos amis", "eb_captcha": "Captcha", "eb_captcha_desc": "Tapez vite", "code_empty": "Entrez un code d'abord !", "code_invalid": "❌ Code invalide ou expiré !", "code_used": "⚠️ Vous avez déjà utilisé ce code.", "code_limit": "⏳ La limite de ce code est atteinte.", "code_success": "🎉 Succès ! Points ajoutés.", "err_server": "⚠️ Erreur de connexion." },
+            "ar": { "eb_title": "مكافأة إضافية", "eb_promo_title": "كود الترويج", "eb_apply": "تطبيق", "eb_zone_title": "المرح والكسب", "eb_scratch": "بطاقة الخدش", "eb_scratch_desc": "اربح يومياً", "eb_math": "مسابقة الرياضيات", "eb_math_desc": "اكسب النقاط", "eb_refer": "الإحالة والكسب", "eb_refer_desc": "دعوة أصدقائك", "eb_captcha": "كتابة الكابتشا", "eb_captcha_desc": "اكتب بسرعة", "code_empty": "أدخل الكود أولاً!", "code_invalid": "❌ كود غير صحيح!", "code_used": "⚠️ لقد استخدمت هذا الكود بالفعل.", "code_limit": "⏳ تم الوصول للحد الأقصى.", "code_success": "🎉 نجاح! تم إضافة النقاط.", "err_server": "⚠️ خطأ في الاتصال." },
+            "pt": { "eb_title": "Bônus Extra", "eb_promo_title": "CÓDIGO PROMO", "eb_promo_desc": "Insira o código exclusivo para ganhar pontos!", "eb_apply": "APLICAR", "eb_zone_title": "Zona de Diversão", "eb_scratch": "Raspadinha", "eb_scratch_desc": "Raspe e ganhe", "eb_math": "Quiz de Matemática", "eb_math_desc": "Ganhe pontos", "eb_refer": "Indique", "eb_refer_desc": "Convide amigos", "eb_captcha": "Digitar Captcha", "eb_captcha_desc": "Digite rápido", "code_empty": "Insira o código primeiro!", "code_invalid": "❌ Código inválido ou expirado!", "code_used": "⚠️ Você já usou este código.", "code_limit": "⏳ O limite deste código foi atingido.", "code_success": "🎉 Sucesso! Pontos adicionados.", "err_server": "⚠️ Erro de conexão." },
+            "ru": { "eb_title": "Экстра Бонус", "eb_promo_title": "ПРОМОКОД", "eb_promo_desc": "Введите эксклюзивный код для получения очков!", "eb_apply": "ПРИМЕНИТЬ", "eb_zone_title": "Зона Развлечений", "eb_scratch": "Скретч-Карта", "eb_scratch_desc": "Стирайте и выигрывайте", "eb_math": "Математика", "eb_math_desc": "Решайте и зарабатывайте", "eb_refer": "Пригласи друга", "eb_refer_desc": "Зови друзей", "eb_captcha": "Ввод Капчи", "eb_captcha_desc": "Печатайте быстро", "code_empty": "Введите промокод!", "code_invalid": "❌ Неверный код!", "code_used": "⚠️ Вы уже использовали этот код.", "code_limit": "⏳ Лимит кода исчерпан.", "code_success": "🎉 Успешно! Очки добавлены.", "err_server": "⚠️ Ошибка сервера." }
         };
 
         function changeLanguage(langCode) {
@@ -168,72 +186,65 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) elem.innerText = transObj[key];
+                if(transObj[key]) { 
+                    if(elem.tagName === "BUTTON") {
+                        if(!elem.disabled) elem.innerText = transObj[key];
+                    } else {
+                        elem.innerText = transObj[key]; 
+                    }
+                }
             });
             document.getElementById("appLanguage").value = langCode;
         }
-    </script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
-
-        // 🔥 DYNAMIC BANNER ADS LOOP FROM MAIN ADMIN CONTROL ROOM
-        database.ref('global_system_runtime_configurations/watch_ads_banner_slots').on('value', (snap) => {
-            if (snap.exists()) {
-                let banners = snap.val();
-                if (banners.slot1_html && banners.slot1_html.trim() !== "") { let s1 = document.getElementById("extraAdSlot1"); if(s1) { s1.innerHTML = banners.slot1_html; runScripts(s1); } }
-                if (banners.slot2_html && banners.slot2_html.trim() !== "") { let s2 = document.getElementById("extraAdSlot2"); if(s2) { s2.innerHTML = banners.slot2_html; runScripts(s2); } }
-                if (banners.slot3_html && banners.slot3_html.trim() !== "") { let s3 = document.getElementById("extraAdSlot3"); if(s3) { s3.innerHTML = banners.slot3_html; runScripts(s3); } }
-                if (banners.slot4_html && banners.slot4_html.trim() !== "") { let s4 = document.getElementById("extraAdSlot4"); if(s4) { s4.innerHTML = banners.slot4_html; runScripts(s4); } }
-            }
-        });
-
-        function runScripts(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
-            }
-        }
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
         document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            // Fetch live sync parameters
-            database.ref('users/' + uid).on('value', (snap) => {
-                if(snap.exists()) {
-                    let d = snap.val();
-                    document.getElementById("liveUserCoins").innerText = d.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (d.balance || 0).toFixed(2);
-                }
-            });
+            fetchDataFromAdminServer();
         });
+
+        // 📡 FETCH USER BALANCE AND ADMIN BANNERS
+        async function fetchDataFromAdminServer() {
+            try {
+                // Fetch Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // Fetch Admin Banners
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                
+                if (confData.success && confData.banners) {
+                    if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
+                    if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
+                    if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
+                    if(confData.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.banners[3];
+                }
+            } catch (err) {
+                console.log("Using cached configuration.");
+            }
+        }
 
         function showCustomAlert(msgKey, isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let msg = langData[currentLang][msgKey] || langData["en"][msgKey];
-            
+            let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey] || msgKey;
+
             const box = document.getElementById("customAlertBox");
             if(isSuccess) box.classList.add("success-border");
             else box.classList.remove("success-border");
 
-            document.getElementById("alertMessage").innerText = msg;
+            document.getElementById("alertMessage").innerText = msgStr;
             document.getElementById("alertOverlay").style.display = "block";
             box.style.display = "block";
         }
@@ -243,76 +254,48 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-       // 🚀 SMART PROMO CODE SYSTEM (WILL TELL EXACT ERROR)
-function applyAdminPromoCode() {
-    const inputField = document.getElementById("promoCodeInput");
-    const code = inputField.value.trim().toUpperCase();
-    
-    if (!code) {
-        alert("❌ Please enter a promo code first!");
-        return;
-    }
-    
-    // Step 1: Check if code exists in Admin Database
-    database.ref('app_active_promo_vouchers_directory/' + code).once('value').then((snapshot) => {
-        if (snapshot.exists()) {
-            let promoData = snapshot.val();
-            let coinValue = parseInt(promoData.allocated_reward_coins_sum || 0);
-            let maxClaims = parseInt(promoData.total_max_allowed_claims_cap || 0);
-            let currentClaims = parseInt(promoData.current_active_claims_counter_index || 0);
+        // 🚀 SECURE PROMO CODE SUBMISSION TO NODE.JS SERVER
+        async function applyNodePromoCode() {
+            const inputField = document.getElementById("promoCodeInput");
+            const code = inputField.value.trim().toUpperCase();
             
-            // Step 2: Check if Limit is Reached
-            if (currentClaims >= maxClaims) {
-                alert(`❌ This Promo Code limit is over! Maximum ${maxClaims} users have already claimed it.`);
-                return;
-            }
-            
-            // Step 3: Check if THIS USER has already claimed it
-            database.ref('users/' + uid + '/used_promos/' + code).once('value').then((usedSnap) => {
-                if (!usedSnap.exists()) {
-                    
-                    // ALL CHECKS PASSED - ADD COINS
-                    database.ref('users/' + uid).once('value').then((userSnap) => {
-                        if (userSnap.exists()) {
-                            let oldCoins = userSnap.val().coins || 0;
-                            let oldBalance = userSnap.val().balance || 0;
-                            let monetaryTranslation = coinValue / 100; // 100 Coins = ₹1 Ratio
-                            
-                            database.ref('users/' + uid).update({
-                                coins: oldCoins + coinValue,
-                                balance: oldBalance + monetaryTranslation
-                            }).then(() => {
-                                // Block future claims for this user
-                                database.ref('users/' + uid + '/used_promos/' + code).set(true);
-                                
-                                // Increase Global Claim Counter
-                                database.ref('app_active_promo_vouchers_directory/' + code).update({
-                                    current_active_claims_counter_index: currentClaims + 1
-                                });
-                                
-                                // Save History
-                                database.ref('users/' + uid + '/earning_history').push({
-                                    activity: `Promo Code Claimed: ${code}`,
-                                    coins_credited: coinValue,
-                                    timestamp: Date.now()
-                                });
-                                
-                                inputField.value = "";
-                                showCustomAlert("code_success", true);
-                            });
-                        }
-                    });
+            if (!code) { showCustomAlert("code_empty"); return; }
+
+            const btn = document.getElementById("promoBtn");
+            btn.disabled = true;
+            btn.style.background = "#475569";
+            btn.innerText = "APPLYING...";
+
+            try {
+                // Call Node.js API to verify and apply Promo Code
+                // Sending syncTask: 't8' to auto-complete the daily check-in task for promo codes
+                const response = await fetch(`${API_BASE_URL}/promo/apply`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: uid, code: code, syncTask: "t8" })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById("liveUserCoins").innerText = result.newCoins;
+                    document.getElementById("liveUserBalance").innerText = "₹" + result.newBalance.toFixed(2);
+                    inputField.value = "";
+                    showCustomAlert("code_success", true);
                 } else {
-                    // USER ALREADY USED IT
-                    alert("❌ You have already claimed this Promo Code once! You cannot use the same code again.");
+                    // result.messageKey will tell us exactly what went wrong (invalid, limit, used)
+                    let errorKey = result.messageKey || "code_invalid";
+                    showCustomAlert(errorKey);
                 }
-            });
-        } else {
-            // CODE DOES NOT EXIST
-            alert("❌ This Promo Code does not exist in the Database! (Check spelling)");
+            } catch (err) {
+                showCustomAlert("err_server");
+            } finally {
+                let currentLang = localStorage.getItem("selectedLang") || "en";
+                btn.disabled = false;
+                btn.style.background = "#0f172a";
+                btn.innerText = langData[currentLang]["eb_apply"] || "APPLY";
+            }
         }
-    });
-}
     </script>
 </body>
 </html>

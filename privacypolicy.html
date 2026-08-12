@@ -4,24 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - Dudo</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f1f5f9; margin: 0; padding: 0; color: #334155; padding-bottom: 40px; line-height: 1.6; }
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-sub: #64748b;
+            --primary-blue: #2563eb;
+            --border-color: #e2e8f0;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 50px; line-height: 1.7; }
         
-        /* Corporate Clean Header */
-        .header { width: 100%; background: #ffffff; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e2e8f0; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #0f172a; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; margin-right: 15px; }
-        .header h2 { margin: 0; font-size: 18px; color: #0f172a; font-weight: 800; }
+        /* Corporate Premium Header */
+        .header { width: 100%; background: var(--card-bg); padding: 18px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-color); }
+        .back-btn { font-size: 20px; font-weight: bold; color: #0f172a; text-decoration: none; padding: 6px 12px; border-radius: 10px; background: #f1f5f9; border: 1px solid var(--border-color); margin-right: 15px; transition: 0.2s; }
+        .back-btn:active { background: #e2e8f0; transform: scale(0.95); }
+        .header h2 { margin: 0; font-size: 19px; color: #0f172a; font-weight: 800; letter-spacing: 0.5px; }
         
         /* Policy Container */
-        .policy-container { width: 92%; max-width: 500px; background: #ffffff; border-radius: 16px; padding: 25px 20px; margin: 20px auto; box-sizing: border-box; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .policy-container { width: 92%; max-width: 600px; background: var(--card-bg); border-radius: 20px; padding: 30px 25px; margin: 25px auto; box-sizing: border-box; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.04); }
         
-        h3 { color: #0f172a; font-size: 18px; margin-top: 25px; margin-bottom: 10px; border-bottom: 2px solid #2563eb; padding-bottom: 5px; display: inline-block; }
-        h4 { color: #1e293b; font-size: 14px; margin-top: 15px; margin-bottom: 5px; font-weight: 700; }
-        p { font-size: 13.5px; margin: 0 0 15px 0; color: #475569; text-align: justify; }
-        ul { margin: 0 0 15px 0; padding-left: 20px; font-size: 13.5px; color: #475569; }
-        li { margin-bottom: 6px; }
+        .last-updated { display: inline-block; background: #eff6ff; color: var(--primary-blue); font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #bfdbfe; }
+
+        .intro-text { font-size: 14.5px; color: #475569; margin-bottom: 25px; font-weight: 600; }
+
+        /* Section Styling */
+        .policy-section { margin-bottom: 30px; }
+        .policy-section h3 { color: #0f172a; font-size: 18px; margin: 0 0 12px 0; border-left: 4px solid var(--primary-blue); padding-left: 10px; display: flex; align-items: center; }
+        .policy-section h4 { color: #1e293b; font-size: 15px; margin: 15px 0 8px 0; font-weight: 800; }
+        .policy-section p { font-size: 14px; margin: 0 0 12px 0; color: var(--text-sub); }
         
-        .last-updated { font-size: 12px; color: #94a3b8; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        ul { margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: var(--text-sub); }
+        li { margin-bottom: 8px; }
+        li strong { color: #1e293b; }
+
+        /* Highlighted Important Box */
+        .highlight-box { background: #fffbeb; border: 1px solid #fde047; border-radius: 12px; padding: 15px; margin-top: 15px; font-size: 13.5px; color: #854d0e; }
+        .highlight-box strong { color: #a16207; }
+
+        /* Deletion Box (Crucial for Play Store) */
+        .deletion-box { background: #fef2f2; border: 1px dashed #f87171; border-radius: 12px; padding: 15px; margin-top: 15px; font-size: 13.5px; color: #991b1b; }
+        .deletion-box strong { color: #7f1d1d; }
     </style>
 </head>
 <body>
@@ -32,51 +58,66 @@
     </div>
 
     <div class="policy-container">
-        <div class="last-updated">Last Updated: August 3, 2026</div>
+        <div class="last-updated">Last Updated: August 2026</div>
         
-        <p>Welcome to <strong>Dudo</strong>. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice or our practices with regard to your personal info, please contact our support desk.</p>
+        <p class="intro-text">Welcome to <strong>Dudo</strong>. We are committed to protecting your personal information and your right to privacy. This Privacy Policy outlines our practices regarding data collection, usage, and your rights in compliance with Google Play Developer Policies.</p>
         
-        <p>This Privacy Policy governs the privacy practices of our mobile application. It explains how we collect, safeguard, and disclose information that results from your use of our platform.</p>
+        <div class="policy-section">
+            <h3>1. Information We Collect</h3>
+            <p>To provide you with a seamless and rewarding experience, we collect specific data points when you use our application:</p>
+            <ul>
+                <li><strong>Personal Information:</strong> Full Name, Registered Mobile Number, and Email Address provided during registration.</li>
+                <li><strong>Payment/Reward Details:</strong> Virtual IDs (e.g., Gaming IDs, UPI IDs) provided explicitly by you during reward redemptions.</li>
+                <li><strong>Device & Advertising Data:</strong> IP address, Device OS, Advertising IDs (AAID), and network activity. This is strictly used for fraud prevention and ad-tracking mechanisms by our partners.</li>
+            </ul>
+        </div>
 
-        <h3>1. Information We Collect</h3>
-        <p>We collect personal data that you voluntarily provide to us when registering on the application or interacting with platform features. This includes:</p>
-        <ul>
-            <li><strong>Account Metadata:</strong> Full Name, Registered Mobile Number, and Registration identification details.</li>
-            <li><strong>Reward Delivery Details:</strong> Virtual IDs or reference identifiers provided explicitly during reward redemptions.</li>
-            <li><strong>Profile Information:</strong> Email addresses and basic demographics when users update their profile dashboard.</li>
-        </ul>
+        <div class="policy-section">
+            <h3>2. How We Use Your Information</h3>
+            <p>We process your data strictly for legitimate business purposes and application functionality:</p>
+            <ul>
+                <li>To create, manage, and authenticate your account securely.</li>
+                <li>To process reward payouts and maintain an accurate ledger of your earned coins.</li>
+                <li>To deliver personalized programmatic advertisements and tasks.</li>
+                <li>To prevent fraudulent activities, cheating, and multiple account abuses.</li>
+            </ul>
+        </div>
 
-        <h3>2. How We Use Your Information</h3>
-        <p>We process your information for purposes based on legitimate business interests, the fulfillment of our contract with you, and compliance with operational requirements. We use the information to:</p>
-        <ul>
-            <li>Facilitate account creation, user authentication, and secure logins.</li>
-            <li>Process reward payouts, user activity logs, and manage live dashboard metrics via secure real-time servers.</li>
-            <li>Request feedback, implement support channels, and manage platform integrity by identifying invalid submissions.</li>
-        </ul>
+        <div class="policy-section">
+            <h3>3. Third-Party Services & Trackers</h3>
+            <p>We utilize trusted third-party SDKs to keep the platform optimized, secure, and operational. These services operate under their own strict privacy policies:</p>
+            <ul>
+                <li><strong>Backend Infrastructure:</strong> Google Firebase & Node.js API clusters for secure, encrypted real-time data syncing.</li>
+                <li><strong>Advertising Partners:</strong> Networks like Adsterra, Monetag, etc., which may use Advertising IDs to serve relevant ads.</li>
+                <li><strong>Offerwalls & Surveys:</strong> Partners like CPX Research, Bitlabs, and Torox process your activity to credit rewards to your account automatically via secure server-to-server postbacks.</li>
+            </ul>
+        </div>
 
-        <h3>3. Third-Party Disclosures & Trackers</h3>
-        <p>To keep the platform optimized, secure, and structurally scalable for future features, we cooperate with third-party service providers. Our platform integrates:</p>
-        <h4>A. Firebase Backend SDK Infrastructure</h4>
-        <p>We utilize encrypted Firebase Realtime Database clusters to manage instantly synchronized user metadata assets, reward configurations, and live account metrics securely.</p>
-        <h4>B. Third-Party Monetization Frameworks</h4>
-        <p>The app displays targeted static banner utilities powered by verified advertising partners. These networks might parse non-sensitive browser identifiers, cache parameters, or network logs to supply valid programmatic advertising outputs.</p>
-        <h4>C. Offerwalls & Task Engines</h4>
-        <p>External survey configurations or third-party task platforms (such as CPX Research, Bitlabs, and Timewall) process tracking identifiers using automated postback scripts to credit activity milestones safely into our database nodes.</p>
+        <div class="policy-section">
+            <h3>4. Data Retention & Deletion Policy</h3>
+            <p>We retain your personal information only for as long as your account is active or as needed to provide you with the services.</p>
+            <div class="deletion-box">
+                <strong>Right to Delete Data:</strong> You have the absolute right to request the deletion of your account and associated personal data. 
+                <br><br>
+                To delete your data, you can navigate to the <strong>Profile &rarr; Account Settings &rarr; Delete Account</strong> section within the app, or contact our support team directly. Upon request, your profile, balances, and history will be permanently erased from our servers within 30 days.
+            </div>
+        </div>
 
-        <h3>4. Data Security & Safety Policies</h3>
-        <p>We implement a variety of premium standard administrative and technical security measures to maintain the safety of your personal data. Your account nodes, activity states, and authentication credentials are fully encrypted inside database protocols. However, please remember that no method of transmission over the internet or mobile storage is 100% secure.</p>
+        <div class="policy-section">
+            <h3>5. Data Security</h3>
+            <p>We implement premium administrative and technical security measures (such as SSL encryption and secure API tokens) to maintain the safety of your personal data. However, please remember that no method of transmission over the internet is 100% secure.</p>
+        </div>
 
-        <h3>5. Account Security & Fair Usage</h3>
-        <p>To preserve the absolute safety of our platform ecosystem, users are expected to maintain fair usage. Submitting invalid transaction data or utilizing automated scripts will trigger security protocols, leading to immediate account restrictions to protect our genuine users and advertising partners.</p>
+        <div class="policy-section">
+            <h3>6. Children's Privacy (COPPA)</h3>
+            <p>Our services do not directly target anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13. If we discover that a child under 13 has provided us with personal information, we immediately delete this from our database.</p>
+        </div>
 
-        <h3>6. Children's Privacy</h3>
-        <p>Our services do not directly address anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13. In the case we discover that a child under 13 has provided us with personal information, we immediately delete this from our database structure.</p>
-
-        <h3>7. Changes to This Privacy Policy</h3>
-        <p>We may update our Privacy Policy from time to time. We will notify you of any structural modifications by updating the "Last Updated" date at the top of this document. You are advised to review this page periodically for changes.</p>
-
-        <h3>8. Contact Us</h3>
-        <p>If you have any compliance questions or structural inquiries regarding this policy execution, you can connect directly with our support help desk operators via the support section inside the application interface.</p>
+        <div class="policy-section">
+            <h3>7. Contact Us</h3>
+            <p>If you have any questions, concerns, or requests regarding your data and this Privacy Policy, please contact our support desk through the "Help & Support" section inside the application.</p>
+        </div>
+        
     </div>
 
 </body>

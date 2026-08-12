@@ -3,82 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Milestone Sponsorships - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <title>Milestone Rewards - Dudo</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; padding-bottom: 30px; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-pink: #f43f5e;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(168, 85, 247, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
         
-        /* Corporate Synchronized Header */
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #a855f7; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #a855f7; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(168, 85, 247, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        /* Premium Sync Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-purple); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-purple); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(168, 85, 247, 0.15); transition: 0.2s; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; letter-spacing: 0.5px; }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
 
-        /* 📢 AD INCOME SOURCE INTERACTION WINDOWS */
-        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #a855f7; margin: 5px 0; }
+        /* 📢 AD INCOME SOURCE SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); margin: 5px 0; box-sizing: border-box; }
 
         /* 📊 Dynamic Metric Target Ring Indicator Ribbon */
-        .user-metric-card { background: linear-gradient(135deg, #a855f7, #7c3aed); border-radius: 18px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25); }
+        .user-metric-card { background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(124, 58, 237, 0.9)); border-radius: 20px; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .metric-details { text-align: left; }
-        .metric-details span { font-size: 11px; font-weight: 800; text-transform: uppercase; opacity: 0.9; letter-spacing: 0.5px; }
-        .metric-details h3 { margin: 3px 0 0 0; font-size: 24px; font-weight: 900; color: #ffffff; }
-        .coin-icon-pouch { font-size: 28px; }
+        .metric-details span { font-size: 12.5px; font-weight: 800; text-transform: uppercase; color: #e9d5ff; letter-spacing: 1px; }
+        .metric-details h3 { margin: 5px 0 0 0; font-size: 28px; font-weight: 900; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .coin-icon-pouch { font-size: 40px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4)); animation: floatCoin 2s infinite alternate; }
+        @keyframes floatCoin { 0% { transform: translateY(0); } 100% { transform: translateY(-5px); } }
 
         /* 🎟️ Premium Neon Sponsorship Cards Grids Layout */
-        .milestone-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 5px; }
-        .sponsor-card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 18px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); box-sizing: border-box; }
+        .milestone-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 5px; }
+        .sponsor-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.4); box-sizing: border-box; backdrop-filter: blur(10px); }
         
         /* Visual Border Indicator Stripes for Different Tiers */
-        .sponsor-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
-        .card-bronze::before { background: #cd7f32; }
-        .card-silver::before { background: #cbd5e1; }
-        .card-gold::before { background: #facc15; }
+        .sponsor-card::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; }
+        .card-bronze::before { background: linear-gradient(to bottom, #d97706, #b45309); }
+        .card-silver::before { background: linear-gradient(to bottom, #cbd5e1, #94a3b8); }
+        .card-gold::before { background: linear-gradient(to bottom, #facc15, #ca8a04); }
 
-        .sponsor-info-block { text-align: left; display: flex; flex-direction: column; gap: 3px; max-width: 65%; }
-        .sponsor-info-block .card-title { font-size: 15px; font-weight: 800; color: #f8fafc; }
-        .sponsor-info-block .card-desc { font-size: 12px; color: #94a3b8; font-weight: 500; line-height: 1.3; }
+        .sponsor-info-block { text-align: left; display: flex; flex-direction: column; gap: 5px; max-width: 65%; }
+        .sponsor-info-block .card-title { font-size: 15px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+        .sponsor-info-block .card-desc { font-size: 12px; color: var(--text-sub); font-weight: 600; line-height: 1.4; }
         
         /* Bar Indicator showing progress to goal */
-        .progress-micro-bar { width: 100%; background: #0f172a; height: 5px; border-radius: 50px; margin-top: 6px; overflow: hidden; position: relative; }
-        .progress-fill { background: #a855f7; height: 100%; width: 0%; transition: width 0.4s ease-in-out; }
-        .card-bronze .progress-fill { background: #cd7f32; }
-        .card-silver .progress-fill { background: #cbd5e1; }
-        .card-gold .progress-fill { background: #facc15; }
+        .progress-micro-bar { width: 100%; background: rgba(0,0,0,0.5); height: 8px; border-radius: 50px; margin-top: 8px; overflow: hidden; position: relative; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease-in-out; border-radius: 50px; }
+        .card-bronze .progress-fill { background: linear-gradient(90deg, #d97706, #f59e0b); box-shadow: 0 0 10px #d97706; }
+        .card-silver .progress-fill { background: linear-gradient(90deg, #94a3b8, #cbd5e1); box-shadow: 0 0 10px #cbd5e1; }
+        .card-gold .progress-fill { background: linear-gradient(90deg, #ca8a04, #fde047); box-shadow: 0 0 10px #facc15; }
 
-        /* Interaction Status Buttons Styles layout */
-        .milestone-action-btn { border: none; padding: 10px 18px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; min-width: 90px; text-align: center; }
-        .btn-locked { background: #334155; color: #64748b; cursor: not-allowed; }
-        .btn-claimable { background: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); animation: pulseBtn 1.5s infinite alternate; }
-        .btn-claimed { background: rgba(255,255,255,0.05); color: #475569; border: 1px solid rgba(255,255,255,0.05); cursor: not-allowed; }
+        /* Interaction Status Buttons Styles */
+        .milestone-action-btn { border: none; padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; min-width: 100px; text-align: center; letter-spacing: 1px; }
+        .btn-locked { background: #334155; color: #94a3b8; cursor: not-allowed; }
+        .btn-claimable { background: linear-gradient(135deg, var(--accent-green), #059669); color: #fff; box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); animation: pulseBtn 1.5s infinite alternate; }
+        .btn-claimable:active { transform: scale(0.95); }
 
         @keyframes pulseBtn {
             0% { transform: scale(1); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-            100% { transform: scale(1.03); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5); }
+            100% { transform: scale(1.05); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.6); }
         }
+
+        /* Custom Alert Popup */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 20px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 35px; border-radius: 50px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
 
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <p id="alertMessage">Message</p>
+        <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
     <div class="header">
-        <a href="home.html" class="back-btn">←</a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2>Milestone Rewards</h2>
     </div>
 
     <div class="main-container">
         
         <!-- 📢 AD CONTEXT INTERACTION TOP REVENUE FIELD -->
-        <div class="ad-banner-slot">
-            <script type="text/javascript">atOptions={'key':'9d8e7e12df3875a6c3846d0cb748a04b','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"></script>
-        </div>
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <!-- Live Score Tracking Statistics Header -->
         <div class="user-metric-card">
             <div class="metric-details">
-                <span>Your Current Total Score</span>
-                <h3 id="masterScoreTxt">0 🪙</h3>
+                <span>Total Lifetime Score</span>
+                <h3 id="masterScoreTxt"><i class="fa-solid fa-spinner fa-spin"></i></h3>
             </div>
             <div class="coin-icon-pouch">🏆</div>
         </div>
@@ -88,70 +117,68 @@
             <!-- Milestone 1: Bronze Level Card -->
             <div class="sponsor-card card-bronze" id="cardBox_bronze">
                 <div class="sponsor-info-block">
-                    <span class="card-title" id="title_bronze">Bronze Sponsor Bonus</span>
-                    <span class="card-desc" id="desc_bronze">Reach coins target to activate.</span>
+                    <span class="card-title" id="title_bronze">Bronze Rank Bonus</span>
+                    <span class="card-desc" id="desc_bronze">Reach target to activate.</span>
                     <div class="progress-micro-bar"><div class="progress-fill" id="barBronze"></div></div>
                 </div>
-                <button class="milestone-action-btn btn-locked" id="btnBronze">Locked</button>
+                <button class="milestone-action-btn btn-locked" id="btnBronze">Locked <i class="fa-solid fa-lock"></i></button>
             </div>
 
             <!-- Milestone 2: Silver Level Card -->
             <div class="sponsor-card card-silver" id="cardBox_silver">
                 <div class="sponsor-info-block">
-                    <span class="card-title" id="title_silver">Silver Premium Pass</span>
-                    <span class="card-desc" id="desc_silver">Reach coins target to activate.</span>
+                    <span class="card-title" id="title_silver">Silver Elite Pass</span>
+                    <span class="card-desc" id="desc_silver">Reach target to activate.</span>
                     <div class="progress-micro-bar"><div class="progress-fill" id="barSilver"></div></div>
                 </div>
-                <button class="milestone-action-btn btn-locked" id="btnSilver">Locked</button>
+                <button class="milestone-action-btn btn-locked" id="btnSilver">Locked <i class="fa-solid fa-lock"></i></button>
             </div>
 
             <!-- 📢 AD CONTEXT MID BANNER SLOT FOR HIGH IMPRESSION REVENUE -->
-            <div class="ad-banner-slot" id="midAdSlot">
-                <script type="text/javascript">atOptions={'key':'7c12f3875a6c3846d0cb748a04b9d8e','format':'iframe','height':50,'width':320,'params':{}};</script>
-                <script type="text/javascript" src="https://www.highperformanceformat.com/7c12f3875a6c3846d0cb748a04b9d8e/invoke.js"></script>
-            </div>
+            <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
             <!-- Milestone 3: Gold Level Card -->
             <div class="sponsor-card card-gold" id="cardBox_gold">
                 <div class="sponsor-info-block">
-                    <span class="card-title" id="title_gold">Gold Ultimate Jackpot</span>
-                    <span class="card-desc" id="desc_gold">Reach coins target to activate.</span>
+                    <span class="card-title" id="title_gold">Gold Master Jackpot</span>
+                    <span class="card-desc" id="desc_gold">Reach target to activate.</span>
                     <div class="progress-micro-bar"><div class="progress-fill" id="barGold"></div></div>
                 </div>
-                <button class="milestone-action-btn btn-locked" id="btnGold">Locked</button>
+                <button class="milestone-action-btn btn-locked" id="btnGold">Locked <i class="fa-solid fa-lock"></i></button>
             </div>
 
         </div>
+        
+        <div class="ad-banner-slot" id="adminBannerSlot3"></div>
 
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
         let userMasterCoinsCounter = 0;
 
         document.addEventListener("DOMContentLoaded", () => {
-            executeStartRealtimeMilestoneListener();
+            if (!uid || !token) { window.location.href = "index.html"; return; }
+            fetchDataFromAdminServer();
         });
 
-        // 🧠 ANALYSIS CORE ENGINE: Watches scores and syncs dynamic multi-level transitions
-        function executeStartRealtimeMilestoneListener() {
-            database.ref('users/' + uid).on('value', (snapshot) => {
-                if(snapshot.exists()) {
-                    let d = snapshot.val();
+        // 📡 FETCH USER METRICS & ADMIN BANNERS
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch User Data (Coins and Milestones logic)
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                
+                if (userData.success && userData.user) {
+                    let d = userData.user;
                     userMasterCoinsCounter = d.coins || 0;
                     document.getElementById("masterScoreTxt").innerText = `${userMasterCoinsCounter} 🪙`;
 
@@ -163,27 +190,39 @@
                     let bronzeGoal = (claimedLogs.bronze_l1 === true) ? 1500 : 500;
                     let bronzeReward = (bronzeGoal === 1500) ? 250 : 100;
                     let bronzeKey = (bronzeGoal === 1500) ? 'bronze_l2' : 'bronze_l1';
-                    let bronzeTitle = (bronzeGoal === 1500) ? "Bronze Sponsor [LVL 2]" : "Bronze Sponsor Bonus";
+                    let bronzeTitle = (bronzeGoal === 1500) ? "Bronze Champion [LVL 2]" : "Bronze Rank Bonus";
                     setupDynamicCardModule(userMasterCoinsCounter, bronzeGoal, bronzeReward, bronzeKey, bronzeTitle, claimedLogs[bronzeKey], "barBronze", "btnBronze", "title_bronze", "desc_bronze", "cardBox_bronze");
 
                     // 2. Silver Processing (L1: 2000, L2: 4000)
                     let silverGoal = (claimedLogs.silver_l1 === true) ? 4000 : 2000;
                     let silverReward = (silverGoal === 4000) ? 600 : 300;
                     let silverKey = (silverGoal === 4000) ? 'silver_l2' : 'silver_l1';
-                    let silverTitle = (silverGoal === 4000) ? "Silver Premium [LVL 2]" : "Silver Premium Pass";
+                    let silverTitle = (silverGoal === 4000) ? "Silver Legend [LVL 2]" : "Silver Elite Pass";
                     setupDynamicCardModule(userMasterCoinsCounter, silverGoal, silverReward, silverKey, silverTitle, claimedLogs[silverKey], "barSilver", "btnSilver", "title_silver", "desc_silver", "cardBox_silver");
 
-                    // 3. Gold Processing (L1: 500, L2: 10000)
+                    // 3. Gold Processing (L1: 5000, L2: 10000)
                     let goldGoal = (claimedLogs.gold_l1 === true) ? 10000 : 5000;
                     let goldReward = (goldGoal === 10000) ? 2500 : 1000;
                     let goldKey = (goldGoal === 10000) ? 'gold_l2' : 'gold_l1';
-                    let goldTitle = (goldGoal === 10000) ? "Gold Jackpot [LVL 2]" : "Gold Ultimate Jackpot";
+                    let goldTitle = (goldGoal === 10000) ? "Gold God Tier [LVL 2]" : "Gold Master Jackpot";
                     setupDynamicCardModule(userMasterCoinsCounter, goldGoal, goldReward, goldKey, goldTitle, claimedLogs[goldKey], "barGold", "btnGold", "title_gold", "desc_gold", "cardBox_gold");
                 }
-            });
+
+                // 2. Fetch Admin Banners
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                
+                if (confData.success && confData.banners) {
+                    if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
+                    if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
+                    if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
+                }
+            } catch (err) {
+                document.getElementById("masterScoreTxt").innerText = "Error Loading";
+            }
         }
 
-        // 🛠️ LEVEL-UP RENDER PIPELINE: Transitions targets, updates titles, and hides ONLY after Level 2 Completion
+        // 🛠️ LEVEL-UP RENDER PIPELINE
         function setupDynamicCardModule(currentCoins, targetGoal, rewardCoins, stateDbKey, titleText, isAlreadyClaimed, barId, btnId, titleId, descId, boxId) {
             const bar = document.getElementById(barId);
             const btn = document.getElementById(btnId);
@@ -205,36 +244,68 @@
             bar.style.width = percentage + "%";
 
             // Clean click router override assignment
-            btn.onclick = () => executeClaimMilestoneCoins(stateDbKey, targetGoal, rewardCoins);
+            btn.onclick = () => executeClaimMilestoneCoins(stateDbKey, targetGoal, rewardCoins, btn);
 
             if (currentCoins >= targetGoal) {
                 btn.className = "milestone-action-btn btn-claimable";
-                btn.innerText = "Claim 🎁";
+                btn.innerHTML = 'Claim <i class="fa-solid fa-gift"></i>';
                 btn.disabled = false;
             } else {
                 btn.className = "milestone-action-btn btn-locked";
-                btn.innerText = "Locked 🔒";
+                btn.innerHTML = 'Locked <i class="fa-solid fa-lock"></i>';
                 btn.disabled = true;
             }
         }
 
         // 💰 TRANSACTION DISPATCH ROUTER: Allocates rewards and unlocks sequential node targets
-        function executeClaimMilestoneCoins(stateDbKey, goalLimitCheck, rewardBonusCoins) {
+        async function executeClaimMilestoneCoins(stateDbKey, goalLimitCheck, rewardBonusCoins, btnObj) {
             if(userMasterCoinsCounter < goalLimitCheck) return;
 
-            database.ref('users/' + uid).once('value').then((snapshot) => {
-                if(snapshot.exists()) {
-                    let oldCoins = snapshot.val().coins || 0;
-                    
-                    let updates = {};
-                    updates['coins'] = oldCoins + rewardBonusCoins;
-                    updates[`claimed_milestones/${stateDbKey}`] = true;
+            btnObj.disabled = true;
+            btnObj.innerText = "PROCESSING...";
+            btnObj.className = "milestone-action-btn btn-locked";
 
-                    database.ref('users/' + uid).update(updates).then(() => {
-                        alert(`🎉 Level-Up Bonus! +${rewardBonusCoins} Coins credited straight inside your wallet.`);
-                    });
+            try {
+                // Securely call the backend to process this milestone claim
+                const res = await fetch(`${API_BASE_URL}/user/claim-milestone`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        milestoneKey: stateDbKey,
+                        pointsToAdd: rewardBonusCoins
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showCustomAlert(`🎉 Level-Up Bonus! +${rewardBonusCoins} Points credited straight inside your wallet.`, true);
+                    fetchDataFromAdminServer(); // Refresh entire logic to load Level 2 or Hide the card
+                } else {
+                    showCustomAlert("❌ Failed to claim milestone. Please try again or check connection.");
+                    btnObj.disabled = false;
+                    btnObj.innerHTML = 'Claim <i class="fa-solid fa-gift"></i>';
+                    btnObj.className = "milestone-action-btn btn-claimable";
                 }
-            });
+            } catch (err) {
+                showCustomAlert("⚠️ Server error while claiming reward.");
+            }
+        }
+
+        // Custom Modern Alert Popup
+        function showCustomAlert(msg, isSuccess = false) {
+            const alertBox = document.getElementById("customAlertBox");
+            if(isSuccess) alertBox.classList.add("success-border");
+            else alertBox.classList.remove("success-border");
+
+            document.getElementById("alertMessage").innerText = msg;
+            document.getElementById("alertOverlay").style.display = "block";
+            alertBox.style.display = "block";
+        }
+
+        function closeCustomAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
         }
     </script>
 </body>

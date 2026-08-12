@@ -4,61 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Read Articles - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-pink: #ec4899;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 85% 10%, rgba(6, 182, 212, 0.1) 0%, transparent 50%), radial-gradient(circle at 15% 90%, rgba(59, 130, 246, 0.08) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
         
-        /* Premium Sync Header (Articles Theme - Cyan) */
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #06b6d4; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #06b6d4; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(6, 182, 212, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-left: 20px; }
+        /* Premium Sync Header (Cyan Theme) */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-cyan); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-cyan); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(6, 182, 212, 0.15); transition: 0.2s; border: 1px solid rgba(6, 182, 212, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-left: 20px; letter-spacing: 0.5px; }
         
-        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #06b6d4; font-weight: bold; cursor: pointer; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-cyan); font-weight: bold; cursor: pointer; }
 
         /* Profile Balance Ribbon */
-        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, #0f172a, #1e293b); border: 2px solid #06b6d4; padding: 12px 20px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .balance-card span { font-size: 16px; }
-        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-cyan); padding: 15px 20px; border-radius: 16px; margin-top: 18px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(6, 182, 212, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; }
 
         /* Banner Ads Slots */
-        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
-        .ad-slot-banner { width: 100%; min-height: 60px; background: #1e293b; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #06b6d4; box-sizing: border-box; }
+        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); box-sizing: border-box; }
 
         /* Grid Layout Components */
-        .section-label { width: 92%; max-width: 440px; font-size: 13px; font-weight: 800; color: #06b6d4; text-transform: uppercase; letter-spacing: 0.8px; margin: 15px 0 8px 0; text-align: left; }
-        .grid-container { width: 92%; max-width: 440px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; box-sizing: border-box; margin-bottom: 15px; }
+        .section-label { width: 92%; max-width: 440px; font-size: 13.5px; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 10px 0; text-align: left; border-left: 4px solid var(--accent-cyan); padding-left: 8px; }
+        .grid-container { width: 92%; max-width: 440px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; box-sizing: border-box; margin-bottom: 18px; }
         
-        .zone-card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 20px 10px; text-align: center; color: #fff; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-decoration: none; }
-        .zone-card:active { transform: scale(0.96); border-color: #06b6d4; }
-        .zone-badge { position: absolute; top: 8px; right: 8px; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 20px; text-transform: uppercase; color: #fff; }
-        .badge-top { background: #ef4444; }
-        .badge-popular { background: #f59e0b; }
-        .badge-new { background: #10b981; }
+        /* Premium Interactive Zone Cards */
+        .zone-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 12px; text-align: center; color: #fff; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.3); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-decoration: none; transition: 0.2s; backdrop-filter: blur(10px); }
+        .zone-card:active { transform: scale(0.96); border-color: var(--accent-cyan); box-shadow: 0 4px 10px rgba(6, 182, 212, 0.4); }
+        .zone-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; color: #fff; }
+        .badge-top { background: var(--accent-pink); }
+        .badge-popular { background: var(--warning); }
+        .badge-new { background: var(--accent-green); }
         
-        .zone-icon { font-size: 32px; margin-bottom: 8px; }
-        .zone-card h3 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
-        .zone-card p { margin: 4px 0 0 0; font-size: 11px; color: #94a3b8; }
+        .zone-icon { font-size: 34px; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        .zone-card h3 { margin: 0; font-size: 14.5px; font-weight: 800; color: #fff; }
+        .zone-card p { margin: 5px 0 0 0; font-size: 11.5px; color: var(--text-sub); }
 
         /* Notice Board Security Safe Box */
-        .security-box { width: 92%; max-width: 440px; border: 1px dashed #06b6d4; background: rgba(6, 182, 212, 0.05); border-radius: 12px; padding: 12px 15px; box-sizing: border-box; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; margin-bottom: 15px; }
+        .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-cyan); background: rgba(6, 182, 212, 0.08); border-radius: 14px; padding: 15px 18px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-bottom: 15px; font-weight: 600; }
 
         /* Custom Modern Alert Modal Popup style */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; width: 80%; max-width: 350px; text-align: center; }
-        .custom-alert.success-border { border-color: #10b981; }
-        .custom-alert p { margin: 0 0 15px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
-        .custom-alert button { background: #ef4444; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .custom-alert.success-border button { background: #10b981; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
 
         /* 🎬 PREMIUM MODAL FOR ARTICLE TASK INSTRUCTIONS */
-        .modal-overlay-article { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1001; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
-        .modal-card-article { width: 100%; max-width: 360px; background: #1e293b; border-radius: 24px; border: 1px solid #475569; padding: 25px 20px; box-sizing: border-box; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center; }
-        .modal-title-article { font-size: 18px; font-weight: 800; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .modal-desc-article { font-size: 13px; color: #cbd5e1; margin: 0 0 20px 0; text-align: left; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid #334155; line-height: 1.6; }
-        .article-action-btn { width: 100%; background: linear-gradient(to right, #06b6d4, #0891b2); color: #fff; border: none; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
-        .article-action-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #334155; }
-        .close-article-modal { background: none; border: none; color: #ef4444; font-size: 13px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 15px; padding: 5px 10px; display: inline-block; }
+        .modal-overlay-article { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.9); z-index: 1001; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
+        .modal-card-article { width: 100%; max-width: 380px; background: var(--card-bg); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); padding: 25px 20px; box-sizing: border-box; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; }
+        .modal-title-article { font-size: 19px; font-weight: 900; color: #fff; margin: 0 0 15px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .modal-desc-article { font-size: 13.5px; color: #cbd5e1; margin: 0 0 22px 0; text-align: left; background: rgba(0,0,0,0.3); padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.6; }
+        .article-action-btn { width: 100%; background: linear-gradient(135deg, #06b6d4, #0369a1); color: #fff; border: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4); }
+        .article-action-btn:active:not(:disabled) { transform: scale(0.96); }
+        .article-action-btn:disabled { opacity: 0.6; cursor: not-allowed; background: #475569; box-shadow: none; }
+        .close-article-modal { background: none; border: none; color: var(--accent-pink); font-size: 13.5px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 18px; padding: 8px 15px; display: inline-block; transition: 0.2s; }
+        .close-article-modal:active { background: rgba(239, 68, 68, 0.1); border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -69,7 +88,7 @@
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
-    <!-- 🎬 PREMIUM DIJAIN: ARTICLE TASK DESCRIPTION POPUP -->
+    <!-- 🎬 PREMIUM DESIGN: ARTICLE TASK DESCRIPTION POPUP -->
     <div class="modal-overlay-article" id="articleInstructionModal">
         <div class="modal-card-article">
             <div class="modal-title-article" id="modalTaskTitle">📰 Read Article</div>
@@ -82,14 +101,13 @@
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="art_title">Read Articles</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
             <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
             <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option><option value="ru">RU</option>
         </select>
     </div>
 
@@ -100,13 +118,11 @@
     
     <div class="ad-container-block">
         <!-- 📢 AD SLOT 1 -->
-        <div class="ad-slot-banner" id="articleAdSlot1">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
         <!-- 📢 AD SLOT 2 -->
-        <div class="ad-slot-banner" id="articleAdSlot2">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
     <div class="section-label" data-i18n="art_label1">Premium Blogs</div>
@@ -158,33 +174,145 @@
 
     <div class="ad-container-block">
         <!-- 📢 AD SLOT 3 -->
-        <div class="ad-slot-banner" id="articleAdSlot3">
-            <script type="text/javascript">atOptions = {'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
         <!-- 📢 AD SLOT 4 -->
-        <div class="ad-slot-banner" id="articleAdSlot4">
-            <script type="text/javascript">atOptions = {'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
     <div class="security-box">
-        <span>🔒</span>
-        <span data-i18n="art_security">Scroll and read the article completely for 60 seconds. Quick closing will result in zero coins. Genuine reading helps you earn more!</span>
+        <span style="font-size: 18px;">🔒</span>
+        <span data-i18n="art_security">Scroll and read the article completely for 60 seconds. Quick closing will result in zero points. Genuine reading helps you earn more!</span>
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
-            "en": { "art_title": "Read Articles", "art_label1": "Premium Blogs", "art_label2": "More Categories", "art_tech": "Tech News", "art_tech_desc": "Latest gadgets info", "art_crypto": "Crypto Updates", "art_crypto_desc": "Bitcoin & market trends", "art_health": "Health Tips", "art_health_desc": "Fitness & lifestyle", "art_gaming": "Gaming World", "art_gaming_desc": "Esports news & reviews", "art_finance": "Finance Guide", "art_finance_desc": "Money management", "art_sports": "Sports News", "art_sports_desc": "Football & cricket scores", "art_top": "Top", "art_pop": "Hot", "art_new": "New", "art_security": "Scroll and read the article completely for 60 seconds. Quick closing will result in zero coins. Genuine reading helps you earn more!", "err_early": "❌ Reading Failed! You must read the article for at least 60 seconds.", "err_invalid": "❌ System Alert: Rapid tab switching detected. Stay on the blog page.", "err_success": "🎉 Task Verified! 25 Coins added via ", "verifying": "Reading... ", "start_task": "Read & Earn (60s)",
-                "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Click the button below to open the blog post.<br>2. Scroll down slowly and read the content.<br>3. Stay on the article page for at least <b>60 seconds</b>.<br><br>⚠️ <i>Note: Clicking ads on the blog page gives you extra trust score! Do not close the tab early.</i>"
+            "en": { 
+                "art_title": "Read Articles", "art_label1": "Premium Blogs", "art_label2": "More Categories", 
+                "art_tech": "Tech News", "art_tech_desc": "Latest gadgets info", "art_crypto": "Crypto Updates", "art_crypto_desc": "Bitcoin & market trends", 
+                "art_health": "Health Tips", "art_health_desc": "Fitness & lifestyle", "art_gaming": "Gaming World", "art_gaming_desc": "Esports news & reviews", 
+                "art_finance": "Finance Guide", "art_finance_desc": "Money management", "art_sports": "Sports News", "art_sports_desc": "Football & cricket scores", 
+                "art_top": "Top", "art_pop": "Hot", "art_new": "New", 
+                "art_security": "Scroll and read the article completely for 60 seconds. Quick closing will result in zero points. Genuine reading helps you earn more!", 
+                "err_early": "❌ Reading Incomplete! You must read the article for at least 60 seconds.", 
+                "err_invalid": "❌ Tracking Interrupted: Rapid tab switching detected. Stay on the blog page.", 
+                "err_success": "🎉 Task Verified! 25 Points added via ", "verifying": "Reading... ", "start_task": "Read & Earn (60s)",
+                "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Click the button below to open the blog post.<br>2. Scroll down slowly and read the content.<br>3. Stay on the article page for at least <b>60 seconds</b>.<br><br>⚠️ <i>Note: Do not close the tab early. Enjoy the reading!</i>"
             },
-            "hi": { "art_title": "लेख पढ़ें", "art_label1": "प्रीमियम ब्लॉग्स", "art_label2": "अन्य श्रेणियां", "art_tech": "टेक न्यूज़", "art_tech_desc": "गैजेट्स की जानकारी", "art_crypto": "क्रिप्टो अपडेट्स", "art_crypto_desc": "बिटकॉइन और मार्केट", "art_health": "हेल्थ टिप्स", "art_health_desc": "फिटनेस और लाइफस्टाइल", "art_gaming": "गेमिंग वर्ल्ड", "art_gaming_desc": "ईस्पोर्ट्स न्यूज़", "art_finance": "फाइनेंस गाइड", "art_finance_desc": "पैसे का प्रबंधन", "art_sports": "स्पोर्ट्स न्यूज़", "art_sports_desc": "क्रिकेट और फुटबॉल", "art_top": "टॉप", "art_pop": "हॉट", "art_new": "नया", "art_security": "पूरा लेख 60 सेकंड तक स्क्रॉल करें और पढ़ें। जल्दी बंद करने पर कोई सिक्के नहीं मिलेंगे।", "err_early": "❌ फेल! आपको कम से कम 60 सेकंड तक लेख पढ़ना होगा।", "err_invalid": "❌ सिस्टम अलर्ट: टैब स्विच करना मना है। ब्लॉग पेज पर रहें।", "err_success": "🎉 टास्क पूरा हुआ! आपके वॉलेट में 25 कॉइन्स जोड़ दिए गए हैं: ", "verifying": "पढ़ रहे हैं... ", "start_task": "पढ़ें और कमाएं (60s)",
-                "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. ब्लॉग पोस्ट खोलने के लिए नीचे क्लिक करें。<br>2. धीरे-धीरे नीचे स्क्रॉल करें और लेख को पढ़ें。<br>3. पेज पर कम से कम <b>60 सेकंड</b> तक रुकें。<br><br>⚠️ <i>ध्यान दें: ब्लॉग पेज पर विज्ञापनों (Ads) पर क्लिक करने से आपका ट्रस्ट स्कोर बढ़ता है! पेज को जल्दी बंद न करें।</i>"
+            "hi": { 
+                "art_title": "लेख पढ़ें", "art_label1": "प्रीमियम ब्लॉग्स", "art_label2": "अन्य श्रेणियां", 
+                "art_tech": "टेक न्यूज़", "art_tech_desc": "गैजेट्स की जानकारी", "art_crypto": "क्रिप्टो अपडेट्स", "art_crypto_desc": "बिटकॉइन और मार्केट", 
+                "art_health": "हेल्थ टिप्स", "art_health_desc": "फिटनेस और लाइफस्टाइल", "art_gaming": "गेमिंग वर्ल्ड", "art_gaming_desc": "ईस्पोर्ट्स न्यूज़", 
+                "art_finance": "फाइनेंस गाइड", "art_finance_desc": "पैसे का प्रबंधन", "art_sports": "स्पोर्ट्स न्यूज़", "art_sports_desc": "क्रिकेट और फुटबॉल", 
+                "art_top": "टॉप", "art_pop": "हॉट", "art_new": "नया", 
+                "art_security": "पूरा लेख 60 सेकंड तक पढ़ें। पेज को जल्दी बंद करने पर कोई पॉइंट नहीं मिलेंगे।", 
+                "err_early": "❌ टास्क पूरा नहीं हुआ! आपको कम से कम 60 सेकंड तक लेख पढ़ना होगा।", 
+                "err_invalid": "❌ सिस्टम अलर्ट: टैब स्विच करना मना है। ब्लॉग पेज पर ही रहें।", 
+                "err_success": "🎉 टास्क पूरा हुआ! आपके वॉलेट में 25 पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "पढ़ रहे हैं... ", "start_task": "पढ़ें और कमाएं (60s)",
+                "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. ब्लॉग पोस्ट खोलने के लिए नीचे क्लिक करें।<br>2. धीरे-धीरे नीचे स्क्रॉल करें और लेख को पढ़ें।<br>3. पेज पर कम से कम <b>60 सेकंड</b> तक रुकें।<br><br>⚠️ <i>ध्यान दें: पेज को समय से पहले बंद न करें।</i>"
             },
-            "bn": { "art_title": "আর্টিকেল পড়ুন", "art_label1": "প্রিমিয়াম ব্লগ", "art_label2": "আরও ক্যাটাগরি", "art_tech": "টেক নিউজ", "art_tech_desc": "গ্যাজেটের খবর", "art_crypto": "ক্রিপ্টো আপডেট", "art_crypto_desc": "মার্কেট ট্রেন্ডস", "art_health": "হেলথ টিপস", "art_health_desc": "ফিটনেস ও লাইফস্টাইল", "art_gaming": "গেমিং ওয়ার্ল্ড", "art_gaming_desc": "ইস্পোর্টস নিউজ", "art_finance": "ফাইন্যান্স গাইড", "art_finance_desc": "মানি ম্যানেজমেন্ট", "art_sports": "স্পোর্টস নিউজ", "art_sports_desc": "খেলার খবর", "art_top": "টপ", "art_pop": "হট", "art_new": "নতুন", "art_security": "৬০ সেকেন্ডের জন্য আর্টিকেলটি স্ক্রোল করে পড়ুন। আগে বন্ধ করলে কয়েন পাবেন না।", "err_early": "❌ ব্যর্থ! আপনাকে অন্তত ৬০ সেকেন্ড পড়তে হবে।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: ব্লগ পেজে থাকুন।", "err_success": "🎉 টাস্ক ভেরিফাইড! ২৫ কয়েন যোগ করা হয়েছে: ", "verifying": "পড়ছেন... ", "start_task": "পড়ুন এবং আয় করুন (60s)",
-                "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. ব্লগ পোস্ট খুলতে নিচে ক্লিক করুন。<br>২. ধীরে ধীরে স্ক্রোল করে পড়ুন。<br>৩. অন্তত <b>৬০ সেকেন্ড</b> পেজে থাকুন。<br><br>⚠️ <i>আগে পেজ বন্ধ করবেন না।</i>"
+            "bn": { 
+                "art_title": "আর্টিকেল পড়ুন", "art_label1": "প্রিমিয়াম ব্লগ", "art_label2": "আরও ক্যাটাগরি", 
+                "art_tech": "টেক নিউজ", "art_tech_desc": "গ্যাজেটের খবর", "art_crypto": "ক্রিপ্টো আপডেট", "art_crypto_desc": "মার্কেট ট্রেন্ডস", 
+                "art_health": "হেলথ টিপস", "art_health_desc": "ফিটনেস ও লাইফস্টাইল", "art_gaming": "গেমিং ওয়ার্ল্ড", "art_gaming_desc": "ইস্পোর্টস নিউজ", 
+                "art_finance": "ফাইন্যান্স গাইড", "art_finance_desc": "মানি ম্যানেজমেন্ট", "art_sports": "স্পোর্টস নিউজ", "art_sports_desc": "খেলার খবর", 
+                "art_top": "টপ", "art_pop": "হট", "art_new": "নতুন", 
+                "art_security": "৬০ সেকেন্ডের জন্য আর্টিকেলটি পড়ুন। আগে বন্ধ করলে পয়েন্ট পাবেন না।", 
+                "err_early": "❌ টাস্ক অসম্পূর্ণ! আপনাকে অন্তত ৬০ সেকেন্ড পড়তে হবে।", 
+                "err_invalid": "❌ সিস্টেম অ্যালার্ট: ব্লগ পেজেই থাকুন।", 
+                "err_success": "🎉 টাস্ক ভেরিফাইড! ২৫ পয়েন্ট যোগ করা হয়েছে: ", "verifying": "পড়ছেন... ", "start_task": "পড়ুন এবং আয় করুন (60s)",
+                "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. ব্লগ খুলতে নিচে ক্লিক করুন।<br>২. ধীরে ধীরে স্ক্রোল করে পড়ুন।<br>৩. অন্তত <b>৬০ সেকেন্ড</b> পেজে থাকুন।"
+            },
+            "te": { 
+                "art_title": "వ్యాసాలు చదవండి", "art_label1": "ప్రీమియం బ్లాగులు", "art_label2": "మరిన్ని విభాగాలు", 
+                "art_tech": "టెక్ న్యూస్", "art_tech_desc": "గ్యాడ్జెట్ సమాచారం", "art_crypto": "క్రిప్టో అప్‌డేట్‌లు", "art_crypto_desc": "మార్కెట్ ట్రెండ్స్", 
+                "art_health": "ఆరోగ్య చిట్కాలు", "art_health_desc": "ఫిట్‌నెస్", "art_gaming": "గేమింగ్ వరల్డ్", "art_gaming_desc": "ఈస్పోర్ట్స్ వార్తలు", 
+                "art_finance": "ఫైనాన్స్ గైడ్", "art_finance_desc": "డబ్బు నిర్వహణ", "art_sports": "క్రీడా వార్తలు", "art_sports_desc": "క్రికెట్ స్కోర్లు", 
+                "art_security": "60 సెకన్ల పాటు వ్యాసాన్ని పూర్తిగా చదవండి. త్వరగా మూసివేస్తే పాయింట్లు రావు.", 
+                "err_early": "❌ చదవడం పూర్తికాలేదు! మీరు కనీసం 60 సెకన్ల పాటు చదవాలి.", "err_invalid": "❌ దయచేసి బ్లాగ్ పేజీలోనే ఉండండి.", 
+                "err_success": "🎉 టాస్క్ ధృవీకరించబడింది! 25 పాయింట్లు జోడించబడ్డాయి: ", "verifying": "చదువుతున్నారు... ", "start_task": "చదవండి & సంపాదించండి (60s)",
+                "inst_generic": "👉 <b>నియమాలు:</b><br>1. బ్లాగ్ తెరవడానికి క్రింద క్లిక్ చేయండి.<br>2. చదవండి.<br>3. కనీసం <b>60 సెకన్లు</b> ఉండండి."
+            },
+            "mr": { 
+                "art_title": "लेख वाचा", "art_label1": "प्रीमियम ब्लॉग्स", "art_label2": "अधिक श्रेणी", 
+                "art_tech": "टेक न्यूज", "art_tech_desc": "गॅजेट्सची माहिती", "art_crypto": "क्रिप्टो अपडेट्स", "art_crypto_desc": "मार्केट ट्रेंड्स", 
+                "art_health": "आरोग्य टिप्स", "art_health_desc": "फिटनेस", "art_gaming": "गेमिंग वर्ल्ड", "art_gaming_desc": "ईस्पोर्ट्स बातम्या", 
+                "art_finance": "फायनान्स गाईड", "art_finance_desc": "मनी मॅनेजमेंट", "art_sports": "क्रीडा बातम्या", "art_sports_desc": "क्रिकेट स्कोअर", 
+                "art_security": "60 सेकंद लेख वाचा. लवकर बंद केल्यास पॉइंट्स मिळणार नाहीत.", 
+                "err_early": "❌ अपूर्ण! तुम्हाला किमान 60 सेकंद लेख वाचावा लागेल.", "err_invalid": "❌ कृपया ब्लॉग पेजवरच राहा.", 
+                "err_success": "🎉 टास्क यशस्वी! 25 पॉइंट्स जोडले गेले: ", "verifying": "वाचत आहे... ", "start_task": "वाचा आणि कमवा (60s)",
+                "inst_generic": "👉 <b>नियम:</b><br>1. ब्लॉग उघडण्यासाठी खाली क्लिक करा.<br>2. वाचा.<br>3. किमान <b>60 सेकंद</b> थांबा."
+            },
+            "ur": { 
+                "art_title": "مضامین پڑھیں", "art_label1": "پریمیم بلاگز", "art_label2": "مزید کیٹیگریز", 
+                "art_security": "60 سیکنڈ تک مضمون مکمل پڑھیں۔ جلدی بند کرنے پر پوائنٹس نہیں ملیں گے۔", 
+                "err_early": "❌ نامکمل! آپ کو کم از کم 60 سیکنڈ تک پڑھنا ہوگا۔", "err_invalid": "❌ براہ کرم بلاگ پیج پر رہیں۔", 
+                "err_success": "🎉 ٹاسک تصدیق شدہ! 25 پوائنٹس شامل ہو گئے: ", "verifying": "پڑھ رہے ہیں... ", "start_task": "پڑھیں اور کمائیں (60s)",
+                "inst_generic": "👉 <b>قواعد:</b><br>1. بلاگ کھولنے کے لیے نیچے کلک کریں۔<br>2. 60 سیکنڈ تک صفحے پر رہیں۔"
+            },
+            "es": { 
+                "art_title": "Leer Artículos", "art_label1": "Blogs Premium", "art_label2": "Más Categorías", 
+                "art_security": "Lee el artículo por 60 segundos. Si cierras rápido no obtendrás puntos.", 
+                "err_early": "❌ ¡Incompleto! Debes leer por al menos 60 segundos.", "err_invalid": "❌ Quédate en la página del blog.", 
+                "err_success": "🎉 ¡Verificado! 25 Puntos añadidos: ", "verifying": "Leyendo... ", "start_task": "Leer y Ganar (60s)",
+                "inst_generic": "👉 <b>PASOS:</b><br>1. Abre el blog.<br>2. Lee y quédate al menos <b>60 segundos</b>."
+            },
+            "fr": { 
+                "art_title": "Lire des Articles", "art_label1": "Blogs Premium", "art_label2": "Plus de Catégories", 
+                "art_security": "Lisez l'article pendant 60 secondes pour obtenir des points.", 
+                "err_early": "❌ Incomplet ! Lisez pendant au moins 60 secondes.", "err_invalid": "❌ Restez sur la page du blog.", 
+                "err_success": "🎉 Vérifié ! 25 Points ajoutés: ", "verifying": "Lecture... ", "start_task": "Lire et Gagner (60s)",
+                "inst_generic": "👉 <b>ÉTAPES:</b><br>1. Ouvrez le blog.<br>2. Restez au moins <b>60 secondes</b>."
+            },
+            "ar": { 
+                "ag_title": "ألعاب AdGem", "ag_label1": "ألعاب ذات دفع عالي", "ag_label2": "عروض صغيرة إضافية", 
+                "ag_games": "العب الألعاب", "ag_games_desc": "الوصول إلى المستوى واربح", "ag_apps": "تطبيقات سريعة", "ag_apps_desc": "تحميل وفتح", 
+                "ag_survey": "استطلاعات", "ag_survey_desc": "شاركنا رأيك", "ag_web": "مهام الويب", "ag_web_desc": "سجل لتربح", 
+                "ag_quizzes": "اختبارات الدماغ", "ag_quizzes_desc": "مكافأة 100% درجة", "ag_premium": "حصري", "ag_premium_desc": "عروض VIP سرية", 
+                "ag_top": "الأعلى أجراً", "ag_pop": "شائع", "ag_new": "سهل", 
+                "ag_security": "تستخدم AdGem تتبعاً متقدماً. يرجى إكمال العروض بصدق. استخدام VPN سيلغي مكافأتك.", 
+                "err_early": "❌ العرض غير مكتمل! يرجى قضاء الوقت المطلوب في صفحة العرض للمطالبة بمكافأتك.", 
+                "err_invalid": "❌ تم اكتشاف تبديل سريع للعلامات. يرجى البقاء في صفحة اللعبة.", 
+                "err_success": "🎉 بدأ العرض! تم إضافة 40 نقطة عبر ", "verifying": "جارِ التحقق... ", "start_task": "ابدأ اللعب (25s)",
+                "inst_games": "👉 <b>خطوات الربح:</b><br>1. انقر للدخول إلى جدار الألعاب.<br>2. اختر لعبة وقم بتثبيتها.<br>3. العب والوصول إلى المستوى المطلوب.<br><br>⚠️ <i>ملاحظة: التثبيت لأول مرة فقط هو المؤهل.</i>",
+                "inst_apps": "👉 <b>خطوات الربح:</b><br>1. افتح جدار التطبيقات.<br>2. قم بتثبيت التطبيق وافتحه لمدة 3 دقائق.<br>3. انتظر في صفحة التتبع لمدة 25 ثانية أولاً.",
+                "inst_generic": "👉 <b>خطوات الربح:</b><br>1. انقر أدناه لتحميل العرض.<br>2. أكمل الإجراءات المطلوبة بشكل صحيح.<br>3. ابق نشطاً لمدة 25 ثانية."
+            },
+            "pt": { 
+                "ag_title": "Jogos AdGem", "ag_label1": "Ofertas de Alto Pagamento", "ag_label2": "Micro Ofertas Extras", 
+                "ag_games": "Jogar", "ag_games_desc": "Alcance o nível e ganhe", "ag_apps": "Apps Rápidos", "ag_apps_desc": "Baixar e Abrir", 
+                "ag_survey": "Pesquisas", "ag_survey_desc": "Sua opinião", "ag_web": "Tarefas Web", "ag_web_desc": "Registre-se para ganhar", 
+                "ag_quizzes": "Quizzes", "ag_quizzes_desc": "Recompensa de 100%", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP", 
+                "ag_top": "Mais Pago", "ag_pop": "Popular", "ag_new": "Fácil", 
+                "ag_security": "A AdGem usa rastreamento avançado. Complete as ofertas honestamente. O uso de VPN anulará sua recompensa.", 
+                "err_early": "❌ Oferta Incompleta! Por favor, gaste o tempo necessário na página da oferta.", 
+                "err_invalid": "❌ Interrupção: Troca rápida de abas detectada. Fique na página do jogo.", 
+                "err_success": "🎉 Oferta iniciada! 40 Pontos adicionados via ", "verifying": "Verificando... ", "start_task": "Começar a Jogar (25s)",
+                "inst_games": "👉 <b>PASSOS PARA GANHAR:</b><br>1. Clique para entrar no mural de jogos.<br>2. Selecione e instale um jogo.<br>3. Jogue e alcance o nível exigido.<br><br>⚠️ <i>Apenas novas instalações são elegíveis.</i>",
+                "inst_apps": "👉 <b>PASSOS PARA GANHAR:</b><br>1. Abra o mural de apps.<br>2. Instale e use por 3 minutos.<br>3. Aguarde 25 segundos na página primeiro.",
+                "inst_generic": "👉 <b>PASSOS PARA GANHAR:</b><br>1. Clique abaixo para carregar a oferta.<br>2. Complete as ações corretamente.<br>3. Fique ativo por 25 segundos."
+            },
+            "ru": { 
+                "ag_title": "Игры AdGem", "ag_label1": "Игры с высокой оплатой", "ag_label2": "Дополнительные офферы", 
+                "ag_games": "Играть", "ag_games_desc": "Достигни уровня", "ag_apps": "Приложения", "ag_apps_desc": "Скачать и Открыть", 
+                "ag_survey": "Опросы", "ag_survey_desc": "Поделитесь мнением", "ag_web": "Веб задания", "ag_web_desc": "Регистрация", 
+                "ag_quizzes": "Викторины", "ag_quizzes_desc": "Награда за 100%", "ag_premium": "Эксклюзив", "ag_premium_desc": "VIP офферы", 
+                "ag_top": "Топ оплата", "ag_pop": "Популярно", "ag_new": "Легко", 
+                "ag_security": "Выполняйте задания честно. Использование VPN или эмуляторов аннулирует вашу награду.", 
+                "err_early": "❌ Не завершено! Пожалуйста, проведите больше времени на странице оффера.", 
+                "err_invalid": "❌ Обнаружено быстрое переключение вкладок. Оставайтесь на странице игры.", 
+                "err_success": "🎉 Оффер начат! 40 очков добавлено через ", "verifying": "Проверка... ", "start_task": "Начать играть (25s)",
+                "inst_games": "👉 <b>ШАГИ ДЛЯ ЗАРАБОТКА:</b><br>1. Нажмите, чтобы открыть стену игр.<br>2. Выберите и установите игру.<br>3. Достигните нужного уровня.<br><br>⚠️ <i>Только для новых установок.</i>",
+                "inst_apps": "👉 <b>ШАГИ ДЛЯ ЗАРАБОТКА:</b><br>1. Откройте стену приложений.<br>2. Установите и используйте 3 минуты.<br>3. Сначала подождите 25 секунд.",
+                "inst_generic": "👉 <b>ШАГИ ДЛЯ ЗАРАБОТКА:</b><br>1. Нажмите ниже, чтобы загрузить оффер.<br>2. Выполните требуемые действия.<br>3. Оставайтесь активными 25 секунд."
             }
+           
         };
 
         function changeLanguage(langCode) {
@@ -196,25 +324,11 @@
             });
             document.getElementById("appLanguage").value = langCode;
         }
-    </script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
-        // 🔥 DYNAMIC ROUTING MAP FOR ALL 6 ARTICLE CATEGORIES Control Room Binding
+        // 🔥 DYNAMIC ROUTING MAP FOR ALL 6 ARTICLE CATEGORIES (Fetched from Admin)
         let articleLinksAdminConfig = {
             tech: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
             crypto: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
@@ -224,53 +338,56 @@
             sports: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
         };
 
-        // Connects to Firebase global configuration for Articles
-        database.ref('global_system_runtime_configurations/articles_configuration').on('value', (snap) => {
-            if (snap.exists()) {
-                let dbData = snap.val();
-                Object.keys(articleLinksAdminConfig).forEach(key => {
-                    if (dbData[`article_${key}`]) articleLinksAdminConfig[key] = dbData[`article_${key}`];
-                    // Fallback link if specific format link is missing
-                    else if (dbData.default_article_link) articleLinksAdminConfig[key] = dbData.default_article_link;
-                });
-            }
-        });
-
-        // 4 Banners dynamic layout injector safely matching framework
-        database.ref('global_system_runtime_configurations/watch_ads_banner_slots').on('value', (snap) => {
-            if (snap.exists()) {
-                let banners = snap.val();
-                if (banners.slot1_html && banners.slot1_html.trim() !== "") { let s1 = document.getElementById("articleAdSlot1"); if (s1) { s1.innerHTML = banners.slot1_html; runScripts(s1); } }
-                if (banners.slot2_html && banners.slot2_html.trim() !== "") { let s2 = document.getElementById("articleAdSlot2"); if (s2) { s2.innerHTML = banners.slot2_html; runScripts(s2); } }
-                if (banners.slot3_html && banners.slot3_html.trim() !== "") { let s3 = document.getElementById("articleAdSlot3"); if (s3) { s3.innerHTML = banners.slot3_html; runScripts(s3); } }
-                if (banners.slot4_html && banners.slot4_html.trim() !== "") { let s4 = document.getElementById("articleAdSlot4"); if (s4) { s4.innerHTML = banners.slot4_html; runScripts(s4); } }
-            }
-        });
-
-        function runScripts(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
-            }
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            database.ref('users/' + uid).on('value', (snap) => {
-                if(snap.exists()) {
-                    let d = snap.val();
-                    document.getElementById("liveUserCoins").innerText = d.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (d.balance || 0).toFixed(2);
-                }
-            });
+            fetchDataFromAdminServer();
         });
 
-        // 🔥 STATE VEHICLE PARAMETERS FOR ACTIVE TASK VIEWPORT
+        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch Profile Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // 2. Fetch Admin Banners and Article Specific Links
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    // Inject Dynamic Banners
+                    if (confData.banners) {
+                        for(let i=1; i<=4; i++) {
+                            let slot = document.getElementById(`adminBannerSlot${i}`);
+                            if(slot && confData.banners[i-1]) slot.innerHTML = confData.banners[i-1];
+                        }
+                    }
+                    // Setup Specific Article Links (Sabka alag alag link admin se aayega)
+                    if (confData.articleLinks) {
+                        Object.keys(articleLinksAdminConfig).forEach(key => {
+                            // Agar admin ne us category ka link diya hai, toh use karo, warna global fallback use karo
+                            articleLinksAdminConfig[key] = confData.articleLinks[key] || confData.globalSmartlink || articleLinksAdminConfig[key];
+                        });
+                    } else if (confData.globalSmartlink) {
+                        Object.keys(articleLinksAdminConfig).forEach(key => {
+                            articleLinksAdminConfig[key] = confData.globalSmartlink;
+                        });
+                    }
+                }
+            } catch (err) {
+                console.log("Using default cached configuration.");
+            }
+        }
+
         let currentActiveTaskKey = "";
         let activeWatchSession = null;
         let targetWindow = null;
@@ -279,8 +396,7 @@
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let langBlock = langData[currentLang] || langData["en"];
-            let translatedMsg = langBlock[msgKey] || langData["en"][msgKey];
+            let translatedMsg = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
 
             const alertBox = document.getElementById("customAlertBox");
             const overlay = document.getElementById("alertOverlay");
@@ -318,26 +434,21 @@
             activeWatchSession = null;
         }
 
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC (60 SECONDS FOR ARTICLES)
         function executeArticleTaskRedirection() {
             let taskKey = currentActiveTaskKey;
-            activeWatchSession = {
-                taskKey: taskKey,
-                isValid: true
-            };
+            activeWatchSession = { taskKey: taskKey, isValid: true };
 
             const startBtn = document.getElementById("btnStartArticleTask");
             let lang = localStorage.getItem("selectedLang") || "en";
-            let transObj = langData[lang] || langData["en"];
-            let verifyText = transObj["verifying"] || "Reading... ";
+            let verifyText = langData[lang] && langData[lang]["verifying"] ? langData[lang]["verifying"] : "Reading... ";
 
             startBtn.disabled = true;
 
-            // Redirect smoothly to remote admin routing handle
+            // Redirect to the specific article link fetched from Admin
             let targetDestinationUrl = articleLinksAdminConfig[taskKey];
             targetWindow = window.open(targetDestinationUrl, '_blank', 'noopener,noreferrer');
 
-            // 🚀 SYSTEM MONITORING LOGIC FOR ARTICLES (60 SECONDS)
-            // 60s ensures high AdSense CPC and valid impressions
             let countdownTime = 60;
             totalSecondsOpen = 0;
             
@@ -347,7 +458,7 @@
                 countdownTime--;
                 startBtn.innerText = `${verifyText}(${countdownTime}s)`;
 
-                // Validation Check 1: User closed tab early before 60s execution
+                // Safe Validation 1: User closed tab early before 60s
                 if (targetWindow && targetWindow.closed) {
                     clearInterval(offerTimer);
                     closeArticleInstructionModal();
@@ -356,7 +467,7 @@
                     return;
                 }
 
-                // Validation Check 2: Invalid rapid tab switching detection
+                // Safe Validation 2: Invalid rapid tab switching detection
                 if (!document.hidden) {
                     if (totalSecondsOpen < 59) { 
                         clearInterval(offerTimer);
@@ -376,33 +487,35 @@
             }, 1000);
         }
 
-        function evaluateArticleTaskReward(taskKey) {
+        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
+        async function evaluateArticleTaskReward(taskKey) {
             document.getElementById("articleInstructionModal").style.display = "none";
             if (!activeWatchSession || !activeWatchSession.isValid) { activeWatchSession = null; return; }
 
             let nameDisplay = taskKey.toUpperCase();
 
-            // Safe Database Ledger Transaction
-            database.ref('users/' + uid).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    let oldCoins = snapshot.val().coins || 0;
-                    let oldBalance = snapshot.val().balance || 0;
-
-                    database.ref('users/' + uid).update({
-                        coins: oldCoins + 25,  // Reading article yields 25 Coins
-                        balance: oldBalance + 0.25
-                    }).then(() => {
-                        showCustomAlert("err_success", nameDisplay + " Blog", true);
-                        
-                        // Push ledger details to history matrix
-                        database.ref('users/' + uid + '/earning_history').push({
-                            activity: `Read Article: ${nameDisplay}`,
-                            coins_credited: 25,
-                            timestamp: Date.now()
-                        });
-                    });
+            try {
+                // Call API to add 25 Points and Sync Daily Task 't5' (Article Reading task)
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: 25, 
+                        action: `read_article_${nameDisplay}`,
+                        syncTask: "t5" // Tells backend to complete task 't5'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById("liveUserCoins").innerText = data.newCoins;
+                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
+                    showCustomAlert("err_success", `${nameDisplay} Blog`, true);
                 }
-            });
+            } catch (err) {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            }
 
             activeWatchSession = null;
         }

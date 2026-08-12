@@ -3,60 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Server - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <title>Secure Cloud - Dudo</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #facc15;
+            --accent-pink: #f43f5e;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
         
         /* Premium Sync Header */
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #10b981; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #10b981; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-green); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-green); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); transition: 0.2s; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
 
-        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #10b981; font-weight: bold; cursor: pointer; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-green); font-weight: bold; cursor: pointer; }
 
-        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
         /* Profile Balance Ribbon */
-        .balance-card { background: linear-gradient(135deg, #0f172a, #1e293b); border: 2px solid #10b981; padding: 12px 20px; border-radius: 12px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin-bottom: 5px; }
-        .balance-card span { font-size: 16px; }
-        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-green); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
-        /* 📢 AD CONFIGURATION: TOP INCOME SLOTS */
-        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #10b981; margin: 5px 0; box-sizing: border-box; }
+        /* Banner Ads Slots */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(16, 185, 129, 0.4); margin: 5px 0; box-sizing: border-box; }
 
         /* 🖥️ Main Controller Terminal Grid */
-        .gateway-card { background: #1e293b; border-radius: 24px; padding: 25px 20px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .gateway-card h3 { margin: 0 0 5px 0; font-size: 18px; color: #10b981; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .gateway-card p { margin: 0 0 20px 0; font-size: 12px; color: #94a3b8; font-weight: 500; line-height: 1.4; }
+        .gateway-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .gateway-card h3 { margin: 0 0 10px 0; font-size: 20px; color: var(--accent-green); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .gateway-card p { margin: 0 0 25px 0; font-size: 13.5px; color: var(--text-sub); font-weight: 600; line-height: 1.5; }
 
         /* 🔥 UPGRADED: Server Grid Buttons Pipeline Layout */
-        .server-btn-node { width: 100%; background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #334155; padding: 18px 20px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; cursor: pointer; box-sizing: border-box; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .server-btn-node:active { transform: scale(0.96); border-color: #10b981; }
-        .server-btn-node .meta-left { text-align: left; display: flex; flex-direction: column; gap: 4px; }
-        .server-btn-node .meta-left .srv-title { font-size: 14px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 6px; }
-        .server-btn-node .meta-left .srv-status { font-size: 10px; color: #10b981; font-weight: 800; text-transform: uppercase; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 4px; width: fit-content; }
-        .server-btn-node .reward-right { background: rgba(250, 204, 21, 0.1); border: 1px solid rgba(250, 204, 21, 0.3); color: #facc15; padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 900; }
+        .server-btn-node { width: 100%; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1); padding: 20px 22px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; cursor: pointer; box-sizing: border-box; transition: 0.2s; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .server-btn-node:active { transform: scale(0.96); border-color: var(--accent-green); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
+        .server-btn-node .meta-left { text-align: left; display: flex; flex-direction: column; gap: 6px; }
+        .server-btn-node .meta-left .srv-title { font-size: 15px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
+        .server-btn-node .meta-left .srv-status { font-size: 11px; color: var(--accent-green); font-weight: 900; text-transform: uppercase; background: rgba(16, 185, 129, 0.15); padding: 4px 10px; border-radius: 8px; width: fit-content; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .server-btn-node .reward-right { background: var(--accent-gold); color: #000; padding: 8px 15px; border-radius: 10px; font-size: 14.5px; font-weight: 900; box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4); }
 
         /* 🔥 UPGRADED: Timer Loading Mask Engine Overlay */
-        .verification-mask-panel { display: none; background: #0f172a; border-radius: 16px; padding: 25px 20px; border: 2px dashed #ef4444; margin-top: 10px; text-align: center; box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.15); animation: pulseBorder 1s infinite alternate; }
-        @keyframes pulseBorder { 100% { box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.3); } }
-        .verification-mask-panel h4 { margin: 0 0 5px 0; font-size: 15px; color: #ef4444; font-weight: 800; text-transform: uppercase; }
-        .verification-mask-panel .ticker-countdown { font-size: 38px; font-weight: 900; color: #facc15; margin: 15px 0; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(250, 204, 21, 0.4); }
+        .verification-mask-panel { display: none; background: rgba(0,0,0,0.6); border-radius: 20px; padding: 30px 20px; border: 2px dashed var(--accent-pink); margin-top: 15px; text-align: center; box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.2); animation: pulseBorder 1.5s infinite alternate; }
+        @keyframes pulseBorder { 100% { box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.4); border-color: #f87171; } }
         
-        .claim-payout-btn { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 16px; border-radius: 14px; font-size: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); text-transform: uppercase; margin-top: 15px; display: none; transition: 0.2s; }
-        .claim-payout-btn:active { transform: scale(0.97); }
+        .verification-mask-panel h4 { margin: 0 0 10px 0; font-size: 16px; color: var(--accent-pink); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .verification-mask-panel .ticker-countdown { font-size: 45px; font-weight: 900; color: var(--accent-gold); margin: 15px 0; letter-spacing: 2px; text-shadow: 0 0 15px rgba(250, 204, 21, 0.5); }
+        .verification-mask-panel p { font-size: 12.5px; color: var(--text-sub); margin: 0; font-weight: 600; line-height: 1.5; }
+        
+        .claim-payout-btn { width: 100%; background: linear-gradient(135deg, var(--accent-green), #059669); color: #fff; border: none; padding: 18px; border-radius: 16px; font-size: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); text-transform: uppercase; margin-top: 20px; display: none; transition: 0.2s; letter-spacing: 1px; }
+        .claim-payout-btn:active { transform: scale(0.96); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
 
-        .security-box { border: 1px dashed #10b981; background: rgba(16, 185, 129, 0.03); border-radius: 12px; padding: 12px 15px; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; margin-top: 10px; }
+        /* Security Safe Box */
+        .security-box { border: 1px dashed var(--accent-green); background: rgba(16, 185, 129, 0.05); border-radius: 16px; padding: 15px 18px; font-size: 12.5px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-top: 5px; font-weight: 600; }
 
         /* Custom Modern Alert Modal Popup style */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; width: 80%; max-width: 350px; text-align: center; }
-        .custom-alert.success-border { border-color: #10b981; }
-        .custom-alert p { margin: 0 0 15px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
-        .custom-alert button { background: #ef4444; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .custom-alert.success-border button { background: #10b981; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
@@ -68,7 +88,7 @@
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="sb_title">Secure Cloud</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
@@ -87,25 +107,18 @@
         </div>
 
         <!-- 📢 ADMIN CONNECTED TOP BANNERS -->
-        <div class="ad-banner-slot" id="secureAdSlot1">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
-        <div class="ad-banner-slot" id="secureAdSlot2">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="gateway-card">
             <h3 data-i18n="sb_h3">Premium Link Access</h3>
-            <p data-i18n="sb_p">Select any high-speed secure mirror stream below. Clear the landing validation to claim your distributed cloud task tokens.</p>
+            <p data-i18n="sb_p">Select any high-speed secure mirror stream below. Complete the validation to claim your distributed cloud tokens.</p>
 
             <div id="serversListWrapper">
                 <!-- Server Node 1 -->
                 <div class="server-btn-node" onclick="executeStartValidationSequence('server1')">
                     <div class="meta-left">
-                        <span class="srv-title">⚡ <span data-i18n="sb_s1">High-Speed Mirror 1</span></span>
-                        <span class="srv-status" data-i18n="sb_s1_sub">🟢 Stable (99ms)</span>
+                        <span class="srv-title"><i class="fa-solid fa-bolt" style="color: #facc15;"></i> <span data-i18n="sb_s1">High-Speed Mirror 1</span></span>
+                        <span class="srv-status" data-i18n="sb_s1_sub">Stable (99ms)</span>
                     </div>
                     <span class="reward-right">+30 🪙</span>
                 </div>
@@ -113,8 +126,8 @@
                 <!-- Server Node 2 -->
                 <div class="server-btn-node" onclick="executeStartValidationSequence('server2')">
                     <div class="meta-left">
-                        <span class="srv-title">🛡️ <span data-i18n="sb_s2">Secure Encrypted 2</span></span>
-                        <span class="srv-status" data-i18n="sb_s2_sub">🟢 Optimized</span>
+                        <span class="srv-title"><i class="fa-solid fa-shield-halved" style="color: #3b82f6;"></i> <span data-i18n="sb_s2">Secure Encrypted 2</span></span>
+                        <span class="srv-status" data-i18n="sb_s2_sub">Optimized</span>
                     </div>
                     <span class="reward-right">+30 🪙</span>
                 </div>
@@ -122,8 +135,8 @@
                 <!-- Server Node 3 -->
                 <div class="server-btn-node" onclick="executeStartValidationSequence('server3')">
                     <div class="meta-left">
-                        <span class="srv-title">🌐 <span data-i18n="sb_s3">Global Traffic Server 3</span></span>
-                        <span class="srv-status" data-i18n="sb_s3_sub">🟢 Pathway Clear</span>
+                        <span class="srv-title"><i class="fa-solid fa-globe" style="color: #a855f7;"></i> <span data-i18n="sb_s3">Global Traffic Server 3</span></span>
+                        <span class="srv-status" data-i18n="sb_s3_sub">Pathway Clear</span>
                     </div>
                     <span class="reward-right">+30 🪙</span>
                 </div>
@@ -131,34 +144,45 @@
 
             <!-- 🔥 Live Ticking Active Validation Tracking Box -->
             <div class="verification-mask-panel" id="verificationMaskCard">
-                <h4 id="maskLabelTxt" data-i18n="sb_decrypt">Verifying Gateway Link...</h4>
+                <h4 id="maskLabelTxt" data-i18n="sb_decrypt"><i class="fa-solid fa-circle-notch fa-spin"></i> Verifying Connection...</h4>
                 <div class="ticker-countdown" id="validationCountdownClock">20s</div>
-                <p style="font-size: 11px; color: #64748b; margin: 0;" id="maskSubDesc" data-i18n="sb_stay">Stay on the sponsor tab for 20s. Closing early voids balance verification loops.</p>
+                <p id="maskSubDesc" data-i18n="sb_stay">Please stay on the sponsor page for 20 seconds. Closing early will cancel your reward.</p>
                 
-                <button class="claim-payout-btn" id="claimValidationRewardBtn" onclick="executeCreditValidationTokens()" data-i18n="sb_claim">Claim Secure Reward Tokens 🎁</button>
+                <button class="claim-payout-btn" id="claimValidationRewardBtn" onclick="executeCreditValidationTokens()"><i class="fa-solid fa-gift"></i> <span data-i18n="sb_claim">Claim Secure Reward Tokens</span></button>
             </div>
         </div>
 
         <!-- 📢 ADMIN CONNECTED BOTTOM BANNERS -->
-        <div class="ad-banner-slot" id="secureAdSlot3">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
-        <div class="ad-banner-slot" id="secureAdSlot4">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <div class="ad-banner-slot" id="adminBannerSlot2"></div>
+        <div class="ad-banner-slot" id="adminBannerSlot3"></div>
 
         <div class="security-box">
-            <span>🛡️</span>
-            <span data-i18n="sb_security">System validation engine is handling this active thread. Switching applications or utilizing split screens limits core rewards instantly.</span>
+            <span style="font-size: 18px;">🛡️</span>
+            <span data-i18n="sb_security">Security protocols are active. Switching applications or tabs during the verification process will pause synchronization and cancel rewards.</span>
         </div>
 
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "sb_title": "Secure Cloud", "sb_wallet": "Wallet Balance", "sb_h3": "Premium Link Access", "sb_p": "Select any high-speed secure mirror stream below. Clear the validation to claim cloud tokens.", "sb_s1": "High-Speed Mirror 1", "sb_s1_sub": "🟢 Stable (99ms)", "sb_s2": "Secure Encrypted 2", "sb_s2_sub": "🟢 Optimized", "sb_s3": "Global Traffic Server 3", "sb_s3_sub": "🟢 Pathway Clear", "sb_decrypt": "Verifying Gateway Link...", "sb_stay": "Stay on the sponsor tab for 20s. Closing early voids balance.", "sb_claim": "Claim Secure Reward Tokens 🎁", "sb_security": "System validation engine is active. Switching apps locks rewards instantly.", "err_early": "❌ Validation Failed! You closed the secure window early.", "err_invalid": "❌ System Alert! You left the link terminal. Stay active for 20s.", "err_success": "🎉 Verification Success! Tokens bundled inside your ledger.", "msg_success": "🔒 LINK SUCCESSFULLY VERIFIED!" },
-            "hi": { "sb_title": "सिक्योर सर्वर", "sb_wallet": "वॉलेट बैलेंस", "sb_h3": "प्रीमियम लिंक एक्सेस", "sb_p": "नीचे दिए गए किसी भी हाई-स्पीड सर्वर को चुनें। टोकन का दावा करने के लिए विज्ञापन सत्यापन पास करें।", "sb_s1": "हाई-स्पीड मिरर 1", "sb_s1_sub": "🟢 स्थिर (99ms)", "sb_s2": "सिक्योर एन्क्रिप्टेड 2", "sb_s2_sub": "🟢 ऑप्टिमाइज़", "sb_s3": "ग्लोबल ट्रैफिक सर्वर 3", "sb_s3_sub": "🟢 पाथवे क्लियर", "sb_decrypt": "लिंक वेरीफाई हो रहा है...", "sb_stay": "कृपया स्पॉन्सर टैब पर 20 सेकंड तक रुकें। जल्दी बंद करने से रिवॉर्ड नहीं मिलेगा।", "sb_claim": "रिवॉर्ड टोकन क्लेम करें 🎁", "sb_security": "सिस्टम मॉनिटर सक्रिय है। ऐप बदलने या स्प्लिट स्क्रीन करने पर रिवॉर्ड तुरंत लॉक हो जाएगा।", "err_early": "❌ सत्यापन विफल! आपने विंडो को जल्दी बंद कर दिया।", "err_invalid": "❌ सिस्टम अलर्ट! कृपया 20 सेकंड तक साइट पर बने रहें।", "err_success": "🎉 सफलता! टोकन आपके वॉलेट में सुरक्षित रूप से जुड़ गए हैं।", "msg_success": "🔒 लिंक सफलतापूर्वक वेरीफाई हो गया!" },
-            "bn": { "sb_title": "নিরাপদ সার্ভার", "sb_wallet": "ওয়ালেট ব্যালেন্স", "sb_h3": "প্রিমিয়াম লিংক অ্যাক্সেস", "sb_p": "নিচের যেকোনো দ্রুত সার্ভার নির্বাচন করুন। টোকেন পেতে যাচাইকরণ সম্পূর্ণ করুন।", "sb_s1": "হাই-স্পিড মিরর ১", "sb_s1_sub": "🟢 স্থিতিশীল", "sb_s2": "সিকিউর এনক্রিপ্টেড ২", "sb_s2_sub": "🟢 অপ্টিমাইজড", "sb_s3": "গ্লোবাল ট্রাফিক সার্ভার ৩", "sb_s3_sub": "🟢 ক্লিয়ার", "sb_decrypt": "লিংক যাচাই করা হচ্ছে...", "sb_stay": "দয়া করে ২০ সেকেন্ড স্পনসর ট্যাবে থাকুন। আগে বন্ধ করলে রিওয়ার্ড পাবেন না।", "sb_claim": "রিওয়ার্ড টোকেন নিন 🎁", "sb_security": "সিস্টেম মনিটর চালু আছে। অ্যাপ পরিবর্তন করলে রিওয়ার্ড লক হবে।", "err_early": "❌ যাচাইকরণ ব্যর্থ! আপনি উইন্ডোটি আগে বন্ধ করেছেন।", "err_invalid": "❌ সিস্টেম অ্যালার্ট! আপনি পেজ থেকে বেরিয়ে গেছেন। ২০ সেকেন্ড থাকুন।", "err_success": "🎉 সফল! টোকেন আপনার ওয়ালেটে যোগ হয়েছে।", "msg_success": "🔒 লিংক সফলভাবে যাচাই করা হয়েছে!" }
+            "en": { "sb_title": "Secure Cloud", "sb_wallet": "Wallet Balance", "sb_h3": "Premium Link Access", "sb_p": "Select any high-speed secure mirror stream below. Complete the validation to claim cloud tokens.", "sb_s1": "High-Speed Mirror 1", "sb_s1_sub": "Stable (99ms)", "sb_s2": "Secure Encrypted 2", "sb_s2_sub": "Optimized", "sb_s3": "Global Traffic Server 3", "sb_s3_sub": "Pathway Clear", "sb_decrypt": "Verifying Connection...", "sb_stay": "Please stay on the sponsor page for 20 seconds. Closing early will cancel your reward.", "sb_claim": "Claim Secure Reward Tokens", "sb_security": "Security protocols are active. Switching applications or tabs during the verification process will pause synchronization and cancel rewards.", "err_early": "❌ Verification Incomplete! You closed the secure window early.", "err_invalid": "❌ Tracking Interrupted! Please stay active on the site for 20s.", "err_success": "🎉 Verification Success! Points added to your balance.", "msg_success": "🔒 CONNECTION SECURED!" },
+            "hi": { "sb_title": "सिक्योर सर्वर", "sb_wallet": "वॉलेट बैलेंस", "sb_h3": "प्रीमियम लिंक एक्सेस", "sb_p": "नीचे दिए गए किसी भी हाई-स्पीड सर्वर को चुनें। टोकन का दावा करने के लिए विज्ञापन सत्यापन पूरा करें।", "sb_s1": "हाई-स्पीड मिरर 1", "sb_s1_sub": "स्थिर (99ms)", "sb_s2": "सिक्योर एन्क्रिप्टेड 2", "sb_s2_sub": "ऑप्टिमाइज़", "sb_s3": "ग्लोबल ट्रैफिक सर्वर 3", "sb_s3_sub": "पाथवे क्लियर", "sb_decrypt": "कनेक्शन वेरीफाई हो रहा है...", "sb_stay": "कृपया स्पॉन्सर टैब पर 20 सेकंड तक रुकें। जल्दी बंद करने से रिवॉर्ड नहीं मिलेगा।", "sb_claim": "रिवॉर्ड टोकन क्लेम करें", "sb_security": "सिक्योरिटी प्रोटोकॉल सक्रिय है। ऐप बदलने या स्प्लिट स्क्रीन करने पर रिवॉर्ड कैंसिल हो जाएगा।", "err_early": "❌ सत्यापन अधूरा! आपने विंडो को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया 20 सेकंड तक साइट पर बने रहें।", "err_success": "🎉 सफलता! टोकन आपके वॉलेट में सुरक्षित रूप से जुड़ गए हैं।", "msg_success": "🔒 लिंक सफलतापूर्वक वेरीफाई हो गया!" },
+            "bn": { "sb_title": "নিরাপদ সার্ভার", "sb_wallet": "ওয়ালেট ব্যালেন্স", "sb_h3": "প্রিমিয়াম লিংক অ্যাক্সেস", "sb_p": "নিচের যেকোনো দ্রুত সার্ভার নির্বাচন করুন। টোকেন পেতে যাচাইকরণ সম্পূর্ণ করুন।", "sb_s1": "হাই-স্পিড মিরর ১", "sb_s1_sub": "স্থিতিশীল", "sb_s2": "সিকিউর এনক্রিপ্টেড ২", "sb_s2_sub": "অপ্টিমাইজড", "sb_s3": "গ্লোবাল ট্রাফিক সার্ভার ৩", "sb_s3_sub": "ক্লিয়ার", "sb_decrypt": "লিংক যাচাই করা হচ্ছে...", "sb_stay": "দয়া করে ২০ সেকেন্ড স্পনসর ট্যাবে থাকুন। আগে বন্ধ করলে রিওয়ার্ড পাবেন না।", "sb_claim": "রিওয়ার্ড টোকেন নিন", "sb_security": "নিরাপত্তা প্রটোকল চালু আছে। অ্যাপ পরিবর্তন করলে রিওয়ার্ড বাতিল হবে।", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি উইন্ডোটি আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! দয়া করে ২০ সেকেন্ড থাকুন।", "err_success": "🎉 সফল! টোকেন আপনার ওয়ালেটে যোগ হয়েছে।", "msg_success": "🔒 লিংক সফলভাবে যাচাই করা হয়েছে!" },
+            "te": { "sb_title": "సురక్షిత సర్వర్", "sb_security": "దయచేసి ట్యాబ్‌లను మార్చవద్దు.", "err_early": "❌ అసంపూర్ణం! త్వరగా మూసివేశారు.", "err_invalid": "❌ ట్యాబ్ మార్చవద్దు.", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "msg_success": "🔒 లింక్ ధృవీకరించబడింది!" },
+            "mr": { "sb_title": "सुरक्षित सर्व्हर", "sb_security": "कृपया टॅब बदलू नका.", "err_early": "❌ अपूर्ण! लवकर बंद केले.", "err_invalid": "❌ टॅब बदलू नका.", "err_success": "🎉 सत्यापित! पॉइंट्स जोडले गेले: ", "msg_success": "🔒 लिंक सत्यापित झाली!" },
+            "ta": { "sb_title": "பாதுகாப்பான சர்வர்", "sb_security": "தாவல்களை மாற்ற வேண்டாம்.", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ தாவல்களை மாற்ற வேண்டாம்.", "err_success": "🎉 சரிபார்க்கப்பட்டது! ", "msg_success": "🔒 இணைப்பு சரிபார்க்கப்பட்டது!" },
+            "ur": { "sb_title": "محفوظ سرور", "sb_security": "ٹیب تبدیل نہ کریں۔", "err_early": "❌ نامکمل! جلدی بند کر دیا۔", "err_invalid": "❌ ٹیب تبدیل نہ کریں۔", "err_success": "🎉 تصدیق ہو گئی! ", "msg_success": "🔒 لنک کی تصدیق ہو گئی!" },
+            "gu": { "sb_title": "સુરક્ષિત સર્વર", "sb_security": "ટેબ બદલશો નહીં.", "err_early": "❌ અધૂરું! વહેલું બંધ કર્યું.", "err_invalid": "❌ ટેબ બદલશો નહીં.", "err_success": "🎉 ચકાસાયેલ! ", "msg_success": "🔒 લિંક ચકાસાયેલ!" },
+            "es": { "sb_title": "Servidor Seguro", "sb_security": "No cambies de pestaña.", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ No cambies de pestaña.", "err_success": "🎉 ¡Verificado! ", "msg_success": "🔒 ¡ENLACE VERIFICADO!" },
+            "fr": { "sb_title": "Serveur Sécurisé", "sb_security": "Ne changez pas d'onglet.", "err_early": "❌ Incomplet!", "err_invalid": "❌ Ne changez pas d'onglet.", "err_success": "🎉 Vérifié ! ", "msg_success": "🔒 LIEN VÉRIFIÉ !" },
+            "ar": { "sb_title": "خادم آمن", "sb_security": "لا تبدل التبويبات.", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ لا تبدل التبويبات.", "err_success": "🎉 تم التحقق! ", "msg_success": "🔒 تم التحقق من الرابط!" },
+            "pt": { "sb_title": "Servidor Seguro", "sb_security": "Não mude de aba.", "err_early": "❌ Incompleto!", "err_invalid": "❌ Não mude de aba.", "err_success": "🎉 Verificado! ", "msg_success": "🔒 LINK VERIFICADO!" },
+            "ru": { "sb_title": "Защищенный сервер", "sb_security": "Не меняйте вкладки.", "err_early": "❌ Не завершено!", "err_invalid": "❌ Не меняйте вкладки.", "err_success": "🎉 Проверено! ", "msg_success": "🔒 СВЯЗЬ ПОДТВЕРЖДЕНА!" }
         };
 
         function changeLanguage(langCode) {
@@ -166,78 +190,75 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) elem.innerText = transObj[key];
+                if(transObj[key]) {
+                    if (elem.tagName === "H4" && elem.id === "maskLabelTxt" && !elem.innerText.includes("VERIFIED")) {
+                        elem.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${transObj[key]}`;
+                    } else if (elem.tagName === "BUTTON" && elem.id === "claimValidationRewardBtn") {
+                        elem.innerHTML = `<i class="fa-solid fa-gift"></i> ${transObj[key]}`;
+                    } else {
+                        elem.innerText = transObj[key];
+                    }
+                }
             });
             document.getElementById("appLanguage").value = langCode;
         }
-    </script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
-        let activeAdminSmartlinkUrl = "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
-
-        // 🔥 CONNECT BANNERS AND TASKS SMARTLINK DIRECT TO FIREBASE ADMIN CONTROL NODES
-        database.ref('global_system_runtime_configurations').on('value', (snap) => {
-            if(snap.exists()) {
-                let conf = snap.val();
-                if(conf.watch_ads_configuration && conf.watch_ads_configuration.global_smartlink) {
-                    activeAdminSmartlinkUrl = conf.watch_ads_configuration.global_smartlink;
-                }
-                if(conf.watch_ads_banner_slots) {
-                    let b = conf.watch_ads_banner_slots;
-                    if (b.slot1_html) { let s1 = document.getElementById("secureAdSlot1"); if(s1) { s1.innerHTML = b.slot1_html; runScripts(s1); } }
-                    if (b.slot2_html) { let s2 = document.getElementById("secureAdSlot2"); if(s2) { s2.innerHTML = b.slot2_html; runScripts(s2); } }
-                    if (b.slot3_html) { let s3 = document.getElementById("secureAdSlot3"); if(s3) { s3.innerHTML = b.slot3_html; runScripts(s3); } }
-                    if (b.slot4_html) { let s4 = document.getElementById("secureAdSlot4"); if(s4) { s4.innerHTML = b.slot4_html; runScripts(s4); } }
-                }
-            }
-        });
-
-        function runScripts(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
-            }
-        }
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
 
         document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            database.ref('users/' + uid).on('value', (snap) => {
-                if(snap.exists()) {
-                    let d = snap.val();
-                    document.getElementById("liveUserCoins").innerText = d.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (d.balance || 0).toFixed(2);
-                }
-            });
+            fetchDataFromAdminServer();
         });
+
+        // 📡 FETCH USER DATA AND ADMIN BANNERS/LINKS
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch Profile Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // 2. Fetch Admin Banners and Smartlinks
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    // Inject Banners
+                    if (confData.banners) {
+                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
+                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
+                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
+                    }
+                    
+                    if (confData.globalSmartlink) {
+                        activeAdminSmartlinkUrl = confData.globalSmartlink;
+                    }
+                }
+            } catch (err) {
+                console.log("Using cached configuration.");
+            }
+        }
 
         function showCustomAlert(msgKey, isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let msg = langData[currentLang][msgKey] || langData["en"][msgKey];
+            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
+
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");
             else alertBox.classList.remove("success-border");
 
-            document.getElementById("alertMessage").innerText = msg;
+            document.getElementById("alertMessage").innerText = msgStr;
             document.getElementById("alertOverlay").style.display = "block";
             alertBox.style.display = "block";
         }
@@ -251,17 +272,15 @@
         let totalSecondsOpenedInt = 0;
         let activeValidationInterval = null;
         let targetValidationWindow = null;
-        const taskRewardCoinsInt = 30;
+        const taskRewardCoinsInt = 30; // Server 1,2,3 same payout for now
 
-        // 🔥 ADDED SYSTEM TAB TRACKER 
+        // 🔥 ADDED TAB TRACKER 
         window.hasMainTabHidden = false;
         document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                window.hasMainTabHidden = true;
-            }
+            if (document.hidden) { window.hasMainTabHidden = true; }
         });
 
-        // 🧠 VALIDATION INITIALIZATION: Generates link trigger and handles layouts
+        // 🚀 PLAY STORE SAFE VALIDATION LOGIC (20 SECONDS)
         function executeStartValidationSequence(serverIdString) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
             validationCountdownInt = 20;
@@ -273,15 +292,15 @@
             document.getElementById("validationCountdownClock").style.display = "block";
             document.getElementById("claimValidationRewardBtn").style.display = "none";
             
-            let verifyTxt = langData[currentLang]["sb_decrypt"] || langData["en"]["sb_decrypt"];
-            document.getElementById("maskLabelTxt").innerText = verifyTxt;
-            document.getElementById("maskLabelTxt").style.color = "#ef4444";
-            document.getElementById("verificationMaskCard").style.borderColor = "#ef4444";
+            let verifyTxt = langData[currentLang]["sb_decrypt"] || "Verifying Connection...";
+            document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${verifyTxt}`;
+            document.getElementById("maskLabelTxt").style.color = "var(--accent-pink)";
+            document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-pink)";
 
             targetValidationWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
 
             activeValidationInterval = setInterval(() => {
-                // Check 1: Early Exit
+                // Safe Validation 1: Tab closed early
                 if(targetValidationWindow && targetValidationWindow.closed) {
                     clearInterval(activeValidationInterval);
                     resetValidationDashboardLayout();
@@ -289,7 +308,7 @@
                     return;
                 }
 
-                // Check 2: Tab Switching Verification
+                // Safe Validation 2: Invalid tab switching
                 if(!document.hidden && window.hasMainTabHidden) {
                     if(totalSecondsOpenedInt < 19) {
                         clearInterval(activeValidationInterval);
@@ -306,41 +325,50 @@
                 if(validationCountdownInt <= 0) {
                     clearInterval(activeValidationInterval);
                     
-                    let successTxt = langData[currentLang]["msg_success"] || langData["en"]["msg_success"];
+                    let successTxt = langData[currentLang]["msg_success"] || "🔒 CONNECTION SECURED!";
                     document.getElementById("validationCountdownClock").style.display = "none";
-                    document.getElementById("maskLabelTxt").innerText = successTxt;
-                    document.getElementById("maskLabelTxt").style.color = "#10b981";
-                    document.getElementById("verificationMaskCard").style.borderColor = "#10b981";
+                    document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-lock"></i> ${successTxt}`;
+                    document.getElementById("maskLabelTxt").style.color = "var(--accent-green)";
+                    document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-green)";
                     document.getElementById("claimValidationRewardBtn").style.display = "block";
                 }
             }, 1000);
         }
 
-        // 💰 TRANSACTION DISPATCH ROUTER & DAILY TASK SYNC
-        function executeCreditValidationTokens() {
-            database.ref('users/' + uid).once('value').then((snapshot) => {
-                if(snapshot.exists()) {
-                    let oldCoins = snapshot.val().coins || 0;
-                    let oldBal = snapshot.val().balance || 0;
-                    let monetized = 30 / 100;
-                    
-                    database.ref('users/' + uid).update({
-                        coins: oldCoins + taskRewardCoinsInt,
-                        balance: oldBal + monetized
-                    }).then(() => {
-                        showCustomAlert("err_success", true);
-                        
-                        // 🔥 SYNC LOG DATA WITH BACKEND HOME CHECKLIST PROGRESS BAR (t10 node)
-                        let currentDailyList = snapshot.val().completed_daily_tasks_array_node || [];
-                        if(!currentDailyList.includes("t10")) {
-                            currentDailyList.push("t10");
-                            database.ref('users/' + uid).update({ completed_daily_tasks_array_node: currentDailyList });
-                        }
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t10)
+        async function executeCreditValidationTokens() {
+            const btn = document.getElementById("claimValidationRewardBtn");
+            btn.disabled = true;
+            btn.innerText = "SAVING...";
 
-                        resetValidationDashboardLayout();
-                    });
+            try {
+                // Call Node API to add 30 Points and Sync Daily Task 't10'
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: taskRewardCoinsInt, 
+                        action: "secure_server_claim",
+                        syncTask: "t10" // Completes Daily Task 't10'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById("liveUserCoins").innerText = data.newCoins;
+                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
+                    
+                    showCustomAlert("err_success", true);
                 }
-            });
+            } catch (err) {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            } finally {
+                resetValidationDashboardLayout();
+                let currentLang = localStorage.getItem("selectedLang") || "en";
+                btn.innerHTML = `<i class="fa-solid fa-gift"></i> ${langData[currentLang]["sb_claim"] || "Claim Secure Reward Tokens"}`;
+                btn.disabled = false;
+            }
         }
 
         function resetValidationDashboardLayout() {

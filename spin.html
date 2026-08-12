@@ -4,41 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spin & Win - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; padding-bottom: 40px; overflow-x: hidden; }
-        
-        /* Premium Gold/Dark Header */
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #fbbf24; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #fbbf24; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(251, 191, 36, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); flex-grow: 1; text-align: center; }
-        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #fbbf24; font-weight: bold; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-pink: #f43f5e;
+            --accent-orange: #f97316;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
 
-        /* Balance Info */
-        .info-bar { width: 90%; max-width: 400px; background: linear-gradient(135deg, #451a03, #78350f); padding: 15px; border-radius: 12px; margin-top: 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; border: 1px solid #b45309; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2); }
-        .info-bar p { margin: 0; font-size: 13px; color: #fde68a; font-weight: bold; }
-        .info-bar h3 { margin: 5px 0 0 0; font-size: 22px; color: #fff; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); padding-bottom: 40px; overflow-x: hidden; }
+        
+        /* Premium Sync Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-gold); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-gold); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(251, 191, 36, 0.15); transition: 0.2s; border: 1px solid rgba(251, 191, 36, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); flex-grow: 1; text-align: center; letter-spacing: 0.5px; }
+        
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-gold); font-weight: bold; cursor: pointer; }
+
+        /* Balance Info Ribbon */
+        .info-bar { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(69, 26, 3, 0.9), rgba(120, 53, 15, 0.9)); padding: 18px 20px; border-radius: 16px; margin-top: 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; border: 1px solid #b45309; box-shadow: 0 8px 25px rgba(251, 191, 36, 0.2); backdrop-filter: blur(10px); }
+        .info-bar p { margin: 0 0 6px 0; font-size: 13.5px; color: #fde68a; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-bar h3 { margin: 0; font-size: 24px; color: #fff; font-weight: 900; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
 
         /* 📢 ADMIN CONNECTED AD BANNER */
-        .ad-banner { width: 90%; max-width: 400px; min-height: 50px; background: #1e293b; margin: 20px 0; border-radius: 8px; display: flex; justify-content: center; align-items: center; border: 1px dashed #475569; overflow: hidden; box-sizing: border-box; }
+        .ad-banner { width: 92%; max-width: 440px; min-height: 52px; background: rgba(255,255,255,0.03); margin: 20px 0; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 1px dashed rgba(251, 191, 36, 0.4); overflow: hidden; box-sizing: border-box; }
 
         /* 🔥 UPGRADED: Spin Wheel Container & Glowing Ring */
-        .wheel-container { position: relative; width: 300px; height: 300px; margin: 40px 0; display: flex; justify-content: center; align-items: center; }
-        .wheel-outer-ring { position: absolute; width: 320px; height: 320px; border-radius: 50%; border: 4px dashed #fbbf24; animation: spinRing 15s linear infinite; opacity: 0.5; box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
+        .wheel-container { position: relative; width: 310px; height: 310px; margin: 30px 0 40px 0; display: flex; justify-content: center; align-items: center; }
+        .wheel-outer-ring { position: absolute; width: 335px; height: 335px; border-radius: 50%; border: 5px dashed var(--accent-orange); animation: spinRing 20s linear infinite; opacity: 0.6; box-shadow: 0 0 25px rgba(249, 115, 22, 0.3); }
         @keyframes spinRing { 100% { transform: rotate(360deg); } }
         
         /* The Pointer */
-        .wheel-pointer { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 35px solid #ef4444; z-index: 10; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); }
+        .wheel-pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid var(--accent-pink); z-index: 10; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); }
 
         /* The Wheel itself */
-        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #fbbf24; box-sizing: border-box; box-shadow: 0 0 30px rgba(251, 191, 36, 0.6), inset 0 0 25px rgba(0,0,0,0.8); overflow: hidden; position: relative; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); background: conic-gradient( #f59e0b 0deg 45deg, #1e293b 45deg 90deg, #f59e0b 90deg 135deg, #1e293b 135deg 180deg, #f59e0b 180deg 225deg, #1e293b 225deg 270deg, #f59e0b 270deg 315deg, #1e293b 315deg 360deg ); z-index: 5; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 10px solid var(--accent-gold); box-sizing: border-box; box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), inset 0 0 30px rgba(0,0,0,0.9); overflow: hidden; position: relative; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); background: conic-gradient( var(--accent-orange) 0deg 45deg, #1e293b 45deg 90deg, var(--accent-orange) 90deg 135deg, #1e293b 135deg 180deg, var(--accent-orange) 180deg 225deg, #1e293b 225deg 270deg, var(--accent-orange) 270deg 315deg, #1e293b 315deg 360deg ); z-index: 5; }
         
         /* Wheel Center Dot */
-        .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 45px; height: 45px; background: radial-gradient(circle, #ffffff, #e2e8f0); border-radius: 50%; border: 6px solid #fbbf24; box-shadow: 0 0 15px rgba(0,0,0,0.8); z-index: 10; }
+        .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: radial-gradient(circle, #ffffff, #e2e8f0); border-radius: 50%; border: 6px solid var(--accent-gold); box-shadow: 0 0 20px rgba(0,0,0,0.9); z-index: 10; }
 
         /* Numbers Visibility */
-        .slice { position: absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: 50% 100%; display: flex; justify-content: center; padding-top: 15px; box-sizing: border-box; font-size: 28px; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); z-index: 5; }
+        .slice { position: absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: 50% 100%; display: flex; justify-content: center; padding-top: 20px; box-sizing: border-box; font-size: 32px; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 6px rgba(0,0,0,0.9); z-index: 5; }
         
         .slice-1 { transform: rotate(22.5deg); }
         .slice-2 { transform: rotate(67.5deg); }
@@ -50,28 +67,29 @@
         .slice-8 { transform: rotate(337.5deg); }
 
         /* Controls */
-        .controls { text-align: center; width: 90%; max-width: 400px; z-index: 10; }
-        .spins-left { font-size: 16px; color: #fbbf24; font-weight: bold; margin-bottom: 15px; background: rgba(251,191,36,0.1); padding: 10px; border-radius: 12px; border: 1px solid rgba(251, 191, 36, 0.3); }
+        .controls { text-align: center; width: 92%; max-width: 440px; z-index: 10; }
+        .spins-left { font-size: 16.5px; color: var(--accent-gold); font-weight: 900; margin-bottom: 20px; background: rgba(251,191,36,0.1); padding: 12px; border-radius: 14px; border: 1px dashed rgba(251, 191, 36, 0.4); text-transform: uppercase; letter-spacing: 0.5px; box-shadow: inset 0 0 10px rgba(251,191,36,0.1); }
         
-        .action-btn { width: 100%; padding: 16px; border-radius: 25px; border: none; font-size: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; box-shadow: 0 6px 20px rgba(0,0,0,0.4); outline: none; }
-        .btn-spin { background: linear-gradient(to right, #f59e0b, #ea580c); color: white; }
-        .btn-spin:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
-        .btn-spin:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+        .action-btn { width: 100%; padding: 18px; border-radius: 50px; border: none; font-size: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: 0 8px 25px rgba(0,0,0,0.5); outline: none; }
+        .btn-spin { background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); color: #000; }
+        .btn-spin:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4); }
+        .btn-spin:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
         
-        .btn-ad { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; display: none; margin-top: 15px; }
-        .btn-ad:active:not(:disabled) { transform: scale(0.96); }
-        .btn-ad:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        .btn-ad { background: linear-gradient(135deg, var(--primary-blue), #1e3a8a); color: white; display: none; margin-top: 15px; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4); }
+        .btn-ad:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .btn-ad:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
         /* Custom Modern Alert Modal Popup style */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 1000; width: 80%; max-width: 345px; text-align: center; }
-        .custom-alert.success-border { border-color: #22c55e; }
-        .custom-alert p { margin: 0 0 20px 0; font-size: 15px; color: #e2e8f0; font-weight: 700; line-height: 1.5; }
-        .custom-alert button { background: linear-gradient(to right, #ef4444, #b91c1c); border: none; color: white; padding: 10px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(239,68,68,0.3); }
-        .custom-alert.success-border button { background: #22c55e; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 20px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 30px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
 
         /* Notice Board Security Safe Box */
-        .security-box { width: 90%; max-width: 400px; border: 1px dashed #fbbf24; background: rgba(251, 191, 36, 0.05); border-radius: 12px; padding: 12px 15px; margin-top: 20px; box-sizing: border-box; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; }
+        .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-gold); background: rgba(251, 191, 36, 0.05); border-radius: 16px; padding: 15px 18px; margin-top: 25px; box-sizing: border-box; font-size: 12.5px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -83,33 +101,33 @@
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="spin_title">Spin & Win</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option><option value="mr">MR</option>
+            <option value="te">TE</option><option value="ta">TA</option><option value="ur">UR</option><option value="gu">GU</option>
         </select>
     </div>
 
     <div class="info-bar">
         <div>
             <p data-i18n="wallet_bal">Wallet Balance</p>
-            <h3 id="wallBal">₹0.00</h3>
+            <h3 id="wallBal"><i class="fa-solid fa-spinner fa-spin" style="font-size: 18px;"></i></h3>
         </div>
         <div style="text-align: right;">
             <p data-i18n="total_coins">Total Coins</p>
-            <h3 id="wallCoins">0🪙</h3>
+            <h3 id="wallCoins"><i class="fa-solid fa-spinner fa-spin" style="font-size: 18px;"></i></h3>
         </div>
     </div>
 
     <!-- 📢 ADMIN CONNECTED AD BANNER SLOT -->
-    <div class="ad-banner" id="spinAdSlot1">
-       <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="ba166ca9f88" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/a166ca9f88/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-    </div>
+    <div class="ad-banner" id="adminBannerSlot1"></div>
 
     <div class="wheel-container">
         <div class="wheel-outer-ring"></div>
         <div class="wheel-pointer"></div>
         <div class="wheel" id="spinWheel">
+            <!-- Values hardcoded for visual UI. Backend decides the actual win -->
             <div class="slice slice-1">0</div>
             <div class="slice slice-2">5</div>
             <div class="slice slice-3">1</div>
@@ -122,23 +140,32 @@
     </div>
 
     <div class="controls">
-        <div class="spins-left"><span data-i18n="spins_left">Spins Left Today:</span> <span id="spinCountText">Loading...</span></div>
+        <div class="spins-left"><span data-i18n="spins_left">Spins Left Today:</span> <span id="spinCountText" style="color:#fff;"><i class="fa-solid fa-circle-notch fa-spin"></i></span></div>
         
-        <button class="action-btn btn-spin" id="spinBtn" onclick="startSpin()" data-i18n="btn_spin">SPIN NOW</button>
-        <button class="action-btn btn-ad" id="adBtn" onclick="watchAdForSpin()" data-i18n="btn_watch_ad">📺 WATCH AD FOR 1 SPIN</button>
+        <button class="action-btn btn-spin" id="spinBtn" onclick="executeSpinRequest()"><i class="fa-solid fa-dharmachakra"></i> <span data-i18n="btn_spin">SPIN NOW</span></button>
+        <button class="action-btn btn-ad" id="adBtn" onclick="watchAdForSpin()"><i class="fa-solid fa-play"></i> <span data-i18n="btn_watch_ad">WATCH AD FOR 1 SPIN</span></button>
     </div>
 
     <div class="security-box">
-        <span>🛡️</span>
-        <span data-i18n="sec_msg">System validation active. Closing ads or switching tabs early voids your extra spin reward.</span>
+        <span style="font-size: 18px;">🛡️</span>
+        <span data-i18n="sec_msg">Verification protocols are active. Do not switch tabs or close the application during the ad view to ensure you receive your extra spin.</span>
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL MULTILINGUAL SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "spin_title": "Spin & Win", "wallet_bal": "Wallet Balance", "total_coins": "Total Coins", "spins_left": "Spins Left Today:", "btn_spin": "SPIN NOW", "btn_watch_ad": "📺 WATCH AD FOR 1 SPIN", "err_early": "❌ Verification Failed! You closed the sponsor tab early.", "err_invalid": "❌ System Alert: App switching detected. Stay on the ad page for 25s.", "spin_added": "🎉 1 Extra Spin Added successfully!", "won_msg": "🎉 Congratulations! You won ", "lost_msg": "😢 Oops! Better luck next time.", "sec_msg": "System validation active. Closing ads or switching tabs early voids your extra spin reward." },
-            "hi": { "spin_title": "स्पिन और विन", "wallet_bal": "वॉलेट बैलेंस", "total_coins": "कुल सिक्के", "spins_left": "आज बचे हुए स्पिन:", "btn_spin": "अभी घुमाएं", "btn_watch_ad": "📺 1 स्पिन के लिए एड देखें", "err_early": "❌ सत्यापन विफल! आपने स्पॉन्सर टैब को जल्दी बंद कर दिया।", "err_invalid": "❌ सिस्टम अलर्ट: ऐप बदलना ब्लॉक किया गया। कृपया 25 सेकंड तक एड पेज पर बने रहें।", "spin_added": "🎉 1 अतिरिक्त स्पिन सफलतापूर्वक जुड़ गया!", "won_msg": "🎉 बधाई हो! आपने जीते हैं ", "lost_msg": "😢 ऊप्स! अगली बार बेहतर किस्मत।", "sec_msg": "सिस्टम वैलिडेशन सक्रिय है। विज्ञापन छोड़ने या टैब बदलने पर स्पिन रद्द हो जाएगा।" },
-            "bn": { "spin_title": "স্পিন এবং জয়", "wallet_bal": "ওয়ালেট ব্যালেন্স", "total_coins": "মোট কয়েন", "spins_left": "আজকের বাকি স্পিন:", "btn_spin": "এখন ঘুরান", "btn_watch_ad": "📺 ১ স্পিনের জন্য অ্যাড দেখুন", "err_early": "❌ যাচাই ব্যর্থ! আপনি স্পনসর ট্যাব আগে বন্ধ করেছেন।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: অ্যাপ পরিবর্তন সনাক্ত হয়েছে। 25s অপেক্ষা করুন।", "spin_added": "🎉 ১টি অতিরিক্ত স্পিন যোগ হয়েছে!", "won_msg": "🎉 অভিনন্দন! আপনি জিতেছেন ", "lost_msg": "😢 উফফ! পরের বার আরও ভালো ভাগ্য।", "sec_msg": "সিস্টেম ভেরিফিকেশন সক্রিয়। বিজ্ঞাপন এড়িয়ে গেলে আপনার স্পিন বাতিল হবে।" },
-            "mr": { "spin_title": "स्पिन आणि जिंका", "wallet_bal": "वॉलेट शिल्लक", "total_coins": "एकूण नाणी", "spins_left": "आजचे उर्वरित स्पिन:", "btn_spin": "आता फिरवा", "btn_watch_ad": "📺 १ स्पिनसाठी जाहिरात पहा", "err_early": "❌ पडताळणी अयशस्वी! आपण स्पॉन्सर टॅब लवकर बंद केला.", "err_invalid": "❌ सिस्टम अलर्ट: ॲप स्विच करणे आढळले. 25 सेकंद जाहिरात पृष्ठावर रहा.", "spin_added": "🎉 1 अतिरिक्त स्पिन यशस्वीरित्या जोडले!", "won_msg": "🎉 अभिनंदन! तुम्ही जिंकलात ", "lost_msg": "😢 अरेरे! पुढच्या वेळी चांगले नशीब.", "sec_msg": "सिस्टम पडताळणी सक्रिय. जाहिरात सोडल्यास किंवा टॅब बदलल्यास स्पिन रद्द होईल." }
+            "en": { "spin_title": "Spin & Win", "wallet_bal": "Wallet Balance", "total_coins": "Total Coins", "spins_left": "Spins Left Today:", "btn_spin": "SPIN NOW", "btn_watch_ad": "WATCH AD FOR 1 SPIN", "err_early": "❌ Verification Incomplete! You closed the sponsor tab early.", "err_invalid": "❌ Tracking Interrupted! Please stay on the ad page for 25s.", "spin_added": "🎉 1 Extra Spin Added successfully!", "won_msg": "🎉 Congratulations! You won ", "lost_msg": "😢 Oops! Better luck next time.", "sec_msg": "Verification protocols are active. Do not switch tabs or close the application during the ad view to ensure you receive your extra spin." },
+            "hi": { "spin_title": "स्पिन और विन", "wallet_bal": "वॉलेट बैलेंस", "total_coins": "कुल सिक्के", "spins_left": "आज बचे हुए स्पिन:", "btn_spin": "अभी घुमाएं", "btn_watch_ad": "1 स्पिन के लिए विज्ञापन देखें", "err_early": "❌ सत्यापन अधूरा! आपने स्पॉन्सर टैब को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया 25 सेकंड तक एड पेज पर बने रहें।", "spin_added": "🎉 1 अतिरिक्त स्पिन सफलतापूर्वक जुड़ गया!", "won_msg": "🎉 बधाई हो! आपने जीते हैं ", "lost_msg": "😢 ऊप्स! अगली बार बेहतर किस्मत।", "sec_msg": "सत्यापन प्रक्रिया सक्रिय है। अतिरिक्त स्पिन प्राप्त करने के लिए विज्ञापन देखते समय ऐप या टैब न बदलें।" },
+            "bn": { "spin_title": "স্পিন এবং জয়", "wallet_bal": "ওয়ালেট ব্যালেন্স", "total_coins": "মোট কয়েন", "spins_left": "বাকি স্পিন:", "btn_spin": "এখন ঘুরান", "btn_watch_ad": "অ্যাড দেখুন (১ স্পিন)", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি স্পনসর ট্যাব আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! 25s পেজেই থাকুন।", "spin_added": "🎉 ১টি স্পিন যোগ হয়েছে!", "won_msg": "🎉 আপনি জিতেছেন ", "lost_msg": "😢 পরের বার আরও ভালো ভাগ্য।", "sec_msg": "ট্যাব পরিবর্তন করলে স্পিন বাতিল হবে।" },
+            "mr": { "spin_title": "स्पिन आणि जिंका", "wallet_bal": "वॉलेट शिल्लक", "total_coins": "एकूण नाणी", "spins_left": "उर्वरित स्पिन:", "btn_spin": "आता फिरवा", "btn_watch_ad": "१ स्पिनसाठी जाहिरात पहा", "err_early": "❌ अपूर्ण! आपण टॅब लवकर बंद केला.", "err_invalid": "❌ ट्रॅकिंग थांबले! 25 सेकंद जाहिरात पृष्ठावर रहा.", "spin_added": "🎉 1 स्पिन जोडले!", "won_msg": "🎉 तुम्ही जिंकलात ", "lost_msg": "😢 पुढच्या वेळी चांगले नशीब.", "sec_msg": "जाहिरात पाहताना टॅब बदलू नका." },
+            "te": { "spin_title": "స్పిన్ & విన్", "btn_spin": "స్పిన్ చేయండి", "err_success": "🎉 గెలిచారు: ", "lost_msg": "😢 మళ్లీ ప్రయత్నించండి." },
+            "ta": { "spin_title": "சுழற்றி வெல்லுங்கள்", "btn_spin": "சுழற்று", "err_success": "🎉 வென்றீர்கள்: ", "lost_msg": "😢 மீண்டும் முயற்சிக்கவும்." },
+            "ur": { "spin_title": "اسپن اور جیتیں", "btn_spin": "اسپن کریں", "err_success": "🎉 آپ نے جیتا: ", "lost_msg": "😢 اگلی بار کے لئے گڈ لک۔" },
+            "gu": { "spin_title": "સ્પિન અને જીતો", "btn_spin": "સ્પિન કરો", "err_success": "🎉 તમે જીત્યા: ", "lost_msg": "😢 ફરી પ્રયાસ કરો." }
         };
 
         function changeLanguage(langCode) {
@@ -146,94 +173,90 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) { elem.innerText = transObj[key]; }
+                if(transObj[key]) elem.innerText = transObj[key];
             });
             document.getElementById("appLanguage").value = langCode;
         }
-    </script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
         const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
         let currentRotation = 0;
         let isSpinning = false;
-        let userCoins = 0;
-        let userBalance = 0;
         let spinsLeft = 0;
-        let activeAdminSmartlinkUrl = "https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js";
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
         
-        const prizes = [0, 5, 1, 10, 2, 20, 3, 5]; 
+        // Match UI with the specific angles
+        const prizesMap = [
+            { label: 0, angle: 22.5 },
+            { label: 5, angle: 67.5 },
+            { label: 1, angle: 112.5 },
+            { label: 10, angle: 157.5 },
+            { label: 2, angle: 202.5 },
+            { label: 20, angle: 247.5 },
+            { label: 3, angle: 292.5 },
+            { label: 5, angle: 337.5 }
+        ];
 
-        // 🔥 CONNECT BANNERS AND TASKS SMARTLINK DIRECT TO FIREBASE ADMIN CONTROL NODES
-        database.ref('global_system_runtime_configurations').on('value', (snap) => {
-            if(snap.exists()) {
-                let conf = snap.val();
-                if(conf.watch_ads_configuration && conf.watch_ads_configuration.global_smartlink) {
-                    activeAdminSmartlinkUrl = conf.watch_ads_configuration.global_smartlink;
-                }
-                if(conf.watch_ads_banner_slots) {
-                    let b = conf.watch_ads_banner_slots;
-                    if (b.slot1_html) { let s1 = document.getElementById("spinAdSlot1"); if(s1) { s1.innerHTML = b.slot1_html; runScripts(s1); } }
-                }
-            }
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            fetchDataFromAdminServer();
         });
 
-        function runScripts(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
+        // 📡 FETCH USER DATA AND ADMIN CONFIGS (NODE API)
+        async function fetchDataFromAdminServer() {
+            try {
+                // Fetch User Details & Spin Counts
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = (userData.user.coins || 0) + " 🪙";
+                    document.getElementById("wallBal").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                    
+                    // Client reads spins from DB
+                    let today = new Date().toLocaleDateString();
+                    if(userData.user.lastSpinDate !== today) {
+                        spinsLeft = 2; // Default daily spins
+                        updateSpinsToBackend(2, today);
+                    } else {
+                        spinsLeft = userData.user.spinsLeftToday !== undefined ? userData.user.spinsLeftToday : 0;
+                    }
+                    updateButtonsUI();
+                }
+
+                // Fetch Admin Banners and Smartlink
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    if (confData.banners && confData.banners[0]) {
+                        document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
+                    }
+                    if (confData.globalSmartlink) {
+                        activeAdminSmartlinkUrl = confData.globalSmartlink;
+                    }
+                }
+            } catch (err) {
+                console.log("Using cached configuration.");
             }
         }
 
-        // 🔥 SYSTEM TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                window.hasMainTabHidden = true;
-            }
-        });
+        async function updateSpinsToBackend(spins, dateStr) {
+            try {
+                await fetch(`${API_BASE_URL}/user/update-spins`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: uid, spinsLeft: spins, date: dateStr })
+                });
+            } catch(e) {}
+        }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            if (!uid) { window.location.href = "index.html"; return; }
-            changeLanguage(localStorage.getItem("selectedLang") || "en");
-
-            database.ref('users/' + uid).on('value', (snap) => {
-                if (snap.exists()) {
-                    let data = snap.val();
-                    userBalance = data.balance || 0;
-                    userCoins = data.coins || 0;
-                    document.getElementById("wallBal").innerText = "₹ " + userBalance.toFixed(2);
-                    document.getElementById("wallCoins").innerText = userCoins + " 🪙";
-
-                    let today = new Date().toLocaleDateString();
-                    if(data.lastSpinDate !== today) {
-                        spinsLeft = 2; // 2 FREE Spins Everyday
-                        database.ref('users/' + uid).update({ spinsLeftToday: 2, lastSpinDate: today });
-                    } else {
-                        spinsLeft = data.spinsLeftToday !== undefined ? data.spinsLeftToday : 0;
-                    }
-                    updateButtons();
-                }
-            });
-        });
-
-        function updateButtons() {
+        function updateButtonsUI() {
             document.getElementById("spinCountText").innerText = spinsLeft;
             if(spinsLeft > 0) {
                 document.getElementById("spinBtn").style.display = "block";
@@ -246,12 +269,13 @@
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let msg = langData[currentLang][msgKey] || langData["en"][msgKey];
+            let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey] || msgKey;
+
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");
             else alertBox.classList.remove("success-border");
 
-            document.getElementById("alertMessage").innerText = msg + appendText;
+            document.getElementById("alertMessage").innerText = msgStr + appendText;
             document.getElementById("alertOverlay").style.display = "block";
             alertBox.style.display = "block";
         }
@@ -261,81 +285,94 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        function startSpin() {
+        // 🔥 ADDED TAB TRACKER 
+        window.hasMainTabHidden = false;
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) { window.hasMainTabHidden = true; }
+        });
+
+        // 🎰 SECURE SPIN LOGIC (Talks to Node API)
+        async function executeSpinRequest() {
             if(isSpinning || spinsLeft <= 0) return;
             isSpinning = true;
             
             document.getElementById("spinBtn").disabled = true;
 
-            spinsLeft--;
-            database.ref('users/' + uid).update({ spinsLeftToday: spinsLeft });
-            updateButtons();
+            try {
+                // Call API to get randomized reward (Backend decides the win)
+                const res = await fetch(`${API_BASE_URL}/spin/play`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: uid })
+                });
 
-            let randomSliceIndex = Math.floor(Math.random() * 8); 
-            let extraSpins = 5 * 360; 
-            let stopAngle = (randomSliceIndex * 45) + 22.5; 
-            
-            currentRotation += extraSpins + stopAngle;
-            
-            let wheel = document.getElementById("spinWheel");
-            wheel.style.transform = `rotate(${currentRotation}deg)`;
+                const data = await res.json();
+                
+                if(data.success) {
+                    spinsLeft--;
+                    updateButtonsUI();
 
-            setTimeout(() => {
+                    let wonCoins = data.reward;
+                    let targetSliceIndex = prizesMap.findIndex(p => p.label === wonCoins);
+                    if(targetSliceIndex === -1) targetSliceIndex = 0; // Fallback
+
+                    let extraSpins = 5 * 360; 
+                    // Calculate exact angle to stop pointer (Pointer is at top)
+                    let stopAngle = 360 - prizesMap[targetSliceIndex].angle; 
+                    
+                    currentRotation += extraSpins + stopAngle;
+                    
+                    let wheel = document.getElementById("spinWheel");
+                    wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+                    setTimeout(() => {
+                        isSpinning = false;
+                        document.getElementById("spinBtn").disabled = false;
+                        
+                        // Update UI balances
+                        document.getElementById("liveUserCoins").innerText = data.newCoins + " 🪙";
+                        document.getElementById("wallBal").innerText = "₹" + data.newBalance.toFixed(2);
+                        
+                        if(wonCoins > 0) {
+                            showCustomAlert("won_msg", `${wonCoins} Coins!`, true);
+                        } else {
+                            showCustomAlert("lost_msg");
+                        }
+
+                    }, 4100);
+
+                } else {
+                    isSpinning = false;
+                    document.getElementById("spinBtn").disabled = false;
+                    alert("Sync Error. Please try again.");
+                }
+            } catch(e) {
                 isSpinning = false;
                 document.getElementById("spinBtn").disabled = false;
-                
-                let actualPrizeIndex = (8 - randomSliceIndex - 1) % 8;
-                if (actualPrizeIndex < 0) actualPrizeIndex += 8; 
-                let wonCoins = prizes[actualPrizeIndex];
-                
-                if(wonCoins > 0) {
-                    showCustomAlert("won_msg", `${wonCoins} Coins!`, true);
-                    
-                    let monetizedValue = wonCoins / 100;
-                    
-                    database.ref('users/' + uid).once('value').then((snapshot) => {
-                        if(snapshot.exists()) {
-                            let oldCoins = snapshot.val().coins || 0;
-                            let oldBalance = snapshot.val().balance || 0;
-                            database.ref('users/' + uid).update({ 
-                                coins: oldCoins + wonCoins,
-                                balance: oldBalance + monetizedValue
-                            }).then(() => {
-                                // 🔥 SYNC LOG DATA WITH BACKEND HOME CHECKLIST PROGRESS BAR (t11 node)
-                                let currentDailyList = snapshot.val().completed_daily_tasks_array_node || [];
-                                if(!currentDailyList.includes("t11")) {
-                                    currentDailyList.push("t11");
-                                    database.ref('users/' + uid).update({ completed_daily_tasks_array_node: currentDailyList });
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    showCustomAlert("lost_msg");
-                }
-            }, 4100);
+                alert("Server connection failed.");
+            }
         }
 
+        // 📺 SECURE AD VERIFICATION (25s)
         let platformTimer = null;
         let countdownTime = 25;
         let targetWindow = null;
         let totalSecondsOpen = 0;
 
-        // 🔥 FIXED VERIFICATION ENGINE: Handles Popup Blocking and Safety Properly
         function watchAdForSpin() {
             const btn = document.getElementById("adBtn");
             btn.disabled = true;
 
             countdownTime = 25;
             totalSecondsOpen = 0;
-            window.hasMainTabHidden = false; // Add tracker for active verification
+            window.hasMainTabHidden = false; // Tracker reset
             
             btn.innerText = `Verifying... (${countdownTime}s)`;
 
             targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
 
             platformTimer = setInterval(() => {
-                // If user instantly closes the ad window without waiting
+                // Check 1: User instantly closes window
                 if(targetWindow && targetWindow.closed) {
                     clearInterval(platformTimer);
                     resetAdBtn();
@@ -343,7 +380,7 @@
                     return;
                 }
 
-                // If they came BACK to the main app BEFORE 24 seconds are up
+                // Check 2: Invalid tab switching
                 if(!document.hidden && window.hasMainTabHidden) {
                     if(totalSecondsOpen < 24) {
                         clearInterval(platformTimer);
@@ -357,14 +394,15 @@
                 countdownTime--;
                 btn.innerText = `Verifying... (${countdownTime}s)`;
 
-                // Success Event Completion Loop
                 if(countdownTime <= 0) {
                     clearInterval(platformTimer);
-                    btn.innerText = "CLAIMED SUCCESSFULLY";
+                    btn.innerText = "SAVING...";
 
+                    // Add +1 Spin and Save to Server
                     spinsLeft++;
-                    database.ref('users/' + uid).update({ spinsLeftToday: spinsLeft }).then(() => {
-                        updateButtons();
+                    let today = new Date().toLocaleDateString();
+                    updateSpinsToBackend(spinsLeft, today).then(() => {
+                        updateButtonsUI();
                         resetAdBtn();
                         showCustomAlert("spin_added", "", true);
                     });
@@ -376,7 +414,7 @@
             const btn = document.getElementById("adBtn");
             let currentLang = localStorage.getItem("selectedLang") || "en";
             btn.disabled = false;
-            btn.innerText = langData[currentLang]["btn_watch_ad"] || "📺 WATCH AD FOR 1 SPIN";
+            btn.innerHTML = `<i class="fa-solid fa-play"></i> ${langData[currentLang]["btn_watch_ad"] || "WATCH AD FOR 1 SPIN"}`;
         }
     </script>
 </body>

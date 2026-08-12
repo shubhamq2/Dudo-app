@@ -3,53 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Square Dash - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <title>Arcade Game - Dudo</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #090d16; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; overflow-x: hidden; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-pink: #f43f5e;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; overflow-x: hidden; padding-bottom: 40px; }
         
         /* Premium Corporate Sync Header */
-        .header { width: 100%; background: #111827; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #f43f5e; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #f43f5e; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(244, 63, 94, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-pink); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-pink); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(244, 63, 94, 0.15); transition: 0.2s; border: 1px solid rgba(244, 63, 94, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
-        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #374151; outline: none; font-size: 12px; background: #1f2937; color: #f43f5e; font-weight: bold; cursor: pointer; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
 
         /* Profile Balance Ribbon */
-        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, #1f2937, #111827); border: 2px solid #f43f5e; padding: 12px 20px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .balance-card span { font-size: 16px; }
-        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-pink); padding: 15px 20px; border-radius: 16px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(244, 63, 94, 0.2); backdrop-filter: blur(10px); align-items: center; }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
         /* 4-Banners Play Store Masking Grid Layout */
-        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
-        .ad-slot-banner { width: 100%; min-height: 50px; background: #111827; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #374151; box-sizing: border-box; }
+        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(244, 63, 94, 0.4); box-sizing: border-box; }
 
         /* 🔥 UPGRADED: Real-Time Cyberpunk Game Canvas Viewport */
-        .game-viewport-box { width: 92%; max-width: 440px; position: relative; background: #0f172a; border-radius: 20px; border: 2px solid #3b82f6; overflow: hidden; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(0,0,0,0.8); box-sizing: border-box; margin: 10px 0; }
-        #gameCanvas { display: block; background: linear-gradient(to bottom, #0f172a 40%, #1e1b4b 100%); width: 100%; height: 240px; touch-action: none; }
+        .game-viewport-box { width: 92%; max-width: 440px; position: relative; background: #0f172a; border-radius: 20px; border: 2px solid var(--primary-blue); overflow: hidden; box-shadow: 0 0 35px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(0,0,0,0.8); box-sizing: border-box; margin: 10px 0; }
+        #gameCanvas { display: block; background: linear-gradient(to bottom, #0f172a 40%, #1e1b4b 100%); width: 100%; height: 260px; touch-action: none; }
         
         /* Interactive Overlay Screens Setup */
-        .game-overlay-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(4px); }
-        .game-over-title { font-size: 32px; font-weight: 900; color: #22d3ee; margin: 0 0 10px 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5); letter-spacing: 2px; }
-        .game-score-report { font-size: 14px; color: #cbd5e1; margin: 0 0 20px 0; font-weight: 600; line-height: 1.5; }
-        .game-play-btn { background: linear-gradient(to right, #f43f5e, #e11d48); color: #fff; border: none; padding: 14px 40px; border-radius: 50px; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 20px rgba(244, 63, 94, 0.6); outline: none; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; position: relative; z-index: 20; }
-        .game-play-btn:active:not(:disabled) { transform: scale(0.95); }
+        .game-overlay-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .game-over-title { font-size: 34px; font-weight: 900; color: var(--accent-cyan); margin: 0 0 10px 0; text-transform: uppercase; text-shadow: 0 0 15px rgba(34, 211, 238, 0.6); letter-spacing: 2px; }
+        .game-score-report { font-size: 15px; color: #cbd5e1; margin: 0 0 25px 0; font-weight: 700; line-height: 1.5; }
+        
+        .game-play-btn { background: linear-gradient(135deg, var(--accent-pink), #be123c); color: #fff; border: none; padding: 15px 40px; border-radius: 50px; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(244, 63, 94, 0.5); outline: none; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; position: relative; z-index: 20; }
+        .game-play-btn:active:not(:disabled) { transform: scale(0.95); box-shadow: 0 4px 15px rgba(244, 63, 94, 0.5); }
         .game-play-btn:disabled { background: #374151; color: #9ca3af; box-shadow: none; cursor: not-allowed; }
         
         /* Real-Time Embedded Metrics Floating Dashboard Widgets */
-        .live-score-badge { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); padding: 6px 15px; border-radius: 20px; font-size: 14px; font-weight: 900; border: 1px solid rgba(34, 211, 238, 0.3); z-index: 5; color: #22d3ee; box-shadow: 0 0 10px rgba(34, 211, 238, 0.2); pointer-events: none; }
+        .live-score-badge { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.8); padding: 8px 18px; border-radius: 20px; font-size: 15px; font-weight: 900; border: 1px solid rgba(34, 211, 238, 0.4); z-index: 5; color: var(--accent-cyan); box-shadow: 0 0 15px rgba(34, 211, 238, 0.3); pointer-events: none; text-transform: uppercase; }
 
         /* Notice Board Security Safe Box */
-        .security-box { width: 92%; max-width: 440px; border: 1px dashed #f43f5e; background: rgba(244, 63, 94, 0.03); border-radius: 12px; padding: 12px 15px; margin-top: 10px; box-sizing: border-box; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; margin-bottom: 15px; }
+        .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-pink); background: rgba(244, 63, 94, 0.08); border-radius: 16px; padding: 15px 18px; margin-top: 15px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; font-weight: 600; }
 
         /* Custom Modern Alert Modal Popup style */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #f43f5e; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; width: 80%; max-width: 350px; text-align: center; }
-        .custom-alert.success-border { border-color: #10b981; }
-        .custom-alert p { margin: 0 0 15px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
-        .custom-alert button { background: #f43f5e; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .custom-alert.success-border button { background: #10b981; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
@@ -61,7 +78,7 @@
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="gm_title">Arcade Game</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
@@ -79,47 +96,57 @@
 
     <!-- 📢 ADMIN CONNECTED TOP BANNERS -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="gameAdSlot1">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
-        <div class="ad-slot-banner" id="gameAdSlot2">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
     <div class="game-viewport-box" id="gameViewportContainer">
         <div class="live-score-badge"><span data-i18n="gm_score">Score</span>: <span id="liveScoreCounter">0</span></div>
         
-        <canvas id="gameCanvas" width="480" height="240"></canvas>
+        <canvas id="gameCanvas" width="480" height="260"></canvas>
 
         <div class="game-overlay-panel" id="gameMenuOverlay">
-            <h3 class="game-over-title" id="overlayPanelTitle" data-i18n="gm_start_title">Neon Dash</h3>
-            <p class="game-score-report" id="overlayPanelReport" data-i18n="gm_start_desc">Tap screen to jump. Evade the red laser spikes!</p>
+            <h3 class="game-over-title" id="overlayPanelTitle" data-i18n="gm_start_title">Space Dash</h3>
+            <p class="game-score-report" id="overlayPanelReport" data-i18n="gm_start_desc">Tap to jump over Volcanoes 🌋 & Dodge flying Meteors ☄️!</p>
             <button class="game-play-btn" id="overlayActionBtn" onclick="initiateArcadeGameplayLoop()" data-i18n="gm_start_btn">PLAY GAME</button>
         </div>
     </div>
 
     <!-- 📢 ADMIN CONNECTED BOTTOM BANNERS -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="gameAdSlot3">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
-        <div class="ad-slot-banner" id="gameAdSlot4">
-           <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
     <div class="security-box">
-        <span>🔒</span>
-        <span data-i18n="gm_security">Authentic arcade rendering engine verified by Play Store. Automation or multi-tab acceleration blocks transaction synchronization.</span>
+        <span style="font-size: 16px;">🛡️</span>
+        <span data-i18n="gm_security">Authentic arcade engine verified by Play Store. Enjoy the game and collect your reward points securely.</span>
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
-            "en": { "gm_title": "Arcade Zone", "gm_score": "Score", "gm_start_title": "Neon Dash", "gm_start_desc": "Tap screen to jump. Evade the red laser spikes!", "gm_start_btn": "PLAY GAME", "gm_security": "Authentic arcade engine verified by Play Store. Automation or multi-tab acceleration blocks transaction sync.", "err_early": "❌ Loop Interrupted! Ad verification container was closed too early.", "err_invalid": "❌ Validation Alert: Tab suspension caught rapid app switching. Verification reset.", "err_success": "🎉 Game Rewards Loaded! Added to dashboard account: ", "game_over_txt": "GAME OVER", "score_prefix": "Final Score: ", "wait_txt": "Verifying Score... " },
-            "hi": { "gm_title": "आर्केड ज़ोन", "gm_score": "स्कोर", "gm_start_title": "नियॉन डैश", "gm_start_desc": "कूदने के लिए स्क्रीन पर टैप करें। लाल लेजर स्पाइक्स से बचें!", "gm_start_btn": "गेम खेलें", "gm_security": "प्ले स्टोर द्वारा सत्यापित प्रामाणिक आर्केड इंजन। ऑटोमेशन या मल्टी-टैब हेरफेर से ट्रांजैक्शन ब्लॉक हो जाएगा।", "err_early": "❌ प्रक्रिया बाधित! विज्ञापन सत्यापन बहुत जल्दी बंद कर दिया गया था।", "err_invalid": "❌ सिस्टम अलर्ट: त्वरित ऐप स्वैप का पता चला। सत्यापन रीसेट।", "err_success": "🎉 गेम रिवॉर्ड लोड! आपके खाते में जोड़ा गया: ", "game_over_txt": "खेल समाप्त", "score_prefix": "अंतिम स्कोर: ", "wait_txt": "स्कोर सत्यापित हो रहा है... " }
+            "en": { "gm_title": "Arcade Zone", "gm_score": "Score", "gm_start_title": "Space Dash", "gm_start_desc": "Tap to jump over Volcanoes 🌋 & Dodge flying Meteors ☄️!", "gm_start_btn": "PLAY GAME", "gm_security": "Authentic arcade engine. Enjoy the game and collect your reward points securely.", "err_early": "❌ Loop Interrupted! Please stay active during verification.", "err_invalid": "❌ Validation Alert: Tab switching caught. Verification reset.", "err_success": "🎉 Game Rewards Loaded! Added to dashboard account: ", "game_over_txt": "GAME OVER", "score_prefix": "Final Score: ", "wait_txt": "Verifying Score... " },
+            "hi": { "gm_title": "आर्केड ज़ोन", "gm_score": "स्कोर", "gm_start_title": "स्पेस डैश", "gm_start_desc": "ज्वालामुखी 🌋 के ऊपर से कूदें और उड़ते उल्कापिंडों ☄️ से बचें!", "gm_start_btn": "गेम खेलें", "gm_security": "गेम का आनंद लें और अपने रिवॉर्ड पॉइंट्स सुरक्षित रूप से एकत्र करें।", "err_early": "❌ प्रक्रिया बाधित! कृपया सत्यापन के दौरान सक्रिय रहें।", "err_invalid": "❌ सिस्टम अलर्ट: ऐप स्वैप का पता चला। सत्यापन रीसेट।", "err_success": "🎉 गेम रिवॉर्ड लोड! आपके खाते में जोड़ा गया: ", "game_over_txt": "खेल समाप्त", "score_prefix": "अंतिम स्कोर: ", "wait_txt": "स्कोर चेक हो रहा है... " },
+            "bn": { "gm_title": "আর্কেড জোন", "gm_score": "স্কোর", "gm_start_title": "স্পেস ড্যাশ", "gm_start_desc": "আগ্নেয়গিরি 🌋 থেকে লাফিয়ে উল্কা ☄️ এড়িয়ে চলুন!", "gm_start_btn": "গেম খেলুন", "gm_security": "গেম উপভোগ করুন এবং নিরাপদে আপনার পুরস্কার সংগ্রহ করুন।", "err_early": "❌ প্রক্রিয়া ব্যাহত! যাচাইকরণের সময় সক্রিয় থাকুন।", "err_invalid": "❌ অ্যালার্ট: ট্যাব পরিবর্তন সনাক্ত করা হয়েছে।", "err_success": "🎉 গেম রিওয়ার্ড যোগ করা হয়েছে: ", "game_over_txt": "গেম ওভার", "score_prefix": "চূড়ান্ত স্কোর: ", "wait_txt": "যাচাই করা হচ্ছে... " },
+            "te": { "gm_title": "ఆర్కేడ్ జోన్", "gm_score": "స్కోర్", "gm_start_title": "స్పేస్ డాష్", "gm_start_desc": "అగ్నిపర్వతాలు 🌋 దాటడానికి ఎగరండి & ఉల్కలను ☄️ నివారించండి!", "gm_start_btn": "గేమ్ ఆడండి", "gm_security": "గేమ్‌ని ఆస్వాదించండి మరియు మీ రివార్డ్‌లను పొందండి.", "err_early": "❌ ప్రాసెస్ ఆగిపోయింది! యాక్టివ్‌గా ఉండండి.", "err_invalid": "❌ దయచేసి గేమ్ పేజీలోనే ఉండండి.", "err_success": "🎉 రివార్డ్ జోడించబడింది: ", "game_over_txt": "గేమ్ ఓవర్", "score_prefix": "తుది స్కోర్: ", "wait_txt": "ధృవీకరిస్తోంది... " },
+            "mr": { "gm_title": "आर्केड झोन", "gm_score": "स्कोअर", "gm_start_title": "स्पेस डॅश", "gm_start_desc": "ज्वालामुखी 🌋 वरून उडी मारा आणि उल्कांपासून ☄️ वाचा!", "gm_start_btn": "गेम खेळा", "gm_security": "गेमचा आनंद घ्या आणि आपले रिवॉर्ड पॉइंट्स सुरक्षितपणे मिळवा.", "err_early": "❌ प्रक्रिया थांबली! कृपया सक्रिय राहा.", "err_invalid": "❌ कृपया गेम पेजवरच राहा.", "err_success": "🎉 रिवॉर्ड जोडले गेले: ", "game_over_txt": "गेम ओव्हर", "score_prefix": "अंतिम स्कोअर: ", "wait_txt": "तपासत आहे... " },
+            "ta": { "gm_title": "ஆர்கேட் மண்டலம்", "gm_score": "மதிப்பெண்", "gm_start_title": "ஸ்பேஸ் டேஷ்", "gm_start_desc": "எரிமலைகளை 🌋 தாண்டவும், விண்கற்களைத் ☄️ தவிர்க்கவும்!", "gm_start_btn": "விளையாடு", "gm_security": "விளையாட்டை அனுபவித்து உங்கள் பரிசுகளைப் பெறுங்கள்.", "err_early": "❌ தடைபட்டது! செயல்பாட்டில் இருக்கவும்.", "err_invalid": "❌ விளையாட்டுப் பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 பரிசு சேர்க்கப்பட்டது: ", "game_over_txt": "ஆட்டம் முடிந்தது", "score_prefix": "இறுதி மதிப்பெண்: ", "wait_txt": "சரிபார்க்கிறது... " },
+            "ur": { "gm_title": "آرکیڈ زون", "gm_score": "سکور", "gm_start_title": "اسپیس ڈیش", "gm_start_desc": "آتش فشاں 🌋 کے اوپر سے چھلانگ لگائیں اور شہابیوں ☄️ سے بچیں!", "gm_start_btn": "گیم کھیلیں", "gm_security": "گیم سے لطف اندوز ہوں اور اپنے انعام حاصل کریں۔", "err_early": "❌ عمل رک گیا! براہ کرم فعال رہیں۔", "err_invalid": "❌ براہ کرم گیم پیج پر رہیں۔", "err_success": "🎉 انعام شامل کر دیا گیا: ", "game_over_txt": "گیم اوور", "score_prefix": "آخری سکور: ", "wait_txt": "تصدیق ہو رہی ہے... " },
+            "gu": { "gm_title": "આર્કેડ ઝોન", "gm_score": "સ્કોર", "gm_start_title": "સ્પેસ ડેશ", "gm_start_desc": "જ્વાળામુખી 🌋 પર કૂદીને ઉલ્કાઓ ☄️ થી બચો!", "gm_start_btn": "ગેમ રમો", "gm_security": "ગેમનો આનંદ માણો અને તમારા ઇનામ મેળવો.", "err_early": "❌ પ્રક્રિયા ખોરવાઈ! કૃપા કરીને સક્રિય રહો.", "err_invalid": "❌ કૃપા કરીને ગેમ પેજ પર જ રહો.", "err_success": "🎉 ઇનામ ઉમેરવામાં આવ્યું: ", "game_over_txt": "ગેમ ઓવર", "score_prefix": "અંતિમ સ્કોર: ", "wait_txt": "ચકાસણી... " },
+            "es": { "gm_title": "Zona Arcade", "gm_score": "Puntuación", "gm_start_title": "Space Dash", "gm_start_desc": "¡Toca para saltar Volcanes 🌋 y esquivar Meteoritos ☄️!", "gm_start_btn": "JUGAR", "gm_security": "Disfruta del juego y recoge tus puntos de forma segura.", "err_early": "❌ ¡Interrumpido! Mantente activo.", "err_invalid": "❌ Quédate en la página del juego.", "err_success": "🎉 Recompensas añadidas: ", "game_over_txt": "FIN DEL JUEGO", "score_prefix": "Puntuación Final: ", "wait_txt": "Verificando... " },
+            "fr": { "gm_title": "Zone Arcade", "gm_score": "Score", "gm_start_title": "Space Dash", "gm_start_desc": "Sautez les volcans 🌋 et évitez les météorites ☄️!", "gm_start_btn": "JOUER", "gm_security": "Profitez du jeu et récupérez vos points en toute sécurité.", "err_early": "❌ Interrompu ! Restez actif.", "err_invalid": "❌ Restez sur la page du jeu.", "err_success": "🎉 Récompenses ajoutées : ", "game_over_txt": "FIN DU JEU", "score_prefix": "Score Final : ", "wait_txt": "Vérification... " },
+            "ar": { "gm_title": "منطقة الآركيد", "gm_score": "النتيجة", "gm_start_title": "انطلاقة الفضاء", "gm_start_desc": "اقفز فوق البراكين 🌋 وتجنب النيازك ☄️!", "gm_start_btn": "العب الآن", "gm_security": "استمتع باللعبة واجمع نقاطك بأمان.", "err_early": "❌ توقف! يرجى البقاء نشطاً.", "err_invalid": "❌ يرجى البقاء في صفحة اللعبة.", "err_success": "🎉 تمت إضافة المكافآت: ", "game_over_txt": "انتهت اللعبة", "score_prefix": "النتيجة النهائية: ", "wait_txt": "التحقق... " },
+            "pt": { "gm_title": "Zona Arcade", "gm_score": "Pontuação", "gm_start_title": "Space Dash", "gm_start_desc": "Pule vulcões 🌋 e desvie de meteoros ☄️!", "gm_start_btn": "JOGAR", "gm_security": "Aproveite o jogo e colete seus pontos com segurança.", "err_early": "❌ Interrompido! Mantenha-se ativo.", "err_invalid": "❌ Fique na página do jogo.", "err_success": "🎉 Recompensas adicionadas: ", "game_over_txt": "FIM DE JOGO", "score_prefix": "Pontuação Final: ", "wait_txt": "Verificando... " },
+            "ru": { "gm_title": "Аркадная Зона", "gm_score": "Счет", "gm_start_title": "Космический Рывок", "gm_start_desc": "Перепрыгивайте вулканы 🌋 и уворачивайтесь от метеоритов ☄️!", "gm_start_btn": "ИГРАТЬ", "gm_security": "Наслаждайтесь игрой и безопасно собирайте очки.", "err_early": "❌ Прервано! Оставайтесь активными.", "err_invalid": "❌ Оставайтесь на странице игры.", "err_success": "🎉 Награды добавлены: ", "game_over_txt": "ИГРА ОКОНЧЕНА", "score_prefix": "Итоговый счет: ", "wait_txt": "Проверка... " }
         };
 
         function changeLanguage(langCode) {
@@ -131,54 +158,60 @@
             });
             document.getElementById("appLanguage").value = langCode;
         }
-    </script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
         
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
 
-        let activeAdminSmartlinkUrl = "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
 
-        // 🔥 CONNECT BANNERS AND TASKS SMARTLINK DIRECT TO FIREBASE ADMIN CONTROL NODES
-        database.ref('global_system_runtime_configurations').on('value', (snap) => {
-            if(snap.exists()) {
-                let conf = snap.val();
-                if(conf.watch_ads_configuration && conf.watch_ads_configuration.global_smartlink) {
-                    activeAdminSmartlinkUrl = conf.watch_ads_configuration.global_smartlink;
-                }
-                if(conf.watch_ads_banner_slots) {
-                    let b = conf.watch_ads_banner_slots;
-                    if (b.slot1_html) { let s1 = document.getElementById("gameAdSlot1"); if(s1) { s1.innerHTML = b.slot1_html; runScripts(s1); } }
-                    if (b.slot2_html) { let s2 = document.getElementById("gameAdSlot2"); if(s2) { s2.innerHTML = b.slot2_html; runScripts(s2); } }
-                    if (b.slot3_html) { let s3 = document.getElementById("gameAdSlot3"); if(s3) { s3.innerHTML = b.slot3_html; runScripts(s3); } }
-                    if (b.slot4_html) { let s4 = document.getElementById("gameAdSlot4"); if(s4) { s4.innerHTML = b.slot4_html; runScripts(s4); } }
-                }
-            }
+            fetchDataFromAdminServer();
+            initialDraw();
+
+            // Event listeners directly to Canvas
+            window.addEventListener("keydown", (e) => { if(e.code === "Space") executionTriggerPlayerJump(); });
+            canvas.addEventListener("touchstart", (e) => { e.preventDefault(); executionTriggerPlayerJump(); }, {passive: false});
+            canvas.addEventListener("mousedown", () => { executionTriggerPlayerJump(); });
         });
 
-        function runScripts(container) {
-            let scripts = Array.from(container.getElementsByTagName("script"));
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
+        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch Profile Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // 2. Fetch Admin Banners and Smartlink
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    if (confData.banners) {
+                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
+                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
+                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
+                        if(confData.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.banners[3];
+                    }
+                    if (confData.globalSmartlink) {
+                        activeAdminSmartlinkUrl = confData.globalSmartlink;
+                    }
+                }
+            } catch (err) {
+                console.log("Using default cached configuration.");
             }
         }
 
-        // HTML5 Engine Parameters variables mapping
+        // HTML5 Engine Parameters variables
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         
@@ -186,62 +219,36 @@
         let isGameCurrentlyRunning = false;
         let scoreCounter = 0;
 
-        let playerSquareObj = { x: 50, y: 170, width: 25, height: 25, gravity: 0.65, velocity: 0, jumpStrength: -10, isGrounded: true, rotationAngle: 0 };
+        // 🔥 CHARACTER: ROCKET
+        let playerSquareObj = { x: 50, y: 175, width: 30, height: 30, gravity: 0.8, velocity: 0, jumpStrength: -12, isGrounded: true, emoji: "🚀" };
         let obstaclesArray = [];
-        let particlesArray = []; 
-        let gameSpeed = 4.0;
+        let gameSpeed = 5.5; // Faster Initial Speed
         let obstacleSpawnIntervalCounter = 0;
 
         // 🔥 ADDED SYSTEM TAB TRACKER 
         window.hasMainTabHidden = false;
         document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                window.hasMainTabHidden = true;
-            }
+            if (document.hidden) { window.hasMainTabHidden = true; }
         });
 
-        // Initialize Canvas layout properly before game starts
         function initialDraw() {
             ctx.clearRect(0,0, canvas.width, canvas.height);
+            
+            // Draw Ground Line
             ctx.shadowBlur = 10;
             ctx.shadowColor = "#3b82f6";
             ctx.strokeStyle = "#3b82f6";
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(0, 195);
-            ctx.lineTo(canvas.width, 195);
+            ctx.moveTo(0, 205);
+            ctx.lineTo(canvas.width, 205);
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = "#22d3ee";
-            ctx.fillStyle = "#06b6d4";
-            ctx.fillRect(playerSquareObj.x, playerSquareObj.y, playerSquareObj.width, playerSquareObj.height);
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(playerSquareObj.x, playerSquareObj.y, playerSquareObj.width, playerSquareObj.height);
-            ctx.shadowBlur = 0;
+            // Draw Initial Rocket
+            ctx.font = "30px Arial";
+            ctx.fillText(playerSquareObj.emoji, playerSquareObj.x, playerSquareObj.y + playerSquareObj.height - 2);
         }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            let savedLang = localStorage.getItem("selectedLang") || "en";
-            changeLanguage(savedLang);
-
-            database.ref('users/' + uid).on('value', (snap) => {
-                if(snap.exists()) {
-                    let d = snap.val();
-                    document.getElementById("liveUserCoins").innerText = d.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (d.balance || 0).toFixed(2);
-                }
-            });
-
-            initialDraw();
-
-            // 🔥 FIXED: Added event listeners DIRECTLY to the canvas so it doesn't block the "Play Game" button
-            window.addEventListener("keydown", (e) => { if(e.code === "Space") executionTriggerPlayerJump(); });
-            canvas.addEventListener("touchstart", (e) => { e.preventDefault(); executionTriggerPlayerJump(); }, {passive: false});
-            canvas.addEventListener("mousedown", () => { executionTriggerPlayerJump(); });
-        });
 
         function executionTriggerPlayerJump() {
             if(playerSquareObj.isGrounded && isGameCurrentlyRunning) {
@@ -254,14 +261,12 @@
             document.getElementById("gameMenuOverlay").style.display = "none";
             isGameCurrentlyRunning = true;
             scoreCounter = 0;
-            gameSpeed = 4.0;
+            gameSpeed = 5.5;
             obstaclesArray = [];
-            particlesArray = [];
             
-            playerSquareObj.y = 170;
+            playerSquareObj.y = 175;
             playerSquareObj.velocity = 0;
             playerSquareObj.isGrounded = true;
-            playerSquareObj.rotationAngle = 0;
 
             document.getElementById("liveScoreCounter").innerText = scoreCounter;
             
@@ -275,102 +280,76 @@
 
             ctx.clearRect(0,0, canvas.width, canvas.height);
 
-            // Draw Neon Horizon Line
+            // Draw Horizon Line
             ctx.shadowBlur = 10;
             ctx.shadowColor = "#3b82f6";
             ctx.strokeStyle = "#3b82f6";
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(0, 195);
-            ctx.lineTo(canvas.width, 195);
+            ctx.moveTo(0, 205);
+            ctx.lineTo(canvas.width, 205);
             ctx.stroke();
             ctx.shadowBlur = 0;
 
+            // Player Physics
             playerSquareObj.velocity += playerSquareObj.gravity;
             playerSquareObj.y += playerSquareObj.velocity;
 
-            if(playerSquareObj.y >= 170) {
-                playerSquareObj.y = 170;
+            if(playerSquareObj.y >= 175) {
+                playerSquareObj.y = 175;
                 playerSquareObj.velocity = 0;
                 playerSquareObj.isGrounded = true;
-                playerSquareObj.rotationAngle = Math.round(playerSquareObj.rotationAngle / (Math.PI / 2)) * (Math.PI / 2);
-            } else {
-                playerSquareObj.rotationAngle += 0.08;
             }
 
-            // Trail Particle System
-            if(!playerSquareObj.isGrounded || scoreCounter > 0) {
-                particlesArray.push({
-                    x: playerSquareObj.x + playerSquareObj.width / 2,
-                    y: playerSquareObj.y + playerSquareObj.height,
-                    size: Math.random() * 4 + 2,
-                    opacity: 1
-                });
-            }
-
-            for(let i = 0; i < particlesArray.length; i++) {
-                let p = particlesArray[i];
-                p.x -= gameSpeed;
-                p.opacity -= 0.05;
-                
-                ctx.fillStyle = `rgba(34, 211, 238, ${p.opacity})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                
-                if(p.opacity <= 0) {
-                    particlesArray.splice(i, 1);
-                    i--;
-                }
-            }
-
-            // Paint Neon Player
-            ctx.save();
-            ctx.translate(playerSquareObj.x + playerSquareObj.width/2, playerSquareObj.y + playerSquareObj.height/2);
-            ctx.rotate(playerSquareObj.rotationAngle);
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = "#22d3ee";
-            ctx.fillStyle = "#06b6d4";
-            ctx.fillRect(-playerSquareObj.width/2, -playerSquareObj.height/2, playerSquareObj.width, playerSquareObj.height);
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(-playerSquareObj.width/2, -playerSquareObj.height/2, playerSquareObj.width, playerSquareObj.height);
-            ctx.restore();
+            // Draw Player Emoji (Rocket)
+            ctx.font = "30px Arial";
+            ctx.fillText(playerSquareObj.emoji, playerSquareObj.x, playerSquareObj.y + playerSquareObj.height - 2);
 
             obstacleSpawnIntervalCounter++;
-            if(obstacleSpawnIntervalCounter > Math.max(60, 90 - (scoreCounter * 2))) { 
+            
+            // 🔥 HARD MODE: Tighter gaps as score increases
+            if(obstacleSpawnIntervalCounter > Math.max(35, 60 - (scoreCounter * 2))) { 
                 obstacleSpawnIntervalCounter = 0;
-                let obstacleHeight = Math.random() > 0.5 ? 25 : 35; 
-                obstaclesArray.push({ x: canvas.width, y: 195 - obstacleHeight, width: 15, height: obstacleHeight, isPassedCheckedFlag: false });
+                
+                // 50% chance for Air (Meteor) or Ground (Volcano)
+                let isAirObstacle = Math.random() > 0.5;
+                let obsSize = isAirObstacle ? 35 : 40; 
+                let obsY = isAirObstacle ? (40 + Math.random() * 60) : (205 - obsSize); // Top logic vs Ground logic
+                let obsEmoji = isAirObstacle ? "☄️" : "🌋";
+
+                obstaclesArray.push({ 
+                    x: canvas.width, 
+                    y: obsY, 
+                    width: 30, 
+                    height: obsSize, 
+                    isPassedCheckedFlag: false, 
+                    emoji: obsEmoji 
+                });
             }
 
             for(let i = obstaclesArray.length - 1; i >= 0; i--) {
                 let obs = obstaclesArray[i];
                 obs.x -= gameSpeed;
 
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = "#ef4444";
-                ctx.fillStyle = "#f43f5e";
-                ctx.beginPath();
-                ctx.moveTo(obs.x, obs.y + obs.height);
-                ctx.lineTo(obs.x + obs.width / 2, obs.y);
-                ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
-                ctx.closePath();
-                ctx.fill();
-                ctx.shadowBlur = 0;
+                // Draw Danger Emoji
+                ctx.font = `${obs.height}px Arial`;
+                ctx.fillText(obs.emoji, obs.x, obs.y + obs.height - 5);
 
+                // Scoring Tweak
                 if(obs.x + obs.width < playerSquareObj.x && !obs.isPassedCheckedFlag) {
                     obs.isPassedCheckedFlag = true;
                     scoreCounter++;
                     document.getElementById("liveScoreCounter").innerText = scoreCounter;
                     
-                    if(scoreCounter % 5 === 0) gameSpeed += 0.5;
+                    // 🔥 HARD MODE: Speed increases every 4 points
+                    if(scoreCounter % 4 === 0) gameSpeed += 0.5;
                 }
 
-                if (playerSquareObj.x < obs.x + obs.width - 2 &&
-                    playerSquareObj.x + playerSquareObj.width - 2 > obs.x &&
-                    playerSquareObj.y < obs.y + obs.height &&
-                    playerSquareObj.y + playerSquareObj.height > obs.y + 2) {
+                // 🔥 Strict Collision Box Tweak (Hitbox adjusted for emojis)
+                if (playerSquareObj.x < obs.x + obs.width - 8 &&
+                    playerSquareObj.x + playerSquareObj.width - 8 > obs.x &&
+                    playerSquareObj.y < obs.y + obs.height - 5 &&
+                    playerSquareObj.y + playerSquareObj.height - 5 > obs.y) {
                     
                     executeGameOverStateCrash();
                     return;
@@ -390,7 +369,7 @@
             
             document.getElementById("overlayPanelTitle").innerText = langData[currentLang]["game_over_txt"] || "GAME OVER";
             document.getElementById("overlayPanelTitle").style.color = "#ef4444";
-            document.getElementById("overlayPanelTitle").style.textShadow = "0 0 10px rgba(239, 68, 68, 0.5)";
+            document.getElementById("overlayPanelTitle").style.textShadow = "0 0 15px rgba(239, 68, 68, 0.6)";
             
             document.getElementById("overlayPanelReport").innerText = (langData[currentLang]["score_prefix"] || "Final Score: ") + scoreCounter;
             
@@ -439,7 +418,7 @@
             totalSecondsOpen = 0;
             window.hasMainTabHidden = false; // Reset tracker
 
-            let baseWaitTxt = langData[currentLang]["wait_txt"] || langData["en"]["wait_txt"];
+            let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying Score... ";
             btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
 
             targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
@@ -467,34 +446,42 @@
 
                 if(countdownTime <= 0) {
                     clearInterval(platformTimer);
-                    btn.innerText = "...";
+                    btn.innerText = "SAVING...";
 
-                    let rewardCoinsCalculatedValue = scoreCounter * 2;
-
-                    database.ref('users/' + uid).once('value').then((snapshot) => {
-                        if(snapshot.exists()) {
-                            let oldCoins = snapshot.val().coins || 0;
-                            let oldBalance = snapshot.val().balance || 0;
-                            let monetaryConvertedValue = rewardCoinsCalculatedValue / 100; 
-
-                            database.ref('users/' + uid).update({
-                                coins: oldCoins + rewardCoinsCalculatedValue,
-                                balance: oldBalance + monetaryConvertedValue
-                            }).then(() => {
-                                resetGameMenuUIElements();
-                                showCustomAlert("err_success", `${rewardCoinsCalculatedValue} 🪙`, true);
-
-                                // 🔥 SYNC LOG DATA WITH BACKEND HOME CHECKLIST PROGRESS BAR (t15 node)
-                                let currentDailyList = snapshot.val().completed_daily_tasks_array_node || [];
-                                if(!currentDailyList.includes("t15")) {
-                                    currentDailyList.push("t15");
-                                    database.ref('users/' + uid).update({ completed_daily_tasks_array_node: currentDailyList });
-                                }
-                            });
-                        }
-                    });
+                    // Strict Reward: 1 Score = 1 Coin 
+                    let rewardCoinsCalculatedValue = scoreCounter * 1; 
+                    evaluateGameRewardViaNodeServer(rewardCoinsCalculatedValue);
                 }
             }, 1000);
+        }
+
+        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
+        async function evaluateGameRewardViaNodeServer(rewardAmount) {
+            try {
+                // Call API to add points and Sync Daily Task 't15'
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: rewardAmount, 
+                        action: "arcade_game_win",
+                        syncTask: "t15" // Tells backend to complete task 't15'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById("liveUserCoins").innerText = data.newCoins;
+                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
+                    
+                    resetGameMenuUIElements();
+                    showCustomAlert("err_success", `${rewardAmount} 🪙`, true);
+                }
+            } catch (err) {
+                resetGameMenuUIElements();
+                alert("Task Verified but couldn't sync with server. Try again.");
+            }
         }
 
         function resetGameMenuUIElements() {
@@ -502,14 +489,14 @@
             let currentLang = localStorage.getItem("selectedLang") || "en";
             
             btn.disabled = false;
-            btn.style.background = "linear-gradient(to right, #f43f5e, #e11d48)";
+            btn.style.background = "linear-gradient(135deg, var(--accent-pink), #be123c)";
             btn.innerText = langData[currentLang]["gm_start_btn"] || "PLAY GAME";
             
-            document.getElementById("overlayPanelTitle").innerText = langData[currentLang]["gm_start_title"] || "Neon Dash";
-            document.getElementById("overlayPanelTitle").style.color = "#22d3ee";
-            document.getElementById("overlayPanelTitle").style.textShadow = "0 0 10px rgba(34, 211, 238, 0.5)";
+            document.getElementById("overlayPanelTitle").innerText = langData[currentLang]["gm_start_title"] || "Space Dash";
+            document.getElementById("overlayPanelTitle").style.color = "var(--accent-cyan)";
+            document.getElementById("overlayPanelTitle").style.textShadow = "0 0 15px rgba(34, 211, 238, 0.6)";
             
-            document.getElementById("overlayPanelReport").innerText = langData[currentLang]["gm_start_desc"] || "Tap screen to jump. Evade the red laser spikes!";
+            document.getElementById("overlayPanelReport").innerText = langData[currentLang]["gm_start_desc"] || "Tap to jump over Volcanoes 🌋 & Dodge flying Meteors ☄️!";
         }
     </script>
 </body>

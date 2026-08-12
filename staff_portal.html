@@ -3,85 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Portal - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <title>Staff Portal - System Core 99</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
-            --bg-base: #060913; --bg-card: #0d1527; --cyber-cyan: #06b6d4;
-            --cyber-green: #10b981; --cyber-red: #f43f5e; --text-glow: #f8fafc;
+            --bg-base: #060913; 
+            --bg-card: #0d1527; 
+            --cyber-cyan: #06b6d4;
+            --cyber-green: #10b981; 
+            --cyber-red: #f43f5e; 
+            --text-glow: #f8fafc;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-base); color: var(--text-glow); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-base); 
+            color: var(--text-glow); 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 15px; 
+            background-image: radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%);
+        }
 
-        .login-card { background: var(--bg-card); border: 2px solid var(--cyber-cyan); border-radius: 20px; padding: 40px 25px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 0 30px rgba(6, 182, 212, 0.3); }
-        .std-panel-input { background: #04060d; border: 1px solid #1e293b; border-radius: 8px; color: #fff; padding: 12px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; margin-bottom: 15px; text-align: center; }
-        .std-panel-input:focus { border-color: var(--cyber-cyan); }
-        .std-panel-btn { background: linear-gradient(135deg, var(--cyber-cyan), #0891b2); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; }
-        .std-panel-btn:active { transform: scale(0.97); }
-        .error-txt { color: var(--cyber-red); font-size: 12px; margin-top: 10px; font-weight: bold; display: none; }
+        .login-card { 
+            background: var(--bg-card); 
+            border: 2px solid var(--cyber-cyan); 
+            border-radius: 24px; 
+            padding: 45px 30px; 
+            width: 100%; 
+            max-width: 380px; 
+            text-align: center; 
+            box-shadow: 0 15px 40px rgba(6, 182, 212, 0.2); 
+            backdrop-filter: blur(10px);
+        }
+        
+        .shield-icon {
+            font-size: 50px;
+            color: var(--cyber-cyan);
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.5));
+        }
+
+        .login-card h2 { color: #fff; margin-bottom: 5px; font-weight: 900; font-size: 26px; letter-spacing: 1px; text-transform: uppercase; }
+        .login-card h3 { color: #94a3b8; font-size: 13px; margin-bottom: 25px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .std-panel-input { 
+            background: #04060d; 
+            border: 1px solid #1e293b; 
+            border-radius: 12px; 
+            color: #fff; 
+            padding: 16px 16px 16px 45px; 
+            font-size: 14.5px; 
+            outline: none; 
+            width: 100%; 
+            box-sizing: border-box; 
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .std-panel-input:focus { border-color: var(--cyber-cyan); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1); }
+        .std-panel-input::placeholder { color: #475569; }
+
+        .std-panel-btn { 
+            background: linear-gradient(135deg, var(--cyber-cyan), #0891b2); 
+            color: #fff; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-weight: 900; 
+            font-size: 15px; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            width: 100%; 
+            transition: 0.2s; 
+            letter-spacing: 1px;
+            box-shadow: 0 6px 15px rgba(6, 182, 212, 0.3);
+            margin-top: 5px;
+        }
+        .std-panel-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3); }
+        .std-panel-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+        .error-txt { 
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px dashed var(--cyber-red);
+            color: var(--cyber-red); 
+            font-size: 13px; 
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px; 
+            font-weight: bold; 
+            display: none; 
+        }
+
+        .security-badge {
+            margin-top: 25px;
+            font-size: 11px;
+            color: #475569;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <h2 style="color:var(--cyber-cyan); margin-bottom:5px; font-weight:900; font-size:24px;">DUDO</h2>
-        <h3 style="color:#fff; font-size:15px; margin-bottom:20px; text-transform:uppercase;">Staff Sub-Panel Portal</h3>
+        <div class="shield-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <h2>System Core 99</h2>
+        <h3>Staff Sub-Panel Portal</h3>
         
-        <input type="text" id="agentUsernameInput" class="std-panel-input" placeholder="Enter Staff ID (Name)..." autocomplete="off">
-        <input type="password" id="agentPasscodeInput" class="std-panel-input" placeholder="Enter Staff Passcode...">
+        <div class="input-group">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="agentUsernameInput" class="std-panel-input" placeholder="Staff ID (Username)" autocomplete="off">
+        </div>
         
-        <button class="std-panel-btn" onclick="authenticateAgentLogin()">Login to Dashboard</button>
-        <div id="errorMsg" class="error-txt">❌ Invalid ID or Passcode!</div>
+        <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="agentPasscodeInput" class="std-panel-input" placeholder="Secure Passcode">
+        </div>
+        
+        <button class="std-panel-btn" id="btnLogin" onclick="authenticateAgentLogin()">Login to Dashboard</button>
+        <div id="errorMsg" class="error-txt"><i class="fa-solid fa-triangle-exclamation"></i> Invalid ID or Passcode!</div>
+
+        <div class="security-badge">
+            <i class="fa-solid fa-lock"></i> End-to-End Encrypted Node
+        </div>
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
 
-        function authenticateAgentLogin() {
+        async function authenticateAgentLogin() {
             let user = document.getElementById("agentUsernameInput").value.trim().toLowerCase();
             let pass = document.getElementById("agentPasscodeInput").value.trim();
             let errBox = document.getElementById("errorMsg");
+            let loginBtn = document.getElementById("btnLogin");
 
             if(!user || !pass) {
-                errBox.innerText = "❌ Please enter both Staff ID and Passcode!";
+                errBox.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> Please enter both Staff ID and Passcode!";
                 errBox.style.display = "block";
                 return;
             }
 
-            // Database se check kar raha hai ID aur Password
-            database.ref('internal_agents_nodes/' + user).once('value').then((snap) => {
-                if(snap.exists()) {
-                    let agentData = snap.val();
-                    if(agentData.passcode === pass) {
-                        // Password Sahi Hai! Token save karke admin.html par bhej do
-                        localStorage.setItem("agentAutoLogin", user);
-                        window.location.href = "admin.html"; // Redirect to your file
-                    } else {
-                        errBox.innerText = "❌ Incorrect Passcode!";
-                        errBox.style.display = "block";
-                    }
+            errBox.style.display = "none";
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> AUTHENTICATING...";
+
+            try {
+                // Node.js Backend API Call for Staff Login
+                const res = await fetch(`${API_BASE_URL}/staff/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, passcode: pass })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Save Token & Permissions securely
+                    localStorage.setItem("agentAutoLogin", user);
+                    localStorage.setItem("agentToken", data.token); // Secure JWT Token
+                    
+                    // Redirect to System Core 99 (Admin Panel file name)
+                    // Ensure you change 'admin_core.html' to whatever your actual admin file is named
+                    window.location.href = "admin_core.html"; 
                 } else {
-                    errBox.innerText = "❌ Staff ID not found!";
+                    errBox.innerHTML = `<i class='fa-solid fa-circle-xmark'></i> ${data.message || "Incorrect Passcode or ID!"}`;
                     errBox.style.display = "block";
+                    loginBtn.disabled = false;
+                    loginBtn.innerText = "Login to Dashboard";
                 }
-            }).catch((error) => {
-                errBox.innerText = "❌ Connection Error!";
+            } catch (error) {
+                errBox.innerHTML = "<i class='fa-solid fa-wifi'></i> Server Connection Error!";
                 errBox.style.display = "block";
-            });
+                loginBtn.disabled = false;
+                loginBtn.innerText = "Login to Dashboard";
+            }
         }
+
+        // Allow pressing Enter key to login
+        document.getElementById("agentPasscodeInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                authenticateAgentLogin();
+            }
+        });
     </script>
 </body>
 </html>

@@ -4,114 +4,213 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Task Wall - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
-        
-        /* Premium Navigation Sync Header */
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3b82f6; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #3b82f6; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #facc15;
+            --accent-pink: #f43f5e;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
 
-        .main-container { width: 92%; max-width: 440px; margin: 15px auto; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
+        
+        /* Premium Sync Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--primary-blue); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--primary-blue); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); transition: 0.2s; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
+
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--primary-blue); font-weight: bold; cursor: pointer; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 15px auto; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; }
+
+        /* Profile Balance Ribbon */
+        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--primary-blue); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
         /* 📢 MULTI-SLOT INCOME ADS SYSTEM */
-        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #3b82f6; margin: 3px 0; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(59, 130, 246, 0.4); box-sizing: border-box; margin: 5px 0; }
 
-        /* Task Cards Container Row Style */
-        .task-card-node { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; transition: 0.2s; }
-        .task-meta { text-align: left; display: flex; flex-direction: column; gap: 4px; max-width: 70%; }
-        .task-title { font-size: 14px; font-weight: 800; color: #f8fafc; }
-        .task-desc { font-size: 11px; color: #94a3b8; font-weight: 500; line-height: 1.3; }
+        /* 🔥 Premium Task Cards */
+        .task-card-node { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 22px 18px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; transition: 0.2s; box-shadow: 0 8px 25px rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        .task-card-node::before { content: ''; position: absolute; left: 0; top: 0; width: 5px; height: 100%; background: var(--primary-blue); }
+        .task-card-node.completed { opacity: 0.7; filter: grayscale(0.5); }
+        .task-card-node.completed::before { background: var(--accent-green); }
         
-        .task-reward-badge { background: rgba(250, 204, 21, 0.1); border: 1px solid rgba(250, 204, 21, 0.3); color: #facc15; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 900; }
+        .task-meta { text-align: left; display: flex; flex-direction: column; gap: 6px; max-width: 65%; }
+        .task-title { font-size: 15.5px; font-weight: 900; color: #fff; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+        .task-desc { font-size: 12px; color: var(--text-sub); font-weight: 600; line-height: 1.4; }
+        
+        .task-reward-badge { background: rgba(250, 204, 21, 0.15); border: 1px solid rgba(250, 204, 21, 0.3); color: var(--accent-gold); padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 900; box-shadow: inset 0 0 10px rgba(250, 204, 21, 0.1); width: fit-content; display: inline-block; margin-top: 5px; }
 
-        .action-task-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); text-transform: uppercase; transition: 0.2s; white-space: nowrap; }
-        .action-task-btn:disabled { background: #334155; color: #64748b; box-shadow: none; cursor: not-allowed; }
+        .action-task-btn { background: linear-gradient(135deg, var(--primary-blue), #1e3a8a); color: #fff; border: none; padding: 12px 20px; border-radius: 12px; font-size: 13.5px; font-weight: 900; cursor: pointer; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); text-transform: uppercase; transition: 0.2s; white-space: nowrap; letter-spacing: 0.5px; }
+        .action-task-btn:active:not(:disabled) { transform: scale(0.95); }
+        .action-task-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
         /* 🔒 SYSTEM VALIDATION REALTIME PROGRESS POPUP SCREEN */
-        .validation-lock-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
-        .progress-circle-txt { font-size: 48px; font-weight: 900; color: #facc15; margin: 20px 0; text-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
-        .overlay-title { font-size: 18px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+        .validation-lock-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
+        .progress-circle-txt { font-size: 55px; font-weight: 900; color: var(--accent-gold); margin: 25px 0; text-shadow: 0 0 20px rgba(250, 204, 21, 0.5); }
+        .overlay-title { font-size: 20px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; }
+        .overlay-desc { color: var(--text-sub); font-size: 13.5px; max-width: 320px; margin-top: 10px; line-height: 1.5; font-weight: 600; }
+        .warning-txt { color: var(--accent-pink); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; animation: pulse 1.5s infinite alternate; }
+        @keyframes pulse { 0% { opacity: 0.6; } 100% { opacity: 1; text-shadow: 0 0 10px rgba(244, 63, 94, 0.5); } }
+
+        /* Custom Alert Popups */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 3000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 2999; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
 
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <p id="alertMessage">Message</p>
+        <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🔒 SYSTEM VALIDATION OVERLAY -->
     <div class="validation-lock-overlay" id="globalVerificationEngineGate">
-        <div style="font-size: 64px;">🛡️</div>
-        <div class="overlay-title">Task Verification Under Progress</div>
-        <p style="color: #94a3b8; font-size: 12px; max-width: 320px; margin-top: 6px; line-height: 1.4;">Do not switch applications or minimize this screen layout. System Monitor validates the stream live bounds frame parameters.</p>
+        <div style="font-size: 65px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🛡️</div>
+        <div class="overlay-title" data-i18n="sw_verifying">Task Verification Active</div>
+        <p class="overlay-desc" data-i18n="sw_stay_msg">Please remain on the sponsor page. Tracking protocols are active to ensure you receive your reward.</p>
         <div class="progress-circle-txt" id="liveVerificationTimerDisplay">20s</div>
-        <p style="color: #ef4444; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Window focus checks are fully active...</p>
+        <p class="warning-txt" data-i18n="sw_warning">Do not switch apps or close the window</p>
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
-        <h2>Smart Task Wall</h2>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="sw_title">Smart Task Wall</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
     </div>
 
     <div class="main-container">
         
-        <div class="ad-banner-slot">
-            <script type="text/javascript">atOptions={'key':'9d8e7e12df3875a6c3846d0cb748a04b','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"></script>
+        <div class="balance-card">
+            <span data-i18n="sw_wallet">Wallet Balance</span>
+            <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
+
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="task-card-node" id="task_wrapper_0">
             <div class="task-meta">
-                <span class="task-title">Watch Premium Video Ads 01</span>
-                <span class="task-desc">Stream the video sponsor layout fully and hold target limits for 20 seconds.</span>
+                <span class="task-title"><i class="fa-solid fa-play" style="color: var(--accent-pink);"></i> <span data-i18n="sw_t1_title">Premium Video Ad 01</span></span>
+                <span class="task-desc" data-i18n="sw_t1_desc">Watch the sponsor video completely and remain active for 20 seconds.</span>
                 <div><span class="task-reward-badge">+30 COINS</span></div>
             </div>
-            <button class="action-task-btn" id="task_trigger_btn_0" onclick="executeTriggerSmartTask(0, 30, 'https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js')">Start ⚡</button>
+            <button class="action-task-btn" id="task_trigger_btn_0" onclick="executeTriggerSmartTask(0, 30, 'task1_link')"><span data-i18n="sw_btn_start">START</span> ⚡</button>
         </div>
 
         <div class="task-card-node" id="task_wrapper_1">
             <div class="task-meta">
-                <span class="task-title">Visit Sponsored Web Offer 02</span>
-                <span class="task-desc">Explore the partner web portal page completely to receive reward ledger credits.</span>
+                <span class="task-title"><i class="fa-solid fa-globe" style="color: var(--accent-cyan);"></i> <span data-i18n="sw_t2_title">Sponsored Web Offer 02</span></span>
+                <span class="task-desc" data-i18n="sw_t2_desc">Explore the partner web portal page completely to receive credits.</span>
                 <div><span class="task-reward-badge">+25 COINS</span></div>
             </div>
-            <button class="action-task-btn" id="task_trigger_btn_1" onclick="executeTriggerSmartTask(1, 25, 'https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js')">Start ⚡</button>
+            <button class="action-task-btn" id="task_trigger_btn_1" onclick="executeTriggerSmartTask(1, 25, 'task2_link')"><span data-i18n="sw_btn_start">START</span> ⚡</button>
         </div>
 
-        <div class="ad-banner-slot">
-            <script type="text/javascript">atOptions={'key':'7c12f3875a6c3846d0cb748a04b9d8e','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/7c12f3875a6c3846d0cb748a04b9d8e/invoke.js"></script>
-        </div>
+        <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
         <div class="task-card-node" id="task_wrapper_2">
             <div class="task-meta">
-                <span class="task-title">Subscribe & Verification Task 03</span>
-                <span class="task-desc">Open the community distribution network hub structure stream window channels.</span>
+                <span class="task-title"><i class="fa-solid fa-bell" style="color: var(--accent-gold);"></i> <span data-i18n="sw_t3_title">Notification Task 03</span></span>
+                <span class="task-desc" data-i18n="sw_t3_desc">Open the community distribution network hub and stay active.</span>
                 <div><span class="task-reward-badge">+40 COINS</span></div>
             </div>
-            <button class="action-task-btn" id="task_trigger_btn_2" onclick="executeTriggerSmartTask(2, 40, 'https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js')">Start ⚡</button>
+            <button class="action-task-btn" id="task_trigger_btn_2" onclick="executeTriggerSmartTask(2, 40, 'task3_link')"><span data-i18n="sw_btn_start">START</span> ⚡</button>
         </div>
 
-        <div class="ad-banner-slot">
-            <script type="text/javascript">atOptions={'key':'9d8e7e12df3875a6c3846d0cb748a04b','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"></script>
-        </div>
+        <div class="ad-banner-slot" id="adminBannerSlot3"></div>
 
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
+        const langData = {
+            "en": { 
+                "sw_title": "Smart Task Wall", "sw_wallet": "Wallet Balance", 
+                "sw_t1_title": "Premium Video Ad 01", "sw_t1_desc": "Watch the sponsor video completely and remain active for 20 seconds.", 
+                "sw_t2_title": "Sponsored Web Offer 02", "sw_t2_desc": "Explore the partner web portal page completely to receive credits.", 
+                "sw_t3_title": "Notification Task 03", "sw_t3_desc": "Open the community distribution network hub and stay active.", 
+                "sw_btn_start": "START", "sw_btn_done": "DONE",
+                "sw_verifying": "Task Verification Active", "sw_stay_msg": "Please remain on the sponsor page. Tracking protocols are active to ensure you receive your reward.", "sw_warning": "Do not switch apps or close the window",
+                "err_early": "❌ Verification Incomplete! You closed the sponsor page before the required time.", "err_invalid": "❌ Tracking Interrupted! Please avoid switching tabs to ensure successful verification.", "err_success": "🎉 Task Verified! Coins successfully deposited to your profile."
+            },
+            "hi": { 
+                "sw_title": "स्मार्ट टास्क वॉल", "sw_wallet": "वॉलेट बैलेंस", 
+                "sw_t1_title": "प्रीमियम वीडियो विज्ञापन 01", "sw_t1_desc": "प्रायोजक वीडियो को पूरा देखें और 20 सेकंड तक सक्रिय रहें।", 
+                "sw_t2_title": "प्रायोजित वेब ऑफर 02", "sw_t2_desc": "क्रेडिट प्राप्त करने के लिए पार्टनर वेब पोर्टल का पूरी तरह से अन्वेषण करें।", 
+                "sw_t3_title": "नोटिफिकेशन टास्क 03", "sw_t3_desc": "कम्युनिटी डिस्ट्रीब्यूशन नेटवर्क हब खोलें और सक्रिय रहें।", 
+                "sw_btn_start": "शुरू करें", "sw_btn_done": "पूरा हुआ",
+                "sw_verifying": "सत्यापन प्रगति पर है", "sw_stay_msg": "कृपया प्रायोजक पृष्ठ पर बने रहें। यह सुनिश्चित करने के लिए कि आपको अपना इनाम मिले, ट्रैकिंग प्रोटोकॉल सक्रिय हैं।", "sw_warning": "ऐप्स न बदलें या विंडो बंद न करें",
+                "err_early": "❌ सत्यापन अधूरा! आपने आवश्यक समय से पहले स्पॉन्सर पेज बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! सफल सत्यापन के लिए कृपया टैब बदलने से बचें।", "err_success": "🎉 टास्क सत्यापित! कॉइन्स आपके खाते में सफलतापूर्वक जमा हो गए हैं।"
+            },
+            "bn": { "sw_title": "স্মার্ট টাস্ক ওয়াল", "sw_wallet": "ওয়ালেট ব্যালেন্স", "sw_btn_start": "শুরু", "sw_btn_done": "সম্পন্ন", "sw_verifying": "যাচাই চলছে", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! ট্যাব পরিবর্তন করবেন না।", "err_success": "🎉 টাস্ক ভেরিফাইড! কয়েন জমা হয়েছে।" },
+            "te": { "sw_title": "స్మార్ట్ టాస్క్ వాల్", "sw_btn_start": "ప్రారంభించండి", "sw_btn_done": "పూర్తయింది", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి." },
+            "mr": { "sw_title": "स्मार्ट टास्क वॉल", "sw_btn_start": "सुरू करा", "sw_btn_done": "पूर्ण", "err_success": "🎉 सत्यापित! कॉइन्स जमा झाले." },
+            "ta": { "sw_title": "ஸ்மார்ட் டாஸ்க்", "sw_btn_start": "தொடங்கு", "sw_btn_done": "முடிந்தது", "err_success": "🎉 வெற்றி! நாணயங்கள் சேர்க்கப்பட்டன." },
+            "ur": { "sw_title": "اسمارٹ ٹاسک وال", "sw_btn_start": "شروع کریں", "sw_btn_done": "مکمل", "err_success": "🎉 تصدیق ہو گئی! کوئنز شامل ہو گئے۔" },
+            "gu": { "sw_title": "સ્માર્ટ ટાસ્ક", "sw_btn_start": "શરૂ કરો", "sw_btn_done": "પૂર્ણ", "err_success": "🎉 સફળતા! સિક્કા ઉમેરાયા." },
+            "es": { "sw_title": "Muro de Tareas", "sw_btn_start": "INICIAR", "sw_btn_done": "HECHO", "err_success": "🎉 ¡Verificado! Monedas añadidas." },
+            "fr": { "sw_title": "Mur de Tâches", "sw_btn_start": "DÉMARRER", "sw_btn_done": "TERMINÉ", "err_success": "🎉 Vérifié ! Pièces ajoutées." },
+            "ar": { "sw_title": "حائط المهام", "sw_btn_start": "ابدأ", "sw_btn_done": "تم", "err_success": "🎉 تم التحقق! أضيفت العملات." },
+            "pt": { "sw_title": "Mural de Tarefas", "sw_btn_start": "INICIAR", "sw_btn_done": "FEITO", "err_success": "🎉 Verificado! Moedas adicionadas." },
+            "ru": { "sw_title": "Стена Заданий", "sw_btn_start": "НАЧАТЬ", "sw_btn_done": "ГОТОВО", "err_success": "🎉 Проверено! Монеты добавлены." }
         };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) {
+                    if(elem.tagName === "BUTTON") {
+                        if(!elem.disabled) elem.innerHTML = `<span>${transObj[key]}</span> ⚡`;
+                        else elem.innerHTML = `${transObj["sw_btn_done"] || "DONE"} ✅`;
+                    } else {
+                        elem.innerText = transObj[key];
+                    }
+                }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
+
+        // 🔥 DYNAMIC LINKS MAPPING (Fetched from Admin)
+        let smartTaskAdminLinks = {
+            task1_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
+            task2_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
+            task3_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
+        };
 
         let liveTickerCountdownValueInt = 20;
         let totalActiveFocusSecondsInt = 0;
@@ -120,55 +219,131 @@
 
         let activeProcessingTaskIdInt = null;
         let activeProcessingTaskCoinsRewardValueInt = 0;
+        let isValidationActive = false;
 
         document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
             executeCheckLocalTaskCompletionFlags();
+            fetchDataFromAdminServer();
         });
 
+        // 📡 FETCH USER DATA AND ADMIN BANNERS/LINKS
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch Profile Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // 2. Fetch Admin Banners and Smartlinks
+                const confRes = await fetch(`${API_BASE_URL}/app-config/smart-tasks`);
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    if (confData.settings.banners) {
+                        if(confData.settings.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.settings.banners[0];
+                        if(confData.settings.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.settings.banners[1];
+                        if(confData.settings.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.settings.banners[2];
+                    }
+                    if (confData.settings.taskLinks) {
+                        if(confData.settings.taskLinks.task1) smartTaskAdminLinks.task1_link = confData.settings.taskLinks.task1;
+                        if(confData.settings.taskLinks.task2) smartTaskAdminLinks.task2_link = confData.settings.taskLinks.task2;
+                        if(confData.settings.taskLinks.task3) smartTaskAdminLinks.task3_link = confData.settings.taskLinks.task3;
+                    }
+                }
+            } catch (err) {
+                console.log("Using cached configuration.");
+            }
+        }
+
+        // 🔥 ADDED SYSTEM TAB TRACKER 
+        window.hasMainTabHidden = false;
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) { window.hasMainTabHidden = true; }
+        });
+
+        function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
+
+            const alertBox = document.getElementById("customAlertBox");
+            const overlay = document.getElementById("alertOverlay");
+            document.getElementById("alertMessage").innerText = msgStr + appendText;
+            
+            if(isSuccess) { alertBox.classList.add("success-border"); } 
+            else { alertBox.classList.remove("success-border"); }
+            
+            alertBox.style.display = "block";
+            overlay.style.display = "block";
+        }
+
+        function closeCustomAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
+        }
+
         function executeCheckLocalTaskCompletionFlags() {
+            let today = new Date().toISOString().slice(0, 10);
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let doneTxt = langData[currentLang]["sw_btn_done"] || "DONE";
+
             for(let i = 0; i < 3; i++) {
-                if(localStorage.getItem(`task_completed_flag_${i}`) === "true") {
+                if(localStorage.getItem(`smart_task_date_${i}_${uid}`) === today) {
                     const btn = document.getElementById(`task_trigger_btn_${i}`);
-                    if(btn) {
+                    const wrapper = document.getElementById(`task_wrapper_${i}`);
+                    if(btn && wrapper) {
                         btn.disabled = true;
-                        btn.innerText = "Done ✅";
+                        btn.innerHTML = `${doneTxt} ✅`;
                         btn.style.background = "#334155";
+                        wrapper.classList.add("completed");
                     }
                 }
             }
         }
 
-        // 🔒 SMART TASK INTERLOCK MODULE: Launches targeted frame and triggers focus monitoring loop
-        function executeTriggerSmartTask(taskIdInt, rewardCoinsValueInt, targetedPayloadUrlString) {
-            if(localStorage.getItem(`task_completed_flag_${taskIdInt}`) === "true") return;
+        // 🔒 SMART TASK INTERLOCK MODULE (20 SECONDS VALIDATION)
+        function executeTriggerSmartTask(taskIdInt, rewardCoinsValueInt, adminLinkKey) {
+            let today = new Date().toISOString().slice(0, 10);
+            if(localStorage.getItem(`smart_task_date_${taskIdInt}_${uid}`) === today) return;
+            if(isValidationActive) return;
 
+            isValidationActive = true;
             activeProcessingTaskIdInt = taskIdInt;
             activeProcessingTaskCoinsRewardValueInt = rewardCoinsValueInt;
 
             liveTickerCountdownValueInt = 20;
             totalActiveFocusSecondsInt = 0;
+            window.hasMainTabHidden = false; // Reset Tracker
 
-            // Trigger HUD overlay mask display properties
             document.getElementById("globalVerificationEngineGate").style.display = "flex";
             document.getElementById("liveVerificationTimerDisplay").innerText = `${liveTickerCountdownValueInt}s`;
 
-            targetTaskExternalWindowHandle = window.open(targetedPayloadUrlString, '_blank', 'noopener,noreferrer');
+            let targetUrl = smartTaskAdminLinks[adminLinkKey];
+            targetTaskExternalWindowHandle = window.open(targetUrl, '_blank', 'noopener,noreferrer');
 
             runningTaskEngineInterval = setInterval(() => {
-                // Tracking Vector 1: Premature closure validation filter
+                // Check 1: Premature closure validation filter
                 if(targetTaskExternalWindowHandle && targetTaskExternalWindowHandle.closed) {
                     clearInterval(runningTaskEngineInterval);
                     executeRollbackTaskWallHUD();
-                    alert("❌ Verification Interrupted! You closed the resource offer portal page early.");
+                    showCustomAlert("err_early");
                     return;
                 }
 
-                // Tracking Vector 2: Background tab minimizing validation monitor
-                if(!document.hidden) {
+                // Check 2: Background tab minimizing validation monitor
+                if(!document.hidden && window.hasMainTabHidden) {
                     if(totalActiveFocusSecondsInt < 19) {
                         clearInterval(runningTaskEngineInterval);
                         executeRollbackTaskWallHUD();
-                        alert("❌ System Alert: App focus lost. Keep task layout focused to clear coin payloads.");
+                        showCustomAlert("err_invalid");
                         return;
                     }
                 }
@@ -184,26 +359,42 @@
             }, 1000);
         }
 
-        // 💰 DATA REWARD PIPELINE: Syncs parameters with live tree nodes upon successful validation
-        function executeCreditVerifiedTaskCoins() {
-            database.ref('users/' + uid).once('value').then((snapshot) => {
-                if(snapshot.exists()) {
-                    let baseLedgerCoins = snapshot.val().coins || 0;
-
-                    database.ref('users/' + uid).update({
-                        coins: baseLedgerCoins + activeProcessingTaskCoinsRewardValueInt
-                    }).then(() => {
-                        localStorage.setItem(`task_completed_flag_${activeProcessingTaskIdInt}`, "true");
-                        alert(`🎉 Task Cleared! +${activeProcessingTaskCoinsRewardValueInt} Coins successfully deposited to your profile.`);
-                        executeRollbackTaskWallHUD();
-                        executeCheckLocalTaskCompletionFlags();
-                    });
+        // 💰 DATA REWARD PIPELINE (NODE API & DAILY TASK SYNC 't13')
+        async function executeCreditVerifiedTaskCoins() {
+            try {
+                // Call API to add Points and Sync Daily Task 't13'
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: activeProcessingTaskCoinsRewardValueInt, 
+                        action: `smart_task_${activeProcessingTaskIdInt}`,
+                        syncTask: "t13" // Completes Daily Task 't13'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById("liveUserCoins").innerText = data.newCoins;
+                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
+                    
+                    let today = new Date().toISOString().slice(0, 10);
+                    localStorage.setItem(`smart_task_date_${activeProcessingTaskIdInt}_${uid}`, today);
+                    
+                    showCustomAlert("err_success", ` (+${activeProcessingTaskCoinsRewardValueInt} 🪙)`, true);
+                    executeCheckLocalTaskCompletionFlags();
                 }
-            });
+            } catch (err) {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            } finally {
+                executeRollbackTaskWallHUD();
+            }
         }
 
         function executeRollbackTaskWallHUD() {
             document.getElementById("globalVerificationEngineGate").style.display = "none";
+            isValidationActive = false;
         }
     </script>
 </body>

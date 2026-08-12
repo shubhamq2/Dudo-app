@@ -4,159 +4,355 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Tasks - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #facc15;
+            --accent-pink: #f43f5e;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(239, 68, 68, 0.15) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
         
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #ef4444; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #ef4444; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        /* Premium Sync Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-pink); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-pink); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); transition: 0.2s; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
+        
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
 
-        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
-        /* 📢 AD INCOME BANNER SLOTS */
-        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #ef4444; margin: 5px 0; }
+        /* Banner Ads Slots */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(239, 68, 68, 0.4); box-sizing: border-box; }
 
         /* 📺 Premium Video Player Card Layout */
-        .video-task-card { background: #1e293b; border-radius: 24px; padding: 20px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .video-wrapper { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 14px; overflow: hidden; background: #000; border: 2px solid #334155; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .video-task-card { background: var(--card-bg); border-radius: 24px; padding: 25px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        
+        /* YouTube Embed Wrapper */
+        .video-wrapper { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 16px; overflow: hidden; background: #000; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; /* Prevents user pausing directly, forced watch */ }
 
         /* Timer Analytics Ticker Widget */
-        .watch-timer-box { background: linear-gradient(135deg, #ef4444, #b91c1c); padding: 10px 16px; border-radius: 50px; font-weight: bold; font-size: 14px; margin: 15px auto; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+        .watch-timer-box { background: linear-gradient(135deg, var(--accent-pink), #b91c1c); padding: 12px 20px; border-radius: 50px; font-weight: 900; font-size: 14.5px; margin: 20px auto 15px auto; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); border: 1px solid #f87171; letter-spacing: 0.5px; transition: 0.3s; }
+        .timer-paused { background: linear-gradient(135deg, #f59e0b, #b45309) !important; border-color: #fcd34d !important; box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4) !important; }
 
-        .video-meta-info { text-align: left; margin-top: 10px; padding: 0 5px; }
-        .video-meta-info h4 { margin: 0 0 5px 0; font-size: 16px; color: #ffffff; font-weight: 800; }
-        .video-meta-info p { margin: 0; font-size: 12px; color: #94a3b8; font-weight: 500; line-height: 1.4; }
+        .video-meta-info { text-align: left; margin-top: 5px; padding: 0 5px; }
+        .video-meta-info h4 { margin: 0 0 8px 0; font-size: 16px; color: #ffffff; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+        .video-meta-info p { margin: 0; font-size: 12.5px; color: var(--text-sub); font-weight: 600; line-height: 1.5; }
 
         /* Claim Status Action Trigger Button */
-        .claim-video-btn { width: 100%; background: #10b981; color: #fff; border: none; padding: 15px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); cursor: pointer; display: none; text-transform: uppercase; margin-top: 15px; }
-        .claim-video-btn:active { transform: scale(0.97); }
+        .claim-video-btn { width: 100%; background: linear-gradient(135deg, var(--accent-green), #059669); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); cursor: pointer; display: none; text-transform: uppercase; margin-top: 20px; transition: 0.2s; letter-spacing: 1px; }
+        .claim-video-btn:active { transform: scale(0.96); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
 
-        .security-box { border: 1px dashed #ef4444; background: rgba(239, 68, 68, 0.05); border-radius: 12px; padding: 12px 15px; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; }
+        .start-video-btn { width: 100%; background: linear-gradient(135deg, var(--primary-blue), #1e3a8a); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4); cursor: pointer; text-transform: uppercase; margin-top: 20px; transition: 0.2s; letter-spacing: 1px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .start-video-btn:active { transform: scale(0.96); }
+
+        .security-box { border: 1px dashed var(--accent-pink); background: rgba(239, 68, 68, 0.05); border-radius: 16px; padding: 15px 18px; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-top: 5px; font-weight: 600; }
+
+        /* Custom Alert Popups */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+
+        #playerOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: pointer; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.6); }
+        .play-icon-overlay { font-size: 50px; color: rgba(255,255,255,0.8); transition: 0.2s; }
+        #playerOverlay:hover .play-icon-overlay { transform: scale(1.1); color: #fff; }
     </style>
 </head>
 <body>
 
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <p id="alertMessage">Message</p>
+        <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
+    </div>
+
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
-        <h2>Micro-Video Tasks</h2>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="vt_title">Micro-Video Tasks</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
     </div>
 
     <div class="main-container">
         
-        <div class="ad-banner-slot">
-            <script type="text/javascript">atOptions={'key':'9d8e7e12df3875a6c3846d0cb748a04b','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"></script>
-        </div>
+        <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="video-task-card">
+            
             <div class="video-wrapper">
-                <iframe id="taskVideoIframe" src="https://www.youtube.com/embed/VIDEO_ID_HERE?enablejsapi=1&rel=0&controls=1" allowfullscreen></iframe>
+                <!-- Overlay to prevent manual interaction and force API start -->
+                <div id="playerOverlay" onclick="startVideoPlayback()"><i class="fa-solid fa-circle-play play-icon-overlay"></i></div>
+                <div id="youtubePlayer"></div>
             </div>
 
             <div class="watch-timer-box" id="videoTimerBox">
-                <span>⏱️ Required Watch Time:</span> <span id="videoCountdownTxt">60</span>s
+                <span>⏱️ <span data-i18n="vt_timer">Required Watch Time:</span></span> <span id="videoCountdownTxt">60</span>s
             </div>
 
             <div class="video-meta-info">
-                <h4>Watch & Earn Premium Coins Reward</h4>
-                <p>Stay focused on this video player. Leaving the page or minimized states instantly puts the watch clock counter on freeze hold.</p>
+                <h4><i class="fa-solid fa-film" style="color: var(--accent-gold);"></i> <span data-i18n="vt_h4">Watch & Earn Reward</span></h4>
+                <p data-i18n="vt_desc">Stay focused on this video player. The timer will automatically pause if you switch tabs, minimize the app, or attempt to skip the video.</p>
             </div>
 
-            <button class="claim-video-btn" id="claimVideoRewardBtn" onclick="executeClaimVideoRewardCoins()">Claim 40 Task Coins 🪙</button>
+            <button class="start-video-btn" id="startVideoBtn" onclick="startVideoPlayback()"><i class="fa-solid fa-play"></i> <span data-i18n="vt_btn_start">Start Playing</span></button>
+            <button class="claim-video-btn" id="claimVideoRewardBtn" onclick="executeClaimVideoRewardCoins()"><i class="fa-solid fa-gift"></i> <span data-i18n="vt_btn_claim">Claim Reward</span> 🪙</button>
         </div>
 
-        <div class="ad-banner-slot">
-            <script type="text/javascript">atOptions={'key':'7c12f3875a6c3846d0cb748a04b9d8e','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/7c12f3875a6c3846d0cb748a04b9d8e/invoke.js"></script>
-        </div>
+        <!-- 📢 ADMIN CONNECTED AD SLOT 2 -->
+        <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
         <div class="security-box">
-            <span>🛡️</span>
-            <span>System monitor is analyzing this video stream window session. Skipping or using splitter view mode locks balance dispatch channels instantly.</span>
+            <span style="font-size: 18px;">🛡️</span>
+            <span data-i18n="vt_security">Verification protocols are strictly monitoring this stream. Skipping, muting, or using split-screen mode will invalidate the session.</span>
         </div>
 
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE RULES
+        const langData = {
+            "en": { "vt_title": "Micro-Video Tasks", "vt_timer": "Required Watch Time:", "vt_h4": "Watch & Earn Reward", "vt_desc": "Stay focused on this video player. The timer will automatically pause if you switch tabs, minimize the app, or attempt to skip the video.", "vt_btn_start": "Start Playing", "vt_btn_claim": "Claim Reward", "vt_security": "Verification protocols are strictly monitoring this stream. Skipping or using split-screen mode will invalidate the session.", "err_pause": "⚠️ Verification Paused! Return to the video.", "err_success": "🎉 Success! Points credited safely to your wallet.", "wait_txt": "Processing... " },
+            "hi": { "vt_title": "वीडियो टास्क", "vt_timer": "आवश्यक समय:", "vt_h4": "देखें और रिवॉर्ड पाएं", "vt_desc": "इस वीडियो प्लेयर पर ध्यान दें। यदि आप टैब बदलते हैं, ऐप को मिनीमाइज़ करते हैं या वीडियो को स्किप करने का प्रयास करते हैं, तो टाइमर अपने आप रुक जाएगा।", "vt_btn_start": "वीडियो शुरू करें", "vt_btn_claim": "रिवॉर्ड प्राप्त करें", "vt_security": "सत्यापन प्रोटोकॉल इस स्ट्रीम की निगरानी कर रहे हैं। स्किप करने या स्प्लिट-स्क्रीन का उपयोग करने से सत्र अमान्य हो जाएगा।", "err_pause": "⚠️ सत्यापन रुका! वीडियो पर वापस आएं।", "err_success": "🎉 सफलता! पॉइंट्स आपके वॉलेट में सुरक्षित रूप से जमा हो गए।", "wait_txt": "प्रोसेसिंग... " },
+            "bn": { "vt_title": "ভিডিও টাস্ক", "vt_timer": "প্রয়োজনীয় সময়:", "vt_btn_start": "শুরু করুন", "vt_btn_claim": "রিওয়ার্ড নিন", "err_pause": "⚠️ যাচাই বন্ধ! ভিডিওতে ফিরুন।", "err_success": "🎉 সফল! পয়েন্ট যোগ হয়েছে।" },
+            "te": { "vt_title": "వీడియో టాస్క్స్", "vt_timer": "సమయం:", "vt_btn_start": "ప్రారంభించండి", "vt_btn_claim": "రివార్డ్ పొందండి", "err_pause": "⚠️ ఆపివేయబడింది! వీడియోకు తిరిగి రండి.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి." },
+            "mr": { "vt_title": "व्हिडिओ टास्क", "vt_btn_start": "सुरू करा", "vt_btn_claim": "रिवॉर्ड मिळवा", "err_pause": "⚠️ थांबले! व्हिडिओवर परत या.", "err_success": "🎉 यशस्वी! पॉइंट्स जोडले गेले." },
+            "ta": { "vt_title": "வீடியோ பணிகள்", "vt_btn_start": "தொடங்கு", "vt_btn_claim": "வெகுமதி பெறு", "err_pause": "⚠️ சரிபார்ப்பு இடைநிறுத்தப்பட்டது!", "err_success": "🎉 வெற்றி! புள்ளிகள் சேர்க்கப்பட்டன." },
+            "ur": { "vt_title": "ویڈیو ٹاسک", "vt_btn_start": "شروع کریں", "vt_btn_claim": "انعام حاصل کریں", "err_pause": "⚠️ تصدیق رک گئی! ویڈیو پر واپس آئیں۔", "err_success": "🎉 کامیابی! پوائنٹس شامل ہو گئے۔" },
+            "gu": { "vt_title": "વિડિઓ ટાસ્ક", "vt_btn_start": "શરૂ કરો", "vt_btn_claim": "ઇનામ મેળવો", "err_pause": "⚠️ ચકાસણી રોકાઈ! વિડિઓ પર પાછા આવો.", "err_success": "🎉 સફળતા! પોઇન્ટ્સ ઉમેરાયા." },
+            "es": { "vt_title": "Tareas de Video", "vt_btn_start": "INICIAR", "vt_btn_claim": "RECLAMAR RECOMPENSA", "err_pause": "⚠️ ¡Pausado! Vuelve al video.", "err_success": "🎉 ¡Éxito! Puntos añadidos." },
+            "fr": { "vt_title": "Tâches Vidéo", "vt_btn_start": "DÉMARRER", "vt_btn_claim": "RÉCLAMER", "err_pause": "⚠️ En pause! Retournez à la vidéo.", "err_success": "🎉 Succès ! Points ajoutés." },
+            "ar": { "vt_title": "مهام الفيديو", "vt_btn_start": "تشغيل", "vt_btn_claim": "احصل على المكافأة", "err_pause": "⚠️ توقف التحقق! عُد إلى الفيديو.", "err_success": "🎉 نجاح! أضيفت النقاط." },
+            "pt": { "vt_title": "Tarefas de Vídeo", "vt_btn_start": "INICIAR", "vt_btn_claim": "RESGATAR", "err_pause": "⚠️ Pausado! Volte para o vídeo.", "err_success": "🎉 Sucesso! Pontos adicionados." },
+            "ru": { "vt_title": "Видео-задания", "vt_btn_start": "НАЧАТЬ", "vt_btn_claim": "ПОЛУЧИТЬ", "err_pause": "⚠️ Пауза! Вернитесь к видео.", "err_success": "🎉 Успех! Очки добавлены." }
         };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
         let videoTimeLeftInt = 60; // 60 seconds strict task loop rule
         let isWindowInFocusState = true;
         let videoTimerInterval = null;
-        const taskRewardCoinsInt = 40;
+        let activeAdminVideoId = "dQw4w9WgXcQ"; // Default Fallback
+        let activeRewardCoinsInt = 40;
+        let isTaskCompleted = false;
+
+        let player; // YouTube Player Object
 
         document.addEventListener("DOMContentLoaded", () => {
-            startVideoWatchVerificationEngine();
+            if (!uid || !token) { window.location.href = "index.html"; return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            fetchDataFromAdminServer();
+            
+            // Load YouTube Iframe API
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
         });
 
-        // 🛡️ VALIDATION ENGINE: Monitors active page view visibility tags
+        // Called automatically when YouTube API loads
+        function onYouTubeIframeAPIReady() {
+            // Player initialization waits for API data
+        }
+
+        // 📡 FETCH ADMIN VIDEO CONFIG (NODE API)
+        async function fetchDataFromAdminServer() {
+            try {
+                const confRes = await fetch(`${API_BASE_URL}/app-config/video-tasks`);
+                const confData = await confRes.json();
+                
+                if (confData.success && confData.settings) {
+                    if (confData.settings.banners) {
+                        if(confData.settings.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.settings.banners[0];
+                        if(confData.settings.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.settings.banners[1];
+                    }
+
+                    if (confData.settings.videoId) activeAdminVideoId = confData.settings.videoId;
+                    if (confData.settings.videoDuration) videoTimeLeftInt = parseInt(confData.settings.videoDuration);
+                    if (confData.settings.videoReward) activeRewardCoinsInt = parseInt(confData.settings.videoReward);
+                    
+                    document.getElementById("videoCountdownTxt").innerText = videoTimeLeftInt;
+
+                    // Initialize Player with Admin ID
+                    player = new YT.Player('youtubePlayer', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: activeAdminVideoId,
+                        playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'disablekb': 1, 'modestbranding': 1 },
+                        events: {
+                            'onStateChange': onPlayerStateChange
+                        }
+                    });
+                }
+            } catch (err) {
+                console.log("Using cached configuration.");
+            }
+        }
+
+        function showCustomAlert(msgKey, isSuccess = false) {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey] || msgKey;
+
+            const alertBox = document.getElementById("customAlertBox");
+            if(isSuccess) alertBox.classList.add("success-border");
+            else alertBox.classList.remove("success-border");
+
+            document.getElementById("alertMessage").innerText = msgStr;
+            document.getElementById("alertOverlay").style.display = "block";
+            alertBox.style.display = "block";
+        }
+
+        function closeCustomAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
+        }
+
+        // 🛡️ ADVANCED VALIDATION ENGINE: Play Store Anti-Cheat Logic
+        // Triggers pause if user changes tab or minimizes app
         document.addEventListener("visibilitychange", () => {
             isWindowInFocusState = !document.hidden;
             const timerBox = document.getElementById("videoTimerBox");
+            let currentLang = localStorage.getItem("selectedLang") || "en";
             
-            if (!isWindowInFocusState) {
-                // Focus lost, freeze color alert
-                timerBox.style.background = "#ef4444";
-                timerBox.innerHTML = "⚠️ Validation Paused! Return to Video Layout";
-            } else {
-                timerBox.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)";
-                timerBox.innerHTML = `<span>⏱️ Required Watch Time:</span> <span>${videoTimeLeftInt}</span>s`;
+            if (!isTaskCompleted) {
+                if (!isWindowInFocusState) {
+                    // Pause Video and Timer safely
+                    if(player && typeof player.pauseVideo === 'function') player.pauseVideo();
+                    timerBox.classList.add("timer-paused");
+                    timerBox.innerHTML = `<span><i class="fa-solid fa-triangle-exclamation"></i> ${langData[currentLang]["err_pause"]}</span>`;
+                } else {
+                    // Resume UI
+                    if(player && typeof player.playVideo === 'function') player.playVideo();
+                    timerBox.classList.remove("timer-paused");
+                    let reqTxt = langData[currentLang]["vt_timer"] || "Required Watch Time:";
+                    timerBox.innerHTML = `<span><i class="fa-solid fa-stopwatch"></i> ${reqTxt}</span> <span id="videoCountdownTxt">${videoTimeLeftInt}</span>s`;
+                }
             }
         });
 
-        // ⏱️ CLOCK PIPELINE: Tracks watch sessions chronological constraints
+        // Listens to YouTube Player states (Play/Pause)
+        function onPlayerStateChange(event) {
+            if(isTaskCompleted) return;
+
+            if (event.data == YT.PlayerState.PLAYING && isWindowInFocusState) {
+                document.getElementById("startVideoBtn").style.display = "none";
+                document.getElementById("playerOverlay").style.display = "none";
+                startVideoWatchVerificationEngine();
+            } else if (event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.ENDED) {
+                clearInterval(videoTimerInterval);
+                if(!isWindowInFocusState && !isTaskCompleted) {
+                    // Handled by visibilitychange
+                }
+            }
+        }
+
+        function startVideoPlayback() {
+            if(player && typeof player.playVideo === 'function') {
+                player.playVideo();
+            }
+        }
+
+        // ⏱️ CLOCK PIPELINE: Strict watch session chronological constraints
         function startVideoWatchVerificationEngine() {
+            if(videoTimerInterval) clearInterval(videoTimerInterval);
+
             videoTimerInterval = setInterval(() => {
-                if (isWindowInFocusState) {
+                if (isWindowInFocusState && player.getPlayerState() == YT.PlayerState.PLAYING) {
                     videoTimeLeftInt--;
                     
-                    // Keep text layout synced during normal ticking states
-                    if(isWindowInFocusState) {
-                        document.getElementById("videoCountdownTxt").innerText = videoTimeLeftInt;
-                    }
+                    let txtNode = document.getElementById("videoCountdownTxt");
+                    if(txtNode) txtNode.innerText = videoTimeLeftInt;
 
                     if (videoTimeLeftInt <= 0) {
                         clearInterval(videoTimerInterval);
+                        isTaskCompleted = true;
+                        if(player && typeof player.pauseVideo === 'function') player.pauseVideo();
                         
-                        // Switch layouts immediately to reveal Claim Action Trigger
-                        document.getElementById("videoTimerBox").style.background = "#10b981";
-                        document.getElementById("videoTimerBox").innerText = "🎉 Watch Task Completed Successfully!";
-                        document.getElementById("claimVideoRewardBtn").style.display = "block";
+                        // Switch layouts to reveal Claim
+                        let box = document.getElementById("videoTimerBox");
+                        box.style.background = "linear-gradient(135deg, var(--accent-green), #059669)";
+                        box.style.borderColor = "#10b981";
+                        box.innerHTML = `<i class="fa-solid fa-circle-check"></i> Watch Task Completed!`;
+                        
+                        let claimBtn = document.getElementById("claimVideoRewardBtn");
+                        let currentLang = localStorage.getItem("selectedLang") || "en";
+                        let claimTxt = langData[currentLang]["vt_btn_claim"] || "Claim Reward";
+                        claimBtn.innerHTML = `<i class="fa-solid fa-gift"></i> <span>${claimTxt}</span> (${activeRewardCoinsInt}🪙)`;
+                        claimBtn.style.display = "block";
                     }
                 }
             }, 1000);
         }
 
-        // 💰 LEDGER SYNC ROUTER: Pushes points directly inside Firebase database tree nodes
-        function executeClaimVideoRewardCoins() {
-            database.ref('users/' + uid).once('value').then((snapshot) => {
-                if(snapshot.exists()) {
-                    let oldCoins = snapshot.val().coins || 0;
-                    
-                    database.ref('users/' + uid).update({
-                        coins: oldCoins + taskRewardCoinsInt
-                    }).then(() => {
-                        alert(`🎉 Success! ${taskRewardCoinsInt} coins credited straight inside your wallet.`);
+        // 💰 LEDGER SYNC ROUTER (NODE API & DAILY TASK SYNC t15)
+        async function executeClaimVideoRewardCoins() {
+            const btn = document.getElementById("claimVideoRewardBtn");
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: activeRewardCoinsInt, 
+                        action: "micro_video_task",
+                        syncTask: "t15" // Completes Daily Task 't15'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showCustomAlert("err_success", true);
+                    setTimeout(() => {
                         window.location.href = "ho.html"; // Redirect back securely
-                    });
+                    }, 2000);
                 }
-            });
+            } catch (err) {
+                alert("Task Verified but couldn't sync with server. Try again.");
+                btn.disabled = false;
+                btn.innerText = "CLAIM REWARD";
+            }
         }
     </script>
 </body>

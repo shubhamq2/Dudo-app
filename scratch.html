@@ -3,100 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scratch Card - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <title>Scratch Card & Passes - Dudo</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #facc15;
+            --accent-pink: #ec4899;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 80% 10%, rgba(236, 72, 153, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
         
         /* Premium Sync Header */
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #ec4899; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #ec4899; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(236, 72, 153, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-pink); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-pink); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(236, 72, 153, 0.15); transition: 0.2s; border: 1px solid rgba(236, 72, 153, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
-        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #ec4899; font-weight: bold; cursor: pointer; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
         /* Profile Balance Ribbon */
-        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, #0f172a, #1e293b); border: 2px solid #ec4899; padding: 12px 20px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .balance-card span { font-size: 16px; }
-        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-pink); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(236, 72, 153, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
-        /* 4-Banners Ads Layout Mapped */
-        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 50px; background: #1e293b; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #ec4899; box-sizing: border-box; }
+        /* Banner Ads Slots */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(236, 72, 153, 0.4); box-sizing: border-box; }
 
         /* Main Game Playground Card */
-        .scratch-main-card { width: 92%; max-width: 440px; background: #1e293b; border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .scratch-main-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         
         /* Interactive Scratch Canvas Container */
-        .scratch-canvas-container { position: relative; width: 280px; height: 160px; margin: 20px auto; background: #0f172a; border-radius: 16px; border: 2px dashed #ec4899; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-        .scratch-under-text { font-size: 26px; font-weight: 800; color: #facc15; z-index: 1; }
-        .scratch-canvas { position: absolute; top: 0; left: 0; cursor: pointer; z-index: 2; border-radius: 12px; }
+        .scratch-canvas-container { position: relative; width: 280px; height: 160px; margin: 20px auto; background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 16px; border: 2px dashed var(--accent-pink); overflow: hidden; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        .scratch-under-text { font-size: 32px; font-weight: 900; color: var(--accent-gold); z-index: 1; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .scratch-canvas { position: absolute; top: 0; left: 0; cursor: pointer; z-index: 2; border-radius: 14px; }
 
         /* Action Status Button */
-        .status-btn { width: 100%; background: #ec4899; color: #fff; border: none; padding: 15px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); outline: none; cursor: pointer; transition: 0.3s; }
-        .status-btn:disabled { background: #475569; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+        .status-btn { width: 100%; background: linear-gradient(135deg, var(--accent-pink), #be185d); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4); outline: none; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
+        .status-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); }
+        .status-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
-        /* 🎟️ REWARD ARENA COMPONENT STYLE */
-        .lottery-wrapper-card { display: none; width: 92%; max-width: 440px; background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 24px; border: 2px solid #a855f7; padding: 22px 18px; text-align: center; box-sizing: border-box; box-shadow: 0 10px 30px rgba(168,85,247,0.25); position: relative; overflow: hidden; margin-top: 10px; }
-        .lottery-badge-corner { position: absolute; top: 0; right: 0; background: #a855f7; color: #fff; font-size: 9px; font-weight: 900; padding: 4px 12px; text-transform: uppercase; border-bottom-left-radius: 12px; }
-        .lottery-wrapper-card h3 { margin: 0; font-size: 18px; font-weight: 900; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px; }
-        .lottery-countdown-txt { font-size: 12px; color: #c084fc; font-weight: 700; margin: 4px 0 15px 0; text-transform: uppercase; }
-        .lottery-buy-btn { width: 100%; background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; border: none; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 800; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 15px rgba(126,34,206,0.4); }
+        /* 🎟️ WEEKLY DROP (HIDDEN BY DEFAULT) */
+        .lottery-wrapper-card { display: none; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(126, 34, 206, 0.1)); border-radius: 24px; border: 2px solid var(--accent-purple); padding: 25px 20px; text-align: center; box-sizing: border-box; box-shadow: 0 10px 30px rgba(168,85,247,0.25); position: relative; overflow: hidden; backdrop-filter: blur(10px); }
+        .lottery-badge-corner { position: absolute; top: 0; right: 0; background: var(--accent-purple); color: #fff; font-size: 10px; font-weight: 900; padding: 6px 15px; text-transform: uppercase; border-bottom-left-radius: 16px; }
+        .lottery-wrapper-card h3 { margin: 0; font-size: 20px; font-weight: 900; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px; }
+        .lottery-countdown-txt { font-size: 13px; color: #d8b4fe; font-weight: 700; margin: 8px 0 15px 0; line-height: 1.4; }
+        .lottery-buy-btn { width: 100%; background: linear-gradient(135deg, var(--accent-purple), #7e22ce); color: #fff; border: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4); transition: 0.2s; letter-spacing: 1px; }
+        .lottery-buy-btn:active { transform: scale(0.96); }
 
         /* 🏆 LATEST WINNER DISPLAY BOX */
-        .latest-winner-box { display: none; background: rgba(16, 185, 129, 0.15); border: 1px dashed #10b981; padding: 12px; border-radius: 12px; margin-top: 15px; text-align: left; }
-        .lw-title { font-size: 10px; color: #10b981; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .lw-name { font-size: 15px; color: #fff; font-weight: 900; }
-        .lw-ticket { font-size: 12px; color: #facc15; font-family: monospace; font-weight: bold; margin-top: 4px; }
+        .latest-winner-box { display: none; background: rgba(16, 185, 129, 0.1); border: 1px dashed var(--accent-green); padding: 15px; border-radius: 16px; margin-top: 20px; text-align: left; }
+        .lw-title { font-size: 11px; color: var(--accent-green); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .lw-name { font-size: 16px; color: #fff; font-weight: 900; }
+        .lw-ticket { font-size: 13px; color: var(--accent-gold); font-family: monospace; font-weight: bold; margin-top: 5px; }
 
-        /* 🔥 DIGITAL TICKETS OWNED LIST DISPLAY BOX */
-        .ticket-inventory-section { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-        .ticket-inventory-header { font-size: 13px; font-weight: 800; color: #c084fc; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
-        .ticket-grid-flow { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-        .ticket-item-row { background: #1e1b4b; border: 1px solid #4338ca; border-radius: 14px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; position: relative; overflow: hidden; }
-        .ticket-item-row:active { transform: scale(0.98); border-color: #a855f7; }
-        .ticket-stub-left { display: flex; flex-direction: column; gap: 2px; text-align: left; }
-        .ticket-serial-txt { font-size: 13px; font-weight: 800; color: #fbbf24; font-family: monospace; letter-spacing: 0.5px; }
-        .ticket-validity-txt { font-size: 10px; color: #94a3b8; font-weight: bold; }
-        .ticket-stub-right { font-size: 11px; font-weight: 800; color: #a855f7; background: rgba(168,85,247,0.15); padding: 4px 10px; border-radius: 6px; text-transform: uppercase; border: 1px solid rgba(168,85,247,0.3); }
+        /* 🔥 DIGITAL TICKETS OWNED LIST */
+        .ticket-inventory-section { display: none; flex-direction: column; gap: 10px; }
+        .ticket-inventory-header { font-size: 14.5px; font-weight: 900; color: var(--accent-purple); text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(168, 85, 247, 0.3); padding-bottom: 8px; }
+        .ticket-grid-flow { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .ticket-item-row { background: rgba(30, 27, 75, 0.6); border: 1px solid #4338ca; border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s; }
+        .ticket-item-row:active { transform: scale(0.98); border-color: var(--accent-purple); }
+        .ticket-stub-left { display: flex; flex-direction: column; gap: 4px; text-align: left; }
+        .ticket-serial-txt { font-size: 14.5px; font-weight: 900; color: var(--accent-gold); font-family: monospace; letter-spacing: 1px; }
+        .ticket-validity-txt { font-size: 11px; color: var(--text-sub); font-weight: 700; }
+        .ticket-stub-right { font-size: 12px; font-weight: 900; color: #fff; background: var(--accent-purple); padding: 6px 12px; border-radius: 8px; text-transform: uppercase; }
 
-        /* Scratch Card Marketplace Layout Nodes */
-        .market-header-title { display: flex; font-size: 16px; font-weight: 800; color: #fff; margin: 20px 0 10px 0; text-align: left; width: 92%; max-width: 440px; align-items: center; gap: 6px; }
-        .marketplace-row-container { display: flex; width: 92%; max-width: 440px; flex-direction: column; gap: 12px; margin-bottom: 15px; box-sizing: border-box; }
-        .market-card-item { background: linear-gradient(135deg, #1e293b, #111827); border: 1px solid #334155; border-radius: 16px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.2s; }
-        .market-card-item:hover { border-color: #ec4899; transform: translateY(-2px); }
-        .market-card-item::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
-        .tier-bronze::before { background: #cd7f32; }
-        .tier-silver::before { background: #cbd5e1; }
-        .tier-gold::before { background: #facc15; }
+        /* MARKETPLACE WRAPPER (HIDDEN BY DEFAULT) */
+        .market-header-title { display: none; font-size: 17px; font-weight: 900; color: #fff; margin: 15px 0 5px 0; text-align: left; align-items: center; gap: 8px; }
+        .marketplace-row-container { display: none; flex-direction: column; gap: 12px; box-sizing: border-box; }
         
-        .market-card-info { text-align: left; display: flex; flex-direction: column; gap: 2px; }
-        .market-card-info .tier-title { font-size: 15px; font-weight: 800; color: #ffffff; }
-        .market-card-info .tier-desc { font-size: 11px; color: #94a3b8; font-weight: 500; }
-        .market-card-info .tier-cost { font-size: 13px; font-weight: 700; color: #facc15; display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+        .market-card-item { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: 0.2s; backdrop-filter: blur(10px); }
+        .market-card-item:hover { border-color: var(--accent-pink); }
+        .market-card-item::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; }
+        .tier-bronze::before { background: linear-gradient(to bottom, #d97706, #b45309); }
+        .tier-silver::before { background: linear-gradient(to bottom, #94a3b8, #475569); }
+        .tier-gold::before { background: linear-gradient(to bottom, #facc15, #ca8a04); }
         
-        .purchase-market-btn { background: #ec4899; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2); text-transform: uppercase; }
+        .market-card-info { text-align: left; display: flex; flex-direction: column; gap: 4px; max-width: 65%; }
+        .market-card-info .tier-title { font-size: 15.5px; font-weight: 900; color: #ffffff; }
+        .market-card-info .tier-desc { font-size: 11.5px; color: var(--text-sub); font-weight: 600; line-height: 1.3; }
+        .market-card-info .tier-cost { font-size: 14px; font-weight: 900; color: var(--accent-gold); display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+        
+        .purchase-market-btn { background: var(--accent-pink); color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); text-transform: uppercase; letter-spacing: 0.5px; }
         .purchase-market-btn:active { transform: scale(0.95); }
 
-        /* Notice Board Security Safe Box */
-        .security-box { width: 92%; max-width: 440px; border: 1px dashed #ec4899; background: rgba(236, 72, 153, 0.05); border-radius: 12px; padding: 12px 15px; margin-top: 15px; box-sizing: border-box; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; margin-bottom: 15px; }
+        /* Rule/Notice Display for Play Store Compliance */
+        .rules-info-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary-blue); border-radius: 16px; padding: 15px 18px; margin-top: 15px; font-size: 12px; color: #cbd5e1; line-height: 1.6; text-align: left; }
+        .rules-info-box h4 { margin: 0 0 8px 0; color: var(--primary-blue); font-size: 14px; font-weight: 800; text-transform: uppercase; }
+        .rules-info-box ul { margin: 0; padding-left: 20px; }
+        .rules-info-box li { margin-bottom: 5px; }
 
-        /* Custom Modern Alert Modal Popup style */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; width: 80%; max-width: 350px; text-align: center; }
-        .custom-alert.success-border { border-color: #10b981; }
-        .custom-alert p { margin: 0 0 15px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
-        .custom-alert button { background: #ef4444; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .custom-alert.success-border button { background: #10b981; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        /* Security Box Info Board */
+        .security-box { border: 1px dashed var(--accent-pink); background: rgba(236, 72, 153, 0.05); border-radius: 16px; padding: 15px 18px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-top: 5px; font-weight: 600; }
 
-        
-        .winner-modal-view { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.9); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(8px); }
-        .winner-modal-card { width:85%; max-width:360px; background: linear-gradient(135deg, #1e1b4b, #581c87); border-radius:30px; border:3px solid #fbbf24; padding:30px 20px; box-shadow:0 0 40px rgba(250,204,21,0.5); text-align:center; position:relative; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* WINNER CELEBRATION POPUP FRAME */
+        .winner-modal-view { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(11,15,25,0.9); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(8px); padding: 20px; box-sizing: border-box; }
+        .winner-modal-card { width:100%; max-width:380px; background: linear-gradient(135deg, #1e1b4b, #581c87); border-radius:30px; border:3px solid var(--accent-gold); padding:35px 20px; box-shadow:0 0 50px rgba(250,204,21,0.5); text-align:center; position:relative; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-sizing: border-box; }
         @keyframes popIn { from { transform: scale(0.7); opacity:0; } to { transform: scale(1); opacity:1; } }
-        .winner-title-text { font-size: 24px; font-weight:900; color:#fbbf24; text-transform:uppercase; text-shadow: 0 0 10px rgba(250,204,21,0.4); margin-bottom:10px; }
-        .winner-amount-box { background: rgba(0,0,0,0.3); padding:15px; border-radius:16px; border:1px dashed #fbbf24; font-size:28px; font-weight:900; color:#10b981; margin:15px 0; }
-        .winner-claim-btn { width:100%; background: linear-gradient(135deg, #fbbf24, #d97706); color:#000; border:none; padding:12px; border-radius:12px; font-size:15px; font-weight:900; cursor:pointer; text-transform:uppercase; }
+        .winner-title-text { font-size: 26px; font-weight:900; color:var(--accent-gold); text-transform:uppercase; text-shadow: 0 0 15px rgba(250,204,21,0.5); margin-bottom:12px; letter-spacing: 1px; }
+        .winner-amount-box { background: rgba(0,0,0,0.4); padding:20px; border-radius:20px; border:2px dashed var(--accent-gold); font-size:32px; font-weight:900; color:var(--accent-green); margin:20px 0; text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+        .winner-claim-btn { width:100%; background: linear-gradient(135deg, var(--accent-gold), #d97706); color:#000; border:none; padding:16px; border-radius:50px; font-size:16px; font-weight:900; cursor:pointer; text-transform:uppercase; box-shadow: 0 6px 20px rgba(250,204,21,0.4); letter-spacing: 1px; transition: 0.2s; }
+        .winner-claim-btn:active { transform: scale(0.96); }
+
+        /* Modern Alert Modal Setup */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
@@ -110,17 +138,17 @@
     <!-- 🎉 WINNER CELEBRATION POPUP FRAME -->
     <div class="winner-modal-view" id="lotteryWinnerModalFrame">
         <div class="winner-modal-card">
-            <div style="font-size:50px; margin-bottom:5px;">🎉👑🥳</div>
+            <div style="font-size:55px; margin-bottom:10px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🎉👑🥳</div>
             <div class="winner-title-text">CONGRATULATIONS!</div>
-            <p style="font-size:13px; color:#e9d5ff; line-height:1.5; margin:0;" id="winnerCardDescMessage">You won the Weekly Mega Pool Match!</p>
+            <p style="font-size:14px; color:#e9d5ff; line-height:1.5; margin:0; font-weight: 600;" id="winnerCardDescMessage">You won the Weekly Mega Drop!</p>
             <div class="winner-amount-box" id="winnerCoinsYieldDisplay">+5000 COINS</div>
             <button class="winner-claim-btn" onclick="executeClaimJackpotPoolCredits()">Claim Reward Matrix 🪙</button>
         </div>
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
-        <h2 data-i18n="sc_title">Scratch Card</h2>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="sc_title">Rewards Zone</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
             <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
@@ -130,123 +158,136 @@
         </select>
     </div>
 
-    <div class="balance-card">
-        <span id="liveUserBalance">₹0.00</span>
-        <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
-    </div>
-
-    <!-- 📢 ADMIN SYSTEM DYNAMIC TOP BANNERS -->
-    <div class="ad-container-block">
-        <div class="ad-slot-banner" id="scratchAdSlot1">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
-        <div class="ad-slot-banner" id="scratchAdSlot2">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
-    </div>
-
-    <div class="scratch-main-card">
-        <h3 style="margin:0; font-size: 20px; color: #ec4899;" data-i18n="sc_h3">Scratch Rewards</h3>
-        <p style="font-size: 13px; color:#94a3b8; margin: 5px 0 15px 0;" data-i18n="sc_p">Rub the silver layer below to unlock secret voucher tokens!</p>
+    <div class="main-container">
         
-        <div class="scratch-canvas-container">
-            <div class="scratch-under-text" id="rewardCoinsDisplay">0 COINS</div>
-            <canvas class="scratch-canvas" id="scratchCanvas" width="280" height="160"></canvas>
+        <div class="balance-card">
+            <span data-i18n="wd_wallet">Wallet Balance</span>
+            <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
 
-        <button class="status-btn" id="scratchStatusBtn" disabled data-i18n="sc_btn">SCRATCH THE CARD</button>
-    </div>
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
-    <!-- 🎟️ REWARD BLOCK INTERLOCK (Controlled by Admin Toggles) -->
-    <div class="lottery-wrapper-card" id="mod_lottery_arena">
-        <div class="lottery-badge-corner">Every Sunday</div>
-        <h3>Weekly Mega Rewards</h3>
-        <div class="lottery-countdown-txt" id="lotteryTimeCountdownLabel">Draw is active this weekend</div>
-        
-        <!-- 🔥 LATEST WINNER TICKER DISPLAY -->
-        <div class="latest-winner-box" id="latestWinnerDisplayBlock">
-            <div class="lw-title">🏆 Previous reward Winner</div>
-            <div class="lw-name" id="lwWinnerNameDisplay">Loading...</div>
-            <div class="lw-ticket" id="lwWinnerTicketDisplay">Pass: #N/A</div>
-        </div>
-
-        <button class="lottery-buy-btn" id="btnBuyLotteryTicketNode" onclick="executeBuyWeeklyLotteryTicket(200)">Unlock Entry Pass (200 🪙)</button>
-    </div>
-
-    <!-- 🔥 DIGITAL TICKETS OWNED LIST DISPLAY BOX -->
-    <div class="ticket-inventory-section" id="ticketsSectionContainer" style="display: none;">
-        <div class="ticket-inventory-header">
-            <span>🎟️ Your Active Passes</span>
-            <span id="ticketCountBadge" style="background:#a855f7; color:#fff; font-size:10px; padding:2px 8px; border-radius:10px;">0</span>
-        </div>
-        <div class="ticket-grid-flow" id="userTicketsGridContainer">
-            <!-- Dynamic Injection Block -->
-        </div>
-    </div>
-
-    <!-- 🏪 MARKETPLACE WRAPPER (Controlled by Admin Toggles) -->
-    <div class="market-header-title" id="mod_market_header">
-        <span>🏪</span> <span data-i18n="market_head">Scratch Card Marketplace</span>
-    </div>
-
-    <div class="marketplace-row-container" id="mod_marketplace_arena">
-        <div class="market-card-item tier-bronze">
-            <div class="market-card-info">
-                <span class="tier-title" data-i18n="tier1_t">Bronze Scratch Pass</span>
-                <span class="tier-desc" data-i18n="tier1_d">Win random bonus up to 250 Coins</span>
-                <span class="tier-cost">100 🪙</span>
+        <div class="scratch-main-card">
+            <h3 style="margin:0 0 8px 0; font-size: 22px; color: var(--accent-pink); font-weight: 900;" data-i18n="sc_h3">Scratch Rewards</h3>
+            <p style="font-size: 13.5px; color:var(--text-sub); margin: 0; font-weight: 600;" data-i18n="sc_p">Rub the silver layer below to unlock secret tokens!</p>
+            
+            <div class="scratch-canvas-container">
+                <div class="scratch-under-text" id="rewardCoinsDisplay"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                <canvas class="scratch-canvas" id="scratchCanvas" width="280" height="160"></canvas>
             </div>
-            <button class="purchase-market-btn" onclick="executeMarketplacePurchase('bronze', 100)" data-i18n="btn_buy">Redeem</button>
+
+            <button class="status-btn" id="scratchStatusBtn" disabled><i class="fa-solid fa-hand-pointer"></i> <span data-i18n="sc_btn">SCRATCH THE CARD</span></button>
         </div>
 
-        <div class="market-card-item tier-silver">
-            <div class="market-card-info">
-                <span class="tier-title" data-i18n="tier2_t">Silver Scratch Pass</span>
-                <span class="tier-desc" data-i18n="tier2_d">Guaranteed returns up to 1000 Coins</span>
-                <span class="tier-cost">500 🪙</span>
+        <!-- 🎟️ WEEKLY DROP BLOCK (HIDDEN BY DEFAULT) -->
+        <div class="lottery-wrapper-card" id="mod_lottery_arena">
+            <div class="lottery-badge-corner" data-i18n="mb_sun">Every Sunday</div>
+            <h3 data-i18n="mb_week_title">Weekly Mega Drop</h3>
+            <div class="lottery-countdown-txt" id="lotteryTimeCountdownLabel" data-i18n="mb_week_desc">Draw is active this weekend. Buy a pass to enter.</div>
+            
+            <div class="latest-winner-box" id="latestWinnerDisplayBlock">
+                <div class="lw-title"><i class="fa-solid fa-trophy"></i> <span data-i18n="mb_prev">Previous Winner</span></div>
+                <div class="lw-name" id="lwWinnerNameDisplay">Loading...</div>
+                <div class="lw-ticket" id="lwWinnerTicketDisplay">Pass: #N/A</div>
             </div>
-            <button class="purchase-market-btn" onclick="executeMarketplacePurchase('silver', 500)" data-i18n="btn_buy">Redeem</button>
+
+            <button class="lottery-buy-btn" id="btnBuyLotteryTicketNode" onclick="executeBuyWeeklyLotteryTicket(200)"><i class="fa-solid fa-ticket"></i> <span data-i18n="mb_buy">Unlock Entry Pass (200 🪙)</span></button>
         </div>
 
-        <div class="market-card-item tier-gold">
-            <div class="market-card-info">
-                <span class="tier-title" data-i18n="tier3_t">Gold Premium Pass</span>
-                <span class="tier-desc" data-i18n="tier3_d">Ultimate premium tier multiplier loop</span>
-                <span class="tier-cost">1000 🪙</span>
+        <!-- 🔥 DIGITAL TICKETS OWNED LIST -->
+        <div class="ticket-inventory-section" id="ticketsSectionContainer">
+            <div class="ticket-inventory-header">
+                <span data-i18n="mb_active">🎟️ Your Active Passes</span>
+                <span id="ticketCountBadge" style="background:var(--accent-purple); color:#fff; font-size:11px; padding:3px 10px; border-radius:12px;">0</span>
             </div>
-            <button class="purchase-market-btn" onclick="executeMarketplacePurchase('gold', 1000)" data-i18n="btn_buy">Redeem</button>
+            <div class="ticket-grid-flow" id="userTicketsGridContainer"></div>
         </div>
+
+        <!-- 🏪 MARKETPLACE WRAPPER (HIDDEN BY DEFAULT) -->
+        <div class="market-header-title" id="mod_market_header">
+            <span>🏪</span> <span data-i18n="market_head">Premium Passes Marketplace</span>
+        </div>
+
+        <div class="marketplace-row-container" id="mod_marketplace_arena">
+            
+            <div class="rules-info-box">
+                <h4 data-i18n="pl_r_title">Marketplace Rules:</h4>
+                <ul>
+                    <li data-i18n="pl_r1">Redeem your coins for Premium Passes.</li>
+                    <li data-i18n="pl_r2">Passes grant immediate access to high-reward scratch cards.</li>
+                    <li data-i18n="pl_r3">Rewards are randomized within the specified tier limits.</li>
+                </ul>
+            </div>
+
+            <div class="market-card-item tier-bronze">
+                <div class="market-card-info">
+                    <span class="tier-title" data-i18n="tier1_t">Bronze Scratch Pass</span>
+                    <span class="tier-desc" data-i18n="tier1_d">Win random bonus up to 250 Coins</span>
+                    <span class="tier-cost"><i class="fa-solid fa-coins"></i> 100</span>
+                </div>
+                <button class="purchase-market-btn" onclick="executeMarketplacePurchase('bronze', 100)" data-i18n="btn_buy">Redeem</button>
+            </div>
+
+            <div class="market-card-item tier-silver">
+                <div class="market-card-info">
+                    <span class="tier-title" data-i18n="tier2_t">Silver Scratch Pass</span>
+                    <span class="tier-desc" data-i18n="tier2_d">Guaranteed returns up to 1000 Coins</span>
+                    <span class="tier-cost"><i class="fa-solid fa-coins"></i> 500</span>
+                </div>
+                <button class="purchase-market-btn" onclick="executeMarketplacePurchase('silver', 500)" data-i18n="btn_buy">Redeem</button>
+            </div>
+
+            <div class="market-card-item tier-gold">
+                <div class="market-card-info">
+                    <span class="tier-title" data-i18n="tier3_t">Gold Premium Pass</span>
+                    <span class="tier-desc" data-i18n="tier3_d">Ultimate premium tier multiplier loop</span>
+                    <span class="tier-cost"><i class="fa-solid fa-coins"></i> 1000</span>
+                </div>
+                <button class="purchase-market-btn" onclick="executeMarketplacePurchase('gold', 1000)" data-i18n="btn_buy">Redeem</button>
+            </div>
+        </div>
+
+        <div class="ad-banner-slot" id="adminBannerSlot2"></div>
+
+        <div class="security-box">
+            <span style="font-size: 18px;">🛡️</span>
+            <span data-i18n="sc_security">Verification protocols are active. Do not close the window during the process to ensure successful reward validation.</span>
+        </div>
+
     </div>
 
-    <!-- 📢 ADMIN SYSTEM DYNAMIC BOTTOM BANNERS -->
-    <div class="ad-container-block">
-        <div class="ad-slot-banner" id="scratchAdSlot3">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
-        <div class="ad-slot-banner" id="scratchAdSlot4">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
-    </div>
-
-    <div class="security-box">
-        <span>🔒</span>
-        <span data-i18n="sc_security">System validation protocols are active on this window. Closing ad windows or skipping verification voids the voucher credit event.</span>
-    </div>
-
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
             "en": { 
-                "sc_title": "Scratch Card", "sc_h3": "Scratch Rewards", "sc_p": "Rub the silver layer below to unlock secret voucher tokens!", "sc_btn": "SCRATCH THE CARD", "sc_security": "System validation protocols are active on this window. Closing ad windows or skipping verification voids the voucher credit event.", "err_early": "❌ Verification Failed! You closed the sponsor tab early.", "err_invalid": "❌ System Alert: Invalid rapid app switching detected. Stay on the ad page for 25s.", "err_success": "🎉 Success! Coins credited successfully: ", "wait_txt": "Verifying ad view... ",
-                "market_head": "Scratch Card Marketplace", "tier1_t": "Bronze Scratch Pass", "tier1_d": "Win random bonus up to 250 Coins", "tier2_t": "Silver Scratch Pass", "tier2_d": "Guaranteed returns up to 1000 Coins", "tier3_t": "Gold Premium Pass", "tier3_d": "Ultimate premium tier multiplier loop", "btn_buy": "Redeem",
-                "nsf_coins": "❌ Not enough coins to unlock this marketplace pass!", "buy_success": "🎉 Premium Voucher Activated! Scratch the card matrix canvas block now."
+                "sc_title": "Rewards Zone", "wd_wallet": "Wallet Balance", "sc_h3": "Scratch Rewards", "sc_p": "Rub the silver layer below to unlock secret tokens!", "sc_btn": "SCRATCH THE CARD", "sc_security": "Verification protocols are active. Do not close the window during the process to ensure successful reward validation.", "err_early": "❌ Verification Incomplete! Please keep the sponsor tab open.", "err_invalid": "❌ Tracking Interrupted! Stay on the verification page.", "err_success": "🎉 Success! Coins credited successfully: ", "wait_txt": "Verifying... ",
+                "mb_sun": "Every Sunday", "mb_week_title": "Weekly Mega Drop", "mb_week_desc": "Draw is active this weekend. Buy a pass to enter.", "mb_prev": "Previous Winner", "mb_buy": "Unlock Entry Pass (200 🪙)", "mb_active": "🎟️ Your Active Passes",
+                "market_head": "Premium Passes Marketplace", "pl_r_title": "Marketplace Rules:", "pl_r1": "Redeem your coins for Premium Passes.", "pl_r2": "Passes grant immediate access to high-reward scratch cards.", "pl_r3": "Rewards are randomized within the specified tier limits.",
+                "tier1_t": "Bronze Scratch Pass", "tier1_d": "Win random bonus up to 250 Coins", "tier2_t": "Silver Scratch Pass", "tier2_d": "Guaranteed returns up to 1000 Coins", "tier3_t": "Gold Premium Pass", "tier3_d": "Ultimate premium tier multiplier loop", "btn_buy": "Redeem",
+                "nsf_coins": "❌ Not enough coins to unlock this pass!", "buy_success": "🎉 Pass Activated! Scratch the card matrix now."
             },
             "hi": { 
-                "sc_title": "स्क्रैच कार्ड", "sc_h3": "स्क्रैच और रिवॉर्ड्स", "sc_p": "गुप्त वाउचर टोकन अनलॉक करने के लिए नीचे दी गई सिल्वर परत को रगड़ें!", "sc_btn": "कार्ड स्क्रैच करें", "sc_security": "सत्यापन प्रोटोकॉल इस सत्र को ट्रैक कर रहे हैं। विज्ञापन विंडो बंद करने से वाउचर अमान्य हो जाएगा।", "err_early": "❌ सत्यापन विफल! आपने स्पॉन्सर टैब को जल्दी बंद कर दिया।", "err_invalid": "❌ सिस्टम अलर्ट: आपने बहुत जल्दी ऐप बदल दिया। कृपया 25 सेकंड तक एड पेज पर रहें।", "err_success": "🎉 सफलता! आपके खाते में सिक्के जोड़ दिए गए हैं: ", "wait_txt": "विज्ञापन सत्यापित हो रहा है... ",
-                "market_head": "स्क्रैच कार्ड मार्केटप्लेस", "tier1_t": "कांस्य स्क्रैच पास", "tier1_d": "250 कॉइन्स तक का रैंडम बोनस जीतें", "tier2_t": "रजत स्क्रैच पास", "tier2_d": "1000 कॉइन्स तक का सुनिश्चित रिटर्न", "tier3_t": "स्वर्ण प्रीमियम पास", "tier3_d": "अल्टीमेट प्रीमियम टियर मल्टीप्लायर लूप", "btn_buy": "प्राप्त करें",
-                "nsf_coins": "❌ इस पास को अनलॉक करने के लिए पर्याप्त सिक्के नहीं हैं!", "buy_success": "🎉 प्रीमियम वाउचर सक्रिय! अब अपना कार्ड स्क्रैच करें।"
-            }
+                "sc_title": "रिवॉर्ड्स ज़ोन", "wd_wallet": "वॉलेट बैलेंस", "sc_h3": "स्क्रैच रिवॉर्ड्स", "sc_p": "सीक्रेट टोकन अनलॉक करने के लिए नीचे दी गई सिल्वर परत को रगड़ें!", "sc_btn": "कार्ड स्क्रैच करें", "sc_security": "सत्यापन प्रक्रिया सक्रिय है। रिवॉर्ड प्राप्त करने के लिए कृपया विज्ञापन पेज को बंद न करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर टैब खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया स्पॉन्सर पेज पर बने रहें।", "err_success": "🎉 सफलता! आपके खाते में सिक्के जोड़ दिए गए हैं: ", "wait_txt": "चेक हो रहा है... ",
+                "mb_sun": "हर रविवार", "mb_week_title": "साप्ताहिक मेगा ड्रॉप", "mb_week_desc": "इस वीकेंड ड्रॉ सक्रिय है। भाग लेने के लिए पास प्राप्त करें।", "mb_prev": "पिछला विजेता", "mb_buy": "एंट्री पास अनलॉक करें (200 🪙)", "mb_active": "🎟️ आपके सक्रिय पास",
+                "market_head": "प्रीमियम पास मार्केटप्लेस", "pl_r_title": "मार्केटप्लेस के नियम:", "pl_r1": "प्रीमियम पास के लिए अपने सिक्के रिडीम करें।", "pl_r2": "पास आपको बड़े रिवॉर्ड वाले स्क्रैच कार्ड देते हैं।", "pl_r3": "इनाम संबंधित टियर लिमिट के अनुसार रैंडम होते हैं।",
+                "tier1_t": "कांस्य स्क्रैच पास", "tier1_d": "250 कॉइन्स तक का रैंडम बोनस", "tier2_t": "रजत स्क्रैच पास", "tier2_d": "1000 कॉइन्स तक का रिटर्न", "tier3_t": "स्वर्ण प्रीमियम पास", "tier3_d": "अल्टीमेट प्रीमियम टियर", "btn_buy": "रिडीम करें",
+                "nsf_coins": "❌ इस पास को अनलॉक करने के लिए पर्याप्त सिक्के नहीं हैं!", "buy_success": "🎉 पास सक्रिय! अब अपना कार्ड स्क्रैच करें।"
+            },
+            "bn": { "sc_title": "রিওয়ার্ড জোন", "wd_wallet": "ওয়ালেট ব্যালেন্স", "sc_h3": "স্ক্র্যাচ রিওয়ার্ড", "sc_p": "টোকেন পেতে স্ক্র্যাচ করুন!", "sc_btn": "স্ক্র্যাচ করুন", "err_success": "🎉 সফল! কয়েন যোগ করা হয়েছে: ", "wait_txt": "যাচাই হচ্ছে... ", "btn_buy": "রিডিম", "nsf_coins": "❌ কয়েন অপর্যাপ্ত!", "buy_success": "🎉 পাস অ্যাক্টিভ! এখন কার্ড স্ক্র্যাচ করুন।" },
+            "te": { "sc_title": "రివార్డ్స్ జోన్", "sc_btn": "స్క్రాచ్ చేయండి", "err_success": "🎉 విజయం! జోడించబడింది: ", "btn_buy": "పొందండి", "nsf_coins": "❌ కాయిన్స్ సరిపోవు!", "buy_success": "🎉 పాస్ యాక్టివ్! ఇప్పుడు స్క్రాచ్ చేయండి." },
+            "mr": { "sc_title": "रिवॉर्ड्स झोन", "sc_btn": "स्क्रॅच करा", "err_success": "🎉 यशस्वी! जोडले गेले: ", "btn_buy": "मिळवा", "nsf_coins": "❌ कॉइन्स अपुरे!", "buy_success": "🎉 पास अ‍ॅक्टिव्ह! आता स्क्रॅच करा." },
+            "ta": { "sc_title": "ரிவார்ட் மண்டலம்", "sc_btn": "கீறவும்", "err_success": "🎉 வெற்றி! சேர்க்கப்பட்டது: ", "btn_buy": "பெறுக", "nsf_coins": "❌ நாணயங்கள் போதாது!", "buy_success": "🎉 பாஸ் ஆக்டிவ்!" },
+            "ur": { "sc_title": "ریوارڈز زون", "sc_btn": "اسکریچ کریں", "err_success": "🎉 کامیابی! شامل کیے گئے: ", "btn_buy": "حاصل کریں", "nsf_coins": "❌ کوئنز ناکافی ہیں!", "buy_success": "🎉 پاس فعال ہو گیا!" },
+            "gu": { "sc_title": "ઇનામ ઝોન", "sc_btn": "સ્ક્રેચ કરો", "err_success": "🎉 સફળતા! ઉમેરાયા: ", "btn_buy": "મેળવો", "nsf_coins": "❌ સિક્કા અપૂરતા છે!", "buy_success": "🎉 પાસ સક્રિય!" },
+            "es": { "sc_title": "Zona de Recompensas", "sc_btn": "RASCAR TARJETA", "err_success": "🎉 ¡Éxito! Añadido: ", "btn_buy": "Canjear", "nsf_coins": "❌ ¡Monedas insuficientes!", "buy_success": "🎉 ¡Pase activado!" },
+            "fr": { "sc_title": "Zone de Récompenses", "sc_btn": "GRATTER", "err_success": "🎉 Succès ! Ajouté : ", "btn_buy": "Échanger", "nsf_coins": "❌ Pièces insuffisantes !", "buy_success": "🎉 Pass activé !" },
+            "ar": { "sc_title": "منطقة المكافآت", "sc_btn": "اخدش البطاقة", "err_success": "🎉 نجاح! أُضيف: ", "btn_buy": "استرداد", "nsf_coins": "❌ عملات غير كافية!", "buy_success": "🎉 تم تفعيل التذكرة!" },
+            "pt": { "sc_title": "Zona de Recompensas", "sc_btn": "RASPAR", "err_success": "🎉 Sucesso! Adicionado: ", "btn_buy": "Resgatar", "nsf_coins": "❌ Moedas insuficientes!", "buy_success": "🎉 Passe ativado!" },
+            "ru": { "sc_title": "Зона Наград", "sc_btn": "СТЕРЕТЬ", "err_success": "🎉 Успех! Добавлено: ", "btn_buy": "Обменять", "nsf_coins": "❌ Недостаточно монет!", "buy_success": "🎉 Пропуск активирован!" }
         };
 
         function changeLanguage(langCode) {
@@ -254,14 +295,139 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) elem.innerText = transObj[key];
+                if(transObj[key]) {
+                    if (elem.tagName === "BUTTON" && elem.id === "scratchStatusBtn") {
+                        if(!elem.disabled) elem.innerHTML = `<i class="fa-solid fa-gift"></i> ${transObj[key]}`;
+                        else elem.innerHTML = `<i class="fa-solid fa-hand-pointer"></i> ${transObj[key]}`;
+                    } else if (elem.tagName === "BUTTON" && elem.id === "btnBuyLotteryTicketNode") {
+                        elem.innerHTML = `<i class="fa-solid fa-ticket"></i> ${transObj[key]}`;
+                    } else {
+                        elem.innerText = transObj[key];
+                    }
+                }
             });
             document.getElementById("appLanguage").value = langCode;
+        }
+
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
+
+        let randomCoinsReward = 0; 
+        let isScratchedPassed = false;
+        let userCurrentCoinsMaster = 0;
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+        
+        let isLotterySystemActive = false; // Toggle
+        let isMarketplaceActive = false;   // Toggle
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            fetchDataFromAdminServer();
+            resetScratchModuleLocally();
+        });
+
+        // 📡 FETCH USER DATA AND ADMIN CONFIGS (NODE API)
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch User Balance & Active Tickets
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    userCurrentCoinsMaster = userData.user.coins || 0;
+                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // Fetch Passes (If Node API supports it, otherwise keep local cache or separate route)
+                fetchUserPassesFromBackend();
+
+                // 2. Fetch Admin Toggles, Banners & Winners
+                const confRes = await fetch(`${API_BASE_URL}/app-config/scratch-settings`);
+                const confData = await confRes.json();
+                
+                if (confData.success && confData.settings) {
+                    let s = confData.settings;
+                    
+                    // Display Toggles (Play Store Safety)
+                    isLotterySystemActive = (s.enable_weekly_drop === true);
+                    isMarketplaceActive = (s.enable_marketplace !== false);
+                    
+                    document.getElementById("mod_lottery_arena").style.display = isLotterySystemActive ? 'block' : 'none';
+                    document.getElementById("mod_market_header").style.display = isMarketplaceActive ? 'flex' : 'none';
+                    document.getElementById("mod_marketplace_arena").style.display = isMarketplaceActive ? 'flex' : 'none';
+
+                    if (s.global_smartlink) activeAdminSmartlinkUrl = s.global_smartlink;
+                    
+                    // Banners
+                    if(s.banner_1) document.getElementById("adminBannerSlot1").innerHTML = s.banner_1;
+                    if(s.banner_2) document.getElementById("adminBannerSlot2").innerHTML = s.banner_2;
+
+                    // Latest Winner
+                    if(s.latest_winner_name) {
+                        document.getElementById("latestWinnerDisplayBlock").style.display = "block";
+                        document.getElementById("lwWinnerNameDisplay").innerText = s.latest_winner_name;
+                        document.getElementById("lwWinnerTicketDisplay").innerText = `Pass: #${s.latest_winner_ticket || 'SE-MEGA'}`;
+                    }
+
+                    // Jackpot Check (Did I win?)
+                    if(s.jackpot_winner_uid === uid && !localStorage.getItem("ack_jackpot_win")) {
+                        document.getElementById("winnerCoinsYieldDisplay").innerText = `+${s.jackpot_amount || 5000} COINS`;
+                        document.getElementById("lotteryWinnerModalFrame").style.display = "flex";
+                    }
+                }
+            } catch (err) {
+                console.log("Using cached configuration.");
+            }
+        }
+
+        // 🎟️ MOCK USER PASSES (Replace with actual backend route later)
+        async function fetchUserPassesFromBackend() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/user/active-passes/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if(data.success && isLotterySystemActive) {
+                    renderUserActiveTicketsGrid(data.passes);
+                }
+            } catch(e) {}
+        }
+
+        function renderUserActiveTicketsGrid(passesArray) {
+            const container = document.getElementById("ticketsSectionContainer");
+            const grid = document.getElementById("userTicketsGridContainer");
+            const countBadge = document.getElementById("ticketCountBadge");
+
+            grid.innerHTML = ""; 
+            if(passesArray && passesArray.length > 0) {
+                countBadge.innerText = passesArray.length;
+                passesArray.forEach(item => {
+                    let row = document.createElement("div");
+                    row.className = "ticket-item-row";
+                    row.innerHTML = `
+                        <div class="ticket-stub-left">
+                            <span class="ticket-serial-txt">🎫 ${item.ticket_id}</span>
+                            <span class="ticket-validity-txt">⏰ Exp: ${item.valid_until || 'Sunday'}</span>
+                        </div>
+                        <div class="ticket-stub-right">Active</div>
+                    `;
+                    grid.appendChild(row);
+                });
+                container.style.display = "flex";
+            } else {
+                container.style.display = "none";
+            }
         }
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
             let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey] || msgKey;
+
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");
             else alertBox.classList.remove("success-border");
@@ -275,166 +441,26 @@
             document.getElementById("customAlertBox").style.display = "none";
             document.getElementById("alertOverlay").style.display = "none";
         }
-    </script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
-
-        let randomCoinsReward = Math.floor(Math.random() * 20) + 1; 
-        let isScratchedPassed = false;
-        let userCurrentCoinsMaster = 0;
-        let userCurrentBalanceMaster = 0;
-        let activeAdminSmartlinkUrl = "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
-        let activeJackpotPendingValue = 0;
-        let isLotterySystemActive = false; // Controlled by Toggles
-
-        // Date Logic for Auto-Disappear Tickets
-        function getStartOfWeek() {
-            let d = new Date();
-            let day = d.getDay(); // 0 is Sunday, 1 is Monday
-            let diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            let monday = new Date(d.setDate(diff));
-            monday.setHours(0,0,0,0);
-            return monday.getTime();
-        }
-
-        // 🔥 GLOBAL MODULE TOGGLES (PLAY STORE SAFETY)
-        database.ref('global_system_runtime_configurations/module_toggles').on('value', (snap) => {
-            let toggles = snap.val() || {};
-            
-            // Toggle Reward Area 
-            let lotteryArena = document.getElementById('mod_lottery_arena');
-            let showLottery = toggles.lucky_box === true; // Must explicitly be true to show
-            if(lotteryArena) lotteryArena.style.display = showLottery ? 'block' : 'none';
-            isLotterySystemActive = showLottery;
-
-            // Toggle Marketplace Area 
-            let marketHeader = document.getElementById('mod_market_header');
-            let marketContainer = document.getElementById('mod_marketplace_arena');
-            let showMarket = toggles.scratch_market !== false; // Shown unless explicitly false
-            if(marketHeader) marketHeader.style.display = showMarket ? 'flex' : 'none';
-            if(marketContainer) marketContainer.style.display = showMarket ? 'flex' : 'none';
-            
-            // Re-render tickets based on system state
-            database.ref('weekly_reward_bids_tracker').orderByChild('uid').equalTo(uid).once('value', renderUserActiveTicketsGrid);
-        });
-
-        // 🔥 DEEP FILE SETTINGS SYNC (CONNECTS TO ADMIN PANEL)
-        database.ref('app_files_deep_config/scratch_card').on('value', (snap) => {
-            if(snap.exists()) {
-                let conf = snap.val();
-                if(conf.direct_link) activeAdminSmartlinkUrl = conf.direct_link;
-                if(conf.banner_1) { let s1 = document.getElementById("scratchAdSlot1"); if(s1) { s1.innerHTML = conf.banner_1; runScripts(s1); } }
-                if(conf.banner_2) { let s2 = document.getElementById("scratchAdSlot2"); if(s2) { s2.innerHTML = conf.banner_2; runScripts(s2); } }
-                if(conf.banner_3) { let s3 = document.getElementById("scratchAdSlot3"); if(s3) { s3.innerHTML = conf.banner_3; runScripts(s3); } }
-                if(conf.banner_4) { let s4 = document.getElementById("scratchAdSlot4"); if(s4) { s4.innerHTML = conf.banner_4; runScripts(s4); } }
-            }
-        });
-
-        // 🔥 LISTEN FOR LATEST REWARD WINNER FROM ADMIN PANEL
-        database.ref('global_system_runtime_configurations/latest_lottery_winner').on('value', (snap) => {
-            let displayBox = document.getElementById("latestWinnerDisplayBlock");
-            if(snap.exists()){
-                let w = snap.val();
-                displayBox.style.display = "block";
-                document.getElementById("lwWinnerNameDisplay").innerText = w.name || "Mystery Player";
-                document.getElementById("lwWinnerTicketDisplay").innerText = `Pass: #${w.ticket_id || 'N/A'}`;
-            } else {
-                database.ref('global_system_runtime_configurations/leaderboard_winners_podium').once('value').then(podSnap => {
-                    if(podSnap.exists() && podSnap.val().rank1_name) {
-                        displayBox.style.display = "block";
-                        document.getElementById("lwWinnerNameDisplay").innerText = podSnap.val().rank1_name;
-                        document.getElementById("lwWinnerTicketDisplay").innerText = `Pass: #SE-MEGA-DRAW`;
-                    }
-                });
-            }
-        });
-
-        function runScripts(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
-            }
-        }
-
-        // 🔥 SYSTEM TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                window.hasMainTabHidden = true;
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", () => {
-            let savedLang = localStorage.getItem("selectedLang") || "en";
-            changeLanguage(savedLang);
-
-            database.ref('users/' + uid).on('value', (snap) => {
-                if(snap.exists()) {
-                    let d = snap.val();
-                    userCurrentCoinsMaster = d.coins || 0;
-                    userCurrentBalanceMaster = d.balance || 0;
-                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
-                    document.getElementById("liveUserBalance").innerText = "₹" + userCurrentBalanceMaster.toFixed(2);
-                }
-            });
-
-            // 🔥 CELEBRATION POPUP TRIGGER
-            database.ref('users/' + uid + '/earning_history').orderByChild('timestamp').limitToLast(1).on('value', (snap) => {
-                if(snap.exists()) {
-                    snap.forEach(child => {
-                        let d = child.val();
-                        if(d.type === 'mega_reward_win' || d.activity === 'Weekly Reward Winner') {
-                            let lastAck = localStorage.getItem("ack_lottery_win_time") || 0;
-                            if(d.timestamp > lastAck) {
-                                activeJackpotPendingValue = d.coins_credited;
-                                document.getElementById("winnerCoinsYieldDisplay").innerText = `+${activeJackpotPendingValue} COINS`;
-                                document.getElementById("lotteryWinnerModalFrame").style.display = "flex";
-                                localStorage.setItem("ack_lottery_win_time", d.timestamp);
-                            }
-                        }
-                    });
-                }
-            });
-
-            // 🎟️ AUTO-DISAPPEAR TICKETS GRID (Reads from Admin connected node)
-            database.ref('weekly_reward_bids_tracker').orderByChild('uid').equalTo(uid).on('value', (snapshot) => {
-                renderUserActiveTicketsGrid(snapshot);
-            });
-
-            document.getElementById("rewardCoinsDisplay").innerText = `+ ${randomCoinsReward} COINS`;
-            initScratchCanvas();
-        });
-
+        // 🎨 SCRATCH CANVAS LOGIC
         function initScratchCanvas() {
             const canvas = document.getElementById("scratchCanvas");
             const ctx = canvas.getContext("2d");
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = "#334155";
+            
+            // Premium Silver Gradient
+            let gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, "#94a3b8");
+            gradient.addColorStop(1, "#475569");
+            ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            ctx.fillStyle = "#475569";
-            ctx.font = "bold 16px sans-serif";
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "900 18px 'Plus Jakarta Sans', sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText("SCRATCH HERE 🎟️", canvas.width / 2, canvas.height / 2 + 5);
+            ctx.fillText("RUB TO REVEAL 🎟️", canvas.width / 2, canvas.height / 2 + 6);
 
             let isDrawing = false;
 
@@ -447,18 +473,18 @@
 
                 ctx.globalCompositeOperation = 'destination-out';
                 ctx.beginPath();
-                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.arc(x, y, 22, 0, Math.PI * 2);
                 ctx.fill();
 
                 checkScratchPercentage();
             }
 
             canvas.addEventListener("mousedown", () => isDrawing = true);
-            canvas.addEventListener("touchstart", () => isDrawing = true);
+            canvas.addEventListener("touchstart", () => isDrawing = true, {passive: true});
             canvas.addEventListener("mouseup", () => isDrawing = false);
             canvas.addEventListener("touchend", () => isDrawing = false);
-            canvas.addEventListener("mousemove", scratch);
-            canvas.addEventListener("touchmove", scratch);
+            canvas.addEventListener("mousemove", scratch, {passive: true});
+            canvas.addEventListener("touchmove", scratch, {passive: true});
         }
 
         function checkScratchPercentage() {
@@ -476,142 +502,44 @@
             if (percentage > 45) {
                 isScratchedPassed = true;
                 
+                let currentLang = localStorage.getItem("selectedLang") || "en";
                 const btn = document.getElementById("scratchStatusBtn");
                 btn.disabled = false;
-                btn.style.background = "#10b981"; 
-                btn.innerText = "🎁 CLAIM REWARD NOW";
+                btn.style.background = "linear-gradient(135deg, var(--accent-green), #059669)"; 
+                btn.innerHTML = `<i class="fa-solid fa-gift"></i> CLAIM REWARD NOW`;
                 btn.onclick = function() {
-                    btn.style.background = "#ec4899";
+                    btn.style.background = "linear-gradient(135deg, var(--accent-pink), #be185d)";
                     triggerSecureVerification();
                     btn.onclick = null;
                 };
             }
         }
 
-        function executeMarketplacePurchase(tierTypeString, costCoinsInt) {
+        function resetScratchModuleLocally() {
+            isScratchedPassed = false;
+            randomCoinsReward = Math.floor(Math.random() * 20) + 1; // Default Free Card Values
+            document.getElementById("rewardCoinsDisplay").innerText = `+ ${randomCoinsReward} COINS`;
+
+            const btn = document.getElementById("scratchStatusBtn");
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            if(userCurrentCoinsMaster < costCoinsInt) { showCustomAlert("nsf_coins"); return; }
-
-            let finalRewardCalculationValue = 0;
-            let ruleMessage = "";
-            
-            if(tierTypeString === 'bronze') {
-                finalRewardCalculationValue = Math.floor(Math.random() * 250) + 1;
-                ruleMessage = "Bronze Pass Activated! Rub the main silver layout card board above to claim up to 250 coins.";
-            } else if(tierTypeString === 'silver') {
-                finalRewardCalculationValue = Math.floor(Math.random() * 800) + 200;
-                ruleMessage = "Silver Pass Activated! Guaranteed payouts up to 1000 coins. Scratch the canvas interface panel above now.";
-            } else if(tierTypeString === 'gold') {
-                finalRewardCalculationValue = Math.floor(Math.random() * 2000) + 500;
-                ruleMessage = "Premium Pass Activated! Ultimate multiplier reward loaded. Rub the master top canvas frame right now.";
-            }
-
-            let postDeductionCoinsValue = userCurrentCoinsMaster - costCoinsInt;
-            
-            database.ref('users/' + uid).update({ coins: postDeductionCoinsValue }).then(() => {
-                isScratchedPassed = false;
-                randomCoinsReward = finalRewardCalculationValue;
-                document.getElementById("rewardCoinsDisplay").innerText = `+ ${randomCoinsReward} COINS`;
-                
-                // Add to history so user knows where coins went
-                database.ref('users/' + uid + '/earning_history').push({
-                    activity: `Marketplace Redemption: ${tierTypeString} Pass`,
-                    coins_credited: -costCoinsInt,
-                    timestamp: Date.now()
-                });
-
-                resetScratchModule();
-                alert(`🛒 Unlock Complete!\n\n${ruleMessage}`);
-            });
+            btn.innerHTML = `<i class="fa-solid fa-hand-pointer"></i> ${langData[currentLang]["sc_btn"] || "SCRATCH THE CARD"}`;
+            btn.disabled = true;
+            btn.style.background = "linear-gradient(135deg, var(--accent-pink), #be185d)";
+            btn.onclick = null;
+            initScratchCanvas();
         }
 
-        // 🎟️ GENERATE TICKETS TO NEW ADMIN SYNCED NODE
-        function executeBuyWeeklyLotteryTicket(ticketPriceCoins) {
-            if(userCurrentCoinsMaster < ticketPriceCoins) { alert("❌ Insufficient coins to unlock the Weekly Entry Pass!"); return; }
-            
-            let randomSerialSuffix = Math.floor(1000 + Math.random() * 9000);
-            let uniqueGeneratedTicketNumber = `SE-MEGA-${randomSerialSuffix}X`;
-            
-            database.ref('users/' + uid).update({
-                coins: userCurrentCoinsMaster - ticketPriceCoins
-            }).then(() => {
-                let newTicketRef = database.ref('weekly_reward_bids_tracker').push();
-                newTicketRef.set({
-                    ticket_id: uniqueGeneratedTicketNumber,
-                    uid: uid,
-                    userName: localStorage.getItem("userName") || "Player",
-                    item: "Weekly Entry Pass",
-                    coins_spent: ticketPriceCoins,
-                    valid_until: "Coming Sunday 11:59 PM",
-                    timestamp: Date.now()
-                }).then(() => {
-                    alert(`🎟️ Entry Pass Unlocked Successfully!\n\nPass No: ${uniqueGeneratedTicketNumber}\nValidity: Coming Sunday 11:59 PM.\n\nYou can view your active passes inside the inventory grid now!`);
-                });
-            });
-        }
-
-        // 🔥 RENDER FUNCTION: AUTO-HIDE EXPIRED MONDAY TICKETS & RESPECT TOGGLES
-        function renderUserActiveTicketsGrid(snapshot) {
-            const container = document.getElementById("ticketsSectionContainer");
-            const grid = document.getElementById("userTicketsGridContainer");
-            const countBadge = document.getElementById("ticketCountBadge");
-
-            grid.innerHTML = ""; 
-            
-            if(!isLotterySystemActive) {
-                container.style.display = "none";
-                return;
-            }
-            
-            if (snapshot.exists()) {
-                let data = snapshot.val();
-                let ticketKeys = Object.keys(data);
-                let count = 0;
-                let startOfWeekMillis = getStartOfWeek();
-
-                ticketKeys.forEach(key => {
-                    let item = data[key];
-                    if(item.uid === uid && item.timestamp >= startOfWeekMillis) {
-                        count++;
-                        let row = document.createElement("div");
-                        row.className = "ticket-item-row";
-                        row.setAttribute("onclick", `viewVirtualTicketReceiptPopup('${item.ticket_id || key}', '${item.valid_until}', ${item.coins_spent})`);
-                        
-                        row.innerHTML = `
-                            <div class="ticket-stub-left">
-                                <span class="ticket-serial-txt">🎫 ${item.ticket_id || key}</span>
-                                <span class="ticket-validity-txt">⏰ Exp: ${item.valid_until}</span>
-                            </div>
-                            <div class="ticket-stub-right">Active</div>
-                        `;
-                        grid.appendChild(row);
-                    }
-                });
-
-                if (count > 0) {
-                    countBadge.innerText = count;
-                    container.style.display = "flex";
-                    return;
-                }
-            }
-            container.style.display = "none";
-        }
-
-        function viewVirtualTicketReceiptPopup(serial, expiry, cost) {
-            alert(`📝 VIRTUAL ENTRY RECEIPT 📝\n\n-----------------------------\nPass Number: ${serial}\nStatus: Registered & Active\nValidity: ${expiry}\nCoins Redeemed: ${cost} Coins\n-----------------------------\n\nReward allocation occurs every Sunday. If you win, a grand reward layout will auto-trigger on your screen!`);
-        }
-
-        function executeClaimJackpotPoolCredits() {
-            document.getElementById("lotteryWinnerModalFrame").style.display = "none";
-            alert(`🔥 Reward Synchronized! Coins have been safely injected into your main wallet balance.`);
-        }
-
+        // 🚀 PLAY STORE SAFE VALIDATION (25s)
         let platformTimer = null;
         let countdownTime = 25;
         let targetWindow = null;
         let totalSecondsOpen = 0;
+        let isValidationActive = false;
 
         function triggerSecureVerification() {
+            if(isValidationActive) return;
+            isValidationActive = true;
+
             const btn = document.getElementById("scratchStatusBtn");
             btn.disabled = true; 
             let currentLang = localStorage.getItem("selectedLang") || "en";
@@ -620,87 +548,133 @@
             totalSecondsOpen = 0;
             window.hasMainTabHidden = false; 
             
-            let initialWaitTxt = langData[currentLang]["wait_txt"] || langData["en"]["wait_txt"] || "Wait...";
+            let initialWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
             btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
 
             targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
 
             platformTimer = setInterval(() => {
+                countdownTime--;
+                btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
+
                 if(targetWindow && targetWindow.closed) {
                     clearInterval(platformTimer);
-                    resetScratchModule();
+                    resetScratchModuleLocally();
                     showCustomAlert("err_early");
+                    isValidationActive = false;
                     return;
                 }
 
                 if(!document.hidden && window.hasMainTabHidden) {
                     if(totalSecondsOpen < 24) {
                         clearInterval(platformTimer);
-                        resetScratchModule();
+                        resetScratchModuleLocally();
                         showCustomAlert("err_invalid");
+                        isValidationActive = false;
                         return;
                     }
                 }
 
                 totalSecondsOpen++;
-                countdownTime--;
-                btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
 
                 if(countdownTime <= 0) {
                     clearInterval(platformTimer);
                     btn.innerText = "PROCESSING...";
-
-                    database.ref('users/' + uid).once('value').then((snapshot) => {
-                        if(snapshot.exists()) {
-                            let oldCoins = snapshot.val().coins || 0;
-                            let oldBalance = snapshot.val().balance || 0;
-                            let monetaryValue = randomCoinsReward / 100; 
-
-                            database.ref('users/' + uid).update({
-                                coins: oldCoins + randomCoinsReward,
-                                balance: oldBalance + monetaryValue
-                            }).then(() => {
-                                btn.innerText = "CLAIMED SUCCESSFULLY";
-                                showCustomAlert("err_success", `${randomCoinsReward} 🪙`, true);
-
-                                // Add to history
-                                database.ref('users/' + uid + '/earning_history').push({
-                                    activity: `Scratch Card Bonus`,
-                                    coins_credited: randomCoinsReward,
-                                    amount: monetaryValue,
-                                    timestamp: Date.now()
-                                });
-
-                                let currentDailyList = snapshot.val().completed_daily_tasks_array_node || [];
-                                if(!currentDailyList.includes("t5")) {
-                                    currentDailyList.push("t5");
-                                    database.ref('users/' + uid).update({ completed_daily_tasks_array_node: currentDailyList });
-                                }
-                                
-                                userCurrentCoinsMaster = oldCoins + randomCoinsReward;
-                                document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
-                            });
-                        }
-                    });
+                    executeRewardSyncWithNodeAPI();
                 }
             }, 1000);
         }
 
-        function resetScratchModule() {
-            isScratchedPassed = false;
-            
-            if (document.getElementById("rewardCoinsDisplay").innerText.includes(randomCoinsReward)) {
-                randomCoinsReward = Math.floor(Math.random() * 20) + 1;
-                document.getElementById("rewardCoinsDisplay").innerText = `+ ${randomCoinsReward} COINS`;
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5)
+        async function executeRewardSyncWithNodeAPI() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: randomCoinsReward, 
+                        action: "scratch_card_claim",
+                        syncTask: "t5" // Completes Daily Task 't5'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    userCurrentCoinsMaster = data.newCoins;
+                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
+                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
+                    
+                    showCustomAlert("err_success", `${randomCoinsReward} 🪙`, true);
+                }
+            } catch (err) {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            } finally {
+                resetScratchModuleLocally();
+                isValidationActive = false;
             }
+        }
 
-            const btn = document.getElementById("scratchStatusBtn");
-            let currentLang = localStorage.getItem("selectedLang") || "en";
-            btn.innerText = langData[currentLang]["sc_btn"] || "SCRATCH THE CARD";
-            btn.disabled = true;
-            btn.style.background = "#ec4899";
-            btn.onclick = null;
-            initScratchCanvas();
+        // 🏪 MARKETPLACE PURCHASE (BACKEND VERIFIED)
+        async function executeMarketplacePurchase(tierTypeString, costCoinsInt) {
+            if(userCurrentCoinsMaster < costCoinsInt) { showCustomAlert("nsf_coins"); return; }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/store/buy-scratch-pass`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: uid, tier: tierTypeString, cost: costCoinsInt })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    userCurrentCoinsMaster = data.newCoins;
+                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
+                    
+                    // Set New Target Value Locally
+                    isScratchedPassed = false;
+                    randomCoinsReward = data.rewardValue; 
+                    document.getElementById("rewardCoinsDisplay").innerText = `+ ${randomCoinsReward} COINS`;
+
+                    initScratchCanvas();
+                    showCustomAlert("buy_success", "", true);
+                } else {
+                    showCustomAlert("nsf_coins");
+                }
+            } catch (err) {
+                alert("Server connection failed.");
+            }
+        }
+
+        // 🎟️ WEEKLY ENTRY PASS (BACKEND VERIFIED)
+        async function executeBuyWeeklyLotteryTicket(ticketPriceCoins) {
+            if(userCurrentCoinsMaster < ticketPriceCoins) { showCustomAlert("nsf_coins"); return; }
+            
+            try {
+                const res = await fetch(`${API_BASE_URL}/store/buy-weekly-pass`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: uid, cost: ticketPriceCoins })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    userCurrentCoinsMaster = data.newCoins;
+                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
+                    
+                    alert(`🎟️ Entry Pass Unlocked Successfully!\n\nPass No: ${data.ticketId}\nValidity: Coming Sunday 11:59 PM.`);
+                    fetchUserPassesFromBackend(); // Refresh Grid
+                }
+            } catch(e) {
+                alert("Server error processing pass.");
+            }
+        }
+
+        // 🏆 CLAIM JACKPOT WIN
+        async function executeClaimJackpotPoolCredits() {
+            document.getElementById("lotteryWinnerModalFrame").style.display = "none";
+            localStorage.setItem("ack_jackpot_win", "true");
+            alert(`🔥 Reward Synchronized! Check your balance.`);
         }
     </script>
 </body>

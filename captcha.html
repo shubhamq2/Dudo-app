@@ -4,54 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Captcha Type - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-pink: #ec4899;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(236, 72, 153, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
         
         /* Premium Sync Header */
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #ec4899; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #ec4899; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(236, 72, 153, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-pink); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-pink); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(236, 72, 153, 0.15); transition: 0.2s; border: 1px solid rgba(236, 72, 153, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
-        .custom-lang-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: #ec4899; font-weight: bold; cursor: pointer; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
 
         /* Profile Balance Ribbon */
-        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, #0f172a, #1e293b); border: 2px solid #ec4899; padding: 12px 20px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .balance-card span { font-size: 16px; }
-        .coin-txt { color: #facc15; display: flex; align-items: center; gap: 5px; }
+        .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-pink); padding: 18px 20px; border-radius: 16px; margin-top: 18px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 10px 25px rgba(236, 72, 153, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 12px; }
 
-        /* 4-Banners Ads Layout Mapped */
-        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 50px; background: #1e293b; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #ec4899; box-sizing: border-box; }
+        /* Banner Ads Slots */
+        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(236, 72, 153, 0.4); box-sizing: border-box; }
 
         /* Main Captcha Card Box */
-        .captcha-main-card { width: 92%; max-width: 440px; background: #1e293b; border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .captcha-main-card { width: 92%; max-width: 440px; background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); margin-bottom: 10px; }
         
         /* 🔥 UPGRADED: Interactive Captcha Display Box */
-        .captcha-display-box { background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 16px; padding: 25px 20px; font-size: 38px; font-weight: 900; color: #fbbf24; border: 2px solid #a855f7; margin: 20px 0; letter-spacing: 8px; font-style: italic; text-shadow: 0 2px 5px rgba(0,0,0,0.5); user-select: none; position: relative; box-shadow: inset 0 0 20px rgba(168,85,247,0.2), 0 5px 15px rgba(0,0,0,0.3); }
-        .captcha-refresh-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 24px; cursor: pointer; color: #cbd5e1; transition: 0.3s; }
-        .captcha-refresh-icon:active { transform: translateY(-50%) rotate(180deg); }
+        .captcha-display-box { background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 16px; padding: 25px 20px; font-size: 38px; font-weight: 900; color: var(--accent-gold); border: 2px solid var(--accent-purple); margin: 20px 0; letter-spacing: 10px; font-style: italic; text-shadow: 0 4px 15px rgba(251, 191, 36, 0.6); user-select: none; position: relative; box-shadow: inset 0 0 30px rgba(168,85,247,0.3), 0 8px 25px rgba(0,0,0,0.4); overflow: hidden; }
+        .captcha-display-box::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px); pointer-events: none; }
+        .captcha-refresh-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 22px; cursor: pointer; color: #fff; transition: 0.3s; background: rgba(0,0,0,0.4); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); z-index: 2; }
+        .captcha-refresh-icon:active { transform: translateY(-50%) rotate(180deg); background: var(--accent-pink); border-color: var(--accent-pink); }
 
         /* 🔥 UPGRADED: Input Grouping Field */
-        .captcha-input { width: 100%; background: #0f172a; border: 2px solid #ec4899; border-radius: 14px; color: #fff; padding: 18px; font-size: 22px; font-weight: 800; text-align: center; outline: none; box-sizing: border-box; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 4px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .captcha-input:focus { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+        .captcha-input { width: 100%; background: rgba(0,0,0,0.4); border: 2px solid rgba(236, 72, 153, 0.4); border-radius: 16px; color: #fff; padding: 18px; font-size: 22px; font-weight: 900; text-align: center; outline: none; box-sizing: border-box; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 5px; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.3); }
+        .captcha-input:focus { border-color: var(--accent-gold); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4), inset 0 4px 10px rgba(0,0,0,0.3); background: rgba(0,0,0,0.6); }
+        .captcha-input::placeholder { color: #475569; font-weight: 700; letter-spacing: 2px; }
 
         /* Action Status Button */
-        .status-btn { width: 100%; background: #ec4899; color: #fff; border: none; padding: 15px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); outline: none; cursor: pointer; transition: 0.2s; }
-        .status-btn:active:not(:disabled) { transform: scale(0.97); }
-        .status-btn:disabled { background: #475569; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+        .status-btn { width: 100%; background: linear-gradient(135deg, var(--accent-pink), #be185d); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4); outline: none; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; }
+        .status-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); }
+        .status-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
         /* Notice Board Security Safe Box */
-        .security-box { width: 92%; max-width: 440px; border: 1px dashed #ec4899; background: rgba(236, 72, 153, 0.05); border-radius: 12px; padding: 12px 15px; margin-top: 15px; box-sizing: border-box; font-size: 12px; color: #94a3b8; line-height: 1.5; display: flex; gap: 8px; margin-bottom: 15px; }
+        .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-pink); background: rgba(236, 72, 153, 0.08); border-radius: 16px; padding: 15px 18px; margin-top: 15px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; font-weight: 600; }
 
         /* Custom Modern Alert Modal Popup style */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; width: 80%; max-width: 350px; text-align: center; }
-        .custom-alert.success-border { border-color: #10b981; }
-        .custom-alert p { margin: 0 0 15px 0; font-size: 14px; color: #e2e8f0; font-weight: 600; line-height: 1.4; }
-        .custom-alert button { background: #ef4444; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .custom-alert.success-border button { background: #10b981; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
@@ -63,7 +82,7 @@
     </div>
 
     <div class="header">
-        <a href="extra_bonus.html" class="back-btn">←</a>
+        <a href="extra_bonus.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="cc_title">Captcha Type</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
@@ -81,49 +100,73 @@
 
     <!-- 📢 ADMIN CONNECTED TOP BANNERS -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="captchaAdSlot1">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
-        <div class="ad-slot-banner" id="captchaAdSlot2">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="o39929d2fef" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/39929d2fef/?placementName=default"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
     <div class="captcha-main-card">
-        <h3 style="margin:0; font-size: 20px; color: #ec4899;" data-i18n="cc_h3">Type Captcha</h3>
-        <p style="font-size: 13px; color:#94a3b8; margin: 5px 0 15px 0;" data-i18n="cc_p">Type the verification code exactly as shown below to claim instant rewards token!</p>
+        <h3 style="margin:0; font-size: 22px; color: var(--accent-pink); font-weight: 900;" data-i18n="cc_h3">Type Captcha</h3>
+        <p style="font-size: 13px; color:var(--text-sub); margin: 8px 0 20px 0; font-weight: 600;" data-i18n="cc_p">Type the verification code exactly as shown below to claim instant rewards!</p>
         
         <div class="captcha-display-box">
             <span id="captchaCodeString">------</span>
-            <span class="captcha-refresh-icon" onclick="generateNewCaptchaCode()">🔄</span>
+            <div class="captcha-refresh-icon" onclick="generateNewCaptchaCode()"><i class="fa-solid fa-rotate-right"></i></div>
         </div>
 
-        <input type="text" id="captchaInputText" class="captcha-input" placeholder="ENTER CAPTCHA" autocomplete="off" spellcheck="false">
+        <input type="text" id="captchaInputText" class="captcha-input" placeholder="ENTER CODE" autocomplete="off" spellcheck="false">
 
         <button class="status-btn" id="captchaSubmitBtn" onclick="verifyCaptchaCodeSubmit()" data-i18n="cc_btn">SUBMIT CAPTCHA</button>
     </div>
 
     <!-- 📢 ADMIN CONNECTED BOTTOM BANNERS -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="captchaAdSlot3">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
-        <div class="ad-slot-banner" id="captchaAdSlot4">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
-        </div>
+        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
     </div>
 
     <div class="security-box">
-        <span>🔒</span>
-        <span data-i18n="cc_security">System monitor is actively verifying this session. Inputting mismatched words or skipping the 25-seconds sponsor view cancels the reward execution.</span>
+        <span style="font-size: 16px;">🛡️</span>
+        <span data-i18n="cc_security">Please type the words accurately. Stay on the sponsor page for 25 seconds to successfully claim your reward points.</span>
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT (WITH POLITE ERRORS)
         const langData = {
-            "en": { "cc_title": "Captcha Type", "cc_h3": "Type Captcha", "cc_p": "Type the verification code exactly as shown below to claim instant rewards token!", "cc_btn": "SUBMIT CAPTCHA", "cc_security": "System monitor is actively verifying this session. Inputting mismatched words or skipping the 25-seconds sponsor view cancels the reward execution.", "err_wrong": "❌ Mismatched Captcha! Please type carefully exactly as shown.", "err_early": "❌ Verification Failed! You closed the sponsor tab early.", "err_invalid": "❌ System Alert: Invalid app switching detected. Stay on the sponsor tab for 25s.", "err_success": "🎉 Verified! 5 Coins added to your account.", "wait_txt": "Verifying sponsor view... " },
-            "hi": { "cc_title": "कैप्चा टाइप", "cc_h3": "कैप्चा टाइप करें", "cc_p": "तुरंत रिवॉर्ड टोकन का दावा करने के लिए नीचे दिखाए गए वेरिफिकेशन कोड को बिल्कुल सही टाइप करें!", "cc_btn": "कैप्चा सबमिट करें", "cc_security": "सिस्टम मॉनिटर सक्रिय रूप से इस सत्र को ट्रैक कर रहा है। गलत शब्द डालने या 25 सेकंड के स्पॉन्सर दृश्य को छोड़ने से रिवॉर्ड रद्द हो जाएगा।", "err_wrong": "❌ गलत कैप्चा! कृपया नीचे जैसा दिखाया गया है बिल्कुल वैसा ही टाइप करें।", "err_early": "❌ सत्यापन विफल! आपने स्पॉन्सर टैब को जल्दी बंद कर दिया।", "err_invalid": "❌ सिस्टम अलर्ट: अमान्य ऐप स्वैप का पता चला। कृपया 25 सेकंड तक स्पॉन्सर पेज पर बने रहें।", "err_success": "🎉 सत्यापित! आपके खाते में 5 कॉइन्स जोड़ दिए गए हैं।", "wait_txt": "सत्यापित हो रहा है... " }
+            "en": { 
+                "cc_title": "Captcha Type", "cc_h3": "Type Captcha", "cc_p": "Type the verification code exactly as shown below to claim instant rewards!", "cc_btn": "SUBMIT CAPTCHA", 
+                "cc_security": "Please type the words accurately. Stay on the sponsor page for 25 seconds to successfully claim your reward points.", 
+                "err_wrong": "❌ Mismatched Captcha! Please check the code and type carefully.", 
+                "err_early": "❌ Verification Incomplete! Please keep the sponsor tab open for the required time.", 
+                "err_invalid": "❌ Tracking Interrupted: Please stay on the sponsor page to complete verification.", 
+                "err_success": "🎉 Verified! 5 Points added to your account.", "wait_txt": "Verifying... " 
+            },
+            "hi": { 
+                "cc_title": "कैप्चा टाइप", "cc_h3": "कैप्चा टाइप करें", "cc_p": "तुरंत रिवॉर्ड का दावा करने के लिए नीचे दिखाए गए वेरिफिकेशन कोड को बिल्कुल सही टाइप करें!", "cc_btn": "सबमिट करें", 
+                "cc_security": "कृपया शब्दों को सही ढंग से टाइप करें। अपने रिवॉर्ड पॉइंट्स को सफलतापूर्वक प्राप्त करने के लिए 25 सेकंड तक स्पॉन्सर पेज पर रहें।", 
+                "err_wrong": "❌ गलत कैप्चा! कृपया कोड को ध्यान से चेक करें और टाइप करें।", 
+                "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए स्पॉन्सर टैब खुला रखें।", 
+                "err_invalid": "❌ ट्रैकिंग रद्द: कृपया सत्यापन पूरा करने के लिए स्पॉन्सर पेज पर ही रहें।", 
+                "err_success": "🎉 सत्यापित! आपके खाते में 5 पॉइंट्स जोड़ दिए गए हैं।", "wait_txt": "चेक हो रहा है... " 
+            },
+            "bn": { "cc_title": "ক্যাপচা টাইপ", "cc_h3": "ক্যাপচা টাইপ করুন", "cc_p": "রিওয়ার্ড পেতে নিচের কোডটি হুবহু টাইপ করুন!", "cc_btn": "জমা দিন", "cc_security": "সঠিকভাবে শব্দ টাইপ করুন। পুরস্কার পেতে স্পনসর পেজে ২৫ সেকেন্ড থাকুন।", "err_wrong": "❌ ভুল ক্যাপচা! দয়া করে সঠিকভাবে টাইপ করুন।", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি আরও কিছুক্ষণ খোলা রাখুন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে: স্পনসর পেজে থাকুন।", "err_success": "🎉 যাচাইকৃত! ৫ পয়েন্ট যোগ করা হয়েছে।", "wait_txt": "যাচাই করা হচ্ছে... " },
+            "te": { "cc_title": "క్యాప్చా టైప్", "cc_h3": "క్యాప్చా ఎంటర్ చేయండి", "cc_p": "రివార్డ్స్ పొందడానికి కోడ్‌ను సరిగ్గా టైప్ చేయండి!", "cc_btn": "సమర్పించండి", "cc_security": "పదాలను సరిగ్గా టైప్ చేయండి. రివార్డ్ పొందడానికి స్పాన్సర్ పేజీలో 25 సెకన్లు ఉండండి.", "err_wrong": "❌ తప్పు క్యాప్చా! దయచేసి జాగ్రత్తగా టైప్ చేయండి.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని కొద్దిసేపు తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి స్పాన్సర్ పేజీలోనే ఉండండి.", "err_success": "🎉 ధృవీకరించబడింది! 5 పాయింట్లు జోడించబడ్డాయి.", "wait_txt": "ధృవీకరిస్తోంది... " },
+            "mr": { "cc_title": "कॅप्चा टाईप", "cc_h3": "कॅप्चा टाईप करा", "cc_p": "रिवॉर्ड्स मिळवण्यासाठी खालील कोड अचूक टाईप करा!", "cc_btn": "सबमिट करा", "cc_security": "शब्द अचूक टाईप करा. रिवॉर्ड मिळवण्यासाठी स्पॉन्सर पेजवर 25 सेकंद थांबा.", "err_wrong": "❌ चुकीचा कॅप्चा! कृपया काळजीपूर्वक टाईप करा.", "err_early": "❌ अपूर्ण! कृपया स्पॉन्सर टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया स्पॉन्सर पेजवरच थांबा.", "err_success": "🎉 यशस्वी! ५ पॉइंट्स जोडले गेले.", "wait_txt": "पडताळणी सुरू आहे... " },
+            "ta": { "cc_title": "கேப்ட்சா வகை", "cc_h3": "கேப்ட்சாவை உள்ளிடுக", "cc_p": "சரியான குறியீட்டை உள்ளிட்டு பரிசுகளைப் பெறுங்கள்!", "cc_btn": "சமர்ப்பி", "cc_security": "வார்த்தைகளை சரியாக தட்டச்சு செய்யவும். 25 விநாடிகள் காத்திருக்கவும்.", "err_wrong": "❌ தவறான கேப்ட்சா! சரியாக தட்டச்சு செய்யவும்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ விளம்பரப் பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 சரிபார்க்கப்பட்டது! 5 புள்ளிகள் சேர்க்கப்பட்டன.", "wait_txt": "சரிபார்க்கிறது... " },
+            "ur": { "cc_title": "کیپچا ٹائپ", "cc_h3": "کیپچا درج کریں", "cc_p": "انعام حاصل کرنے کے لیے کوڈ بالکل صحیح ٹائپ کریں!", "cc_btn": "جمع کریں", "cc_security": "الفاظ درست ٹائپ کریں۔ 25 سیکنڈ تک سپانسر پیج پر رہیں۔", "err_wrong": "❌ غلط کیپچا! براہ کرم احتیاط سے ٹائپ کریں۔", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم سپانسر پیج پر رہیں۔", "err_success": "🎉 تصدیق ہو گئی! 5 پوائنٹس شامل کر دیے گئے۔", "wait_txt": "تصدیق ہو رہی ہے... " },
+            "gu": { "cc_title": "કેપ્ચા ટાઇપ", "cc_h3": "કેપ્ચા દાખલ કરો", "cc_p": "ઇનામ મેળવવા માટે કોડ બરાબર ટાઇપ કરો!", "cc_btn": "સબમિટ કરો", "cc_security": "શબ્દો યોગ્ય રીતે ટાઇપ કરો. 25 સેકન્ડ માટે સ્પોન્સર પેજ પર રહો.", "err_wrong": "❌ ખોટો કેપ્ચા! કૃપા કરીને ધ્યાનથી ટાઇપ કરો.", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને સ્પોન્સર પેજ પર રહો.", "err_success": "🎉 ચકાસણી સફળ! 5 પોઇન્ટ્સ ઉમેરાયા.", "wait_txt": "ચકાસણી... " },
+            "es": { "cc_title": "Tipo Captcha", "cc_h3": "Escribe el Captcha", "cc_p": "¡Escribe el código exactamente para ganar puntos!", "cc_btn": "ENVIAR", "cc_security": "Escribe con precisión. Mantente en la página 25 segundos.", "err_wrong": "❌ ¡Captcha incorrecto! Revisa el código.", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página del patrocinador.", "err_success": "🎉 ¡Verificado! 5 Puntos añadidos.", "wait_txt": "Verificando... " },
+            "fr": { "cc_title": "Type Captcha", "cc_h3": "Tapez le Captcha", "cc_p": "Tapez le code exactement pour gagner des points !", "cc_btn": "SOUMETTRE", "cc_security": "Tapez avec précision. Restez sur la page 25 secondes.", "err_wrong": "❌ Captcha incorrect ! Vérifiez le code.", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page du sponsor.", "err_success": "🎉 Vérifié ! 5 Points ajoutés.", "wait_txt": "Vérification... " },
+            "ar": { "cc_title": "كتابة الكابتشا", "cc_h3": "اكتب الكابتشا", "cc_p": "اكتب الكود بالضبط لكسب النقاط!", "cc_btn": "إرسال", "cc_security": "اكتب بدقة. ابق في الصفحة لمدة 25 ثانية.", "err_wrong": "❌ كابتشا خاطئ! تحقق من الكود.", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في صفحة الراعي.", "err_success": "🎉 تم التحقق! أضيفت 5 نقاط.", "wait_txt": "التحقق... " },
+            "pt": { "cc_title": "Digitar Captcha", "cc_h3": "Digite o Captcha", "cc_p": "Digite o código exatamente para ganhar pontos!", "cc_btn": "ENVIAR", "cc_security": "Digite com precisão. Fique na página por 25 segundos.", "err_wrong": "❌ Captcha incorreto! Verifique o código.", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página do patrocinador.", "err_success": "🎉 Verificado! 5 Pontos adicionados.", "wait_txt": "Verificando... " },
+            "ru": { "cc_title": "Ввод Капчи", "cc_h3": "Введите Капчу", "cc_p": "Введите код точно для получения очков!", "cc_btn": "ОТПРАВИТЬ", "cc_security": "Вводите точно. Оставайтесь на странице 25 секунд.", "err_wrong": "❌ Неверная капча! Проверьте код.", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице спонсора.", "err_success": "🎉 Проверено! 5 очков добавлено.", "wait_txt": "Проверка... " }
         };
 
         function changeLanguage(langCode) {
@@ -131,77 +174,70 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) elem.innerText = transObj[key];
+                if(transObj[key]) {
+                    if(elem.tagName === "BUTTON" && elem.id === "captchaSubmitBtn") {
+                        if(!elem.disabled) elem.innerText = transObj[key];
+                    } else {
+                        elem.innerText = transObj[key];
+                    }
+                }
             });
             document.getElementById("appLanguage").value = langCode;
         }
-    </script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
 
         let currentActiveCaptchaCode = "";
-        let activeAdminSmartlinkUrl = "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
-
-        // 🔥 CONNECT BANNERS AND TASKS SMARTLINK DIRECT TO FIREBASE ADMIN CONTROL NODES
-        database.ref('global_system_runtime_configurations').on('value', (snap) => {
-            if(snap.exists()) {
-                let conf = snap.val();
-                if(conf.watch_ads_configuration && conf.watch_ads_configuration.global_smartlink) {
-                    activeAdminSmartlinkUrl = conf.watch_ads_configuration.global_smartlink;
-                }
-                if(conf.watch_ads_banner_slots) {
-                    let b = conf.watch_ads_banner_slots;
-                    if (b.slot1_html) { let s1 = document.getElementById("captchaAdSlot1"); if(s1) { s1.innerHTML = b.slot1_html; runScripts(s1); } }
-                    if (b.slot2_html) { let s2 = document.getElementById("captchaAdSlot2"); if(s2) { s2.innerHTML = b.slot2_html; runScripts(s2); } }
-                    if (b.slot3_html) { let s3 = document.getElementById("captchaAdSlot3"); if(s3) { s3.innerHTML = b.slot3_html; runScripts(s3); } }
-                    if (b.slot4_html) { let s4 = document.getElementById("captchaAdSlot4"); if(s4) { s4.innerHTML = b.slot4_html; runScripts(s4); } }
-                }
-            }
-        });
-
-        function runScripts(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
-            }
-        }
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback default
 
         document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            // Fetch current real-time user metrics
-            database.ref('users/' + uid).on('value', (snap) => {
-                if(snap.exists()) {
-                    let d = snap.val();
-                    document.getElementById("liveUserCoins").innerText = d.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (d.balance || 0).toFixed(2);
-                }
-            });
-
+            fetchDataFromAdminServer();
             generateNewCaptchaCode();
         });
 
+        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch Profile Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // 2. Fetch Admin Banners & Captcha Smartlink
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    if (confData.banners) {
+                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
+                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
+                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
+                        if(confData.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.banners[3];
+                    }
+                    if (confData.captchaLink) {
+                        activeAdminSmartlinkUrl = confData.captchaLink;
+                    } else if (confData.globalSmartlink) {
+                        activeAdminSmartlinkUrl = confData.globalSmartlink;
+                    }
+                }
+            } catch (err) {
+                console.log("Using default cached configuration.");
+            }
+        }
+
         // Dynamic 6-Character Shield Token Generator
         function generateNewCaptchaCode() {
-            const chars = "ABCDEFGHJKLMNOPQRSTUVWXYZ23456789"; 
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Removed O, 0, 1, I to avoid confusion
             let code = "";
             for (let i = 0; i < 6; i++) {
                 code += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -213,12 +249,13 @@
 
         function showCustomAlert(msgKey, isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let msg = langData[currentLang][msgKey] || langData["en"][msgKey];
+            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
+
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");
             else alertBox.classList.remove("success-border");
 
-            document.getElementById("alertMessage").innerText = msg;
+            document.getElementById("alertMessage").innerText = msgStr;
             document.getElementById("alertOverlay").style.display = "block";
             alertBox.style.display = "block";
         }
@@ -232,42 +269,43 @@
         let countdownTime = 25;
         let targetWindow = null;
         let totalSecondsOpen = 0;
+        let isValidationActive = false;
 
-        // 🔥 ADDED TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                window.hasMainTabHidden = true;
-            }
-        });
-
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC (25 SECONDS)
         function verifyCaptchaCodeSubmit() {
+            if (isValidationActive) return;
+
             const userInput = document.getElementById("captchaInputText").value.trim().toUpperCase();
             const btn = document.getElementById("captchaSubmitBtn");
             let currentLang = localStorage.getItem("selectedLang") || "en";
 
             if (!userInput) return;
 
-            // Step 1: Strict word matching execution check
+            // Step 1: Strict word matching
             if (userInput !== currentActiveCaptchaCode) {
                 showCustomAlert("err_wrong");
                 generateNewCaptchaCode();
                 return;
             }
 
-            // Step 2: Trigger secure 25-seconds Adsterra smartlink rotation phase
+            // Step 2: Trigger secure 25-seconds sponsor view phase
+            isValidationActive = true;
             countdownTime = 25;
             totalSecondsOpen = 0;
-            window.hasMainTabHidden = false; // Reset tracker
             btn.disabled = true;
 
-            let baseWaitTxt = langData[currentLang]["wait_txt"] || langData["en"]["wait_txt"];
+            let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
             btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
 
             targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
 
+            if (platformTimer) clearInterval(platformTimer);
+
             platformTimer = setInterval(() => {
-                // Check 1: Early window close tracking guard
+                countdownTime--;
+                btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
+
+                // Safe Validation 1: User closed tab early
                 if (targetWindow && targetWindow.closed) {
                     clearInterval(platformTimer);
                     resetCaptchaSubmitButton();
@@ -275,8 +313,8 @@
                     return;
                 }
 
-                // Check 2: Dynamic visibility focus checker loop
-                if (!document.hidden && window.hasMainTabHidden) {
+                // Safe Validation 2: Invalid rapid tab switching detection
+                if (!document.hidden) {
                     if (totalSecondsOpen < 24) {
                         clearInterval(platformTimer);
                         resetCaptchaSubmitButton();
@@ -286,39 +324,45 @@
                 }
 
                 totalSecondsOpen++;
-                countdownTime--;
-                btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
 
                 if (countdownTime <= 0) {
                     clearInterval(platformTimer);
-                    btn.innerText = "...";
-
-                    // Sync verified 5 coins reward with main realtime branch nodes safely
-                    database.ref('users/' + uid).once('value').then((snapshot) => {
-                        if (snapshot.exists()) {
-                            let oldCoins = snapshot.val().coins || 0;
-                            let oldBalance = snapshot.val().balance || 0;
-                            let monetizedValue = 0.05; // 5 Coins = ₹0.05 Matrix
-
-                            database.ref('users/' + uid).update({
-                                coins: oldCoins + 5,
-                                balance: oldBalance + monetizedValue
-                            }).then(() => {
-                                resetCaptchaSubmitButton();
-                                generateNewCaptchaCode();
-                                showCustomAlert("err_success", true);
-
-                                // 🔥 SYNC LOG DATA WITH BACKEND HOME CHECKLIST PROGRESS BAR (t9 node)
-                                let currentDailyList = snapshot.val().completed_daily_tasks_array_node || [];
-                                if(!currentDailyList.includes("t9")) {
-                                    currentDailyList.push("t9");
-                                    database.ref('users/' + uid).update({ completed_daily_tasks_array_node: currentDailyList });
-                                }
-                            });
-                        }
-                    });
+                    btn.innerText = "SAVING...";
+                    evaluateCaptchaReward();
                 }
             }, 1000);
+        }
+
+        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
+        async function evaluateCaptchaReward() {
+            try {
+                // Call API to add 5 Points and Sync Daily Task 't9' (Captcha Solver)
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: 5, 
+                        action: "captcha_solve",
+                        syncTask: "t9" // Tells backend to complete task 't9'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById("liveUserCoins").innerText = data.newCoins;
+                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
+                    
+                    resetCaptchaSubmitButton();
+                    generateNewCaptchaCode();
+                    showCustomAlert("err_success", true);
+                } else {
+                    throw new Error("API Failure");
+                }
+            } catch (err) {
+                resetCaptchaSubmitButton();
+                alert("Task Verified but couldn't sync with server. Try again.");
+            }
         }
 
         function resetCaptchaSubmitButton() {
@@ -326,6 +370,7 @@
             let currentLang = localStorage.getItem("selectedLang") || "en";
             btn.disabled = false;
             btn.innerText = langData[currentLang]["cc_btn"] || "SUBMIT CAPTCHA";
+            isValidationActive = false;
         }
     </script>
 </body>

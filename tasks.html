@@ -4,91 +4,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Zone - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; padding-bottom: 30px; }
-        
-        /* Premium Header */
-        .header { width: 100%; background: #1e293b; padding: 12px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3b82f6; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #3b82f6; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); }
-        .header-controls { display: flex; gap: 12px; align-items: center; }
-        
-        /* Language Dropdown */
-        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; outline: none; font-size: 13px; background: #1e293b; color: #fff; font-weight: bold; cursor: pointer; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #facc15;
+            --accent-pink: #f43f5e;
+            --accent-purple: #a855f7;
+            --accent-orange: #f97316;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
 
-        .main-container { width: 92%; max-width: 440px; margin: 15px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
-        .section-headline { font-size: 14px; font-weight: 800; color: #3b82f6; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 5px; margin-bottom: 5px; text-align: left; width: 100%; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+        
+        /* Premium Sync Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--primary-blue); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--primary-blue); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); transition: 0.2s; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
+
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--primary-blue); font-weight: bold; cursor: pointer; }
+
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
+
+        /* Profile Balance Ribbon */
+        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--primary-blue); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+
+        /* Banner Ads Slots */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(59, 130, 246, 0.4); box-sizing: border-box; margin: 5px 0; }
+
+        /* Section Headlines */
+        .section-headline { font-size: 15px; font-weight: 900; color: var(--primary-blue); text-transform: uppercase; letter-spacing: 0.8px; margin: 10px 0 5px 0; text-align: left; border-left: 4px solid var(--primary-blue); padding-left: 8px; }
 
         /* Grid Framework Matching Screen Exactly */
-        .networks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .network-card { background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px; box-sizing: border-box; }
-        .network-card:active { transform: scale(0.95); background: #24344d; }
+        .networks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-bottom: 15px; }
+        .network-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 25px 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px; box-sizing: border-box; box-shadow: 0 8px 25px rgba(0,0,0,0.4); backdrop-filter: blur(10px); overflow: hidden; }
+        .network-card:active { transform: scale(0.95); border-color: var(--primary-blue); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .network-card::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--primary-blue); opacity: 0.5; }
         
-        .card-badge { position: absolute; top: 10px; right: 10px; font-size: 8px; font-weight: 900; color: #fff; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; }
-        .badge-popular { background: #3b82f6; }
-        .badge-hot { background: #f97316; }
-        .badge-autopay { background: #10b981; }
+        .card-badge { position: absolute; top: 10px; right: 10px; font-size: 9px; font-weight: 900; color: #fff; padding: 4px 8px; border-radius: 20px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .badge-popular { background: var(--primary-blue); }
+        .badge-hot { background: var(--accent-orange); }
+        .badge-autopay { background: var(--accent-green); }
 
-        .network-icon { font-size: 42px; margin-bottom: 8px; }
-        .network-title { font-size: 15px; font-weight: 800; color: #fff; margin: 0 0 4px 0; }
-        .network-desc { font-size: 11px; color: #94a3b8; margin: 0; font-weight: 500; }
+        .network-icon { font-size: 40px; margin-bottom: 12px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+        .network-title { font-size: 15px; font-weight: 900; color: #fff; margin: 0 0 5px 0; letter-spacing: 0.5px; }
+        .network-desc { font-size: 11.5px; color: var(--text-sub); margin: 0; font-weight: 600; }
 
-        /* 📢 4 LIVE DYNAMIC ADMIN ADS SLOTS */
-        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #3b82f6; margin: 5px 0; box-sizing: border-box; }
+        /* Security Info Board */
+        .security-box { border: 1px dashed var(--accent-cyan); background: rgba(6, 182, 212, 0.08); border-radius: 16px; padding: 15px 18px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-bottom: 15px; font-weight: 600; margin-top: 10px; }
 
         /* 🎬 MULTI-OPTION POPUP MODAL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
-        .modal-card { width: 100%; max-width: 360px; background: #1e293b; border-radius: 24px; border: 1px solid #475569; padding: 20px; box-sizing: border-box; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center; animation: zoomIn 0.3s ease; }
-        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
+        .modal-card { width: 100%; max-width: 380px; background: var(--card-bg); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); padding: 25px 20px; box-sizing: border-box; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        .modal-title { font-size: 17px; font-weight: 800; color: #fff; margin: 0 0 5px 0; }
-        .modal-subtitle { font-size: 11px; color: #94a3b8; margin: 0 0 20px 0; }
+        .modal-title { font-size: 20px; font-weight: 900; color: #fff; margin: 0 0 8px 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .modal-subtitle { font-size: 13px; color: var(--text-sub); margin: 0 0 20px 0; font-weight: 600; line-height: 1.4; }
 
-        .video-option-btn { width: 100%; background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 14px; color: #fff; text-align: left; font-size: 13px; font-weight: bold; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; transition: 0.2s; position: relative; }
-        .video-option-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .video-option-btn:active:not(:disabled) { background: #1e293b; border-color: #3b82f6; }
-        .option-meta { display: flex; flex-direction: column; gap: 2px; }
-        .option-reward { font-size: 11px; color: #facc15; font-weight: 800; background: rgba(250, 204, 21, 0.1); padding: 3px 8px; border-radius: 6px; }
+        .video-option-btn { width: 100%; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.05); padding: 16px 15px; border-radius: 16px; color: #fff; text-align: left; cursor: pointer; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
+        .video-option-btn:disabled { opacity: 0.6; cursor: not-allowed; border-color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+        .video-option-btn:active:not(:disabled) { transform: scale(0.98); border-color: var(--primary-blue); background: rgba(59, 130, 246, 0.1); }
+        
+        .option-meta { display: flex; flex-direction: column; gap: 4px; }
+        .option-title { font-size: 14.5px; font-weight: 900; color: #fff; }
+        .option-sub { font-size: 11px; color: var(--text-sub); font-weight: 600; }
+        .option-reward { font-size: 13px; color: var(--accent-gold); font-weight: 900; background: rgba(250, 204, 21, 0.15); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(250, 204, 21, 0.3); }
 
-        .close-modal-btn { background: none; border: none; color: #ef4444; font-size: 13px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; padding: 5px 10px; }
+        .close-modal-btn { background: none; border: none; color: var(--accent-pink); font-size: 13.5px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 15px; padding: 8px 15px; transition: 0.2s; }
+        .close-modal-btn:active { background: rgba(244, 63, 94, 0.1); border-radius: 8px; }
+
+        /* Custom Alert Popups */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 2000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 1999; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
 
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <p id="alertMessage">Message</p>
+        <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
     <!-- 🎬 MULTI-OPTION POPUP MODAL -->
     <div class="modal-overlay" id="videoOptionsModal">
         <div class="modal-card">
-            <div class="modal-title" id="currentNetworkName">Video Servers</div>
-            <div class="modal-subtitle" data-i18n="select_channel">Select a video channel to stream and earn coins</div>
+            <div class="modal-title" id="currentNetworkName"><i class="fa-solid fa-play"></i> Video Servers</div>
+            <div class="modal-subtitle" data-i18n="select_channel">Select a video channel to stream and earn points</div>
             
-            <div id="optionsContainer"></div>
+            <div id="optionsContainer">
+                <!-- Buttons Injected via JS -->
+            </div>
 
             <button class="close-modal-btn" onclick="closeVideoOptionsModal()">Close Menu ×</button>
         </div>
     </div>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
-        <h2 data-i18n="watch_ads" style="margin:0; font-size:20px; flex-grow:1; text-align:center;">Video Zone</h2>
-        <div class="header-controls">
-            <select class="custom-lang-select notranslate" id="appLanguage" onchange="changeLanguage(this.value)">
-                <option value="en">English</option><option value="hi">हिंदी (HI)</option><option value="bn">বাংলা (BN)</option>
-                <option value="te">తెలుగు (TE)</option><option value="mr">मराठी (MR)</option><option value="ta">தமிழ் (TA)</option>
-                <option value="ur">اردو (UR)</option><option value="gu">ગુજરાતી (GU)</option><option value="es">Español (ES)</option>
-                <option value="fr">Français (FR)</option><option value="ar">عربي (AR)</option><option value="pt">Português (PT)</option>
-                <option value="ru">Русский (RU)</option>
-            </select>
-        </div>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="watch_ads">Video Zone</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
     </div>
 
     <div class="main-container">
         
-        <!-- 📢 AD SLOT 1 (Dynamic Wrapper Node) -->
-        <div class="ad-banner-slot" id="adSlot1">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        <div class="balance-card">
+            <span data-i18n="wallet_bal">Wallet Balance</span>
+            <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
+        
+        <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="section-headline" data-i18n="watch_earn_networks">Media Networks</div>
 
@@ -108,10 +156,8 @@
             </div>
         </div>
 
-        <!-- 📢 AD SLOT 2 -->
-        <div class="ad-banner-slot" id="adSlot2">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <!-- 📢 ADMIN CONNECTED AD SLOT 2 -->
+        <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
         <div class="networks-grid">
             <div class="network-card" onclick="openVideoOptions('hideout', '📺')">
@@ -128,10 +174,8 @@
             </div>
         </div>
 
-        <!-- 📢 AD SLOT 3 -->
-        <div class="ad-banner-slot" id="adSlot3">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <!-- 📢 ADMIN CONNECTED AD SLOT 3 -->
+        <div class="ad-banner-slot" id="adminBannerSlot3"></div>
 
         <div class="networks-grid">
             <div class="network-card" onclick="openVideoOptions('notik', '📱')">
@@ -147,161 +191,40 @@
             </div>
         </div>
 
-        <!-- 📢 AD SLOT 4 -->
-        <div class="ad-banner-slot" id="adSlot4">
-            <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+        <!-- 📢 ADMIN CONNECTED AD SLOT 4 -->
+        <div class="ad-banner-slot" id="adminBannerSlot4"></div>
+
+        <div class="security-box">
+            <span style="font-size: 18px;">🛡️</span>
+            <span data-i18n="st_security">Tracking protocols are active. Do not switch tabs or close the video early to ensure successful point verification.</span>
         </div>
 
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
 
-        let adServerLinksConfig = {
-            adscend: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
-            lootably: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
-            hideout: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
-            timewall: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
-            notik: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" },
-            monlix: { srv1: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv2: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN", srv3: "https://www.profitablecpmrate.com/TUMHARA_CODE_YAHAN" }
-        };
-
-        // ⚡ ADMIN VIDEO CHANNELS LISTENER ROUTINE
-        database.ref('global_system_runtime_configurations/watch_ads_configuration').on('value', (snap) => {
-            if (snap.exists()) {
-                let dbData = snap.val();
-                Object.keys(adServerLinksConfig).forEach(netKey => {
-                    if (dbData[netKey]) {
-                        if (dbData[netKey].srv1) adServerLinksConfig[netKey].srv1 = dbData[netKey].srv1;
-                        if (dbData[netKey].srv2) adServerLinksConfig[netKey].srv2 = dbData[netKey].srv2;
-                        if (dbData[netKey].srv3) adServerLinksConfig[netKey].srv3 = dbData[netKey].srv3;
-                    }
-                });
-            }
-        });
-
-        // ⚡ NEW FEATURE: 4 BANNERS AD SLOTS DYNAMIC ADMIN SYNC OVERRIDE
-        database.ref('global_system_runtime_configurations/watch_ads_banner_slots').on('value', (snap) => {
-            if (snap.exists()) {
-                let banners = snap.val();
-                
-                // Dynamic script injection logic for live cross-network banner switches
-                if (banners.slot1_html) {
-                    let s1 = document.getElementById("adSlot1");
-                    if (s1) { s1.innerHTML = banners.slot1_html; executeScriptsInsideContainer(s1); }
-                }
-                if (banners.slot2_html) {
-                    let s2 = document.getElementById("adSlot2");
-                    if (s2) { s2.innerHTML = banners.slot2_html; executeScriptsInsideContainer(s2); }
-                }
-                if (banners.slot3_html) {
-                    let s3 = document.getElementById("adSlot3");
-                    if (s3) { s3.innerHTML = banners.slot3_html; executeScriptsInsideContainer(s3); }
-                }
-                if (banners.slot4_html) {
-                    let s4 = document.getElementById("adSlot4");
-                    if (s4) { s4.innerHTML = banners.slot4_html; executeScriptsInsideContainer(s4); }
-                }
-            }
-        });
-
-        // Helper framework to ensure loaded admin script tags execute smoothly
-        function executeScriptsInsideContainer(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let scriptNode = document.createElement("script");
-                if (scripts[i].src) {
-                    scriptNode.src = scripts[i].src;
-                } else {
-                    scriptNode.text = scripts[i].text;
-                }
-                scripts[i].parentNode.replaceChild(scriptNode, scripts[i]);
-            }
-        }
-
-        let activeWatchSession = null;
-
-        // FULL 13 LANGUAGES TRANSLATIONS MATRIX REGISTER (Google Safe Mode)
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": {
-                "watch_ads": "Video Zone", "watch_earn_networks": "Media Networks", "unlimited_desc": "Unlimited Videos",
-                "premium_video_desc": "Premium Videos", "short_ads_desc": "Short 10s Clips", "high_paying_desc": "High Yield Media",
-                "select_channel": "Select a video channel to stream and earn coins", "verifying": "Verifying stream integrity..."
+            "en": { 
+                "watch_ads": "Video Zone", "wallet_bal": "Wallet Balance", "watch_earn_networks": "Media Networks", "unlimited_desc": "Unlimited Videos", "premium_video_desc": "Premium Videos", "short_ads_desc": "Short 10s Clips", "high_paying_desc": "High Yield Media", "select_channel": "Select a video channel to stream and earn points", "verifying": "Verifying stream...", "btn_stream": "Stream & Claim", "st_security": "Tracking protocols are active. Do not switch tabs or close the video early to ensure successful point verification.", "err_early": "❌ Verification Incomplete! You closed the stream before the required 15 seconds.", "err_invalid": "❌ Tracking Interrupted! Please stay on the page to complete verification.", "err_success": "🎉 Task Verified! Points credited via "
             },
-            "hi": {
-                "watch_ads": "वीडियो ज़ोन", "watch_earn_networks": "मीडिया नेटवर्क", "unlimited_desc": "असीमित वीडियो",
-                "premium_video_desc": "प्रीमियम वीडियो", "short_ads_desc": "छोटे 10s क्लिप्स", "high_paying_desc": "प्रीमियम मीडिया",
-                "select_channel": "सिक्के कमाने के लिए एक वीडियो चैनल चुनें", "verifying": "सत्यापन चल रहा है..."
+            "hi": { 
+                "watch_ads": "वीडियो ज़ोन", "wallet_bal": "वॉलेट बैलेंस", "watch_earn_networks": "मीडिया नेटवर्क", "unlimited_desc": "असीमित वीडियो", "premium_video_desc": "प्रीमियम वीडियो", "short_ads_desc": "छोटे 10s क्लिप्स", "high_paying_desc": "प्रीमियम मीडिया", "select_channel": "पॉइंट्स कमाने के लिए एक वीडियो चैनल चुनें", "verifying": "सत्यापन चल रहा है...", "btn_stream": "वीडियो देखें", "st_security": "सत्यापन प्रोटोकॉल सक्रिय हैं। पॉइंट्स प्राप्त करने के लिए वीडियो को जल्दी बंद न करें या टैब न बदलें।", "err_early": "❌ सत्यापन अधूरा! आपने 15 सेकंड से पहले वीडियो बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया वीडियो पेज पर बने रहें।", "err_success": "🎉 सत्यापित! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: "
             },
-            "bn": {
-                "watch_ads": "ভিডিও জোন", "watch_earn_networks": "মিডিয়া নেটওয়ার্ক", "unlimited_desc": "আনলিমিটেড ভিডিও",
-                "premium_video_desc": "প্রিমিয়াম ভিডিও", "short_ads_desc": "ছোট 10s ক্লিপ", "high_paying_desc": "উচ্চ মানের মিডিয়া",
-                "select_channel": "কয়েন উপার্জন করতে একটি ভিডিও চ্যানেল নির্বাচন করুন", "verifying": "যাচাই করা হচ্ছে..."
-            },
-            "te": {
-                "watch_ads": "వీడియో జోన్", "watch_earn_networks": "మీడియా నెట్‌వర్క్స్", "unlimited_desc": "అపరిమిత వీడియోలు",
-                "premium_video_desc": "ప్రీమియం వీడియోలు", "short_ads_desc": "చిన్న 10s క్లిప్‌లు", "high_paying_desc": "హై యీల్డ్ మీడియా",
-                "select_channel": "నాణేలను సంపాదించడానికి వీడియో ఛానెల్‌ని ఎంచుకోండి", "verifying": "ధృవీకరిస్తోంది..."
-            },
-            "mr": {
-                "watch_ads": "व्हिडिओ झोन", "watch_earn_networks": "मीडिया नेटवर्क्स", "unlimited_desc": "अमर्यादित व्हिडिओ",
-                "premium_video_desc": "प्रीमियम व्हिडिओ", "short_ads_desc": "लहान 10s क्लिप्स", "high_paying_desc": "हाय यील्ड मीडिया",
-                "select_channel": "नाणी मिळवण्यासाठी एक व्हिडिओ चॅनेल निवडा", "verifying": "पडताळणी सुरू आहे..."
-            },
-            "ta": {
-                "watch_ads": "வீடியோ மண்டலம்", "watch_earn_networks": "மீடியா நெட்வொர்க்குகள்", "unlimited_desc": "வரம்பற்ற வீடியோக்கள்",
-                "premium_video_desc": "பிரீமியம் வீடியோக்கள்", "short_ads_desc": "குறுகிய 10s கிளிப்புகள்", "high_paying_desc": "உயர் மகசூல் மீடியா",
-                "select_channel": "நாணயங்களை சம்பாதிக்க வீடியோ சேனலைத் தேர்ந்தெடுக்கவும்", "verifying": "சரிபார்க்கிறது..."
-            },
-            "ur": {
-                "watch_ads": "ویڈیو زون", "watch_earn_networks": "میڈیا نیٹ ورکس", "unlimited_desc": "لامحدود ویڈیوز",
-                "premium_video_desc": "پریمیم ویڈیوز", "short_ads_desc": "مختصر 10s کلپس", "high_paying_desc": "ہائی ییلڈ میڈیا",
-                "select_channel": "سکے کمانے کے لیے ویڈیو چینل منتخب کریں", "verifying": "تصدیق ہو رہی ہے..."
-            },
-            "gu": {
-                "watch_ads": "વિડિઓ ઝોન", "watch_earn_networks": "મીડિયા નેટવર્ક્સ", "unlimited_desc": "અમર્યાદિત વિડિઓઝ",
-                "premium_video_desc": "પ્રીમિયમ વિડિઓઝ", "short_ads_desc": "ટૂંકી 10s ક્લિપ્સ", "high_paying_desc": "હાઇ યીલ્ડ મીડિયા",
-                "select_channel": "સિક્કા કમાવવા માટે વિડિઓ ચેનલ પસંદ કરો", "verifying": "ચકાસણી ચાલુ છે..."
-            },
-            "es": {
-                "watch_ads": "Zona de Video", "watch_earn_networks": "Redes de Medios", "unlimited_desc": "Videos Ilimitados",
-                "premium_video_desc": "Videos Premium", "short_ads_desc": "Clips Cortos de 10s", "high_paying_desc": "Medios de Alto Rendimiento",
-                "select_channel": "Seleccione un canal de video para transmitir y ganar monedas", "verifying": "Verificando integridad..."
-            },
-            "fr": {
-                "watch_ads": "Zone Vidéo", "watch_earn_networks": "Réseaux Médias", "unlimited_desc": "Vidéos Illimitées",
-                "premium_video_desc": "Vidéos Premium", "short_ads_desc": "Clips Courts de 10s", "high_paying_desc": "Médias à Haut Rendement",
-                "select_channel": "Sélectionnez une chaîne vidéo pour diffuser et gagner des pièces", "verifying": "Vérification en cours..."
-            },
-            "ar": {
-                "watch_ads": "منطقة الفيديو", "watch_earn_networks": "شبكات الوسائط", "unlimited_desc": "فيديوهات غير محدودة",
-                "premium_video_desc": "فيديوهات مميزة", "short_ads_desc": "مقاطع قصيرة 10 ثوانٍ", "high_paying_desc": "وسائط عالية العائد",
-                "select_channel": "اختر قناة فيديو للمشاهدة وكسب العملات", "verifying": "جاري التحقق..."
-            },
-            "pt": {
-                "watch_ads": "Zona de Vídeo", "watch_earn_networks": "Redes de Mídia", "unlimited_desc": "Vídeos Ilimitados",
-                "premium_video_desc": "Vídeos Premium", "short_ads_desc": "Clipes Curtos de 10s", "high_paying_desc": "Mídia de Alto Rendimento",
-                "select_channel": "Selecione um canal de vídeo para assistir e ganhar moedas", "verifying": "Verificando integridade..."
-            },
-            "ru": {
-                "watch_ads": "Видео Зона", "watch_earn_networks": "Медиа Сети", "unlimited_desc": "Безлимитные видео",
-                "premium_video_desc": "Премиум Видео", "short_ads_desc": "Короткие 10с Клипы", "high_paying_desc": "Высокодоходные Медиа",
-                "select_channel": "Выберите видеоканал для просмотра и заработка монет", "verifying": "Проверка подлинности..."
-            }
+            "bn": { "watch_ads": "ভিডিও জোন", "select_channel": "ভিডিও চ্যানেল নির্বাচন করুন", "btn_stream": "ভিডিও দেখুন", "err_early": "❌ অসম্পূর্ণ! ১৫ সেকেন্ডের আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! পেজেই থাকুন।", "err_success": "🎉 ভেরিফাইড! পয়েন্ট যোগ হয়েছে: " },
+            "te": { "watch_ads": "వీడియో జోన్", "select_channel": "వీడియో ఛానెల్‌ని ఎంచుకోండి", "btn_stream": "చూడండి", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: " },
+            "mr": { "watch_ads": "व्हिडिओ झोन", "select_channel": "व्हिडिओ चॅनेल निवडा", "btn_stream": "पहा", "err_success": "🎉 सत्यापित! पॉइंट्स जोडले गेले: " },
+            "ta": { "watch_ads": "வீடியோ மண்டலம்", "select_channel": "வீடியோ சேனலைத் தேர்ந்தெடுக்கவும்", "btn_stream": "பார்க்கவும்", "err_success": "🎉 சரிபார்க்கப்பட்டது! " },
+            "ur": { "watch_ads": "ویڈیو زون", "select_channel": "ویڈیو چینل منتخب کریں", "btn_stream": "دیکھیں", "err_success": "🎉 تصدیق ہو گئی! " },
+            "gu": { "watch_ads": "વિડિઓ ઝોન", "select_channel": "વિડિઓ ચેનલ પસંદ કરો", "btn_stream": "જુઓ", "err_success": "🎉 ચકાસાયેલ! " },
+            "es": { "watch_ads": "Zona de Video", "select_channel": "Selecciona un canal para ganar", "btn_stream": "Ver Video", "err_success": "🎉 ¡Verificado! " },
+            "fr": { "watch_ads": "Zone Vidéo", "select_channel": "Sélectionnez une chaîne pour gagner", "btn_stream": "Regarder", "err_success": "🎉 Vérifié ! " },
+            "ar": { "watch_ads": "منطقة الفيديو", "select_channel": "اختر قناة لكسب النقاط", "btn_stream": "شاهد", "err_success": "🎉 تم التحقق! " },
+            "pt": { "watch_ads": "Zona de Vídeo", "select_channel": "Selecione um canal para ganhar", "btn_stream": "Assistir", "err_success": "🎉 Verificado! " },
+            "ru": { "watch_ads": "Видео Зона", "select_channel": "Выберите канал для заработка", "btn_stream": "Смотреть", "err_success": "🎉 Проверено! " }
         };
 
         function changeLanguage(langCode) {
@@ -309,9 +232,101 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) { elem.innerText = transObj[key]; }
+                if(transObj[key]) elem.innerText = transObj[key];
             });
             document.getElementById("appLanguage").value = langCode;
+        }
+
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
+
+        // 🔥 DYNAMIC LINKS MAPPING (Fetched from Admin)
+        let videoAdminLinksConfig = {
+            adscend: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
+            lootably: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
+            hideout: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
+            timewall: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
+            notik: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
+            monlix: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            fetchDataFromAdminServer();
+        });
+
+        // 📡 FETCH USER DATA AND ADMIN BANNERS/LINKS
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch Profile Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
+                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
+                }
+
+                // 2. Fetch Admin Banners and Video Links
+                const confRes = await fetch(`${API_BASE_URL}/app-config/video-settings`);
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    if (confData.settings.banners) {
+                        if(confData.settings.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.settings.banners[0];
+                        if(confData.settings.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.settings.banners[1];
+                        if(confData.settings.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.settings.banners[2];
+                        if(confData.settings.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.settings.banners[3];
+                    }
+                    if (confData.settings.videoLinks) {
+                        Object.keys(videoAdminLinksConfig).forEach(netKey => {
+                            if (confData.settings.videoLinks[netKey]) {
+                                if (confData.settings.videoLinks[netKey].srv1) videoAdminLinksConfig[netKey].srv1 = confData.settings.videoLinks[netKey].srv1;
+                                if (confData.settings.videoLinks[netKey].srv2) videoAdminLinksConfig[netKey].srv2 = confData.settings.videoLinks[netKey].srv2;
+                                if (confData.settings.videoLinks[netKey].srv3) videoAdminLinksConfig[netKey].srv3 = confData.settings.videoLinks[netKey].srv3;
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.log("Using cached configuration.");
+            }
+        }
+
+        let activeWatchSession = null;
+        let isValidationActive = false;
+        let platformTimer = null;
+        let targetWindow = null;
+        let totalSecondsOpen = 0;
+
+        // 🔥 ADDED TAB TRACKER 
+        window.hasMainTabHidden = false;
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) { window.hasMainTabHidden = true; }
+        });
+
+        function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
+
+            const alertBox = document.getElementById("customAlertBox");
+            const overlay = document.getElementById("alertOverlay");
+            document.getElementById("alertMessage").innerText = msgStr + appendText;
+            
+            if(isSuccess) { alertBox.classList.add("success-border"); } 
+            else { alertBox.classList.remove("success-border"); }
+            
+            alertBox.style.display = "block";
+            overlay.style.display = "block";
+        }
+
+        function closeCustomAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
         }
 
         function openVideoOptions(networkName, icon) {
@@ -321,9 +336,12 @@
             if(networkName === 'hideout') prettyName = "Hideout.tv";
             if(networkName === 'monlix') prettyName = "Monlix Videos";
 
-            document.getElementById("currentNetworkName").innerText = `${icon} ${prettyName}`;
+            document.getElementById("currentNetworkName").innerHTML = `${icon} ${prettyName}`;
             const container = document.getElementById("optionsContainer");
             container.innerHTML = ""; 
+
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let streamTxt = langData[currentLang]["btn_stream"] || "Stream & Claim";
 
             const serverOptions = [
                 { id: "srv1", title: "Server 1: Premium Stream", reward: 15 },
@@ -337,8 +355,8 @@
                 btn.id = `btn_${opt.id}`;
                 btn.innerHTML = `
                     <div class="option-meta">
-                        <span>${opt.title}</span>
-                        <span style="font-size:10px; color:#64748b; font-weight:500;" id="sub_${opt.id}">Stream video and claim coins</span>
+                        <span class="option-title">${opt.title}</span>
+                        <span class="option-sub" id="sub_${opt.id}">${streamTxt}</span>
                     </div>
                     <span class="option-reward">+${opt.reward} 🪙</span>
                 `;
@@ -351,76 +369,119 @@
             document.getElementById("videoOptionsModal").style.display = "flex";
         }
 
-        function triggerVideoSessionTimeoutFallback(network, serverId, serverTitle) {
-            setTimeout(() => {
-                if (activeWatchSession && activeWatchSession.serverId === serverId) {
-                    evaluateRewardValidation(network, serverId, serverTitle);
-                }
-            }, 15000); 
+        function closeVideoOptionsModal() {
+            if(isValidationActive) return; // Prevent closing while watching
+            document.getElementById("videoOptionsModal").style.display = "none";
+            activeWatchSession = null;
         }
 
+        // 🚀 PLAY STORE SAFE VALIDATION ENGINE (15 SECONDS)
         function triggerSecureAdStream(network, serverId, serverTitle, rewardAmt) {
+            if(isValidationActive) return;
+            isValidationActive = true;
+
             activeWatchSession = {
                 network: network,
                 serverId: serverId,
-                startTime: Date.now(),
+                serverTitle: serverTitle,
                 isValid: true,
                 reward: rewardAmt
             };
 
             const targetBtn = document.getElementById(`btn_${serverId}`);
             const targetSubText = document.getElementById(`sub_${serverId}`);
-            if (targetBtn) targetBtn.disabled = true;
+            
+            // Disable all buttons in modal
+            document.querySelectorAll(".video-option-btn").forEach(b => b.disabled = true);
 
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let verifyText = langData[currentLang] ? langData[currentLang]["verifying"] : "Verifying...";
-            if (targetSubText) targetSubText.innerText = verifyText;
+            let verifyText = langData[currentLang]["verifying"] || "Verifying...";
+            
+            let countdown = 15;
+            totalSecondsOpen = 0;
+            window.hasMainTabHidden = false; // Reset Tracker
 
-            triggerVideoSessionTimeoutFallback(network, serverId, serverTitle);
+            let finalTargetAdUrl = videoAdminLinksConfig[network][serverId];
+            targetWindow = window.open(finalTargetAdUrl, '_blank', 'noopener,noreferrer');
 
-            let finalTargetAdUrl = adServerLinksConfig[network][serverId];
-            window.open(finalTargetAdUrl, '_blank', 'noopener,noreferrer');
+            platformTimer = setInterval(() => {
+                countdown--;
+                if (targetSubText) targetSubText.innerText = `${verifyText} (${countdown}s)`;
+
+                // Validation 1: Tab closed early
+                if (targetWindow && targetWindow.closed) {
+                    clearInterval(platformTimer);
+                    resetModalUI();
+                    showCustomAlert("err_early");
+                    return;
+                }
+
+                // Validation 2: Invalid tab switching
+                if (!document.hidden && window.hasMainTabHidden) {
+                    if (totalSecondsOpen < 14) { 
+                        clearInterval(platformTimer);
+                        resetModalUI();
+                        showCustomAlert("err_invalid");
+                        return;
+                    }
+                }
+
+                totalSecondsOpen++;
+
+                if (countdown <= 0) {
+                    clearInterval(platformTimer);
+                    if (targetSubText) targetSubText.innerText = "SAVING...";
+                    evaluateRewardValidation();
+                }
+            }, 1000);
         }
 
-        function evaluateRewardValidation(network, serverId, serverTitle) {
-            const targetBtn = document.getElementById(`btn_${serverId}`);
-            const targetSubText = document.getElementById(`sub_${serverId}`);
+        function resetModalUI() {
+            isValidationActive = false;
+            activeWatchSession = null;
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let streamTxt = langData[currentLang]["btn_stream"] || "Stream & Claim";
             
-            if (targetBtn) targetBtn.disabled = false;
-            if (targetSubText) targetSubText.innerText = "Stream video and claim coins";
+            document.querySelectorAll(".video-option-btn").forEach(b => {
+                b.disabled = false;
+                let subNode = b.querySelector('.option-sub');
+                if(subNode) subNode.innerText = streamTxt;
+            });
+        }
 
-            if (!activeWatchSession) return;
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t14)
+        async function evaluateRewardValidation() {
+            document.getElementById("videoOptionsModal").style.display = "none";
+            if (!activeWatchSession || !activeWatchSession.isValid) { resetModalUI(); return; }
 
             let finalCoinsReward = activeWatchSession.reward;
+            let netName = activeWatchSession.network.toUpperCase();
 
-            database.ref('users/' + uid).once('value').then((snap) => {
-                if (snap.exists()) {
-                    let oldCoins = snap.val().coins || 0;
-                    let oldBal = snap.val().balance || 0;
-                    let newCoins = oldCoins + finalCoinsReward;
-                    let newBal = oldBal + (finalCoinsReward / 100); 
-
-                    database.ref('users/' + uid).update({
-                        coins: newCoins,
-                        balance: newBal
-                    }).then(() => {
-                        alert(`🎉 Success! You earned +${finalCoinsReward} Coins from ${serverTitle}`);
-                        
-                        database.ref('users/' + uid + '/earning_history').push({
-                            activity: `Streamed Media: ${network.toUpperCase()} - ${serverTitle}`,
-                            coins_credited: finalCoinsReward,
-                            timestamp: Date.now()
-                        });
-                    });
+            try {
+                // Call API to add Points and Sync Daily Task 't14'
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ 
+                        userId: uid, 
+                        pointsToAdd: finalCoinsReward, 
+                        action: `video_stream_${netName}`,
+                        syncTask: "t14" // Completes Daily Task 't14'
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById("liveUserCoins").innerText = data.newCoins;
+                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
+                    
+                    showCustomAlert("err_success", ` ${netName} (${finalCoinsReward}🪙)`, true);
                 }
-            });
-
-            activeWatchSession = null;
-        }
-
-        function closeVideoOptionsModal() {
-            document.getElementById("videoOptionsModal").style.display = "none";
-            activeWatchSession = null;
+            } catch (err) {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            } finally {
+                resetModalUI();
+            }
         }
     </script>
 </body>

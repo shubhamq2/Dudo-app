@@ -3,57 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mystery Box - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <title>Weekly Drop - Dudo</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; }
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #eab308;
+            --accent-pink: #f43f5e;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 0%, rgba(234, 179, 8, 0.15) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
         
-        .header { width: 100%; background: #1e293b; padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #eab308; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #eab308; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: rgba(234, 179, 8, 0.1); }
-        .header h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; }
+        /* Premium Sync Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-gold); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-gold); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(234, 179, 8, 0.15); transition: 0.2s; border: 1px solid rgba(234, 179, 8, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
 
-        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-gold); font-weight: bold; cursor: pointer; }
 
-        /* 📢 AD SLOTS FOR DIRECT REVENUE */
-        .ad-banner-slot { width: 100%; min-height: 50px; background: #1e293b; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed #eab308; margin: 5px 0; }
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; }
+
+        /* 📢 AD SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(234, 179, 8, 0.4); box-sizing: border-box; }
 
         /* 🎫 Mega Reward Display Card */
-        .reward-banner-card { background: linear-gradient(135deg, #eab308, #ca8a04); border-radius: 20px; padding: 25px 15px; text-align: center; box-shadow: 0 10px 25px rgba(234, 179, 8, 0.2); color: #0f172a; }
-        .reward-banner-card div { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; }
-        .reward-banner-card h3 { margin: 8px 0; font-size: 32px; font-weight: 900; }
-        .reward-banner-card p { margin: 0; font-size: 13px; font-weight: 700; opacity: 0.8; }
+        .reward-banner-card { background: linear-gradient(135deg, #ca8a04, #854d0e); border-radius: 24px; padding: 30px 20px; text-align: center; box-shadow: 0 15px 35px rgba(234, 179, 8, 0.3); color: #fff; position: relative; overflow: hidden; border: 1px solid #facc15; }
+        .reward-banner-card::before { content: '🎁'; position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.1; transform: rotate(15deg); }
+        .reward-banner-card div { font-size: 12.5px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fef08a; }
+        .reward-banner-card h3 { margin: 10px 0; font-size: 34px; font-weight: 900; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .reward-banner-card p { margin: 0; font-size: 13.5px; font-weight: 700; opacity: 0.9; }
 
         /* Live Tracker Metrics Box */
-        .pool-tracker-grid { display: flex; gap: 10px; margin-top: 5px; }
-        .tracker-metric-box { flex: 1; background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 14px; text-align: center; }
-        .tracker-metric-box .metric-label { font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
-        .tracker-metric-box .metric-value { font-size: 18px; font-weight: 800; color: #ffffff; }
-        .tracker-metric-box .value-gold { color: #eab308; }
+        .pool-tracker-grid { display: flex; gap: 12px; }
+        .tracker-metric-box { flex: 1; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); padding: 18px 12px; border-radius: 18px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
+        .tracker-metric-box .metric-label { font-size: 11px; color: var(--text-sub); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .tracker-metric-box .metric-value { font-size: 24px; font-weight: 900; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .tracker-metric-box .value-gold { color: var(--accent-gold); }
 
         /* Claim Interface Center Card */
-        .entry-pass-card { background: #1e293b; border-radius: 24px; padding: 25px 20px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .pass-cost-badge { display: inline-block; background: rgba(234, 179, 8, 0.1); color: #eab308; padding: 6px 14px; border-radius: 50px; font-size: 13px; font-weight: 800; margin-bottom: 15px; border: 1px solid rgba(234, 179, 8, 0.2); }
+        .entry-pass-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.4); backdrop-filter: blur(10px); }
+        .pass-cost-badge { display: inline-block; background: rgba(234, 179, 8, 0.15); color: var(--accent-gold); padding: 8px 18px; border-radius: 50px; font-size: 14px; font-weight: 900; margin-bottom: 20px; border: 1px solid rgba(234, 179, 8, 0.3); box-shadow: inset 0 0 10px rgba(234, 179, 8, 0.1); }
         
-        .buy-action-btn { width: 100%; background: linear-gradient(135deg, #eab308, #ca8a04); color: #0f172a; border: none; padding: 15px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 6px 20px rgba(234, 179, 8, 0.3); cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .buy-action-btn:active { transform: scale(0.97); }
+        .buy-action-btn { width: 100%; background: linear-gradient(135deg, var(--accent-gold), #b45309); color: #000; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; box-shadow: 0 8px 25px rgba(234, 179, 8, 0.4); cursor: pointer; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px; outline: none; }
+        .buy-action-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4); }
+        .buy-action-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
         /* User's Current Live Pass Numbers Array Box */
-        .my-passes-section { background: #111827; border-radius: 14px; padding: 12px; margin-top: 15px; text-align: left; border: 1px solid #1e293b; }
-        .my-passes-title { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
-        .passes-wrapper-flex { display: flex; flex-wrap: wrap; gap: 6px; }
-        .pass-tag-pill { background: #1e293b; color: #eab308; border: 1px solid #334155; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 800; font-family: monospace; }
-        .no-passes-txt { font-size: 12px; color: #475569; font-weight: 600; }
+        .my-passes-section { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 18px; margin-top: 25px; text-align: left; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 4px 10px rgba(0,0,0,0.3); }
+        .my-passes-title { font-size: 12px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .passes-wrapper-flex { display: flex; flex-wrap: wrap; gap: 8px; }
+        .pass-tag-pill { background: rgba(30, 41, 59, 0.8); color: var(--accent-gold); border: 1px solid rgba(234, 179, 8, 0.3); padding: 8px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 900; font-family: monospace; letter-spacing: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .no-passes-txt { font-size: 13px; color: #64748b; font-weight: 600; font-style: italic; }
 
         /* Custom Modern Alert Modal Popup style */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid #ef4444; padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 365px; text-align: center; }
-        .custom-alert.success-border { border-color: #10b981; }
-        .custom-alert h4 { margin: 0 0 10px 0; font-size: 20px; color: #ef4444; font-weight: 900; }
-        .custom-alert.success-border h4 { color: #10b981; }
-        .custom-alert p { margin: 0 0 20px 0; font-size: 14px; color: #cbd5e1; font-weight: 600; line-height: 1.5; }
-        .custom-alert button { background: #ef4444; border: none; color: white; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .custom-alert.success-border button { background: #10b981; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 1000; width: 85%; max-width: 360px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 20px 50px rgba(16, 185, 129, 0.2); }
+        .custom-alert h4 { margin: 0 0 12px 0; font-size: 20px; color: var(--accent-pink); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        .custom-alert.success-border h4 { color: var(--accent-green); }
+        .custom-alert p { margin: 0 0 22px 0; font-size: 14.5px; color: #fff; font-weight: 600; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 35px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+        
+        /* 🏆 WINNER CELEBRATION POPUP */
+        .winner-modal-view { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(11, 15, 25, 0.9); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(8px); padding: 20px; box-sizing: border-box; }
+        .winner-modal-card { width:100%; max-width:380px; background: linear-gradient(135deg, #1e1b4b, #581c87); border-radius:30px; border:3px solid var(--accent-gold); padding:35px 20px; box-shadow:0 0 50px rgba(234, 179, 8, 0.4); text-align:center; position:relative; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-sizing: border-box; }
+        @keyframes popIn { from { transform: scale(0.7); opacity:0; } to { transform: scale(1); opacity:1; } }
+        .winner-title-text { font-size: 26px; font-weight:900; color:var(--accent-gold); text-transform:uppercase; text-shadow: 0 0 15px rgba(234, 179, 8, 0.5); margin-bottom:10px; letter-spacing: 1px; }
+        .winner-amount-box { background: rgba(0,0,0,0.4); padding:20px; border-radius:20px; border:2px dashed var(--accent-gold); font-size:32px; font-weight:900; color:var(--accent-green); margin:20px 0; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        .winner-claim-btn { width:100%; background: linear-gradient(135deg, var(--accent-gold), #b45309); color:#000; border:none; padding:16px; border-radius:50px; font-size:16px; font-weight:900; cursor:pointer; text-transform:uppercase; box-shadow: 0 6px 20px rgba(234, 179, 8, 0.4); transition: 0.2s; letter-spacing: 0.5px; }
+        .winner-claim-btn:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
@@ -65,208 +96,258 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🎉 WINNER CELEBRATION POPUP FRAME -->
+    <div class="winner-modal-view" id="lotteryWinnerModalFrame">
+        <div class="winner-modal-card">
+            <div style="font-size:60px; margin-bottom:10px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🎉👑</div>
+            <div class="winner-title-text" data-i18n="win_title">CONGRATULATIONS!</div>
+            <p style="font-size:14px; color:#e9d5ff; line-height:1.6; margin:0; font-weight: 600;" id="winnerCardDescMessage" data-i18n="win_desc">You are the Champion of this week's Mega Drop!</p>
+            <div class="winner-amount-box" id="winnerCoinsYieldDisplay">+0 COINS</div>
+            <button class="winner-claim-btn" onclick="executeClaimJackpotPoolCredits()"><i class="fa-solid fa-gift"></i> <span data-i18n="win_btn">Claim Reward 🪙</span></button>
+        </div>
+    </div>
+
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
-        <h2>Mystery Box</h2>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="wd_title">Weekly Drop</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
     </div>
 
     <div class="main-container">
         
-        <!-- 📢 TOP BANNER INCOME AD -->
-        <div class="ad-banner-slot" id="luckyAdSlot1">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <!-- Grand Reward Presentation Banner -->
         <div class="reward-banner-card">
-            <div>🔥 Weekly Mystery Reward 🔥</div>
-            <h3>🎁 SURPRISE COINS</h3>
-            <p>More Entry Passes = Higher Chances!</p>
+            <div data-i18n="wd_hero_sub">🔥 Weekly Mega Reward 🔥</div>
+            <h3 data-i18n="wd_hero_main">🎁 SURPRISE COINS</h3>
+            <p data-i18n="wd_hero_desc">More Entry Passes = Higher Chances!</p>
         </div>
 
         <!-- Real-time Global Counters Tracker Grid -->
         <div class="pool-tracker-grid">
             <div class="tracker-metric-box">
-                <div class="metric-label">Total Participants</div>
-                <div class="metric-value" id="globalPoolSold">0</div>
+                <div class="metric-label" data-i18n="wd_total">Total Participants</div>
+                <div class="metric-value" id="globalPoolSold"><i class="fa-solid fa-spinner fa-spin"></i></div>
             </div>
             <div class="tracker-metric-box">
-                <div class="metric-label">Your Entry Passes</div>
-                <div class="metric-value value-gold" id="myPassesCount">0</div>
+                <div class="metric-label" data-i18n="wd_yours">Your Entry Passes</div>
+                <div class="metric-value value-gold" id="myPassesCount"><i class="fa-solid fa-spinner fa-spin"></i></div>
             </div>
         </div>
 
         <!-- Claim Terminal Card -->
         <div class="entry-pass-card">
-            <div class="pass-cost-badge">🎫 1 Entry Pass = 50 Coins</div>
-            <button class="buy-action-btn" onclick="executeClaimEntryPass()">Claim Entry Pass 🎟️</button>
+            <div class="pass-cost-badge"><i class="fa-solid fa-ticket"></i> <span data-i18n="wd_cost">1 Entry Pass = 50 Coins</span></div>
+            <button class="buy-action-btn" id="btnClaimPass" onclick="executeClaimEntryPass()"><span data-i18n="wd_btn_claim">Claim Entry Pass</span> 🎟️</button>
             
-            <!-- User Personal Purchased List Sub-Box -->
+            <!-- User Personal Active List -->
             <div class="my-passes-section">
-                <div class="my-passes-title">Your Active Pass Codes</div>
+                <div class="my-passes-title"><i class="fa-solid fa-list-check"></i> <span data-i18n="wd_active_list">Your Active Pass Codes</span></div>
                 <div class="passes-wrapper-flex" id="myActivePassesBox">
-                    <span class="no-passes-txt">You don't hold any passes for this week yet.</span>
+                    <span class="no-passes-txt" data-i18n="wd_no_pass">Fetching your passes...</span>
                 </div>
             </div>
         </div>
 
-        <!-- 📢 BOTTOM BANNER INCOME AD -->
-        <div class="ad-banner-slot" id="luckyAdSlot2">
-            <ins style="width: 320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
-        </div>
+        <!-- 📢 ADMIN CONNECTED AD SLOT 2 -->
+        <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
     </div>
 
+    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH 100% PLAY STORE SAFE TERMS
+        const langData = {
+            "en": {
+                "wd_title": "Weekly Drop", "wd_hero_sub": "🔥 Weekly Mega Reward 🔥", "wd_hero_main": "🎁 SURPRISE COINS", "wd_hero_desc": "More Entry Passes = Higher Chances!",
+                "wd_total": "Total Participants", "wd_yours": "Your Entry Passes", "wd_cost": "1 Entry Pass = 50 Coins", "wd_btn_claim": "Claim Entry Pass",
+                "wd_active_list": "Your Active Pass Codes", "wd_no_pass": "You don't hold any passes for this week yet.",
+                "err_nsf_title": "❌ INSUFFICIENT COINS", "err_nsf_desc": "Not enough coins! Complete more tasks to earn 50 coins.",
+                "pass_success_title": "🎉 PASS CLAIMED", "pass_success_desc": "acquired successfully! Keep participating to increase your chances.",
+                "win_title": "CONGRATULATIONS!", "win_desc": "You are the Champion of this week's Mega Drop!", "win_btn": "Claim Reward 🪙"
+            },
+            "hi": {
+                "wd_title": "साप्ताहिक ड्रॉप", "wd_hero_sub": "🔥 साप्ताहिक मेगा रिवॉर्ड 🔥", "wd_hero_main": "🎁 सरप्राइज कॉइन्स", "wd_hero_desc": "अधिक पास = जीतने के अधिक अवसर!",
+                "wd_total": "कुल प्रतिभागी", "wd_yours": "आपके एंट्री पास", "wd_cost": "1 एंट्री पास = 50 कॉइन्स", "wd_btn_claim": "एंट्री पास प्राप्त करें",
+                "wd_active_list": "आपके सक्रिय पास कोड", "wd_no_pass": "आपके पास इस सप्ताह के लिए कोई पास नहीं है।",
+                "err_nsf_title": "❌ अपर्याप्त कॉइन्स", "err_nsf_desc": "पर्याप्त कॉइन्स नहीं हैं! 50 कॉइन्स कमाने के लिए और टास्क पूरे करें।",
+                "pass_success_title": "🎉 पास प्राप्त हुआ", "pass_success_desc": "सफलतापूर्वक प्राप्त हुआ! जीतने के अवसर बढ़ाने के लिए भाग लेते रहें।",
+                "win_title": "बधाई हो!", "win_desc": "आप इस सप्ताह के मेगा ड्रॉप के चैंपियन हैं!", "win_btn": "रिवॉर्ड क्लेम करें 🪙"
+            },
+            "bn": { "wd_title": "সাপ্তাহিক ড্রপ", "wd_hero_main": "🎁 সারপ্রাইজ কয়েন", "wd_btn_claim": "এন্ট্রি পাস নিন", "err_nsf_title": "❌ কয়েন নেই", "pass_success_title": "🎉 পাস পেয়েছেন", "win_title": "অভিনন্দন!" },
+            "te": { "wd_title": "వీక్లీ డ్రాప్", "wd_hero_main": "🎁 సర్ప్రైజ్ కాయిన్స్", "wd_btn_claim": "పాస్ పొందండి", "err_nsf_title": "❌ కాయిన్స్ లేవు", "pass_success_title": "🎉 పాస్ వచ్చింది", "win_title": "అభినందనలు!" },
+            "mr": { "wd_title": "साप्ताहिक ड्रॉप", "wd_hero_main": "🎁 सरप्राईज कॉइन्स", "wd_btn_claim": "पास मिळवा", "err_nsf_title": "❌ कॉइन्स नाहीत", "pass_success_title": "🎉 पास मिळाला", "win_title": "अभिनंदन!" },
+            "ta": { "wd_title": "வாராந்திர டிராப்", "wd_hero_main": "🎁 ஆச்சரிய நாணயங்கள்", "wd_btn_claim": "பாஸ் பெறுக", "err_nsf_title": "❌ நாணயங்கள் இல்லை", "pass_success_title": "🎉 பாஸ் பெறப்பட்டது", "win_title": "வாழ்த்துக்கள்!" },
+            "ur": { "wd_title": "ہفتہ وار ڈراپ", "wd_hero_main": "🎁 سرپرائز کوئنز", "wd_btn_claim": "پاس حاصل کریں", "err_nsf_title": "❌ کوئنز ناکافی", "pass_success_title": "🎉 پاس مل گیا", "win_title": "مبارک ہو!" },
+            "gu": { "wd_title": "સાપ્તાહિક ડ્રોપ", "wd_hero_main": "🎁 સરપ્રાઈઝ સિક્કા", "wd_btn_claim": "પાસ મેળવો", "err_nsf_title": "❌ સિક્કા નથી", "pass_success_title": "🎉 પાસ મળ્યો", "win_title": "અભિનંદન!" },
+            "es": { "wd_title": "Drop Semanal", "wd_hero_main": "🎁 MONEDAS SORPRESA", "wd_btn_claim": "Reclamar Pase", "err_nsf_title": "❌ Monedas Insuficientes", "pass_success_title": "🎉 Pase Reclamado", "win_title": "¡FELICIDADES!" },
+            "fr": { "wd_title": "Drop Hebdomadaire", "wd_hero_main": "🎁 PIÈCES SURPRISES", "wd_btn_claim": "Réclamer le Pass", "err_nsf_title": "❌ Pièces Insuffisantes", "pass_success_title": "🎉 Pass Réclamé", "win_title": "FÉLICITATIONS!" },
+            "ar": { "wd_title": "السحب الأسبوعي", "wd_hero_main": "🎁 عملات مفاجئة", "wd_btn_claim": "احصل على بطاقة", "err_nsf_title": "❌ عملات غير كافية", "pass_success_title": "🎉 تم الحصول", "win_title": "مبروك!" },
+            "pt": { "wd_title": "Drop Semanal", "wd_hero_main": "🎁 MOEDAS SURPRESA", "wd_btn_claim": "Resgatar Passe", "err_nsf_title": "❌ Moedas Insuficientes", "pass_success_title": "🎉 Passe Resgatado", "win_title": "PARABÉNS!" },
+            "ru": { "wd_title": "Еженедельный Дроп", "wd_hero_main": "🎁 СЮРПРИЗ-МОНЕТЫ", "wd_btn_claim": "Получить Пропуск", "err_nsf_title": "❌ Недостаточно монет", "pass_success_title": "🎉 Пропуск Получен", "win_title": "ПОЗДРАВЛЯЕМ!" }
         };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
-        const uid = localStorage.getItem("userId") || "GuestUser";
 
-        let userMasterCoinsCounter = 0;
-        const singlePassCostInt = 50;
-        let myCurrentPassesList = [];
-
-        document.addEventListener("DOMContentLoaded", () => {
-            executeStartLivePoolSyncModules();
-            executeListenForRewardResult();
-            
-            // Sync Admin Banners
-            database.ref('app_files_deep_config/lucky_box').on('value', (snap) => {
-                if(snap.exists()) {
-                    let conf = snap.val();
-                    if(conf.banner_1) { let s1 = document.getElementById("luckyAdSlot1"); if(s1) { s1.innerHTML = conf.banner_1; runScripts(s1); } }
-                    if(conf.banner_2) { let s2 = document.getElementById("luckyAdSlot2"); if(s2) { s2.innerHTML = conf.banner_2; runScripts(s2); } }
-                }
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
             });
-        });
-
-        function runScripts(container) {
-            let scripts = container.getElementsByTagName("script");
-            for (let i = 0; i < scripts.length; i++) {
-                let sNode = document.createElement("script");
-                if (scripts[i].src) sNode.src = scripts[i].src;
-                else sNode.text = scripts[i].text;
-                scripts[i].parentNode.replaceChild(sNode, scripts[i]);
-            }
+            document.getElementById("appLanguage").value = langCode;
         }
 
-        function executeStartLivePoolSyncModules() {
-            database.ref('users/' + uid + '/coins').on('value', (snap) => {
-                userMasterCoinsCounter = snap.exists() ? snap.val() : 0;
-            });
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
+        
+        let userMasterCoinsCounter = 0;
+        const singlePassCostInt = 50;
 
-            // Linked to Admin Panel's Tracker (Keep database keys intact)
-            database.ref('lottery_bids_tracker').on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const allPassesMap = snapshot.val();
-                    const totalSoldSize = Object.keys(allPassesMap).length;
-                    document.getElementById("globalPoolSold").innerText = totalSoldSize;
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid || !token) { window.location.href = "index.html"; return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
 
-                    myCurrentPassesList = [];
-                    for (let passKey in allPassesMap) {
-                        if (allPassesMap[passKey].uid === uid) {
-                            myCurrentPassesList.push(allPassesMap[passKey].ticket_id);
-                        }
+            fetchDataFromAdminServer();
+        });
+
+        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
+        async function fetchDataFromAdminServer() {
+            try {
+                // 1. Fetch User Balance
+                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+                if (userData.success && userData.user) {
+                    userMasterCoinsCounter = userData.user.coins || 0;
+                }
+
+                // 2. Fetch Weekly Drop Stats & Banners
+                const confRes = await fetch(`${API_BASE_URL}/drop/stats/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const confData = await confRes.json();
+                
+                if (confData.success) {
+                    // Inject Banners
+                    if (confData.banners) {
+                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
+                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
                     }
 
-                    document.getElementById("myPassesCount").innerText = myCurrentPassesList.length;
+                    // Inject Live Trackers
+                    document.getElementById("globalPoolSold").innerText = confData.stats.totalGlobalPasses || 0;
+                    document.getElementById("myPassesCount").innerText = confData.stats.userPassesCount || 0;
+
+                    // Inject Active Passes
                     const wrapper = document.getElementById("myActivePassesBox");
                     wrapper.innerHTML = "";
+                    let currentLang = localStorage.getItem("selectedLang") || "en";
+                    let noPassTxt = langData[currentLang]["wd_no_pass"] || "You don't hold any passes for this week yet.";
 
-                    if (myCurrentPassesList.length > 0) {
-                        myCurrentPassesList.forEach(code => {
+                    if (confData.stats.userPassCodes && confData.stats.userPassCodes.length > 0) {
+                        confData.stats.userPassCodes.forEach(code => {
                             let pill = document.createElement("span");
                             pill.className = "pass-tag-pill";
-                            pill.innerText = "🎁 " + code;
+                            pill.innerText = "🎟️ " + code;
                             wrapper.appendChild(pill);
                         });
                     } else {
-                        wrapper.innerHTML = `<span class="no-passes-txt">You don't hold any passes for this week yet.</span>`;
+                        wrapper.innerHTML = `<span class="no-passes-txt">${noPassTxt}</span>`;
                     }
-                } else {
-                    document.getElementById("globalPoolSold").innerText = "0";
-                    document.getElementById("myPassesCount").innerText = "0";
-                    document.getElementById("myActivePassesBox").innerHTML = `<span class="no-passes-txt">You don't hold any passes for this week yet.</span>`;
+
+                    // Check for Unclaimed Win
+                    if (confData.winnerData && confData.winnerData.isWinner && !confData.winnerData.claimed) {
+                        document.getElementById("winnerCoinsYieldDisplay").innerText = `+${confData.winnerData.winAmount} COINS`;
+                        document.getElementById("lotteryWinnerModalFrame").style.display = "flex";
+                    }
                 }
-            });
+            } catch (err) {
+                console.log("Error loading drop data.");
+                document.getElementById("globalPoolSold").innerText = "-";
+                document.getElementById("myPassesCount").innerText = "-";
+                document.getElementById("myActivePassesBox").innerHTML = `<span class="no-passes-txt">Offline Mode</span>`;
+            }
         }
 
-        function executeClaimEntryPass() {
+        // 🚀 CLAIM PASS (CALLS NODE API)
+        async function executeClaimEntryPass() {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            
             if (userMasterCoinsCounter < singlePassCostInt) {
-                showCustomAlert("❌ INSUFFICIENT COINS", "Not enough coins! Complete more tasks to earn 50 coins.", false);
+                showCustomAlert("err_nsf_title", langData[currentLang]["err_nsf_desc"], false);
                 return;
             }
 
-            const randomCodeInt = Math.floor(1000 + Math.random() * 9000);
-            const charactersString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const randomChar1 = charactersString.charAt(Math.floor(Math.random() * 26));
-            const randomChar2 = charactersString.charAt(Math.floor(Math.random() * 26));
-            const cleanGeneratedPassCode = `SE-PASS-${randomCodeInt}-${randomChar1}${randomChar2}`;
+            const btn = document.getElementById("btnClaimPass");
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
 
-            let dynamicPostDeductionCoinsValue = userMasterCoinsCounter - singlePassCostInt;
-
-            database.ref('users/' + uid).update({
-                coins: dynamicPostDeductionCoinsValue
-            }).then(() => {
-                // Connected to Admin Panel Node (Do not change node name)
-                const poolItemRef = database.ref('lottery_bids_tracker').push();
-                poolItemRef.set({
-                    uid: uid,
-                    ticket_id: cleanGeneratedPassCode,
-                    userName: localStorage.getItem("userName") || "Player",
-                    item: "Weekly Mystery Pass",
-                    coins_spent: singlePassCostInt,
-                    valid_until: "Coming Sunday",
-                    timestamp: Date.now()
-                }).then(() => {
-                    showCustomAlert("🎉 PASS CLAIMED", `Pass Code ${cleanGeneratedPassCode} acquired successfully! Keep playing to increase your chances.`, true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/drop/claim-pass`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: uid, cost: singlePassCostInt })
                 });
-            }).catch(error => {
-                console.error("Reward pipeline transaction failed:", error);
-            });
-        }
 
-        // 🔥 REAL-TIME DRAW DETECTOR ENGINE: Listens for Admin Winner Broadcast
-        function executeListenForRewardResult() {
-            // Admin Panel sends winning log directly to user's earning history
-            database.ref('users/' + uid + '/earning_history').orderByChild('timestamp').limitToLast(1).on('value', (snap) => {
-                if(snap.exists()) {
-                    snap.forEach(child => {
-                        let d = child.val();
-                        // Ensuring compatibility with old and new admin panels
-                        if(d.activity === 'Lottery Winner Prize' || d.activity === 'Mega Reward Winner') {
-                            let lastAck = localStorage.getItem("ack_mystery_win_time") || 0;
-                            if(d.timestamp > lastAck) {
-                                showCustomAlert(
-                                    "🏆 WINNER ANNOUNCED!",
-                                    `🎉 CONGRATULATIONS! You are the Mega Winner of this week's Mystery Box! ${d.coins_credited} COINS have been credited to your wallet successfully.`,
-                                    true
-                                );
-                                localStorage.setItem("ack_mystery_win_time", d.timestamp);
-                            }
-                        }
-                    });
+                const data = await res.json();
+                
+                if (data.success) {
+                    let descTxt = langData[currentLang]["pass_success_desc"] || "acquired successfully! Keep participating.";
+                    showCustomAlert("pass_success_title", `Pass Code ${data.passCode} ${descTxt}`, true);
+                    fetchDataFromAdminServer(); // Refresh entire dashboard securely
+                } else {
+                    showCustomAlert("err_nsf_title", "Transaction failed.", false);
                 }
-            });
+            } catch (err) {
+                alert("Network error. Please try again later.");
+            } finally {
+                let btnTxt = langData[currentLang]["wd_btn_claim"] || "Claim Entry Pass";
+                btn.disabled = false;
+                btn.innerHTML = `<span>${btnTxt}</span> 🎟️`;
+            }
         }
 
-        function showCustomAlert(headerText, messageText, isSuccess = false) {
+        // 🏆 CLAIM MEGA REWARD
+        async function executeClaimJackpotPoolCredits() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/drop/claim-win`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: uid })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById("lotteryWinnerModalFrame").style.display = "none";
+                    alert(`🔥 Reward Synchronized! Coins have been safely injected into your wallet.`);
+                }
+            } catch(e) {
+                alert("Server error processing claim. Contact Support.");
+            }
+        }
+
+        function showCustomAlert(headerKey, messageText, isSuccess = false) {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let headerStr = langData[currentLang][headerKey] || headerKey;
+
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");
             else alertBox.classList.remove("success-border");
 
-            document.getElementById("alertHeader").innerText = headerText;
+            document.getElementById("alertHeader").innerText = headerStr;
             document.getElementById("alertMessage").innerText = messageText;
             document.getElementById("alertOverlay").style.display = "block";
             alertBox.style.display = "block";
