@@ -3,107 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1v1 Coin Battle Arena - Dudo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <title>1v1 Battle Arena - Dudo</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 30, 49, 0.85);
             --primary: #3b82f6;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --border-glow: rgba(59, 130, 246, 0.18);
         }
 
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 60%); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
         /* HEADER */
-        .header { background: var(--card-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10; }
-        .back-btn { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: bold; }
+        .header { background: rgba(15, 23, 42, 0.9); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 10; backdrop-filter: blur(12px); }
+        .back-btn { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: bold; padding: 5px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
         .title { margin: 0; font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); }
-        .wallet-box { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); padding: 5px 12px; border-radius: 20px; font-weight: bold; color: var(--success); display: flex; align-items: center; gap: 5px; }
+        .wallet-box { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px; font-weight: 800; color: var(--success); display: flex; align-items: center; gap: 6px; font-size: 14px; }
 
-        .main-container { flex: 1; overflow-y: auto; padding: 20px; position: relative; }
+        .main-container { flex: 1; overflow-y: auto; padding: 20px; position: relative; max-width: 440px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+
+        /* ADMIN BANNER SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(255,255,255,0.15); margin-bottom: 15px; }
 
         /* LOBBY SCREEN */
         #lobbyScreen { display: flex; flex-direction: column; gap: 15px; }
-        .arena-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid #334155; position: relative; overflow: hidden; }
-        .arena-title { font-size: 22px; font-weight: 900; margin: 0 0 5px 0; color: #fff; }
-        .arena-desc { font-size: 13px; color: var(--text-muted); margin: 0 0 20px 0; }
+        .arena-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border-glow); position: relative; overflow: hidden; backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        .arena-title { font-size: 20px; font-weight: 900; margin: 0 0 5px 0; color: #fff; }
+        .arena-desc { font-size: 12.5px; color: var(--text-muted); margin: 0 0 20px 0; line-height: 1.4; }
         
-        .battle-tier { background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; transition: 0.2s; }
+        .battle-tier { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; transition: 0.2s; }
         .battle-tier:active { transform: scale(0.98); border-color: var(--primary); }
-        .tier-info h4 { margin: 0 0 5px 0; font-size: 16px; color: #fff; }
-        .tier-info p { margin: 0; font-size: 12px; color: var(--text-muted); }
-        .win-amt { color: var(--warning); font-weight: bold; }
-        .play-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 14px; cursor: pointer; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4); text-transform: uppercase; }
+        .tier-info h4 { margin: 0 0 4px 0; font-size: 15px; color: #fff; font-weight: 800; }
+        .tier-info p { margin: 0; font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+        .win-amt { color: var(--warning); font-weight: 900; }
+        .play-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); text-transform: uppercase; }
 
         /* MATCHMAKING SCREEN */
         #matchmakingScreen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
-        .radar-animation { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); border-top-color: transparent; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        .radar-animation { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--primary); border-top-color: transparent; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .finding-text { font-size: 18px; font-weight: bold; color: var(--primary); animation: pulse 1.5s infinite; }
+        .finding-text { font-size: 16px; font-weight: 800; color: var(--primary); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         /* BATTLE SCREEN */
-        #battleScreen { display: none; flex-direction: column; height: 100%; justify-content: space-between; padding-bottom: 20px; }
+        #battleScreen { display: none; flex-direction: column; height: 100%; justify-content: space-between; padding-bottom: 20px; box-sizing: border-box; }
         
-        .versus-header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px; border-radius: 15px; border: 1px solid #334155; }
+        .versus-header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px; border-radius: 16px; border: 1px solid var(--border-glow); }
         .player-box { text-align: center; width: 40%; }
-        .player-avatar { width: 50px; height: 50px; background: #334155; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 5px; border: 2px solid var(--primary); }
-        .opponent-avatar { border-color: var(--danger); }
-        .player-name { font-size: 12px; font-weight: bold; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .player-avatar { width: 55px; height: 55px; background: #0f172a; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 5px; border: 2px solid var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.3); }
+        .opponent-avatar { border-color: var(--danger); box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+        .player-name { font-size: 12px; font-weight: 800; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .vs-badge { font-size: 20px; font-weight: 900; color: var(--warning); font-style: italic; }
 
         .battle-arena { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .choice-display { display: flex; justify-content: space-between; width: 100%; padding: 0 40px; box-sizing: border-box; }
-        .move-icon { font-size: 60px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); transition: 0.3s; }
-        #oppMove { transform: scaleX(-1); } /* Flip opponent image */
-        .timer { font-size: 40px; font-weight: 900; color: #fff; position: absolute; text-shadow: 0 0 15px rgba(255,255,255,0.5); }
+        .choice-display { display: flex; justify-content: space-between; width: 100%; padding: 0 30px; box-sizing: border-box; }
+        .move-icon { font-size: 55px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); transition: 0.3s; }
+        #oppMove { transform: scaleX(-1); }
+        .timer { font-size: 38px; font-weight: 900; color: #fff; position: absolute; text-shadow: 0 0 15px rgba(255,255,255,0.5); }
 
-        .controls { display: flex; justify-content: center; gap: 15px; background: var(--card-bg); padding: 20px; border-radius: 20px 20px 0 0; margin: 0 -20px; border-top: 1px solid #334155; }
-        .action-btn { background: #334155; border: 2px solid #475569; border-radius: 50%; width: 70px; height: 70px; font-size: 35px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .controls { display: flex; justify-content: center; gap: 15px; background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid var(--border-glow); }
+        .action-btn { background: rgba(51, 65, 85, 0.5); border: 2px solid #475569; border-radius: 50%; width: 65px; height: 65px; font-size: 30px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .action-btn:active { transform: scale(0.9); }
-        .action-btn.selected { border-color: var(--primary); background: rgba(59, 130, 246, 0.2); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        
-        .action-btn.disabled { opacity: 0.5; pointer-events: none; }
+        .action-btn.selected { border-color: var(--primary); background: rgba(59, 130, 246, 0.25); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .action-btn.disabled { opacity: 0.4; pointer-events: none; }
 
         /* RESULT MODAL */
-        .result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
-        .result-card { background: var(--card-bg); width: 100%; max-width: 320px; border-radius: 20px; padding: 30px 20px; text-align: center; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
+        .result-card { background: var(--card-bg); width: 100%; max-width: 320px; border-radius: 20px; padding: 30px 20px; text-align: center; border: 2px solid var(--primary); box-shadow: 0 0 35px rgba(59, 130, 246, 0.3); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         
-        #resIcon { font-size: 60px; margin-bottom: 10px; }
-        #resTitle { font-size: 24px; font-weight: 900; margin: 0 0 10px 0; text-transform: uppercase; }
-        #resMsg { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
-        .res-btn { background: var(--primary); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
-
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: bold; display: none; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap; }
+        #resIcon { font-size: 55px; margin-bottom: 8px; }
+        #resTitle { font-size: 22px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; }
+        #resMsg { font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; font-weight: 600; }
+        .res-btn { background: linear-gradient(135deg, var(--primary), #2563eb); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <a href="ho.html" class="back-btn">←</a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 class="title">Battle Arena</h2>
         <div class="wallet-box">🪙 <span id="userBalance">0</span></div>
     </div>
 
     <div class="main-container">
         
+        <!-- Admin Dynamic Banner Slot 1 -->
+        <div class="ad-banner-slot" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+
         <!-- LOBBY SCREEN -->
         <div id="lobbyScreen">
             <div class="arena-card">
                 <h3 class="arena-title">Rock Paper Scissors</h3>
-                <p class="arena-desc">Play 1v1 against real-time opponents. Winner takes the pot! (10% Platform fee applies)</p>
+                <p class="arena-desc">Play 1v1 tactical matches against live challengers. Win rewards instantly!</p>
                 
                 <div class="battle-tier">
                     <div class="tier-info">
                         <h4>Starter Battle</h4>
-                        <p>Entry: 10 Coins | Win: <span class="win-amt">18 Coins</span></p>
+                        <p>Participation: 10 Pts | Reward: <span class="win-amt">18 Pts</span></p>
                     </div>
                     <button class="play-btn" onclick="startMatchmaking(10, 18)">Play 10</button>
                 </div>
@@ -111,43 +118,43 @@
                 <div class="battle-tier">
                     <div class="tier-info">
                         <h4>Pro Arena</h4>
-                        <p>Entry: 50 Coins | Win: <span class="win-amt">90 Coins</span></p>
+                        <p>Participation: 50 Pts | Reward: <span class="win-amt">90 Pts</span></p>
                     </div>
                     <button class="play-btn" onclick="startMatchmaking(50, 90)">Play 50</button>
                 </div>
 
-                <div class="battle-tier" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.05);">
+                <div class="battle-tier" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.05);">
                     <div class="tier-info">
                         <h4 style="color: var(--warning);">High Roller</h4>
-                        <p>Entry: 100 Coins | Win: <span class="win-amt">180 Coins</span></p>
+                        <p>Participation: 100 Pts | Reward: <span class="win-amt">180 Pts</span></p>
                     </div>
                     <button class="play-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="startMatchmaking(100, 180)">Play 100</button>
                 </div>
             </div>
 
-            <div class="arena-card" style="background: rgba(59, 130, 246, 0.1); border-color: var(--primary); text-align: center; padding: 15px;">
-                <h4 style="margin: 0 0 5px 0; color: var(--primary);">How to play?</h4>
-                <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Choose Rock ✊, Paper ✋, or Scissors ✌️ before the timer runs out. Rock beats Scissors, Scissors beat Paper, Paper beats Rock.</p>
+            <div class="arena-card" style="background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.3); text-align: center; padding: 15px;">
+                <h4 style="margin: 0 0 4px 0; color: var(--primary); font-size: 14px;">Game Rules</h4>
+                <p style="margin: 0; font-size: 11.5px; color: var(--text-muted);">Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.</p>
             </div>
         </div>
 
         <!-- MATCHMAKING SCREEN -->
         <div id="matchmakingScreen">
             <div class="radar-animation"></div>
-            <div class="finding-text">Searching for Opponent...</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-top: 10px;">Entry fee deducted. Do not close the app.</p>
+            <div class="finding-text">Matching with Challenger...</div>
+            <p style="color: var(--text-muted); font-size: 12px; margin-top: 10px;">Please keep the app open during matchmaking.</p>
         </div>
 
         <!-- BATTLE SCREEN -->
         <div id="battleScreen">
             <div class="versus-header">
                 <div class="player-box">
-                    <div class="player-avatar">👤</div>
+                    <div class="player-avatar" id="myAvatarIcon">👤</div>
                     <div class="player-name" id="myName">You</div>
                 </div>
                 <div class="vs-badge">VS</div>
                 <div class="player-box">
-                    <div class="player-avatar opponent-avatar">😈</div>
+                    <div class="player-avatar opponent-avatar" id="oppAvatarIcon">😈</div>
                     <div class="player-name" id="oppName">Opponent</div>
                 </div>
             </div>
@@ -158,7 +165,7 @@
                     <div class="move-icon" id="myMove">❓</div>
                     <div class="move-icon" id="oppMove">❓</div>
                 </div>
-                <div id="winnerText" style="position: absolute; bottom: -30px; font-weight: bold; font-size: 18px; color: var(--warning); display: none;"></div>
+                <div id="winnerText" style="position: absolute; bottom: 10px; font-weight: 900; font-size: 18px; color: var(--warning); display: none; text-transform: uppercase; letter-spacing: 1px;"></div>
             </div>
 
             <div class="controls" id="playerControls">
@@ -168,51 +175,31 @@
             </div>
         </div>
 
+        <!-- Admin Dynamic Banner Slot 2 -->
+        <div class="ad-banner-slot" id="adminBannerSlot2" style="margin-top: 15px;"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+
     </div>
 
     <!-- RESULT MODAL -->
     <div class="result-overlay" id="resultModal">
         <div class="result-card" id="resCardBox">
             <div id="resIcon">🏆</div>
-            <h2 id="resTitle">You Won!</h2>
-            <p id="resMsg">+90 Coins added to your wallet.</p>
-            <button class="res-btn" onclick="returnToLobby()">Back to Arena</button>
+            <h2 id="resTitle">Victory!</h2>
+            <p id="resMsg">Reward added to your balance.</p>
+            <button class="res-btn" onclick="returnToLobby()">Return to Arena</button>
         </div>
     </div>
 
+    <!-- NODE.JS API SERVER SCRIPT INTEGRATION -->
     <script>
-        // NEW FIREBASE CONFIGURATION (Dudo)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNc_eIIfqqxbTGqyZ1YWGE3W6lbNqUJQ",
-            authDomain: "dudo-63594.firebaseapp.com",
-            databaseURL: "https://dudo-63594-default-rtdb.firebaseio.com",
-            projectId: "dudo-63594",
-            storageBucket: "dudo-63594.firebasestorage.app",
-            messagingSenderId: "732244407571",
-            appId: "1:732244407571:web:d08486136dea6190de96e6",
-            measurementId: "G-H6VVEXCD54"
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
+        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
+        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
 
-        // 🛑 BULLETPROOF UID SYSTEM & TEST MODE
-        let uid = localStorage.getItem("userId");
-        
-        // Agar file direct open ki gayi hai bina login ke, toh Dummy/Test mode active karein
-        if (!uid || uid === "null" || uid === "undefined") {
-            uid = "DEMO_TEST_" + Math.floor(Math.random() * 10000);
-            localStorage.setItem("userId", uid);
-            localStorage.setItem("userName", "Demo Player");
-            
-            // Testing ke liye 1000 free coins Database me daal do taaki buttons chal sakein
-            database.ref('users/' + uid + '/coins').set(1000);
-            database.ref('users/' + uid + '/name').set("Demo Player");
-            
-            alert("⚠️ TEST MODE ACTIVE: Login ID nahi mili, isliye testing ke liye aapko 1000 Free Coins diye gaye hain!");
-        }
+        const uid = localStorage.getItem("userId");
+        const token = localStorage.getItem("userToken");
+        let storedName = localStorage.getItem("userName") || "Player";
 
-        // GAME VARIABLES
         let currentBalance = 0;
         let activeBet = 0;
         let activeWinPrize = 0;
@@ -220,68 +207,105 @@
         let myChoiceIcon = '❓';
         let countdownInterval;
         
-        // VIRTUAL OPPONENTS LIST
         const virtualNames = ["Rahul_99", "ProGamer_X", "Aman_Destroyer", "Vikas.123", "Neha_Queen", "KillerBoy", "ShadowNinja", "Rajput_Don"];
+        const virtualAvatars = ["🎯", "🦊", "🥷", "🦁", "🐉", "🦅", "💀", "👦"];
+        
         const moves = [
             { id: 'rock', icon: '✊' },
             { id: 'paper', icon: '✋' },
             { id: 'scissors', icon: '✌️' }
         ];
 
-        // LOAD USER DATA FROM FIREBASE
         document.addEventListener("DOMContentLoaded", () => {
-            let storedName = localStorage.getItem("userName") || "Player";
-            document.getElementById("myName").innerText = storedName.split(" ")[0];
+            if (!uid || !token) {
+                window.location.href = "index.html";
+                return;
+            }
 
-            database.ref('users/' + uid + '/coins').on('value', (snap) => {
-                if(snap.exists()) {
-                    currentBalance = Number(snap.val()) || 0;
-                    document.getElementById("userBalance").innerText = currentBalance;
-                } else {
-                    currentBalance = 0;
-                    document.getElementById("userBalance").innerText = "0";
-                }
-            });
+            document.getElementById("myName").innerText = storedName.split(" ")[0];
+            fetchUserProfileData();
+            fetchAdminBanners();
         });
 
-        // STEP 1: MATCHMAKING & FEE DEDUCTION
-        function startMatchmaking(entryFee, winPrize) {
-            // STRICT BALANCE CHECK (Prominent Alert)
-            if(Number(currentBalance) < Number(entryFee)) {
-                alert("❌ GAME START NAHI HUA! Aapke paas sufficient coins nahi hain. Current Balance: " + currentBalance + " Coins. Kripya pehle aur coins earn karein.");
+        // 📡 FETCH USER DATA & PROFILE PIC FROM NODE.JS BACKEND
+        async function fetchUserProfileData() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/user/${uid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                
+                if (data.success && data.user) {
+                    currentBalance = Number(data.user.coins) || 0;
+                    document.getElementById("userBalance").innerText = currentBalance;
+                    
+                    if (data.user.name) {
+                        storedName = data.user.name;
+                        document.getElementById("myName").innerText = storedName.split(" ")[0];
+                    }
+
+                    if (data.user.profile_pic) {
+                        document.getElementById("myAvatarIcon").innerHTML = `<img src="${data.user.profile_pic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load user session balance");
+            }
+        }
+
+        // 📡 FETCH ADMIN BANNERS FROM RENDER BACKEND
+        async function fetchAdminBanners() {
+            try {
+                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
+                const confData = await confRes.json();
+                if (confData.success && confData.banners) {
+                    if (confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
+                    if (confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
+                }
+            } catch (e) { console.log("Ad banners load failed"); }
+        }
+
+        // STEP 1: MATCHMAKING & SERVER BALANCE UPDATE
+        async function startMatchmaking(entryFee, winPrize) {
+            if (Number(currentBalance) < Number(entryFee)) {
+                alert("❌ Insufficient Points! You need at least " + entryFee + " points to participate. Current Balance: " + currentBalance);
                 return;
             }
 
             activeBet = Number(entryFee);
             activeWinPrize = Number(winPrize);
-            
-            // Calculate strictly as Numbers to prevent string addition bugs
-            let newBalance = Number(currentBalance) - Number(entryFee);
 
-            // Deduct Entry Fee immediately
-            database.ref('users/' + uid + '/coins').set(newBalance).then(() => {
-                // Log Entry Fee
-                database.ref('users/' + uid + '/earning_history').push({
-                    activity: `Battle Arena Entry Fee`,
-                    coins_credited: -activeBet,
-                    timestamp: Date.now()
+            // Deduct entry fee via Node.js server API
+            try {
+                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: uid, pointsToAdd: -activeBet, action: "battle_entry" })
                 });
+                const data = await res.json();
 
-                document.getElementById("lobbyScreen").style.display = "none";
-                document.getElementById("matchmakingScreen").style.display = "flex";
-                
-                // Simulate matchmaking delay (2 to 4 seconds)
-                let delay = Math.floor(Math.random() * 2000) + 2000;
-                setTimeout(startBattle, delay);
-            }).catch(error => {
-                alert("❌ Firebase Error: " + error.message);
-            });
+                if (data.success) {
+                    currentBalance = data.newCoins;
+                    document.getElementById("userBalance").innerText = currentBalance;
+
+                    document.getElementById("lobbyScreen").style.display = "none";
+                    document.getElementById("matchmakingScreen").style.display = "flex";
+
+                    let delay = Math.floor(Math.random() * 2000) + 2000;
+                    setTimeout(startBattle, delay);
+                } else {
+                    alert("❌ Transaction failed. Try again.");
+                }
+            } catch (e) {
+                alert("⚠️ Server connection error.");
+            }
         }
 
         // STEP 2: START BATTLE
         function startBattle() {
-            let randomOpponent = virtualNames[Math.floor(Math.random() * virtualNames.length)];
-            document.getElementById("oppName").innerText = randomOpponent;
+            let randomIdx = Math.floor(Math.random() * virtualNames.length);
+            document.getElementById("oppName").innerText = virtualNames[randomIdx];
+            document.getElementById("oppAvatarIcon").innerText = virtualAvatars[randomIdx];
 
             document.getElementById("matchmakingScreen").style.display = "none";
             document.getElementById("battleScreen").style.display = "flex";
@@ -294,7 +318,7 @@
             countdownInterval = setInterval(() => {
                 timeLeft--;
                 document.getElementById("roundTimer").innerText = timeLeft;
-                if(timeLeft <= 0) {
+                if (timeLeft <= 0) {
                     clearInterval(countdownInterval);
                     resolveMatch();
                 }
@@ -302,7 +326,8 @@
         }
 
         function resetBattleUI() {
-            myChoice = null; myChoiceIcon = '❓';
+            myChoice = null; 
+            myChoiceIcon = '❓';
             document.getElementById("myMove").innerText = '❓';
             document.getElementById("oppMove").innerText = '❓';
             document.getElementById("winnerText").style.display = "none";
@@ -316,7 +341,7 @@
 
         // STEP 3: PLAYER CHOOSES MOVE
         function selectMove(moveId, icon) {
-            if(myChoice !== null) return; 
+            if (myChoice !== null) return; 
             
             myChoice = moveId;
             myChoiceIcon = icon;
@@ -324,14 +349,14 @@
 
             let btns = document.querySelectorAll(".action-btn");
             btns.forEach(btn => {
-                if(!btn.innerHTML.includes(icon)) btn.classList.add("disabled");
+                if (!btn.innerHTML.includes(icon)) btn.classList.add("disabled");
                 else btn.classList.add("selected");
             });
         }
 
-        // STEP 4: RESOLVE MATCH (LOGIC)
+        // STEP 4: RESOLVE MATCH
         function resolveMatch() {
-            if(myChoice === null) {
+            if (myChoice === null) {
                 let randomMyMove = moves[Math.floor(Math.random() * moves.length)];
                 myChoice = randomMyMove.id;
                 myChoiceIcon = randomMyMove.icon;
@@ -356,14 +381,14 @@
 
             let wText = document.getElementById("winnerText");
             wText.style.display = "block";
-            wText.innerText = result === "WIN" ? "YOU WON!" : (result === "LOSS" ? "OPPONENT WON!" : "IT'S A TIE!");
+            wText.innerText = result === "WIN" ? "VICTORY!" : (result === "LOSS" ? "DEFEAT!" : "IT'S A TIE!");
             wText.style.color = result === "WIN" ? "var(--success)" : (result === "LOSS" ? "var(--danger)" : "var(--warning)");
 
             setTimeout(() => { showResultModal(result); }, 1500);
         }
 
-        // STEP 5: SHOW MODAL & GIVE PRIZE
-        function showResultModal(result) {
+        // STEP 5: SHOW MODAL & UPDATE SERVER BALANCE
+        async function showResultModal(result) {
             const modal = document.getElementById("resultModal");
             const resBox = document.getElementById("resCardBox");
             const resIcon = document.getElementById("resIcon");
@@ -372,42 +397,53 @@
 
             if (result === "WIN") {
                 resBox.style.borderColor = "var(--success)";
-                resBox.style.boxShadow = "0 0 30px rgba(16, 185, 129, 0.3)";
+                resBox.style.boxShadow = "0 0 35px rgba(16, 185, 129, 0.3)";
                 resIcon.innerText = "🏆";
                 resTitle.innerText = "VICTORY!";
                 resTitle.style.color = "var(--success)";
-                resMsg.innerText = `Awesome! You won ${activeWinPrize} Coins.`;
+                resMsg.innerText = `Awesome! You won ${activeWinPrize} Points.`;
                 
-                // Add Winning Coins exactly as Numbers
-                let newWinBalance = Number(currentBalance) + Number(activeWinPrize);
-                
-                database.ref('users/' + uid + '/coins').set(newWinBalance).then(() => {
-                    database.ref('users/' + uid + '/earning_history').push({
-                        activity: `Battle Arena WIN Prize`,
-                        coins_credited: activeWinPrize,
-                        timestamp: Date.now()
+                try {
+                    const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ userId: uid, pointsToAdd: activeWinPrize, action: "battle_win" })
                     });
-                });
+                    const data = await res.json();
+                    if(data.success) {
+                        currentBalance = data.newCoins;
+                        document.getElementById("userBalance").innerText = currentBalance;
+                    }
+                } catch(e) {}
 
             } else if (result === "LOSS") {
                 resBox.style.borderColor = "var(--danger)";
-                resBox.style.boxShadow = "0 0 30px rgba(239, 68, 68, 0.3)";
+                resBox.style.boxShadow = "0 0 35px rgba(239, 68, 68, 0.3)";
                 resIcon.innerText = "💀";
                 resTitle.innerText = "DEFEATED!";
                 resTitle.style.color = "var(--danger)";
-                resMsg.innerText = `You lost ${activeBet} Coins. Better luck next time!`;
+                resMsg.innerText = `You lost ${activeBet} Points. Better luck next time!`;
                 
             } else {
                 resBox.style.borderColor = "var(--warning)";
-                resBox.style.boxShadow = "0 0 30px rgba(245, 158, 11, 0.3)";
+                resBox.style.boxShadow = "0 0 35px rgba(245, 158, 11, 0.3)";
                 resIcon.innerText = "🤝";
                 resTitle.innerText = "MATCH DRAW!";
                 resTitle.style.color = "var(--warning)";
-                resMsg.innerText = `Entry fee of ${activeBet} Coins has been refunded.`;
+                resMsg.innerText = `Participation fee of ${activeBet} Points has been refunded.`;
                 
-                // Refund Coins exactly as Numbers
-                let refundBalance = Number(currentBalance) + Number(activeBet);
-                database.ref('users/' + uid + '/coins').set(refundBalance);
+                try {
+                    const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ userId: uid, pointsToAdd: activeBet, action: "battle_draw" })
+                    });
+                    const data = await res.json();
+                    if(data.success) {
+                        currentBalance = data.newCoins;
+                        document.getElementById("userBalance").innerText = currentBalance;
+                    }
+                } catch(e) {}
             }
 
             modal.style.display = "flex";
@@ -417,6 +453,7 @@
             document.getElementById("resultModal").style.display = "none";
             document.getElementById("battleScreen").style.display = "none";
             document.getElementById("lobbyScreen").style.display = "flex";
+            fetchUserProfileData();
         }
     </script>
 </body>
