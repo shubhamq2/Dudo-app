@@ -443,6 +443,7 @@ app.get('/api/app-config/:type', async (req, res) => {
         else if (type === 'offerwalls') dbPath = 'global_system_runtime_configurations/offerwall_configurations';
         else if (type === 'secure-cloud') dbPath = 'global_system_runtime_configurations/watch_ads_configuration';
         else if (type === 'module-toggles') dbPath = 'global_system_runtime_configurations/module_toggles'; // 🔥 YAHAN HIDE/SHOW ADD KIYA HAI
+        else if (type === 'marquee') dbPath = 'incentives_popup_array_feed_source'; // 🔥 YAHAN LIVE REDEEM (MARQUEE) ADD KIYA HAI
         else return res.status(400).json({ success: false, message: "Invalid Config Type" });
 
         const snap = await db.ref(dbPath).once('value');
