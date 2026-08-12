@@ -1,16 +1,17 @@
 {
-  "name": "dudo-backend",
+  "name": "system-core-99",
   "version": "1.0.0",
-  "description": "Dudo Custom Backend Server",
+  "description": "Backend server for Dudo App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.0"
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.1.0",
+    "jsonwebtoken": "^9.0.2"
   }
 }
