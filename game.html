@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -29,14 +34,18 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
+        
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
-        /* Profile Balance Ribbon */
+        /* Profile Balance Ribbon - Upgraded (Rupees Removed) */
         .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-pink); padding: 15px 20px; border-radius: 16px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(244, 63, 94, 0.2); backdrop-filter: blur(10px); align-items: center; }
-        .balance-card span { font-size: 18px; font-weight: 900; }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 900; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
-        /* 4-Banners Play Store Masking Grid Layout */
+        /* Banner Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
         .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(244, 63, 94, 0.4); box-sizing: border-box; }
 
@@ -67,6 +76,13 @@
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-pink); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(244, 63, 94, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -77,29 +93,43 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-gamepad" style="color:var(--accent-cyan);"></i> Secure Game Reward</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <div class="header">
-        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-        <h2 data-i18n="gm_title">Arcade Game</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        <a href="extra_bonus.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="gm_title">Arcade Zone</h2>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="balance-card">
-        <span id="liveUserBalance">₹0.00</span>
+        <span style="color:var(--text-sub); font-size:14px; text-transform:uppercase; letter-spacing:1px;">🕹️ Arcade Zone</span>
         <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
     </div>
 
     <!-- 📢 ADMIN CONNECTED TOP BANNERS -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
-        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot1"></div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"></div>
     </div>
 
     <div class="game-viewport-box" id="gameViewportContainer">
@@ -116,10 +146,8 @@
 
     <!-- 📢 ADMIN CONNECTED BOTTOM BANNERS -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
-        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot3"></div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"></div>
     </div>
 
     <div class="security-box">
@@ -127,16 +155,30 @@
         <span data-i18n="gm_security">Authentic arcade engine verified by Play Store. Enjoy the game and collect your reward points securely.</span>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 25; // Default time
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
-            "en": { "gm_title": "Arcade Zone", "gm_score": "Score", "gm_start_title": "Space Dash", "gm_start_desc": "Tap to jump over Volcanoes 🌋 & Dodge flying Meteors ☄️!", "gm_start_btn": "PLAY GAME", "gm_security": "Authentic arcade engine. Enjoy the game and collect your reward points securely.", "err_early": "❌ Loop Interrupted! Please stay active during verification.", "err_invalid": "❌ Validation Alert: Tab switching caught. Verification reset.", "err_success": "🎉 Game Rewards Loaded! Added to dashboard account: ", "game_over_txt": "GAME OVER", "score_prefix": "Final Score: ", "wait_txt": "Verifying Score... " },
-            "hi": { "gm_title": "आर्केड ज़ोन", "gm_score": "स्कोर", "gm_start_title": "स्पेस डैश", "gm_start_desc": "ज्वालामुखी 🌋 के ऊपर से कूदें और उड़ते उल्कापिंडों ☄️ से बचें!", "gm_start_btn": "गेम खेलें", "gm_security": "गेम का आनंद लें और अपने रिवॉर्ड पॉइंट्स सुरक्षित रूप से एकत्र करें।", "err_early": "❌ प्रक्रिया बाधित! कृपया सत्यापन के दौरान सक्रिय रहें।", "err_invalid": "❌ सिस्टम अलर्ट: ऐप स्वैप का पता चला। सत्यापन रीसेट।", "err_success": "🎉 गेम रिवॉर्ड लोड! आपके खाते में जोड़ा गया: ", "game_over_txt": "खेल समाप्त", "score_prefix": "अंतिम स्कोर: ", "wait_txt": "स्कोर चेक हो रहा है... " },
-            "bn": { "gm_title": "আর্কেড জোন", "gm_score": "স্কোর", "gm_start_title": "স্পেস ড্যাশ", "gm_start_desc": "আগ্নেয়গিরি 🌋 থেকে লাফিয়ে উল্কা ☄️ এড়িয়ে চলুন!", "gm_start_btn": "গেম খেলুন", "gm_security": "গেম উপভোগ করুন এবং নিরাপদে আপনার পুরস্কার সংগ্রহ করুন।", "err_early": "❌ প্রক্রিয়া ব্যাহত! যাচাইকরণের সময় সক্রিয় থাকুন।", "err_invalid": "❌ অ্যালার্ট: ট্যাব পরিবর্তন সনাক্ত করা হয়েছে।", "err_success": "🎉 গেম রিওয়ার্ড যোগ করা হয়েছে: ", "game_over_txt": "গেম ওভার", "score_prefix": "চূড়ান্ত স্কোর: ", "wait_txt": "যাচাই করা হচ্ছে... " },
+            "en": { "gm_title": "Arcade Zone", "gm_score": "Score", "gm_start_title": "Space Dash", "gm_start_desc": "Tap to jump over Volcanoes 🌋 & Dodge flying Meteors ☄️!", "gm_start_btn": "PLAY GAME", "gm_security": "Authentic arcade engine. Enjoy the game and collect your reward points securely.", "err_early": "❌ Loop Interrupted! Please stay active during verification.", "err_invalid": "❌ Validation Alert: App minimized. Verification reset.", "err_success": "🎉 Game Rewards Loaded! Added to dashboard account: ", "game_over_txt": "GAME OVER", "score_prefix": "Final Score: ", "wait_txt": "Verifying Score... " },
+            "hi": { "gm_title": "आर्केड ज़ोन", "gm_score": "स्कोर", "gm_start_title": "स्पेस डैश", "gm_start_desc": "ज्वालामुखी 🌋 के ऊपर से कूदें और उड़ते उल्कापिंडों ☄️ से बचें!", "gm_start_btn": "गेम खेलें", "gm_security": "गेम का आनंद लें और अपने रिवॉर्ड पॉइंट्स सुरक्षित रूप से एकत्र करें।", "err_early": "❌ प्रक्रिया बाधित! कृपया सत्यापन के दौरान सक्रिय रहें।", "err_invalid": "❌ सिस्टम अलर्ट: ऐप मिनिमाइज़ का पता चला। सत्यापन रीसेट।", "err_success": "🎉 गेम रिवॉर्ड लोड! आपके खाते में जोड़ा गया: ", "game_over_txt": "खेल समाप्त", "score_prefix": "अंतिम स्कोर: ", "wait_txt": "स्कोर चेक हो रहा है... " },
+            "bn": { "gm_title": "আর্কেড জোন", "gm_score": "স্কোর", "gm_start_title": "স্পেস ড্যাশ", "gm_start_desc": "আগ্নেয়গিরি 🌋 থেকে লাফিয়ে উল্কা ☄️ এড়িয়ে চলুন!", "gm_start_btn": "গেম খেলুন", "gm_security": "গেম উপভোগ করুন এবং নিরাপদে আপনার পুরস্কার সংগ্রহ করুন।", "err_early": "❌ প্রক্রিয়া ব্যাহত! যাচাইকরণের সময় সক্রিয় থাকুন।", "err_invalid": "❌ অ্যালার্ট: অ্যাপ বন্ধ করা হয়েছে।", "err_success": "🎉 গেম রিওয়ার্ড যোগ করা হয়েছে: ", "game_over_txt": "গেম ওভার", "score_prefix": "চূড়ান্ত স্কোর: ", "wait_txt": "যাচাই করা হচ্ছে... " },
             "te": { "gm_title": "ఆర్కేడ్ జోన్", "gm_score": "స్కోర్", "gm_start_title": "స్పేస్ డాష్", "gm_start_desc": "అగ్నిపర్వతాలు 🌋 దాటడానికి ఎగరండి & ఉల్కలను ☄️ నివారించండి!", "gm_start_btn": "గేమ్ ఆడండి", "gm_security": "గేమ్‌ని ఆస్వాదించండి మరియు మీ రివార్డ్‌లను పొందండి.", "err_early": "❌ ప్రాసెస్ ఆగిపోయింది! యాక్టివ్‌గా ఉండండి.", "err_invalid": "❌ దయచేసి గేమ్ పేజీలోనే ఉండండి.", "err_success": "🎉 రివార్డ్ జోడించబడింది: ", "game_over_txt": "గేమ్ ఓవర్", "score_prefix": "తుది స్కోర్: ", "wait_txt": "ధృవీకరిస్తోంది... " },
             "mr": { "gm_title": "आर्केड झोन", "gm_score": "स्कोअर", "gm_start_title": "स्पेस डॅश", "gm_start_desc": "ज्वालामुखी 🌋 वरून उडी मारा आणि उल्कांपासून ☄️ वाचा!", "gm_start_btn": "गेम खेळा", "gm_security": "गेमचा आनंद घ्या आणि आपले रिवॉर्ड पॉइंट्स सुरक्षितपणे मिळवा.", "err_early": "❌ प्रक्रिया थांबली! कृपया सक्रिय राहा.", "err_invalid": "❌ कृपया गेम पेजवरच राहा.", "err_success": "🎉 रिवॉर्ड जोडले गेले: ", "game_over_txt": "गेम ओव्हर", "score_prefix": "अंतिम स्कोअर: ", "wait_txt": "तपासत आहे... " },
             "ta": { "gm_title": "ஆர்கேட் மண்டலம்", "gm_score": "மதிப்பெண்", "gm_start_title": "ஸ்பேஸ் டேஷ்", "gm_start_desc": "எரிமலைகளை 🌋 தாண்டவும், விண்கற்களைத் ☄️ தவிர்க்கவும்!", "gm_start_btn": "விளையாடு", "gm_security": "விளையாட்டை அனுபவித்து உங்கள் பரிசுகளைப் பெறுங்கள்.", "err_early": "❌ தடைபட்டது! செயல்பாட்டில் இருக்கவும்.", "err_invalid": "❌ விளையாட்டுப் பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 பரிசு சேர்க்கப்பட்டது: ", "game_over_txt": "ஆட்டம் முடிந்தது", "score_prefix": "இறுதி மதிப்பெண்: ", "wait_txt": "சரிபார்க்கிறது... " },
@@ -154,22 +196,99 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) elem.innerText = transObj[key];
+                if(transObj[key]) {
+                    if(elem.tagName === "BUTTON" && elem.id === "overlayActionBtn") {
+                        if(!elem.disabled) elem.innerText = transObj[key];
+                    } else {
+                        elem.innerText = transObj[key];
+                    }
+                }
             });
             document.getElementById("appLanguage").value = langCode;
+            
+            if(!isGameCurrentlyRunning && scoreCounter > 0) {
+                document.getElementById("overlayPanelTitle").innerText = transObj["game_over_txt"] || "GAME OVER";
+                document.getElementById("overlayPanelReport").innerText = (transObj["score_prefix"] || "Final Score: ") + scoreCounter;
+            }
+        }
+
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-        
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
+            
+            // Sync Language from Home Page
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync
+                            function createEmojiURI(emoji) {
+                                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+                                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+                            }
+
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Link & Time)
+                    db.ref('global_system_runtime_configurations/arcade_game_configs').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME
+                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            
+                            // Load Banners
+                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+
+                            // Setup Game Link
+                            if (adminData.game_ad_link) {
+                                activeAdminSmartlinkUrl = adminData.game_ad_link;
+                            }
+                        } else {
+                            // Fallback to Global Smartlink
+                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
+                                if(globalSnap.exists()) activeAdminSmartlinkUrl = globalSnap.val();
+                            });
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+            
             initialDraw();
 
             // Event listeners directly to Canvas
@@ -177,39 +296,6 @@
             canvas.addEventListener("touchstart", (e) => { e.preventDefault(); executionTriggerPlayerJump(); }, {passive: false});
             canvas.addEventListener("mousedown", () => { executionTriggerPlayerJump(); });
         });
-
-        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                }
-
-                // 2. Fetch Admin Banners and Smartlink
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
-                        if(confData.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.banners[3];
-                    }
-                    if (confData.globalSmartlink) {
-                        activeAdminSmartlinkUrl = confData.globalSmartlink;
-                    }
-                }
-            } catch (err) {
-                console.log("Using default cached configuration.");
-            }
-        }
 
         // HTML5 Engine Parameters variables
         const canvas = document.getElementById("gameCanvas");
@@ -220,16 +306,10 @@
         let scoreCounter = 0;
 
         // 🔥 CHARACTER: ROCKET
-        let playerSquareObj = { x: 50, y: 175, width: 30, height: 30, gravity: 0.8, velocity: 0, jumpStrength: -12, isGrounded: true, emoji: "🚀" };
+        let playerSquareObj = { x: 50, y: 175, width: 30, height: 30, gravity: 0.95, velocity: 0, jumpStrength: -12, isGrounded: true, emoji: "🚀" };
         let obstaclesArray = [];
-        let gameSpeed = 5.5; // Faster Initial Speed
+        let gameSpeed = 6.5; 
         let obstacleSpawnIntervalCounter = 0;
-
-        // 🔥 ADDED SYSTEM TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { window.hasMainTabHidden = true; }
-        });
 
         function initialDraw() {
             ctx.clearRect(0,0, canvas.width, canvas.height);
@@ -261,7 +341,7 @@
             document.getElementById("gameMenuOverlay").style.display = "none";
             isGameCurrentlyRunning = true;
             scoreCounter = 0;
-            gameSpeed = 5.5;
+            gameSpeed = 6.5; // Reset to hard base speed
             obstaclesArray = [];
             
             playerSquareObj.y = 175;
@@ -308,13 +388,13 @@
             obstacleSpawnIntervalCounter++;
             
             // 🔥 HARD MODE: Tighter gaps as score increases
-            if(obstacleSpawnIntervalCounter > Math.max(35, 60 - (scoreCounter * 2))) { 
+            if(obstacleSpawnIntervalCounter > Math.max(25, 50 - (scoreCounter * 2))) { 
                 obstacleSpawnIntervalCounter = 0;
                 
                 // 50% chance for Air (Meteor) or Ground (Volcano)
                 let isAirObstacle = Math.random() > 0.5;
                 let obsSize = isAirObstacle ? 35 : 40; 
-                let obsY = isAirObstacle ? (40 + Math.random() * 60) : (205 - obsSize); // Top logic vs Ground logic
+                let obsY = isAirObstacle ? (40 + Math.random() * 60) : (205 - obsSize);
                 let obsEmoji = isAirObstacle ? "☄️" : "🌋";
 
                 obstaclesArray.push({ 
@@ -341,15 +421,15 @@
                     scoreCounter++;
                     document.getElementById("liveScoreCounter").innerText = scoreCounter;
                     
-                    // 🔥 HARD MODE: Speed increases every 4 points
-                    if(scoreCounter % 4 === 0) gameSpeed += 0.5;
+                    // 🔥 HARD MODE: Speed increases every 3 points
+                    if(scoreCounter % 3 === 0) gameSpeed += 0.6;
                 }
 
-                // 🔥 Strict Collision Box Tweak (Hitbox adjusted for emojis)
-                if (playerSquareObj.x < obs.x + obs.width - 8 &&
-                    playerSquareObj.x + playerSquareObj.width - 8 > obs.x &&
-                    playerSquareObj.y < obs.y + obs.height - 5 &&
-                    playerSquareObj.y + playerSquareObj.height - 5 > obs.y) {
+                // 🔥 Strict Collision Box Tweak (Hitbox tighter for emojis)
+                if (playerSquareObj.x < obs.x + obs.width - 10 &&
+                    playerSquareObj.x + playerSquareObj.width - 10 > obs.x &&
+                    playerSquareObj.y < obs.y + obs.height - 8 &&
+                    playerSquareObj.y + playerSquareObj.height - 8 > obs.y) {
                     
                     executeGameOverStateCrash();
                     return;
@@ -404,84 +484,85 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🚀 SYSTEM MULTI-TAB SHIELD SECURE FOR ARCADE
+        // 🚀 SYSTEM SECURE IN-APP AD VIEWER FOR ARCADE
         let platformTimer = null;
-        let countdownTime = 25;
-        let targetWindow = null;
-        let totalSecondsOpen = 0;
 
         function triggerSecureEarningVerificationRoute() {
             const btn = document.getElementById("overlayActionBtn");
             let currentLang = localStorage.getItem("selectedLang") || "en";
             
-            countdownTime = 25;
-            totalSecondsOpen = 0;
-            window.hasMainTabHidden = false; // Reset tracker
+            let countdownTime = globalAdTimerSeconds;
 
             let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying Score... ";
-            btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
+            btn.innerText = baseWaitTxt;
+            btn.disabled = true;
 
-            targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
+
+            if (platformTimer) clearInterval(platformTimer);
 
             platformTimer = setInterval(() => {
-                if(targetWindow && targetWindow.closed) {
+                countdownTime--;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if(document.hidden) {
                     clearInterval(platformTimer);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
                     resetGameMenuUIElements();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     return;
                 }
 
-                if(!document.hidden && window.hasMainTabHidden) {
-                    if(totalSecondsOpen < 24) {
-                        clearInterval(platformTimer);
-                        resetGameMenuUIElements();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
-                countdownTime--;
-                btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
-
                 if(countdownTime <= 0) {
                     clearInterval(platformTimer);
-                    btn.innerText = "SAVING...";
-
-                    // Strict Reward: 1 Score = 1 Coin 
-                    let rewardCoinsCalculatedValue = scoreCounter * 1; 
-                    evaluateGameRewardViaNodeServer(rewardCoinsCalculatedValue);
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
         // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
-        async function evaluateGameRewardViaNodeServer(rewardAmount) {
-            try {
-                // Call API to add points and Sync Daily Task 't15'
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: rewardAmount, 
-                        action: "arcade_game_win",
-                        syncTask: "t15" // Tells backend to complete task 't15'
-                    })
-                });
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+
+            // Strict Reward: 1 Score = 1 Coin 
+            let rewardCoinsCalculatedValue = scoreCounter * 1; 
+            evaluateGameRewardViaFirebase(rewardCoinsCalculatedValue);
+        }
+
+        function evaluateGameRewardViaFirebase(rewardAmount) {
+            
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + rewardAmount;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
-                    
-                    resetGameMenuUIElements();
-                    showCustomAlert("err_success", `${rewardAmount} 🪙`, true);
-                }
-            } catch (err) {
+                // 2. Mark Daily Task 't15' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t15")) {
+                        tasks.push("t15");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                resetGameMenuUIElements();
+                showCustomAlert("err_success", `${rewardAmount} 🪙`, true);
+                
+            }).catch(() => {
                 resetGameMenuUIElements();
                 alert("Task Verified but couldn't sync with server. Try again.");
-            }
+            });
         }
 
         function resetGameMenuUIElements() {

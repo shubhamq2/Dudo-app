@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -32,15 +37,19 @@
         
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
 
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
+
         .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Profile Balance Ribbon */
+        /* PLAY STORE SAFE: Only show Coins */
         .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-pink); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(236, 72, 153, 0.2); backdrop-filter: blur(10px); }
         .balance-card span { font-size: 18px; font-weight: 900; }
         .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
         /* Banner Ads Slots */
-        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(236, 72, 153, 0.4); box-sizing: border-box; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: none; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(236, 72, 153, 0.4); box-sizing: border-box; }
 
         /* Main Game Playground Card */
         .scratch-main-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
@@ -55,7 +64,7 @@
         .status-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); }
         .status-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
-        /* 🎟️ WEEKLY DROP (HIDDEN BY DEFAULT) */
+        /* 🎟️ WEEKLY DROP (HIDDEN BY DEFAULT - Admin Controlled) */
         .lottery-wrapper-card { display: none; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(126, 34, 206, 0.1)); border-radius: 24px; border: 2px solid var(--accent-purple); padding: 25px 20px; text-align: center; box-sizing: border-box; box-shadow: 0 10px 30px rgba(168,85,247,0.25); position: relative; overflow: hidden; backdrop-filter: blur(10px); }
         .lottery-badge-corner { position: absolute; top: 0; right: 0; background: var(--accent-purple); color: #fff; font-size: 10px; font-weight: 900; padding: 6px 15px; text-transform: uppercase; border-bottom-left-radius: 16px; }
         .lottery-wrapper-card h3 { margin: 0; font-size: 20px; font-weight: 900; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -80,7 +89,7 @@
         .ticket-validity-txt { font-size: 11px; color: var(--text-sub); font-weight: 700; }
         .ticket-stub-right { font-size: 12px; font-weight: 900; color: #fff; background: var(--accent-purple); padding: 6px 12px; border-radius: 8px; text-transform: uppercase; }
 
-        /* MARKETPLACE WRAPPER (HIDDEN BY DEFAULT) */
+        /* MARKETPLACE WRAPPER (HIDDEN BY DEFAULT - Admin Controlled) */
         .market-header-title { display: none; font-size: 17px; font-weight: 900; color: #fff; margin: 15px 0 5px 0; text-align: left; align-items: center; gap: 8px; }
         .marketplace-row-container { display: none; flex-direction: column; gap: 12px; box-sizing: border-box; }
         
@@ -99,14 +108,11 @@
         .purchase-market-btn { background: var(--accent-pink); color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); text-transform: uppercase; letter-spacing: 0.5px; }
         .purchase-market-btn:active { transform: scale(0.95); }
 
-        /* Rule/Notice Display for Play Store Compliance */
+        /* Rule/Notice Display */
         .rules-info-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary-blue); border-radius: 16px; padding: 15px 18px; margin-top: 15px; font-size: 12px; color: #cbd5e1; line-height: 1.6; text-align: left; }
         .rules-info-box h4 { margin: 0 0 8px 0; color: var(--primary-blue); font-size: 14px; font-weight: 800; text-transform: uppercase; }
         .rules-info-box ul { margin: 0; padding-left: 20px; }
         .rules-info-box li { margin-bottom: 5px; }
-
-        /* Security Box Info Board */
-        .security-box { border: 1px dashed var(--accent-pink); background: rgba(236, 72, 153, 0.05); border-radius: 16px; padding: 15px 18px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-top: 5px; font-weight: 600; }
 
         /* WINNER CELEBRATION POPUP FRAME */
         .winner-modal-view { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(11,15,25,0.9); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(8px); padding: 20px; box-sizing: border-box; }
@@ -117,7 +123,7 @@
         .winner-claim-btn { width:100%; background: linear-gradient(135deg, var(--accent-gold), #d97706); color:#000; border:none; padding:16px; border-radius:50px; font-size:16px; font-weight:900; cursor:pointer; text-transform:uppercase; box-shadow: 0 6px 20px rgba(250,204,21,0.4); letter-spacing: 1px; transition: 0.2s; }
         .winner-claim-btn:active { transform: scale(0.96); }
 
-        /* Modern Alert Modal Setup */
+        /* Custom Modern Alert Modal Popup style */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
@@ -125,7 +131,30 @@
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-pink); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
+
+   <!-- ⚡⚡ ANTI-FLICKER SCRIPT FOR INDEPENDENT TOGGLES ⚡⚡ -->
+<script>
+    let cssRules = "";
+    let cToggles = localStorage.getItem("d_toggles");
+    if (cToggles) {
+        let toggles = JSON.parse(cToggles);
+        if (toggles.mod_lottery_arena === false) cssRules += "#mod_lottery_arena, #ticketsSectionContainer { display: none !important; } ";
+        if (toggles.mod_marketplace_arena === false) cssRules += "#mod_market_header, #mod_marketplace_arena { display: none !important; } ";
+    }
+    if (cssRules !== "") {
+        let style = document.createElement('style');
+        style.innerHTML = cssRules;
+        document.head.appendChild(style);
+    }
+</script>
 </head>
 <body>
 
@@ -133,6 +162,17 @@
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
         <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-gift" style="color:var(--accent-pink);"></i> Secure Reward System</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
     <!-- 🎉 WINNER CELEBRATION POPUP FRAME -->
@@ -149,13 +189,15 @@
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="sc_title">Rewards Zone</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+        </div>
     </div>
 
     <div class="main-container">
@@ -179,7 +221,7 @@
             <button class="status-btn" id="scratchStatusBtn" disabled><i class="fa-solid fa-hand-pointer"></i> <span data-i18n="sc_btn">SCRATCH THE CARD</span></button>
         </div>
 
-        <!-- 🎟️ WEEKLY DROP BLOCK (HIDDEN BY DEFAULT) -->
+        <!-- 🎟️ WEEKLY DROP BLOCK (HIDDEN BY DEFAULT - Controlled by Admin) -->
         <div class="lottery-wrapper-card" id="mod_lottery_arena">
             <div class="lottery-badge-corner" data-i18n="mb_sun">Every Sunday</div>
             <h3 data-i18n="mb_week_title">Weekly Mega Drop</h3>
@@ -203,7 +245,7 @@
             <div class="ticket-grid-flow" id="userTicketsGridContainer"></div>
         </div>
 
-        <!-- 🏪 MARKETPLACE WRAPPER (HIDDEN BY DEFAULT) -->
+        <!-- 🏪 MARKETPLACE WRAPPER (HIDDEN BY DEFAULT - Controlled by Admin) -->
         <div class="market-header-title" id="mod_market_header">
             <span>🏪</span> <span data-i18n="market_head">Premium Passes Marketplace</span>
         </div>
@@ -248,46 +290,55 @@
         </div>
 
         <div class="ad-banner-slot" id="adminBannerSlot2"></div>
-
-        <div class="security-box">
-            <span style="font-size: 18px;">🛡️</span>
-            <span data-i18n="sc_security">Verification protocols are active. Do not close the window during the process to ensure successful reward validation.</span>
-        </div>
-
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 25; // Default time
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
             "en": { 
-                "sc_title": "Rewards Zone", "wd_wallet": "Wallet Balance", "sc_h3": "Scratch Rewards", "sc_p": "Rub the silver layer below to unlock secret tokens!", "sc_btn": "SCRATCH THE CARD", "sc_security": "Verification protocols are active. Do not close the window during the process to ensure successful reward validation.", "err_early": "❌ Verification Incomplete! Please keep the sponsor tab open.", "err_invalid": "❌ Tracking Interrupted! Stay on the verification page.", "err_success": "🎉 Success! Coins credited successfully: ", "wait_txt": "Verifying... ",
+                "sc_title": "Rewards Zone", "wd_wallet": "Wallet Balance", "sc_h3": "Scratch Rewards", "sc_p": "Rub the silver layer below to unlock secret tokens!", "sc_btn": "SCRATCH THE CARD", "err_success": "🎉 Success! Coins credited successfully: ", "wait_txt": "Verifying... ",
                 "mb_sun": "Every Sunday", "mb_week_title": "Weekly Mega Drop", "mb_week_desc": "Draw is active this weekend. Buy a pass to enter.", "mb_prev": "Previous Winner", "mb_buy": "Unlock Entry Pass (200 🪙)", "mb_active": "🎟️ Your Active Passes",
                 "market_head": "Premium Passes Marketplace", "pl_r_title": "Marketplace Rules:", "pl_r1": "Redeem your coins for Premium Passes.", "pl_r2": "Passes grant immediate access to high-reward scratch cards.", "pl_r3": "Rewards are randomized within the specified tier limits.",
                 "tier1_t": "Bronze Scratch Pass", "tier1_d": "Win random bonus up to 250 Coins", "tier2_t": "Silver Scratch Pass", "tier2_d": "Guaranteed returns up to 1000 Coins", "tier3_t": "Gold Premium Pass", "tier3_d": "Ultimate premium tier multiplier loop", "btn_buy": "Redeem",
-                "nsf_coins": "❌ Not enough coins to unlock this pass!", "buy_success": "🎉 Pass Activated! Scratch the card matrix now."
+                "nsf_coins": "❌ Not enough coins to unlock this pass!", "buy_success": "🎉 Pass Activated! Scratch the card matrix now.", "err_early": "❌ Verification Incomplete! Please keep the sponsor page open.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page to verify."
             },
             "hi": { 
-                "sc_title": "रिवॉर्ड्स ज़ोन", "wd_wallet": "वॉलेट बैलेंस", "sc_h3": "स्क्रैच रिवॉर्ड्स", "sc_p": "सीक्रेट टोकन अनलॉक करने के लिए नीचे दी गई सिल्वर परत को रगड़ें!", "sc_btn": "कार्ड स्क्रैच करें", "sc_security": "सत्यापन प्रक्रिया सक्रिय है। रिवॉर्ड प्राप्त करने के लिए कृपया विज्ञापन पेज को बंद न करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर टैब खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया स्पॉन्सर पेज पर बने रहें।", "err_success": "🎉 सफलता! आपके खाते में सिक्के जोड़ दिए गए हैं: ", "wait_txt": "चेक हो रहा है... ",
+                "sc_title": "रिवॉर्ड्स ज़ोन", "wd_wallet": "वॉलेट बैलेंस", "sc_h3": "स्क्रैच रिवॉर्ड्स", "sc_p": "सीक्रेट टोकन अनलॉक करने के लिए नीचे दी गई सिल्वर परत को रगड़ें!", "sc_btn": "कार्ड स्क्रैच करें", "err_success": "🎉 सफलता! आपके खाते में सिक्के जोड़ दिए गए हैं: ", "wait_txt": "चेक हो रहा है... ",
                 "mb_sun": "हर रविवार", "mb_week_title": "साप्ताहिक मेगा ड्रॉप", "mb_week_desc": "इस वीकेंड ड्रॉ सक्रिय है। भाग लेने के लिए पास प्राप्त करें।", "mb_prev": "पिछला विजेता", "mb_buy": "एंट्री पास अनलॉक करें (200 🪙)", "mb_active": "🎟️ आपके सक्रिय पास",
                 "market_head": "प्रीमियम पास मार्केटप्लेस", "pl_r_title": "मार्केटप्लेस के नियम:", "pl_r1": "प्रीमियम पास के लिए अपने सिक्के रिडीम करें।", "pl_r2": "पास आपको बड़े रिवॉर्ड वाले स्क्रैच कार्ड देते हैं।", "pl_r3": "इनाम संबंधित टियर लिमिट के अनुसार रैंडम होते हैं।",
                 "tier1_t": "कांस्य स्क्रैच पास", "tier1_d": "250 कॉइन्स तक का रैंडम बोनस", "tier2_t": "रजत स्क्रैच पास", "tier2_d": "1000 कॉइन्स तक का रिटर्न", "tier3_t": "स्वर्ण प्रीमियम पास", "tier3_d": "अल्टीमेट प्रीमियम टियर", "btn_buy": "रिडीम करें",
-                "nsf_coins": "❌ इस पास को अनलॉक करने के लिए पर्याप्त सिक्के नहीं हैं!", "buy_success": "🎉 पास सक्रिय! अब अपना कार्ड स्क्रैच करें।"
+                "nsf_coins": "❌ इस पास को अनलॉक करने के लिए पर्याप्त सिक्के नहीं हैं!", "buy_success": "🎉 पास सक्रिय! अब अपना कार्ड स्क्रैच करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर ही रहें।"
             },
-            "bn": { "sc_title": "রিওয়ার্ড জোন", "wd_wallet": "ওয়ালেট ব্যালেন্স", "sc_h3": "স্ক্র্যাচ রিওয়ার্ড", "sc_p": "টোকেন পেতে স্ক্র্যাচ করুন!", "sc_btn": "স্ক্র্যাচ করুন", "err_success": "🎉 সফল! কয়েন যোগ করা হয়েছে: ", "wait_txt": "যাচাই হচ্ছে... ", "btn_buy": "রিডিম", "nsf_coins": "❌ কয়েন অপর্যাপ্ত!", "buy_success": "🎉 পাস অ্যাক্টিভ! এখন কার্ড স্ক্র্যাচ করুন।" },
-            "te": { "sc_title": "రివార్డ్స్ జోన్", "sc_btn": "స్క్రాచ్ చేయండి", "err_success": "🎉 విజయం! జోడించబడింది: ", "btn_buy": "పొందండి", "nsf_coins": "❌ కాయిన్స్ సరిపోవు!", "buy_success": "🎉 పాస్ యాక్టివ్! ఇప్పుడు స్క్రాచ్ చేయండి." },
-            "mr": { "sc_title": "रिवॉर्ड्स झोन", "sc_btn": "स्क्रॅच करा", "err_success": "🎉 यशस्वी! जोडले गेले: ", "btn_buy": "मिळवा", "nsf_coins": "❌ कॉइन्स अपुरे!", "buy_success": "🎉 पास अ‍ॅक्टिव्ह! आता स्क्रॅच करा." },
-            "ta": { "sc_title": "ரிவார்ட் மண்டலம்", "sc_btn": "கீறவும்", "err_success": "🎉 வெற்றி! சேர்க்கப்பட்டது: ", "btn_buy": "பெறுக", "nsf_coins": "❌ நாணயங்கள் போதாது!", "buy_success": "🎉 பாஸ் ஆக்டிவ்!" },
-            "ur": { "sc_title": "ریوارڈز زون", "sc_btn": "اسکریچ کریں", "err_success": "🎉 کامیابی! شامل کیے گئے: ", "btn_buy": "حاصل کریں", "nsf_coins": "❌ کوئنز ناکافی ہیں!", "buy_success": "🎉 پاس فعال ہو گیا!" },
-            "gu": { "sc_title": "ઇનામ ઝોન", "sc_btn": "સ્ક્રેચ કરો", "err_success": "🎉 સફળતા! ઉમેરાયા: ", "btn_buy": "મેળવો", "nsf_coins": "❌ સિક્કા અપૂરતા છે!", "buy_success": "🎉 પાસ સક્રિય!" },
-            "es": { "sc_title": "Zona de Recompensas", "sc_btn": "RASCAR TARJETA", "err_success": "🎉 ¡Éxito! Añadido: ", "btn_buy": "Canjear", "nsf_coins": "❌ ¡Monedas insuficientes!", "buy_success": "🎉 ¡Pase activado!" },
-            "fr": { "sc_title": "Zone de Récompenses", "sc_btn": "GRATTER", "err_success": "🎉 Succès ! Ajouté : ", "btn_buy": "Échanger", "nsf_coins": "❌ Pièces insuffisantes !", "buy_success": "🎉 Pass activé !" },
-            "ar": { "sc_title": "منطقة المكافآت", "sc_btn": "اخدش البطاقة", "err_success": "🎉 نجاح! أُضيف: ", "btn_buy": "استرداد", "nsf_coins": "❌ عملات غير كافية!", "buy_success": "🎉 تم تفعيل التذكرة!" },
-            "pt": { "sc_title": "Zona de Recompensas", "sc_btn": "RASPAR", "err_success": "🎉 Sucesso! Adicionado: ", "btn_buy": "Resgatar", "nsf_coins": "❌ Moedas insuficientes!", "buy_success": "🎉 Passe ativado!" },
-            "ru": { "sc_title": "Зона Наград", "sc_btn": "СТЕРЕТЬ", "err_success": "🎉 Успех! Добавлено: ", "btn_buy": "Обменять", "nsf_coins": "❌ Недостаточно монет!", "buy_success": "🎉 Пропуск активирован!" }
+            "bn": { "sc_title": "রিওয়ার্ড জোন", "wd_wallet": "ওয়ালেট ব্যালেন্স", "sc_btn": "স্ক্র্যাচ করুন", "err_success": "🎉 সফল! কয়েন যোগ করা হয়েছে: ", "wait_txt": "যাচাই হচ্ছে... ", "btn_buy": "রিডিম", "nsf_coins": "❌ কয়েন অপর্যাপ্ত!", "buy_success": "🎉 পাস অ্যাক্টিভ! এখন কার্ড স্ক্র্যাচ করুন।", "err_early": "❌ যাচাই অসম্পূর্ণ!", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে!" },
+            "te": { "sc_title": "రివార్డ్స్ జోన్", "sc_btn": "స్క్రాచ్ చేయండి", "err_success": "🎉 విజయం! జోడించబడింది: ", "btn_buy": "పొందండి", "nsf_coins": "❌ కాయిన్స్ సరిపోవు!", "buy_success": "🎉 పాస్ యాక్టివ్! ఇప్పుడు స్క్రాచ్ చేయండి.", "err_early": "❌ అసంపూర్ణం!", "err_invalid": "❌ దయచేసి పేజీలోనే ఉండండి." },
+            "mr": { "sc_title": "रिवॉर्ड्स झोन", "sc_btn": "स्क्रॅच करा", "err_success": "🎉 यशस्वी! जोडले गेले: ", "btn_buy": "मिळवा", "nsf_coins": "❌ कॉइन्स अपुरे!", "buy_success": "🎉 पास अ‍ॅक्टिव्ह! आता स्क्रॅच करा.", "err_early": "❌ अपूर्ण!", "err_invalid": "❌ कृपया पेजवरच थांबा." },
+            "ta": { "sc_title": "ரிவார்ட் மண்டலம்", "sc_btn": "கீறவும்", "err_success": "🎉 வெற்றி! சேர்க்கப்பட்டது: ", "btn_buy": "பெறுக", "nsf_coins": "❌ நாணயங்கள் போதாது!", "buy_success": "🎉 பாஸ் ஆக்டிவ்!", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ அதே பக்கத்திலேயே இருக்கவும்." },
+            "ur": { "sc_title": "ریوارڈز زون", "sc_btn": "اسکریچ کریں", "err_success": "🎉 کامیابی! شامل کیے گئے: ", "btn_buy": "حاصل کریں", "nsf_coins": "❌ کوئنز ناکافی ہیں!", "buy_success": "🎉 پاس فعال ہو گیا!", "err_early": "❌ نامکمل!", "err_invalid": "❌ براہ کرم پیج پر رہیں۔" },
+            "gu": { "sc_title": "ઇનામ ઝોન", "sc_btn": "સ્ક્રેચ કરો", "err_success": "🎉 સફળતા! ઉમેરાયા: ", "btn_buy": "મેળવો", "nsf_coins": "❌ સિક્કા અપૂરતા છે!", "buy_success": "🎉 પાસ સક્રિય!", "err_early": "❌ અધૂરું!", "err_invalid": "❌ કૃપા કરીને પેજ પર રહો." },
+            "es": { "sc_title": "Zona de Recompensas", "sc_btn": "RASCAR TARJETA", "err_success": "🎉 ¡Éxito! Añadido: ", "btn_buy": "Canjear", "nsf_coins": "❌ ¡Monedas insuficientes!", "buy_success": "🎉 ¡Pase activado!", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ Quédate en la página." },
+            "fr": { "sc_title": "Zone de Récompenses", "sc_btn": "GRATTER", "err_success": "🎉 Succès ! Ajouté : ", "btn_buy": "Échanger", "nsf_coins": "❌ Pièces insuffisantes !", "buy_success": "🎉 Pass activé !", "err_early": "❌ Incomplet !", "err_invalid": "❌ Restez sur la page." },
+            "ar": { "sc_title": "منطقة المكافآت", "sc_btn": "اخدش البطاقة", "err_success": "🎉 نجاح! أُضيف: ", "btn_buy": "استرداد", "nsf_coins": "❌ عملات غير كافية!", "buy_success": "🎉 تم تفعيل التذكرة!", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ يرجى البقاء في الصفحة." },
+            "pt": { "sc_title": "Zona de Recompensas", "sc_btn": "RASPAR", "err_success": "🎉 Sucesso! Adicionado: ", "btn_buy": "Resgatar", "nsf_coins": "❌ Moedas insuficientes!", "buy_success": "🎉 Passe ativado!", "err_early": "❌ Incompleto!", "err_invalid": "❌ Fique na página." },
+            "ru": { "sc_title": "Зона Наград", "sc_btn": "СТЕРЕТЬ", "err_success": "🎉 Успех! Добавлено: ", "btn_buy": "Обменять", "nsf_coins": "❌ Недостаточно монет!", "buy_success": "🎉 Пропуск активирован!", "err_early": "❌ Не завершено!", "err_invalid": "❌ Оставайтесь на странице." }
         };
 
         function changeLanguage(langCode) {
@@ -310,92 +361,129 @@
         }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-
         let randomCoinsReward = 0; 
         let isScratchedPassed = false;
         let userCurrentCoinsMaster = 0;
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
         
-        let isLotterySystemActive = false; // Toggle
-        let isMarketplaceActive = false;   // Toggle
+        let isLotterySystemActive = false; // Admin Toggle
+        let isMarketplaceActive = false;   // Admin Toggle
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            userCurrentCoinsMaster = data.coins || 0;
+                            document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
+                        }
+                    });
+
+                    // 2. Fetch Admin Toggles, Banners & Time
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if (snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // Load Banners & Time
+                            if (adminData.scratch_pass_configs) {
+                                
+                                // 🔥 GET ADMIN CONTROLLED TIME
+                                if (adminData.scratch_pass_configs.ad_timer) { globalAdTimerSeconds = parseInt(adminData.scratch_pass_configs.ad_timer); }
+
+                                if (adminData.scratch_pass_configs.slot1_code && adminData.scratch_pass_configs.active !== false) {
+                                    document.getElementById("adminBannerSlot1").style.display = "flex";
+                                    setAdHTML(document.getElementById("adminBannerSlot1"), adminData.scratch_pass_configs.slot1_code);
+                                } else {
+                                    document.getElementById("adminBannerSlot1").style.display = "none";
+                                }
+                                
+                                if (adminData.scratch_pass_configs.slot2_code && adminData.scratch_pass_configs.active !== false) {
+                                    document.getElementById("adminBannerSlot2").style.display = "flex";
+                                    setAdHTML(document.getElementById("adminBannerSlot2"), adminData.scratch_pass_configs.slot2_code);
+                                } else {
+                                    document.getElementById("adminBannerSlot2").style.display = "none";
+                                }
+                                
+                                if (adminData.scratch_pass_configs.scratch_ad_link) {
+                                    activeAdminSmartlinkUrl = adminData.scratch_pass_configs.scratch_ad_link;
+                                }
+                            } else if (adminData.globalSmartlink) {
+                                activeAdminSmartlinkUrl = adminData.globalSmartlink;
+                            }
+                            
+                            // 🔥 INDEPENDENT TOGGLES (Connected to New Admin Switches)
+                            if (adminData.module_toggles) {
+                                localStorage.setItem("d_toggles", JSON.stringify(adminData.module_toggles));
+                                
+                                isLotterySystemActive = (adminData.module_toggles.mod_lottery_arena === true);
+                                isMarketplaceActive = (adminData.module_toggles.mod_marketplace_arena === true);
+                                
+                                document.getElementById("mod_lottery_arena").style.display = isLotterySystemActive ? 'block' : 'none';
+                                document.getElementById("ticketsSectionContainer").style.display = isLotterySystemActive ? 'flex' : 'none';
+                                document.getElementById("mod_market_header").style.display = isMarketplaceActive ? 'flex' : 'none';
+                                document.getElementById("mod_marketplace_arena").style.display = isMarketplaceActive ? 'flex' : 'none';
+                            }
+                            
+                            // Latest Winner (From scratch_settings)
+                            if (adminData.scratch_settings && adminData.scratch_settings.latest_winner_name) {
+                                document.getElementById("latestWinnerDisplayBlock").style.display = "block";
+                                document.getElementById("lwWinnerNameDisplay").innerText = adminData.scratch_settings.latest_winner_name;
+                                document.getElementById("lwWinnerTicketDisplay").innerText = `Pass: #${adminData.scratch_settings.latest_winner_ticket || 'SE-MEGA'}`;
+                            }
+                        }
+                    });
+
+                    // 3. Check for Jackpot Win (Admin Panel weekly_drop sync)
+                    db.ref('weekly_drop').on('value', snap => {
+                        if(snap.exists()) {
+                            let wDrop = snap.val();
+                            if(wDrop.winner_uid === uid && !localStorage.getItem("ack_jackpot_win")) {
+                                document.getElementById("winnerCoinsYieldDisplay").innerText = `+${wDrop.jackpot_amount || 5000} COINS`;
+                                document.getElementById("lotteryWinnerModalFrame").style.display = "flex";
+                            }
+                        }
+                    });
+
+                    // Fetch Active Passes for User
+                    fetchUserPassesFromFirebase();
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+
             resetScratchModuleLocally();
         });
 
-        // 📡 FETCH USER DATA AND ADMIN CONFIGS (NODE API)
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch User Balance & Active Tickets
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    userCurrentCoinsMaster = userData.user.coins || 0;
-                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                }
-
-                // Fetch Passes (If Node API supports it, otherwise keep local cache or separate route)
-                fetchUserPassesFromBackend();
-
-                // 2. Fetch Admin Toggles, Banners & Winners
-                const confRes = await fetch(`${API_BASE_URL}/app-config/scratch-settings`);
-                const confData = await confRes.json();
-                
-                if (confData.success && confData.settings) {
-                    let s = confData.settings;
-                    
-                    // Display Toggles (Play Store Safety)
-                    isLotterySystemActive = (s.enable_weekly_drop === true);
-                    isMarketplaceActive = (s.enable_marketplace !== false);
-                    
-                    document.getElementById("mod_lottery_arena").style.display = isLotterySystemActive ? 'block' : 'none';
-                    document.getElementById("mod_market_header").style.display = isMarketplaceActive ? 'flex' : 'none';
-                    document.getElementById("mod_marketplace_arena").style.display = isMarketplaceActive ? 'flex' : 'none';
-
-                    if (s.global_smartlink) activeAdminSmartlinkUrl = s.global_smartlink;
-                    
-                    // Banners
-                    if(s.banner_1) document.getElementById("adminBannerSlot1").innerHTML = s.banner_1;
-                    if(s.banner_2) document.getElementById("adminBannerSlot2").innerHTML = s.banner_2;
-
-                    // Latest Winner
-                    if(s.latest_winner_name) {
-                        document.getElementById("latestWinnerDisplayBlock").style.display = "block";
-                        document.getElementById("lwWinnerNameDisplay").innerText = s.latest_winner_name;
-                        document.getElementById("lwWinnerTicketDisplay").innerText = `Pass: #${s.latest_winner_ticket || 'SE-MEGA'}`;
-                    }
-
-                    // Jackpot Check (Did I win?)
-                    if(s.jackpot_winner_uid === uid && !localStorage.getItem("ack_jackpot_win")) {
-                        document.getElementById("winnerCoinsYieldDisplay").innerText = `+${s.jackpot_amount || 5000} COINS`;
-                        document.getElementById("lotteryWinnerModalFrame").style.display = "flex";
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
-        // 🎟️ MOCK USER PASSES (Replace with actual backend route later)
-        async function fetchUserPassesFromBackend() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/active-passes/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if(data.success && isLotterySystemActive) {
-                    renderUserActiveTicketsGrid(data.passes);
+        // 🎟️ MOCK USER PASSES (Pure Firebase Live Fetch)
+        function fetchUserPassesFromFirebase() {
+            db.ref(`users/${uid}/active_passes`).on('value', (snap) => {
+                let passesArray = [];
+                if(snap.exists()) {
+                    snap.forEach(childSnap => { passesArray.push(childSnap.val()); });
                 }
-            } catch(e) {}
+                if(isLotterySystemActive) {
+                    renderUserActiveTicketsGrid(passesArray);
+                } else {
+                    document.getElementById("ticketsSectionContainer").style.display = "none";
+                }
+            });
         }
 
         function renderUserActiveTicketsGrid(passesArray) {
@@ -404,7 +492,7 @@
             const countBadge = document.getElementById("ticketCountBadge");
 
             grid.innerHTML = ""; 
-            if(passesArray && passesArray.length > 0) {
+            if(passesArray && passesArray.length > 0 && isLotterySystemActive) {
                 countBadge.innerText = passesArray.length;
                 passesArray.forEach(item => {
                     let row = document.createElement("div");
@@ -517,7 +605,9 @@
 
         function resetScratchModuleLocally() {
             isScratchedPassed = false;
-            randomCoinsReward = Math.floor(Math.random() * 20) + 1; // Default Free Card Values
+            // Free Daily Card Values (Unless overridden by Marketplace)
+            if(randomCoinsReward === 0) randomCoinsReward = Math.floor(Math.random() * 20) + 1; 
+            
             document.getElementById("rewardCoinsDisplay").innerText = `+ ${randomCoinsReward} COINS`;
 
             const btn = document.getElementById("scratchStatusBtn");
@@ -529,12 +619,17 @@
             initScratchCanvas();
         }
 
-        // 🚀 PLAY STORE SAFE VALIDATION (25s)
+        // 🚀 PLAY STORE SAFE VALIDATION (WITH IN-APP VIEWER)
         let platformTimer = null;
         let countdownTime = 25;
         let targetWindow = null;
         let totalSecondsOpen = 0;
         let isValidationActive = false;
+
+        window.hasMainTabHidden = false; 
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) { window.hasMainTabHidden = true; }
+        });
 
         function triggerSecureVerification() {
             if(isValidationActive) return;
@@ -544,134 +639,191 @@
             btn.disabled = true; 
             let currentLang = localStorage.getItem("selectedLang") || "en";
 
-            countdownTime = 25;
+            countdownTime = globalAdTimerSeconds;
             totalSecondsOpen = 0;
             window.hasMainTabHidden = false; 
             
             let initialWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
             btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
 
-            targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
 
             platformTimer = setInterval(() => {
                 countdownTime--;
                 btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
 
-                if(targetWindow && targetWindow.closed) {
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if(document.hidden) {
                     clearInterval(platformTimer);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
+                    randomCoinsReward = 0; // Reset reward
                     resetScratchModuleLocally();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     isValidationActive = false;
                     return;
                 }
 
-                if(!document.hidden && window.hasMainTabHidden) {
-                    if(totalSecondsOpen < 24) {
-                        clearInterval(platformTimer);
-                        resetScratchModuleLocally();
-                        showCustomAlert("err_invalid");
-                        isValidationActive = false;
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
-
                 if(countdownTime <= 0) {
                     clearInterval(platformTimer);
                     btn.innerText = "PROCESSING...";
-                    executeRewardSyncWithNodeAPI();
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5)
-        async function executeRewardSyncWithNodeAPI() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: randomCoinsReward, 
-                        action: "scratch_card_claim",
-                        syncTask: "t5" // Completes Daily Task 't5'
-                    })
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5) via PURE FIREBASE
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + randomCoinsReward;
+            }).then(() => {
+                
+                // 🔥 Add to Transaction Ledger History
+                db.ref(`users/${uid}/transactions`).push({
+                    action: "scratch_card_win",
+                    amount: randomCoinsReward,
+                    status: "SUCCESSFUL",
+                    details: "Daily Scratch Reward",
+                    timestamp: Date.now()
                 });
                 
-                const data = await res.json();
-                if (data.success) {
-                    userCurrentCoinsMaster = data.newCoins;
-                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
-                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
-                    
-                    showCustomAlert("err_success", `${randomCoinsReward} 🪙`, true);
-                }
-            } catch (err) {
-                alert("Task Verified but couldn't sync with server. Try again.");
-            } finally {
-                resetScratchModuleLocally();
-                isValidationActive = false;
-            }
-        }
-
-        // 🏪 MARKETPLACE PURCHASE (BACKEND VERIFIED)
-        async function executeMarketplacePurchase(tierTypeString, costCoinsInt) {
-            if(userCurrentCoinsMaster < costCoinsInt) { showCustomAlert("nsf_coins"); return; }
-
-            try {
-                const res = await fetch(`${API_BASE_URL}/store/buy-scratch-pass`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid, tier: tierTypeString, cost: costCoinsInt })
+                // Mark Daily Task 't5' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t5")) {
+                        tasks.push("t5");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
                 });
 
-                const data = await res.json();
-                if (data.success) {
-                    userCurrentCoinsMaster = data.newCoins;
-                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
+                showCustomAlert("err_success", `${randomCoinsReward} 🪙`, true);
+                
+            }).catch(() => {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            }).finally(() => {
+                randomCoinsReward = 0; // Reset for next scratch
+                resetScratchModuleLocally();
+                isValidationActive = false;
+            });
+        }
+
+        // 🏪 MARKETPLACE PURCHASE (PURE FIREBASE TRANSACTION WITH ADMIN SYNC)
+        function executeMarketplacePurchase(tierTypeString, costCoinsInt) {
+            if(userCurrentCoinsMaster < costCoinsInt) { showCustomAlert("nsf_coins"); return; }
+
+            // 1. Deduct Entry Fee via Firebase Transaction
+            db.ref(`users/${uid}/coins`).transaction((currentCoins) => {
+                if (currentCoins >= costCoinsInt) {
+                    return currentCoins - costCoinsInt;
+                }
+                return; // Abort if insufficient balance
+            }).then((result) => {
+                if(result.committed) {
                     
+                    // 🔥 Add to Transaction Ledger History
+                    db.ref(`users/${uid}/transactions`).push({
+                        action: `buy_premium_pass_${tierTypeString}`,
+                        amount: -costCoinsInt,
+                        status: "SUCCESSFUL",
+                        details: `Premium Scratch Pass`,
+                        timestamp: Date.now()
+                    });
+
+                    // 🔥 UPDATE ADMIN PANEL METRICS LIVE (Passes Sold Tracking)
+                    db.ref(`marketplace_metrics/passes_sold_${tierTypeString}`).set(firebase.database.ServerValue.increment(1));
+
+                    // Reward Calculation Logic
+                    let rewardGenerated = 0;
+                    if (tierTypeString === 'bronze') rewardGenerated = Math.floor(Math.random() * 250) + 10;
+                    else if (tierTypeString === 'silver') rewardGenerated = Math.floor(Math.random() * 1000) + 50;
+                    else if (tierTypeString === 'gold') rewardGenerated = Math.floor(Math.random() * 2500) + 100;
+
                     // Set New Target Value Locally
                     isScratchedPassed = false;
-                    randomCoinsReward = data.rewardValue; 
+                    randomCoinsReward = rewardGenerated; 
                     document.getElementById("rewardCoinsDisplay").innerText = `+ ${randomCoinsReward} COINS`;
 
                     initScratchCanvas();
                     showCustomAlert("buy_success", "", true);
+                    
+                    // Scroll to Top to Scratch
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
-                    showCustomAlert("nsf_coins");
+                    throw new Error("Insufficient Coins");
                 }
-            } catch (err) {
-                alert("Server connection failed.");
-            }
+            }).catch((err) => {
+                showCustomAlert("nsf_coins");
+            });
         }
 
-        // 🎟️ WEEKLY ENTRY PASS (BACKEND VERIFIED)
-        async function executeBuyWeeklyLotteryTicket(ticketPriceCoins) {
+        // 🎟️ WEEKLY ENTRY PASS (ADMIN PANEL LOTTERY SYNC)
+        function executeBuyWeeklyLotteryTicket(ticketPriceCoins) {
             if(userCurrentCoinsMaster < ticketPriceCoins) { showCustomAlert("nsf_coins"); return; }
             
-            try {
-                const res = await fetch(`${API_BASE_URL}/store/buy-weekly-pass`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid, cost: ticketPriceCoins })
-                });
-
-                const data = await res.json();
-                if (data.success) {
-                    userCurrentCoinsMaster = data.newCoins;
-                    document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
-                    
-                    alert(`🎟️ Entry Pass Unlocked Successfully!\n\nPass No: ${data.ticketId}\nValidity: Coming Sunday 11:59 PM.`);
-                    fetchUserPassesFromBackend(); // Refresh Grid
+            // 1. Deduct Entry Fee via Firebase Transaction
+            db.ref(`users/${uid}/coins`).transaction((currentCoins) => {
+                if (currentCoins >= ticketPriceCoins) {
+                    return currentCoins - ticketPriceCoins;
                 }
-            } catch(e) {
-                alert("Server error processing pass.");
-            }
+                return; // Abort if insufficient balance
+            }).then((result) => {
+                if(result.committed) {
+                    // Generate Ticket ID
+                    let tId = "DUDO-" + Math.floor(Math.random() * 900000 + 100000);
+                    
+                    // 🔥 2. Add to User's Active Passes
+                    let p1 = db.ref(`users/${uid}/active_passes/${tId}`).set({
+                        ticket_id: tId,
+                        purchased_at: firebase.database.ServerValue.TIMESTAMP,
+                        valid_until: "Sunday"
+                    });
+
+                    // 🔥 3. Sync with Admin Panel Lottery Bids Tracker
+                    let p2 = db.ref(`lottery_bids_tracker/${tId}`).set({
+                        uid: uid,
+                        ticket_id: tId,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    // 🔥 4. Increment Admin Panel Global Passes Count
+                    let p3 = db.ref(`weekly_drop/global_passes_count`).set(firebase.database.ServerValue.increment(1));
+
+                    // 🔥 5. Add to Transaction Ledger History
+                    let p4 = db.ref(`users/${uid}/transactions`).push({
+                        action: "buy_lottery_pass",
+                        amount: -ticketPriceCoins,
+                        status: "SUCCESSFUL",
+                        details: `Lottery Pass: #${tId}`,
+                        timestamp: Date.now()
+                    });
+
+                    return Promise.all([p1, p2, p3, p4]).then(() => tId);
+                } else {
+                    throw new Error("Insufficient Coins");
+                }
+            }).then((ticketId) => {
+                alert(`🎟️ Entry Pass Unlocked Successfully!\n\nPass No: ${ticketId}\nValidity: Coming Sunday 11:59 PM.`);
+                // Active tickets grid will auto-update via the .on('value') listener
+            }).catch((err) => {
+                showCustomAlert("nsf_coins");
+            });
         }
 
         // 🏆 CLAIM JACKPOT WIN
-        async function executeClaimJackpotPoolCredits() {
+        function executeClaimJackpotPoolCredits() {
             document.getElementById("lotteryWinnerModalFrame").style.display = "none";
             localStorage.setItem("ack_jackpot_win", "true");
             alert(`🔥 Reward Synchronized! Check your balance.`);

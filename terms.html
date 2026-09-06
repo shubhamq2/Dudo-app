@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Dudo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-base: #060913; 
+            --bg-card: #0d1527; 
+            --cyber-cyan: #06b6d4; 
+            --cyber-purple: #d946ef; 
+            --cyber-red: #f43f5e;
+            --text-glow: #f8fafc; 
+            --text-dim: #94a3b8; 
+            --border-neon: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-base); 
+            color: var(--text-dim); 
+            line-height: 1.6; 
+            overflow-x: hidden;
+        }
+
+        /* 🔵 Header Setup */
+        .page-header {
+            background: rgba(13, 21, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--cyber-cyan);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .back-btn {
+            color: var(--cyber-cyan);
+            text-decoration: none;
+            font-size: 20px;
+            margin-right: 15px;
+            transition: 0.3s;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 📜 Content Container */
+        .content-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 25px 20px;
+        }
+
+        .last-updated {
+            font-size: 12px;
+            color: var(--cyber-cyan);
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: inline-block;
+            background: rgba(6, 182, 212, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        /* 📑 Sections */
+        .tos-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-neon);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+        
+        .tos-section:hover {
+            border-color: rgba(217, 70, 239, 0.4);
+            box-shadow: 0 6px 20px rgba(217, 70, 239, 0.05);
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-glow);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px dashed var(--border-neon);
+            padding-bottom: 10px;
+        }
+
+        .section-title i {
+            color: var(--cyber-purple);
+            font-size: 18px;
+        }
+
+        .tos-text {
+            font-size: 13px;
+            font-weight: 500;
+            text-align: justify;
+        }
+
+        /* 🚨 Strict Rule Alert Box */
+        .alert-box {
+            background: linear-gradient(145deg, rgba(244, 63, 94, 0.1), transparent);
+            border-left: 4px solid var(--cyber-red);
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+            margin: 15px 0;
+        }
+
+        .alert-title {
+            color: var(--cyber-red);
+            font-weight: 800;
+            font-size: 13px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .alert-text {
+            color: #fca5a5;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+        
+        li strong {
+            color: var(--text-glow);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--border-neon); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--cyber-purple); }
+
+    </style>
+</head>
+<body>
+
+    <header class="page-header">
+        <a href="index.html" class="back-btn" onclick="history.back(); return false;"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="header-title">Terms of Service</div>
+    </header>
+
+    <div class="content-container">
+        
+        <div class="last-updated"><i class="fa-solid fa-clock"></i> Last Updated: August 2026</div>
+
+        <p style="font-size: 13px; margin-bottom: 25px;">Welcome to Dudo! By downloading, installing, or using our application, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please do not use the application.</p>
+
+        <!-- Section 1: User Accounts -->
+        <div class="tos-section">
+            <div class="section-title"><i class="fa-solid fa-user-shield"></i> 1. Account & Eligibility</div>
+            <div class="tos-text">
+                <ul>
+                    <li>You must be at least <strong>13 years old</strong> to use this application. If you are under 18, you must have parental consent.</li>
+                    <li>Only <strong>one account per real person</strong> and <strong>one account per device</strong> is strictly allowed.</li>
+                    <li>You are responsible for maintaining the security of your account and password. The administration is not liable for lost accounts.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 2: Anti-Fraud (CRITICAL FOR PLAY STORE) -->
+        <div class="tos-section" style="border-color: rgba(244, 63, 94, 0.4);">
+            <div class="section-title"><i class="fa-solid fa-ban" style="color: var(--cyber-red);"></i> 2. Anti-Fraud & Prohibited Activities</div>
+            <div class="tos-text">
+                To maintain a fair ecosystem for all users and our advertising partners, the following actions are strictly prohibited and will result in an <strong>immediate permanent ban</strong> without payout:
+                
+                <div class="alert-box">
+                    <div class="alert-title">Zero Tolerance Policy</div>
+                    <div class="alert-text">
+                        • Use of VPNs, Proxies, or Fake IPs.<br>
+                        • Using Emulators, Virtual Machines, or Rooted/Jailbroken devices.<br>
+                        • Utilizing Auto-clickers, bots, scripts, or any automated manipulation.<br>
+                        • Creating multiple accounts on a single device or exploiting referral systems.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Virtual Currency -->
+        <div class="tos-section">
+            <div class="section-title"><i class="fa-solid fa-coins" style="color: var(--cyber-orange);"></i> 3. Virtual Currency (Coins)</div>
+            <div class="tos-text">
+                <ul>
+                    <li>The "Coins" earned within the app are <strong>virtual digital items</strong> and hold no real-world value outside the app until formally redeemed through official payout channels.</li>
+                    <li>Coins are non-transferable between users and cannot be purchased with real money.</li>
+                    <li>We reserve the right to modify the value, exchange rates, and availability of Coins at any time without prior notice.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 4: Payouts & Rewards -->
+        <div class="tos-section">
+            <div class="section-title"><i class="fa-solid fa-wallet" style="color: var(--cyber-green);"></i> 4. Payouts & Verification</div>
+            <div class="tos-text">
+                <ul>
+                    <li>All payout requests are subject to a <strong>manual and automated security audit</strong> to verify task completion and compliance with our Anti-Fraud policy.</li>
+                    <li>Verification and processing may take up to 24-72 business hours.</li>
+                    <li>If our fraud detection system flags an account during the withdrawal process, the request will be declined, and the account may be suspended.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 5: Termination -->
+        <div class="tos-section">
+            <div class="section-title"><i class="fa-solid fa-gavel"></i> 5. Account Termination</div>
+            <div class="tos-text">
+                The Administration reserves the absolute right to suspend, terminate, or restrict your access to the app at any time, for any reason, including but not limited to violations of these Terms. Upon termination, all accumulated Coins and pending rewards will be permanently forfeited.
+            </div>
+        </div>
+
+        <!-- Section 6: Disclaimer -->
+        <div class="tos-section">
+            <div class="section-title"><i class="fa-solid fa-circle-exclamation"></i> 6. Disclaimer of Warranties</div>
+            <div class="tos-text">
+                The App is provided on an "AS IS" and "AS AVAILABLE" basis. We do not guarantee that the app will always be safe, secure, or error-free. We hold no liability for third-party offerwalls, missing ad rewards, or payment gateway delays.
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; margin-bottom: 20px;">
+            <p style="font-size: 11px; color: var(--text-dim);">By continuing to use the App, you acknowledge that you have read, understood, and agree to be bound by these terms.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>

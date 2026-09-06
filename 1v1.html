@@ -3,98 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Point Battles - Dudo</title>
-    
+    <title>1v1 Battle Arena - Dudo</title>
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
-            --bg-dark: #0b0f19;
-            --card-bg: rgba(30, 41, 59, 0.85);
-            --primary-blue: #3b82f6;
-            --accent-cyan: #06b6d4;
-            --accent-green: #10b981;
-            --accent-gold: #fbbf24;
-            --accent-pink: #ef4444;
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 30, 49, 0.85);
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-glow: rgba(59, 130, 246, 0.18);
         }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.1) 0%, transparent 60%);
-            margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #fff; min-height: 100vh; 
-        }
-        
-        /* Premium Corporate Header */
-        .header { 
-            width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; 
-            box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(239, 68, 68, 0.3); backdrop-filter: blur(10px);
-        }
-        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-pink); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); transition: 0.2s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 60%); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* HEADER */
+        .header { background: rgba(15, 23, 42, 0.9); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 10; backdrop-filter: blur(12px); }
+        .back-btn { color: var(--danger); text-decoration: none; font-size: 20px; font-weight: bold; padding: 5px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); transition: 0.2s; }
         .back-btn:active { transform: scale(0.9); }
-        .header h2 { margin: 0; font-size: 18px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; letter-spacing: 0.5px; }
+        .title { margin: 0; font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fff; flex-grow: 1; text-align: center; }
         
-        /* Language Dropdown */
-        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: var(--primary); font-weight: bold; cursor: pointer; }
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; transition: 0.3s; }
+        
+        .wallet-box { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px; font-weight: 800; color: var(--success); display: flex; align-items: center; gap: 6px; font-size: 14px; margin-right: 10px; }
 
-        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
+        .main-container { flex: 1; overflow-y: auto; padding: 20px; position: relative; max-width: 440px; width: 100%; margin: 0 auto; box-sizing: border-box; }
 
-        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 18px; box-sizing: border-box; }
+        /* ADMIN BANNER SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(255,255,255,0.15); margin-bottom: 15px; }
 
-        /* Profile Balance Ribbon */
-        .balance-card { 
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9)); 
-            border: 1px solid rgba(239, 68, 68, 0.4); padding: 15px 20px; border-radius: 16px; 
-            display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; 
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15); backdrop-filter: blur(8px);
-        }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; font-size: 18px; }
+        /* LOBBY SCREEN */
+        #lobbyScreen { display: flex; flex-direction: column; gap: 15px; }
+        .arena-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border-glow); position: relative; overflow: hidden; backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        .arena-title { font-size: 20px; font-weight: 900; margin: 0 0 5px 0; color: #fff; }
+        .arena-desc { font-size: 12.5px; color: var(--text-muted); margin: 0 0 20px 0; line-height: 1.4; }
+        
+        .battle-tier { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; transition: 0.2s; }
+        .battle-tier:active { transform: scale(0.98); border-color: var(--primary); }
+        .tier-info h4 { margin: 0 0 4px 0; font-size: 15px; color: #fff; font-weight: 800; }
+        .tier-info p { margin: 0; font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+        .win-amt { color: var(--warning); font-weight: 900; }
+        .play-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); text-transform: uppercase; }
 
-        /* 📢 PROMO DISPLAY SLOTS */
-        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(30, 41, 59, 0.5); border-radius: 14px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(239, 68, 68, 0.3); box-sizing: border-box; }
+        /* MATCHMAKING SCREEN */
+        #matchmakingScreen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+        .radar-animation { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--primary); border-top-color: transparent; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .finding-text { font-size: 16px; font-weight: 800; color: var(--primary); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* Matchmaking / Battle Arena Card */
-        .battle-card { background: var(--card-bg); border-radius: 24px; padding: 25px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); position: relative; overflow: hidden; }
-        .battle-card::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--accent-pink), transparent); }
+        /* BATTLE SCREEN */
+        #battleScreen { display: none; flex-direction: column; height: 100%; justify-content: space-between; padding-bottom: 20px; box-sizing: border-box; }
+        
+        .versus-header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px; border-radius: 16px; border: 1px solid var(--border-glow); }
+        .player-box { text-align: center; width: 40%; }
+        .player-avatar { width: 55px; height: 55px; background: #0f172a; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 5px; border: 2px solid var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.3); overflow: hidden;}
+        .opponent-avatar { border-color: var(--danger); box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+        .player-name { font-size: 12px; font-weight: 800; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .vs-badge { font-size: 20px; font-weight: 900; color: var(--warning); font-style: italic; }
 
+        .battle-arena { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .choice-display { display: flex; justify-content: space-between; width: 100%; padding: 0 30px; box-sizing: border-box; }
+        .move-icon { font-size: 55px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); transition: 0.3s; }
+        #oppMove { transform: scaleX(-1); }
+        .timer { font-size: 38px; font-weight: 900; color: #fff; position: absolute; text-shadow: 0 0 15px rgba(255,255,255,0.5); }
+
+        .controls { display: flex; justify-content: center; gap: 15px; background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid var(--border-glow); }
+        .action-btn { background: rgba(51, 65, 85, 0.5); border: 2px solid #475569; border-radius: 50%; width: 65px; height: 65px; font-size: 30px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .action-btn:active { transform: scale(0.9); }
+        .action-btn.selected { border-color: var(--primary); background: rgba(59, 130, 246, 0.25); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .action-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+        /* RESULT MODAL */
+        .result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
+        .result-card { background: var(--card-bg); width: 100%; max-width: 320px; border-radius: 20px; padding: 30px 20px; text-align: center; border: 2px solid var(--primary); box-shadow: 0 0 35px rgba(59, 130, 246, 0.3); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        
+        #resIcon { font-size: 55px; margin-bottom: 8px; }
+        #resTitle { font-size: 22px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; }
+        #resMsg { font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; font-weight: 600; }
+        .res-btn { background: linear-gradient(135deg, var(--primary), #2563eb); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+
+        #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
+        
         /* Dynamic Entry Fee Controls */
-        .bet-adjuster { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 18px 0; background: rgba(15, 23, 42, 0.8); padding: 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); }
-        .bet-btn { background: #334155; border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .bet-btn:active { background: var(--accent-pink); transform: scale(0.9); }
-        .bet-amount { font-size: 24px; font-weight: 900; color: var(--accent-gold); width: 90px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+        .fee-adjuster { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 18px 0; background: rgba(15, 23, 42, 0.8); padding: 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); }
+        .fee-btn { background: #334155; border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .fee-btn:active { background: var(--accent-pink); transform: scale(0.9); }
+        .fee-amount { font-size: 24px; font-weight: 900; color: var(--accent-gold); width: 90px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
 
         /* 1v1 Matching Display Layout */
         .vs-container { display: flex; justify-content: space-around; align-items: center; margin: 30px 0; position: relative; }
         .player-node { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 40%; }
+        
+        /* 🔥 Smart Avatar Frame */
         .avatar-frame { width: 75px; height: 75px; border-radius: 50%; background: #0f172a; border: 3px solid #64748b; display: flex; justify-content: center; align-items: center; font-size: 35px; box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: 0.3s; overflow: hidden; }
-        .player-node.user-side .avatar-frame { border-color: var(--primary-blue); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-        .player-node.opponent-side .avatar-frame { border-color: var(--accent-pink); box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+        
+        .player-node.user-side .avatar-frame { border-color: var(--primary); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        .player-node.opponent-side .avatar-frame { border-color: var(--danger); box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
         .p-name { font-size: 14px; font-weight: 800; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
-        .vs-badge { font-size: 24px; font-weight: 900; color: var(--accent-gold); font-style: italic; background: #0f172a; padding: 8px 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
-
+        
         /* Action Launch Button */
-        .action-battle-btn { width: 100%; background: linear-gradient(135deg, var(--accent-pink), #991b1b); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4); text-transform: uppercase; transition: 0.2s; letter-spacing: 1px; }
+        .action-battle-btn { width: 100%; background: linear-gradient(135deg, var(--danger), #991b1b); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4); text-transform: uppercase; transition: 0.2s; letter-spacing: 1px; }
         .action-battle-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
         .action-battle-btn:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
         /* Interactive Gameplay Area */
         .gameplay-terminal { display: none; background: rgba(15, 23, 42, 0.95); border-radius: 20px; padding: 25px; border: 2px solid var(--accent-gold); margin-top: 20px; text-align: center; box-shadow: 0 0 30px rgba(251, 191, 36, 0.15); animation: popIn 0.4s ease-out; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
         .game-target-box { background: rgba(30, 41, 59, 0.8); border-radius: 14px; padding: 20px; font-size: 26px; font-weight: 900; margin-bottom: 20px; color: var(--accent-gold); letter-spacing: 2px; border: 1px solid rgba(255,255,255,0.05); }
         
         /* Grid Buttons Option Layout */
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .opt-btn { background: rgba(30, 41, 59, 0.9); border: 2px solid #334155; padding: 20px; border-radius: 14px; color: #fff; font-size: 22px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .opt-btn:active { background: var(--primary-blue); border-color: #60a5fa; transform: scale(0.95); }
+        .opt-btn:active { background: var(--primary); border-color: #60a5fa; transform: scale(0.95); }
 
         .battle-pool-badge { background: rgba(250, 204, 21, 0.15); border: 1px solid rgba(250, 204, 21, 0.3); color: var(--accent-gold); padding: 8px 20px; border-radius: 50px; font-size: 14px; font-weight: 900; display: inline-block; margin-bottom: 8px; letter-spacing: 0.5px; }
 
-        /* Modals & Overlays */
-        #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-cyan); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--danger); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -102,108 +145,119 @@
     <!-- 🌐 OFFLINE SCREEN -->
     <div id="globalOfflineWarningOverlay">
         <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
-        <h2 style="color: var(--accent-pink); font-size: 20px; font-weight: 900; text-transform: uppercase;">No Internet Connection</h2>
-        <p style="color: #94a3b8; font-size: 13px; margin: 10px 0 20px 0;">Please enable Mobile Data or Wi-Fi to continue.</p>
-        <button onclick="window.location.reload()" style="background: var(--accent-pink); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;">Retry Connection</button>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;">Retry Connection</button>
     </div>
 
-    <!-- 👑 Header -->
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Secure Ad Task</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode is ON for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
+    <!-- HEADER -->
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-        <h2 data-i18n="cb_title">Point Battles</h2>
+        <h2 class="title" data-i18n="arena_title">Arena</h2>
         
         <div class="header-controls">
+            <div class="wallet-box">🪙 <span id="userBalance">0</span></div>
             <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
                 <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
                 <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
                 <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
                 <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option><option value="ru">RU</option>
             </select>
-
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
         </div>
     </div>
 
     <div class="main-container">
-
-        <div class="balance-card">
-            <span data-i18n="cb_wallet" style="color: #cbd5e1;">Available Points</span>
-            <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
-        </div>
         
-        <!-- 📢 Admin Dynamic Promo Banner Slot 1 -->
-        <div class="ad-banner-slot" id="battleAdSlot1">  <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <!-- Admin Dynamic Banner Slot 1 -->
+        <div class="ad-banner-slot" id="battleAdSlot1"></div>
 
-        <div class="battle-card">
-            <div class="battle-pool-badge" id="poolPrizeBadge">🏆 REWARD: 40 POINTS</div>
-            <p style="margin: 0; font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.5;" data-i18n="cb_desc">Set your Entry Fee. Fast tap the highest number block to beat your opponent. Minimizing app cancels the match!</p>
+        <!-- LOBBY SCREEN -->
+        <div id="lobbyScreen">
+            <div class="arena-card">
+                <div class="battle-pool-badge" id="poolPrizeBadge">🏆 REWARD POOL: 40 POINTS</div>
+                <p style="margin: 0; font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.5;" data-i18n="cb_desc">Set your Entry Fee. Fast tap the highest number block to beat your opponent. Minimizing app cancels the match!</p>
 
-            <!-- Dynamic Entry Fee Form Controls -->
-            <div class="bet-adjuster">
-                <button class="bet-btn" onclick="adjustEntryFee(-10)">-</button>
-                <div class="bet-amount"><span id="currentBetEntryTxt">20</span><span style="font-size: 12px;"> 🪙</span></div>
-                <button class="bet-btn" onclick="adjustEntryFee(10)">+</button>
-            </div>
-
-            <!-- 1v1 Node Arena Setup -->
-            <div class="vs-container">
-                <div class="player-node user-side">
-                    <!-- 👤 Dynamic Arena Avatar -->
-                    <div class="avatar-frame" id="myAvatar">👤</div>
-                    <span class="p-name" id="userNameTxt">Loading...</span>
+                <!-- Dynamic Entry Fee Form Controls -->
+                <div class="fee-adjuster">
+                    <button class="fee-btn" onclick="adjustEntryFee(-10)">-</button>
+                    <div class="fee-amount"><span id="currentFeeEntryTxt">20</span><span style="font-size: 12px;"> 🪙</span></div>
+                    <button class="fee-btn" onclick="adjustEntryFee(10)">+</button>
                 </div>
-                
-                <div class="vs-badge">VS</div>
 
-                <div class="player-node opponent-side">
-                    <div class="avatar-frame" id="oppAvatar">?</div>
-                    <span class="p-name" id="oppNameTxt" data-i18n="cb_searching">Searching...</span>
+                <!-- 1v1 Node Arena Setup -->
+                <div class="vs-container">
+                    <div class="player-node user-side">
+                        <div class="avatar-frame" id="myAvatar">👤</div>
+                        <span class="p-name" id="userNameTxt">Loading...</span>
+                    </div>
+                    
+                    <div class="vs-badge">VS</div>
+
+                    <div class="player-node opponent-side">
+                        <div class="avatar-frame" id="oppAvatar">?</div>
+                        <span class="p-name" id="oppNameTxt" data-i18n="cb_searching">Searching...</span>
+                    </div>
                 </div>
-            </div>
 
-            <button class="action-battle-btn" id="findMatchBtn" onclick="executeStartMatchmakingLoop()" data-i18n="cb_btn_find">Find Challenger ⚔️</button>
+                <button class="action-battle-btn" id="findMatchBtn" onclick="executeStartMatchmakingLoop()" data-i18n="cb_btn_find">Find Challenger ⚔️</button>
 
-            <!-- 🔥 Live Gameplay Module Window -->
-            <div class="gameplay-terminal" id="gameplayPanelBox">
-                <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 8px; font-weight: 800; letter-spacing: 1px;" data-i18n="cb_question">WHICH NUMBER IS HIGHEST?</div>
-                <div class="game-target-box" id="gameMetricsQuestionDisplay">0 vs 0</div>
-                
-                <div class="options-grid">
-                    <button class="opt-btn" id="optLeftBtn" onclick="executeSubmitGameAction('left')">0</button>
-                    <button class="opt-btn" id="optRightBtn" onclick="executeSubmitGameAction('right')">0</button>
+                <!-- 🔥 Live Gameplay Module Window -->
+                <div class="gameplay-terminal" id="gameplayPanelBox">
+                    <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 8px; font-weight: 800; letter-spacing: 1px;" data-i18n="cb_question">WHICH NUMBER IS HIGHEST?</div>
+                    <div class="game-target-box" id="gameMetricsQuestionDisplay">0 vs 0</div>
+                    
+                    <div class="options-grid">
+                        <button class="opt-btn" id="optLeftBtn" onclick="executeSubmitGameAction('left')">0</button>
+                        <button class="opt-btn" id="optRightBtn" onclick="executeSubmitGameAction('right')">0</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 📢 Admin Dynamic Promo Banner Slot 2 -->
-        <div class="ad-banner-slot" id="battleAdSlot2">  <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <!-- Admin Dynamic Promo Banner Slot 2 -->
+        <div class="ad-banner-slot" id="battleAdSlot2"></div>
 
     </div>
 
-    <!-- 🟢 PURE NODE.JS API SERVER SCRIPT (With Sync Profile Feature) -->
+    <!-- 🟢 PURE FIREBASE ENGINE (With Avatar Sync & Admin Ads) -->
     <script>
-        // 🌐 ADMIN CONTROLLED SERVER LINK
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
         
         let adPartnerLink = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
+        
+        // 🔥 ADMIN CONTROLS VARIABLES 🔥
+        let globalAdTimerSeconds = 25; // Default time
+        let globalWinMultiplier = 2;   // Default coins multiplier (20 lgao 40 pao)
 
         // PLAY STORE COMPLIANT TRANSLATIONS (13+ Languages)
         const langData = {
             "en": { "cb_title": "Point Battles", "cb_wallet": "Available Points", "cb_desc": "Set your Entry Fee. Fast tap the highest number block to beat your opponent. Minimizing app cancels the match!", "cb_searching": "Searching...", "cb_btn_find": "Find Challenger ⚔️", "cb_question": "WHICH NUMBER IS HIGHEST?", "cb_connecting": "Connecting Matchmaking...", "cb_active": "Battle Active! 🎯" },
-            "hi": { "cb_title": "पॉइंट बैटल", "cb_wallet": "उपलब्ध पॉइंट्स", "cb_desc": "एंट्री फीस सेट करें। विरोधी को हराने के लिए सबसे बड़े नंबर पर जल्दी टैप करें। ऐप मिनिमाइज़ करने पर मैच रद्द हो जाएगा!", "cb_searching": "खोज रहे हैं...", "cb_btn_find": "चैलेंजर खोजें ⚔️", "cb_question": "कौन सा नंबर बड़ा है?", "cb_connecting": "कनेक्ट हो रहा है...", "cb_active": "बैटल शुरू! 🎯" },
-            "bn": { "cb_title": "পয়েন্ট ব্যাটল", "cb_wallet": "পয়েন্ট ব্যালেন্স", "cb_desc": "আপনার এন্ট্রি ফি সেট করুন। প্রতিপক্ষকে হারাতে সবচেয়ে বড় নম্বরে দ্রুত ট্যাপ করুন।", "cb_searching": "খুঁজছি...", "cb_btn_find": "প্রতিপক্ষ খুঁজুন ⚔️", "cb_question": "কোন নম্বরটি বড়?", "cb_connecting": "কানেক্ট হচ্ছে...", "cb_active": "ব্যাটল শুরু! 🎯" },
-            "te": { "cb_title": "పాయింట్ బ్యాటిల్స్", "cb_wallet": "లభ్యమైన పాయింట్లు", "cb_desc": "మీ ఎంట్రీ ఫీజు సెట్ చేయండి. ప్రత్యర్థిని ఓడించడానికి పెద్ద సంఖ్యను త్వరగా నొక్కండి.", "cb_searching": "వెతుకుతోంది...", "cb_btn_find": "ప్రత్యర్థిని కనుగొనండి ⚔️", "cb_question": "ఏ సంఖ్య పెద్దది?", "cb_connecting": "కనెక్ట్ అవుతోంది...", "cb_active": "యుద్ధం ప్రారంభమైంది! 🎯" },
-            "mr": { "cb_title": "पॉइंट बॅटल्स", "cb_wallet": "उपलब्ध पॉइंट्स", "cb_desc": "प्रवेश शुल्क निश्चित करा. प्रतिस्पर्ध्याला हरवण्यासाठी मोठ्या संख्येवर वेगाने टॅप करा.", "cb_searching": "शोधत आहे...", "cb_btn_find": "प्रतिस्पर्धी शोधा ⚔️", "cb_question": "कोणती संख्या मोठी आहे?", "cb_connecting": "कनेक्ट करत आहे...", "cb_active": "बॅटल सुरू! 🎯" },
-            "ta": { "cb_title": "புள்ளி போர்கள்", "cb_wallet": "கிடைக்கக்கூடிய புள்ளிகள்", "cb_desc": "நுழைவு கட்டணத்தை அமைக்கவும். பெரிய எண்ணை வேகமாக தட்டவும்.", "cb_searching": "தேடுகிறது...", "cb_btn_find": "எதிரியைத் தேடு ⚔️", "cb_question": "எந்த எண் பெரியது?", "cb_connecting": "இணைக்கிறது...", "cb_active": "போர் ஆரம்பம்! 🎯" },
-            "ur": { "cb_title": "پوائنٹ بیٹل", "cb_wallet": "دستیاب پوائنٹس", "cb_desc": "اپنی انٹری فیس مقرر کریں۔ مخالف کو ہرانے کے لیے سب سے بڑے نمبر پر تیزی سے ٹیپ کریں۔", "cb_searching": "تلاش کر رہا ہے...", "cb_btn_find": "مخالف تلاش کریں ⚔️", "cb_question": "کون سا نمبر بڑا ہے؟", "cb_connecting": "جڑ رہا ہے...", "cb_active": "جنگ شروع! 🎯" },
-            "gu": { "cb_title": "પોઇન્ટ બેટલ્સ", "cb_wallet": "ઉપલબ્ધ પોઇન્ટ્સ", "cb_desc": "તમારી એન્ટ્રી ફી સેટ કરો. સૌથી મોટી સંખ્યા પર ઝડપથી ટેપ કરો.", "cb_searching": "શોધી રહ્યા છીએ...", "cb_btn_find": "વિરોધી શોધો ⚔️", "cb_question": "કયો નંબર મોટો છે?", "cb_connecting": "કનેક્ટ થઈ રહ્યું છે...", "cb_active": "યુદ્ધ શરૂ! 🎯" },
-            "es": { "cb_title": "Batallas de Puntos", "cb_wallet": "Puntos Disponibles", "cb_desc": "Establece tu cuota de entrada. Toca rápido el número mayor.", "cb_searching": "Buscando...", "cb_btn_find": "Buscar Oponente ⚔️", "cb_question": "¿QUÉ NÚMERO ES MAYOR?", "cb_connecting": "Conectando...", "cb_active": "¡Batalla Activa! 🎯" },
-            "fr": { "cb_title": "Batailles de Points", "cb_wallet": "Points Disponibles", "cb_desc": "Fixez vos frais d'entrée. Appuyez rapidement sur le chiffre le plus élevé.", "cb_searching": "Recherche...", "cb_btn_find": "Trouver un adversaire ⚔️", "cb_question": "QUEL EST LE PLUS GRAND NOMBRE ?", "cb_connecting": "Connexion...", "cb_active": "Bataille Active! 🎯" },
-            "ar": { "cb_title": "معارك النقاط", "cb_wallet": "النقاط المتاحة", "cb_desc": "حدد رسوم الدخول الخاصة بك. انقر بسرعة على الرقم الأكبر.", "cb_searching": "جارٍ البحث...", "cb_btn_find": "ابحث عن الخصم ⚔️", "cb_question": "أي رقم هو الأكبر؟", "cb_connecting": "جارٍ الاتصال...", "cb_active": "بدأت المعركة! 🎯" },
-            "pt": { "cb_title": "Batalhas de Pontos", "cb_wallet": "Pontos Disponíveis", "cb_desc": "Defina sua taxa de entrada. Toque rápido no número maior.", "cb_searching": "Procurando...", "cb_btn_find": "Encontrar Oponente ⚔️", "cb_question": "QUAL NÚMERO É MAIOR?", "cb_connecting": "Conectando...", "cb_active": "Batalha Ativa! 🎯" },
-            "ru": { "cb_title": "Битвы за очки", "cb_wallet": "Доступные очки", "cb_desc": "Установите вступительный взнос. Быстро нажмите на большее число.", "cb_searching": "Поиск...", "cb_btn_find": "Найти соперника ⚔️", "cb_question": "КАКОЕ ЧИСЛО БОЛЬШЕ?", "cb_connecting": "Подключение...", "cb_active": "Битва началась! 🎯" }
+            "hi": { "cb_title": "पॉइंट बैटल", "cb_wallet": "उपलब्ध पॉइंट्स", "cb_desc": "एंट्री फीस सेट करें। विरोधी को हराने के लिए सबसे बड़े नंबर पर जल्दी टैप करें। ऐप मिनिमाइज़ करने पर मैच रद्द हो जाएगा!", "cb_searching": "खोज रहे हैं...", "cb_btn_find": "चैलेंजर खोजें ⚔️", "cb_question": "कौन सा नंबर बड़ा है?", "cb_connecting": "कनेक्ट हो रहा है...", "cb_active": "बैटल शुरू! 🎯" }
         };
 
         function changeLanguage(langCode) {
@@ -216,17 +270,24 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+
         // Check Network Status
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
         window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-        let userName = localStorage.getItem("userName") || "Player";
-
         let currentWalletCoinsBalance = 0;
         let leftValueInt = 0, rightValueInt = 0, mathematicallyCorrectAnswerStr = "";
-        let currentBetAmount = 20; 
+        let currentFeeAmount = 20; 
         let isBattleActive = false;
 
         const systemOpponentNamesList = ["AlphaPro", "Challenger_99", "ShadowPlayer", "BulletCheck", "MatrixVoid", "Zenith", "Rahul_Pro", "Aman_Win", "Neha_Gamer", "Vikram2024"];
@@ -235,70 +296,95 @@
         document.addEventListener("DOMContentLoaded", () => {
             if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
             
+            // 🌐 SYNC LANGUAGE FROM HOME PAGE
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            if(!uid) { window.location.href = "index.html"; return; }
-            
-            fetchUserProfileAndConfig();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const uid = user.uid;
+                    
+                    // 📡 1. FETCH USER PROFILE & SMART AVATAR SYNC
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            currentWalletCoinsBalance = data.coins || 0;
+                            document.getElementById("userBalance").innerText = currentWalletCoinsBalance;
+                            
+                            let userName = data.name || "Player";
+                            document.getElementById("userNameTxt").innerText = userName;
+                            
+                            // 🔥 SMART AVATAR LOGIC
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            document.getElementById("headerProfileIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            document.getElementById("myAvatar").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                        }
+                    });
+
+                    // 📡 2. FETCH ADMIN BANNERS, REWARD LINK & DYNAMIC VARIABLES
+                    db.ref('global_system_runtime_configurations/1v1').on('value', (snap) => {
+                        if (snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // Load Post Match Ad Link
+                            if (adminData.battle_link && adminData.battle_link.trim() !== "") {
+                                adPartnerLink = adminData.battle_link;
+                            }
+                            
+                            // 🔥 Fetch Admin Timer & Multiplier 🔥
+                            if (adminData.ad_timer) {
+                                globalAdTimerSeconds = parseInt(adminData.ad_timer);
+                            }
+                            if (adminData.win_multiplier) {
+                                globalWinMultiplier = parseFloat(adminData.win_multiplier);
+                            }
+                            // Update badge live
+                            adjustEntryFee(0);
+                            
+                            // Load Banner Slot 1
+                            if (adminData.slot1_code && adminData.active !== false) {
+                                document.getElementById("battleAdSlot1").style.display = "flex";
+                                setAdHTML(document.getElementById("battleAdSlot1"), adminData.slot1_code);
+                            } else {
+                                document.getElementById("battleAdSlot1").style.display = "none";
+                            }
+                            
+                            // Load Banner Slot 2
+                            if (adminData.slot2_code && adminData.active !== false) {
+                                document.getElementById("battleAdSlot2").style.display = "flex";
+                                setAdHTML(document.getElementById("battleAdSlot2"), adminData.slot2_code);
+                            } else {
+                                document.getElementById("battleAdSlot2").style.display = "none";
+                            }
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
-
-        // 📡 FETCH DATA FROM NODE.JS ADMIN PANEL (Profile + Sync Profile Pic + Banners)
-        async function fetchUserProfileAndConfig() {
-            try {
-                // Fetch Profile Data
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                
-                if (userData.success && userData.user) {
-                    currentWalletCoinsBalance = userData.user.coins || 0;
-                    document.getElementById("liveUserCoins").innerText = currentWalletCoinsBalance;
-                    
-                    // 🟢 UPDATE REAL USERNAME & AVATAR EVERYWHERE (HEADER + ARENA)
-                    userName = userData.user.name || "Player";
-                    document.getElementById("userNameTxt").innerText = userName;
-                    
-                    if (userData.user.profile_pic) {
-                        document.getElementById("homeProfileIcon").innerHTML = `<img src="${userData.user.profile_pic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                        document.getElementById("myAvatar").innerHTML = `<img src="${userData.user.profile_pic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                    } else {
-                        let firstLetter = userName.charAt(0).toUpperCase();
-                        document.getElementById("homeProfileIcon").innerText = firstLetter;
-                        document.getElementById("myAvatar").innerText = firstLetter;
-                    }
-                }
-
-                // Fetch Dynamic Banners & Post-Match Ad Link
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                if (confData.success && confData.banners) {
-                    if (confData.banners[0]) document.getElementById("battleAdSlot1").innerHTML = confData.banners[0];
-                    if (confData.banners[1]) document.getElementById("battleAdSlot2").innerHTML = confData.banners[1];
-                }
-                if (confData.success && confData.postMatchAdLink) {
-                    adPartnerLink = confData.postMatchAdLink;
-                }
-            } catch (e) { console.log("Offline mode active. Using cached data."); }
-        }
 
         // 🎛️ ADJUST ENTRY FEE FUNCTION
         function adjustEntryFee(change) {
             if(isBattleActive) return; 
             
-            let newBet = currentBetAmount + change;
-            if(newBet < 20) newBet = 20; // Minimum 20 rule
+            let newFee = currentFeeAmount + change;
+            if(newFee < 20) newFee = 20; // Minimum 20 rule
             
-            currentBetAmount = newBet;
-            document.getElementById("currentBetEntryTxt").innerText = currentBetAmount;
-            document.getElementById("poolPrizeBadge").innerText = `🏆 REWARD: ${currentBetAmount * 2} POINTS`;
+            currentFeeAmount = newFee;
+            document.getElementById("currentFeeEntryTxt").innerText = currentFeeAmount;
+            
+            // Apply Dynamic Multiplier from Admin Panel
+            let calculatedPool = Math.floor(currentFeeAmount * globalWinMultiplier);
+            document.getElementById("poolPrizeBadge").innerText = `🏆 REWARD POOL: ${calculatedPool} POINTS`;
         }
 
         // 🧠 MATCHMAKING ENGINE (Bot 2 Matches Per 24 Hrs Limit Rule)
         function executeStartMatchmakingLoop() {
-            if(currentWalletCoinsBalance < currentBetAmount) {
-                alert(`❌ Insufficient Balance! You need at least ${currentBetAmount} points to join this pool.`);
+            if(currentWalletCoinsBalance < currentFeeAmount) {
+                alert(`❌ Insufficient Balance! You need at least ${currentFeeAmount} points to join this pool.`);
                 return;
             }
 
@@ -346,8 +432,9 @@
             btn.innerText = langData[lang]["cb_active"] || "Battle Active! 🎯";
             isBattleActive = true;
             
-            // UI Fake deduction
-            document.getElementById("liveUserCoins").innerText = currentWalletCoinsBalance - currentBetAmount;
+            // Deduct Fee Immediately via Firebase Transaction
+            const uid = localStorage.getItem("userId");
+            db.ref(`users/${uid}/coins`).transaction(current => (current || 0) - currentFeeAmount);
 
             executeLaunchLiveBattleArena();
         }
@@ -375,16 +462,20 @@
             }
         });
 
-        // ⚔️ TRANSACTION LOGIC: Evaluates Win/Loss properly & Updates Node.js DB
-        async function executeSubmitGameAction(selectedDirectionString) {
+        // ⚔️ TRANSACTION LOGIC: Evaluates Win/Loss properly
+        function executeSubmitGameAction(selectedDirectionString) {
             if(!isBattleActive) return;
             isBattleActive = false;
 
             document.getElementById("gameplayPanelBox").style.display = "none";
-            let rewardPool = currentBetAmount * 2;
+            
+            // Calculate reward dynamically from Admin Multiplier
+            let rewardPool = Math.floor(currentFeeAmount * globalWinMultiplier); 
+            
+            const uid = localStorage.getItem("userId");
 
             if(selectedDirectionString === 'timeout_cancel') {
-                alert("❌ Session Interrupted! Match cancelled.");
+                alert("❌ Session Interrupted! Match cancelled. Entry fee lost.");
                 executeResetBattleTerminalState();
                 return;
             }
@@ -392,43 +483,13 @@
             if(selectedDirectionString === mathematicallyCorrectAnswerStr) {
                 // WINNER PATH 
                 alert(`🎉 Victory! Watch a quick ad to claim your ${rewardPool} Points.`);
-                window.open(adPartnerLink, "_blank"); // Open dynamic Ad Link fetched from Admin
                 
-                // Call Node.js Backend API to add Reward
-                setTimeout(async () => {
-                    try {
-                        const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                            body: JSON.stringify({ userId: uid, pointsToAdd: rewardPool, action: "1v1_win" })
-                        });
-                        const data = await res.json();
-                        if(data.success) {
-                            alert(`💰 Reward Credited: +${rewardPool} Points!`);
-                            currentWalletCoinsBalance = data.newCoins;
-                            document.getElementById("liveUserCoins").innerText = currentWalletCoinsBalance;
-                        }
-                    } catch (e) { alert("Error connecting to server."); }
-                    
-                    executeResetBattleTerminalState();
-                }, 5000); // 5 sec delay to simulate ad watch
+                // 🔥 In-App Ad Viewer Call with Admin Controlled Time & Coins
+                openInAppAdViewer(adPartnerLink, rewardPool, globalAdTimerSeconds, '1v1_battle_win');
                 
             } else {
-                // LOST PATH
-                alert(`❌ Defeat! Incorrect or too slow. Points deducted.`);
-                try {
-                    const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ userId: uid, pointsToAdd: -currentBetAmount, action: "1v1_loss" })
-                    });
-                    const data = await res.json();
-                    if(data.success) {
-                        currentWalletCoinsBalance = data.newCoins;
-                        document.getElementById("liveUserCoins").innerText = currentWalletCoinsBalance;
-                    }
-                } catch (e) {}
-                
+                // LOST PATH (Fee already deducted at start)
+                alert(`❌ Defeat! Incorrect or too slow.`);
                 executeResetBattleTerminalState();
             }
         }
@@ -442,6 +503,70 @@
             document.getElementById("oppNameTxt").innerText = langData[lang]["cb_searching"] || "Searching...";
             document.getElementById("oppAvatar").innerText = "?";
             isBattleActive = false;
+        }
+
+        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC 🔥
+        let adTimerInterval = null;
+        let pendingRewardCoins = 0; 
+        let pendingTaskName = "";   
+
+        function openInAppAdViewer(adUrl, rewardCoinsAmount, timerSeconds, taskName = "ad_task") {
+            pendingRewardCoins = rewardCoinsAmount; 
+            pendingTaskName = taskName;
+            
+            let countdownTime = timerSeconds; 
+            
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL
+            document.getElementById("adIframe").src = adUrl;
+
+            adTimerInterval = setInterval(() => {
+                countdownTime--;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+
+                if(countdownTime <= 0) {
+                    clearInterval(adTimerInterval);
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                }
+            }, 1000);
+        }
+
+        // Jab user X button dabayega tab usko reward mil jayega
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+
+            const uid = localStorage.getItem("userId");
+            if(pendingRewardCoins > 0 && typeof uid !== 'undefined' && uid) {
+                // Grant Reward Coins
+                db.ref(`users/${uid}/coins`).transaction((current) => {
+                    return (current || 0) + pendingRewardCoins;
+                }).then(() => {
+                    // Update Task History
+                    db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                        let tasks = snap.val() || [];
+                        if (!tasks.includes(pendingTaskName)) { 
+                            tasks.push(pendingTaskName); 
+                            db.ref(`users/${uid}/completed_daily_tasks`).set(tasks); 
+                        }
+                    });
+                    
+                    alert(`💰 Reward Credited: +${pendingRewardCoins} Points!`);
+                    executeResetBattleTerminalState(); // Battle reset
+                    pendingRewardCoins = 0; 
+                }).catch(() => {
+                    alert("Error connecting to server. Please check internet.");
+                    executeResetBattleTerminalState();
+                });
+            } else {
+                executeResetBattleTerminalState();
+            }
         }
     </script>
 </body>

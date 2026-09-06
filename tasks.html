@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -31,11 +36,16 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
 
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--primary-blue); font-weight: bold; cursor: pointer; }
+
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Profile Balance Ribbon */
+        /* PLAY STORE SAFE: Only show Coins */
         .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--primary-blue); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); backdrop-filter: blur(10px); }
         .balance-card span { font-size: 18px; font-weight: 900; }
         .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
@@ -64,7 +74,7 @@
         /* Security Info Board */
         .security-box { border: 1px dashed var(--accent-cyan); background: rgba(6, 182, 212, 0.08); border-radius: 16px; padding: 15px 18px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-bottom: 15px; font-weight: 600; margin-top: 10px; }
 
-        /* 🎬 MULTI-OPTION POPUP MODAL */
+        /* 🎬 MULTI-OPTION POPUP MODAL (3 Servers) */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
         .modal-card { width: 100%; max-width: 380px; background: var(--card-bg); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); padding: 25px 20px; box-sizing: border-box; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -85,13 +95,20 @@
         .close-modal-btn:active { background: rgba(244, 63, 94, 0.1); border-radius: 8px; }
 
         /* Custom Alert Popups */
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 2000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 10000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
         .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 1999; backdrop-filter: blur(5px); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 9999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -99,10 +116,21 @@
     <div class="overlay" id="alertOverlay"></div>
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
-        <button onclick="closeCustomAlert()">OK</button>
+        <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
-    <!-- 🎬 MULTI-OPTION POPUP MODAL -->
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-play" style="color:var(--accent-green);"></i> Secure Video Server</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 15s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
+    <!-- 🎬 MULTI-OPTION POPUP MODAL (3 Servers) -->
     <div class="modal-overlay" id="videoOptionsModal">
         <div class="modal-card">
             <div class="modal-title" id="currentNetworkName"><i class="fa-solid fa-play"></i> Video Servers</div>
@@ -119,17 +147,22 @@
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="watch_ads">Video Zone</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="main-container">
         
+        <!-- PLAY STORE SAFE: Only show Coins -->
         <div class="balance-card">
             <span data-i18n="wallet_bal">Wallet Balance</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
@@ -196,25 +229,40 @@
 
         <div class="security-box">
             <span style="font-size: 18px;">🛡️</span>
-            <span data-i18n="st_security">Tracking protocols are active. Do not switch tabs or close the video early to ensure successful point verification.</span>
+            <span data-i18n="st_security">Tracking protocols are active. Do not minimize the app or close the video early to ensure successful point verification.</span>
         </div>
 
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 15; // Default time
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
             "en": { 
-                "watch_ads": "Video Zone", "wallet_bal": "Wallet Balance", "watch_earn_networks": "Media Networks", "unlimited_desc": "Unlimited Videos", "premium_video_desc": "Premium Videos", "short_ads_desc": "Short 10s Clips", "high_paying_desc": "High Yield Media", "select_channel": "Select a video channel to stream and earn points", "verifying": "Verifying stream...", "btn_stream": "Stream & Claim", "st_security": "Tracking protocols are active. Do not switch tabs or close the video early to ensure successful point verification.", "err_early": "❌ Verification Incomplete! You closed the stream before the required 15 seconds.", "err_invalid": "❌ Tracking Interrupted! Please stay on the page to complete verification.", "err_success": "🎉 Task Verified! Points credited via "
+                "watch_ads": "Video Zone", "wallet_bal": "Wallet Balance", "watch_earn_networks": "Media Networks", "unlimited_desc": "Unlimited Videos", "premium_video_desc": "Premium Videos", "short_ads_desc": "Short 10s Clips", "high_paying_desc": "High Yield Media", "select_channel": "Select a video channel to stream and earn points", "verifying": "Verifying stream...", "btn_stream": "Stream & Claim", "st_security": "Tracking protocols are active. Do not minimize the app or close the video early to ensure successful point verification.", "err_early": "❌ Verification Incomplete! You closed the stream early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "err_success": "🎉 Task Verified! Points credited via "
             },
             "hi": { 
-                "watch_ads": "वीडियो ज़ोन", "wallet_bal": "वॉलेट बैलेंस", "watch_earn_networks": "मीडिया नेटवर्क", "unlimited_desc": "असीमित वीडियो", "premium_video_desc": "प्रीमियम वीडियो", "short_ads_desc": "छोटे 10s क्लिप्स", "high_paying_desc": "प्रीमियम मीडिया", "select_channel": "पॉइंट्स कमाने के लिए एक वीडियो चैनल चुनें", "verifying": "सत्यापन चल रहा है...", "btn_stream": "वीडियो देखें", "st_security": "सत्यापन प्रोटोकॉल सक्रिय हैं। पॉइंट्स प्राप्त करने के लिए वीडियो को जल्दी बंद न करें या टैब न बदलें।", "err_early": "❌ सत्यापन अधूरा! आपने 15 सेकंड से पहले वीडियो बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया वीडियो पेज पर बने रहें।", "err_success": "🎉 सत्यापित! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: "
+                "watch_ads": "वीडियो ज़ोन", "wallet_bal": "वॉलेट बैलेंस", "watch_earn_networks": "मीडिया नेटवर्क", "unlimited_desc": "असीमित वीडियो", "premium_video_desc": "प्रीमियम वीडियो", "short_ads_desc": "छोटे 10s क्लिप्स", "high_paying_desc": "प्रीमियम मीडिया", "select_channel": "पॉइंट्स कमाने के लिए एक वीडियो चैनल चुनें", "verifying": "सत्यापन चल रहा है...", "btn_stream": "वीडियो देखें", "st_security": "सत्यापन प्रोटोकॉल सक्रिय हैं। पॉइंट्स प्राप्त करने के लिए वीडियो को जल्दी बंद न करें या ऐप को मिनीमाइज न करें।", "err_early": "❌ सत्यापन अधूरा! आपने वीडियो जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें।", "err_success": "🎉 सत्यापित! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: "
             },
-            "bn": { "watch_ads": "ভিডিও জোন", "select_channel": "ভিডিও চ্যানেল নির্বাচন করুন", "btn_stream": "ভিডিও দেখুন", "err_early": "❌ অসম্পূর্ণ! ১৫ সেকেন্ডের আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! পেজেই থাকুন।", "err_success": "🎉 ভেরিফাইড! পয়েন্ট যোগ হয়েছে: " },
+            "bn": { "watch_ads": "ভিডিও জোন", "select_channel": "ভিডিও চ্যানেল নির্বাচন করুন", "btn_stream": "ভিডিও দেখুন", "err_early": "❌ অসম্পূর্ণ! তাড়াতাড়ি বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ মিনিমাইজ করবেন না।", "err_success": "🎉 ভেরিফাইড! পয়েন্ট যোগ হয়েছে: " },
             "te": { "watch_ads": "వీడియో జోన్", "select_channel": "వీడియో ఛానెల్‌ని ఎంచుకోండి", "btn_stream": "చూడండి", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: " },
             "mr": { "watch_ads": "व्हिडिओ झोन", "select_channel": "व्हिडिओ चॅनेल निवडा", "btn_stream": "पहा", "err_success": "🎉 सत्यापित! पॉइंट्स जोडले गेले: " },
             "ta": { "watch_ads": "வீடியோ மண்டலம்", "select_channel": "வீடியோ சேனலைத் தேர்ந்தெடுக்கவும்", "btn_stream": "பார்க்கவும்", "err_success": "🎉 சரிபார்க்கப்பட்டது! " },
@@ -238,70 +286,106 @@
         }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
 
         // 🔥 DYNAMIC LINKS MAPPING (Fetched from Admin)
         let videoAdminLinksConfig = {
-            adscend: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
-            lootably: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
-            hideout: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
-            timewall: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
-            notik: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" },
-            monlix: { srv1: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv2: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", srv3: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js" }
+            adscend: { srv1: "", srv2: "", srv3: "" },
+            lootably: { srv1: "", srv2: "", srv3: "" },
+            hideout: { srv1: "", srv2: "", srv3: "" },
+            timewall: { srv1: "", srv2: "", srv3: "" },
+            notik: { srv1: "", srv2: "", srv3: "" },
+            monlix: { srv1: "", srv2: "", srv3: "" },
+            default_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
         };
 
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync (Matches ho.html)
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Time & All 18 Links)
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            let vzConfig = adminData.video_zone_configs;
+                            if(vzConfig) {
+                                
+                                // 🔥 GET ADMIN CONTROLLED TIME
+                                if (vzConfig.ad_timer) { globalAdTimerSeconds = parseInt(vzConfig.ad_timer); }
+
+                                // Load Banners
+                                if(vzConfig.slot1_code) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), vzConfig.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                                if(vzConfig.slot2_code) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), vzConfig.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                                if(vzConfig.slot3_code) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), vzConfig.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                                if(vzConfig.slot4_code) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), vzConfig.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+
+                                // Load Server Links
+                                const networks = ['adscend', 'lootably', 'hideout', 'timewall', 'notik', 'monlix'];
+                                networks.forEach(net => {
+                                    if(vzConfig[`link_${net}_s1`]) videoAdminLinksConfig[net].srv1 = vzConfig[`link_${net}_s1`];
+                                    if(vzConfig[`link_${net}_s2`]) videoAdminLinksConfig[net].srv2 = vzConfig[`link_${net}_s2`];
+                                    if(vzConfig[`link_${net}_s3`]) videoAdminLinksConfig[net].srv3 = vzConfig[`link_${net}_s3`];
+                                });
+                            } else if (adminData.banner_ads) { // Fallback to global banners
+                                if(adminData.banner_ads.slot1 && adminData.banner_ads.slot1.active) setAdHTML(document.getElementById("adminBannerSlot1"), adminData.banner_ads.slot1.code);
+                                if(adminData.banner_ads.slot2 && adminData.banner_ads.slot2.active) setAdHTML(document.getElementById("adminBannerSlot2"), adminData.banner_ads.slot2.code);
+                                if(adminData.banner_ads.slot3 && adminData.banner_ads.slot3.active) setAdHTML(document.getElementById("adminBannerSlot3"), adminData.banner_ads.slot3.code);
+                            }
+
+                            if (adminData.globalSmartlink) {
+                                videoAdminLinksConfig.default_link = adminData.globalSmartlink;
+                            }
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH USER DATA AND ADMIN BANNERS/LINKS
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                }
-
-                // 2. Fetch Admin Banners and Video Links
-                const confRes = await fetch(`${API_BASE_URL}/app-config/video-settings`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.settings.banners) {
-                        if(confData.settings.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.settings.banners[0];
-                        if(confData.settings.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.settings.banners[1];
-                        if(confData.settings.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.settings.banners[2];
-                        if(confData.settings.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.settings.banners[3];
-                    }
-                    if (confData.settings.videoLinks) {
-                        Object.keys(videoAdminLinksConfig).forEach(netKey => {
-                            if (confData.settings.videoLinks[netKey]) {
-                                if (confData.settings.videoLinks[netKey].srv1) videoAdminLinksConfig[netKey].srv1 = confData.settings.videoLinks[netKey].srv1;
-                                if (confData.settings.videoLinks[netKey].srv2) videoAdminLinksConfig[netKey].srv2 = confData.settings.videoLinks[netKey].srv2;
-                                if (confData.settings.videoLinks[netKey].srv3) videoAdminLinksConfig[netKey].srv3 = confData.settings.videoLinks[netKey].srv3;
-                            }
-                        });
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
         let activeWatchSession = null;
         let isValidationActive = false;
         let platformTimer = null;
-        let targetWindow = null;
-        let totalSecondsOpen = 0;
 
         // 🔥 ADDED TAB TRACKER 
         window.hasMainTabHidden = false;
@@ -329,12 +413,13 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
+        // 3 SERVER MODAL GENERATOR
         function openVideoOptions(networkName, icon) {
             let prettyName = networkName.charAt(0).toUpperCase() + networkName.slice(1) + " Media";
-            if(networkName === 'timewall') prettyName = "Timewall Clicks";
             if(networkName === 'notik') prettyName = "Notik Me";
             if(networkName === 'hideout') prettyName = "Hideout.tv";
             if(networkName === 'monlix') prettyName = "Monlix Videos";
+            if(networkName === 'timewall') prettyName = "Timewall Clicks";
 
             document.getElementById("currentNetworkName").innerHTML = `${icon} ${prettyName}`;
             const container = document.getElementById("optionsContainer");
@@ -375,7 +460,7 @@
             activeWatchSession = null;
         }
 
-        // 🚀 PLAY STORE SAFE VALIDATION ENGINE (15 SECONDS)
+        // 🚀 PLAY STORE SAFE VALIDATION ENGINE (IN-APP VIEWER)
         function triggerSecureAdStream(network, serverId, serverTitle, rewardAmt) {
             if(isValidationActive) return;
             isValidationActive = true;
@@ -388,50 +473,41 @@
                 reward: rewardAmt
             };
 
-            const targetBtn = document.getElementById(`btn_${serverId}`);
-            const targetSubText = document.getElementById(`sub_${serverId}`);
-            
             // Disable all buttons in modal
             document.querySelectorAll(".video-option-btn").forEach(b => b.disabled = true);
 
-            let currentLang = localStorage.getItem("selectedLang") || "en";
-            let verifyText = langData[currentLang]["verifying"] || "Verifying...";
-            
-            let countdown = 15;
-            totalSecondsOpen = 0;
+            let countdown = globalAdTimerSeconds;
             window.hasMainTabHidden = false; // Reset Tracker
 
-            let finalTargetAdUrl = videoAdminLinksConfig[network][serverId];
-            targetWindow = window.open(finalTargetAdUrl, '_blank', 'noopener,noreferrer');
+            let finalTargetAdUrl = videoAdminLinksConfig[network][serverId] || videoAdminLinksConfig.default_link;
+            
+            // HIDE MODAL & SHOW IN-APP VIEWER
+            document.getElementById("videoOptionsModal").style.display = "none";
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdown}s`;
+            
+            document.getElementById("adIframe").src = finalTargetAdUrl;
 
             platformTimer = setInterval(() => {
                 countdown--;
-                if (targetSubText) targetSubText.innerText = `${verifyText} (${countdown}s)`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdown}s`;
 
-                // Validation 1: Tab closed early
-                if (targetWindow && targetWindow.closed) {
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if (document.hidden) { 
                     clearInterval(platformTimer);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
                     resetModalUI();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     return;
                 }
 
-                // Validation 2: Invalid tab switching
-                if (!document.hidden && window.hasMainTabHidden) {
-                    if (totalSecondsOpen < 14) { 
-                        clearInterval(platformTimer);
-                        resetModalUI();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
-
                 if (countdown <= 0) {
                     clearInterval(platformTimer);
-                    if (targetSubText) targetSubText.innerText = "SAVING...";
-                    evaluateRewardValidation();
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
@@ -439,49 +515,42 @@
         function resetModalUI() {
             isValidationActive = false;
             activeWatchSession = null;
-            let currentLang = localStorage.getItem("selectedLang") || "en";
-            let streamTxt = langData[currentLang]["btn_stream"] || "Stream & Claim";
-            
-            document.querySelectorAll(".video-option-btn").forEach(b => {
-                b.disabled = false;
-                let subNode = b.querySelector('.option-sub');
-                if(subNode) subNode.innerText = streamTxt;
-            });
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t14)
-        async function evaluateRewardValidation() {
-            document.getElementById("videoOptionsModal").style.display = "none";
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t14) VIA PURE FIREBASE
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            evaluateRewardValidationViaFirebase();
+        }
+
+        function evaluateRewardValidationViaFirebase() {
             if (!activeWatchSession || !activeWatchSession.isValid) { resetModalUI(); return; }
 
             let finalCoinsReward = activeWatchSession.reward;
             let netName = activeWatchSession.network.toUpperCase();
 
-            try {
-                // Call API to add Points and Sync Daily Task 't14'
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: finalCoinsReward, 
-                        action: `video_stream_${netName}`,
-                        syncTask: "t14" // Completes Daily Task 't14'
-                    })
-                });
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + finalCoinsReward;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
-                    
-                    showCustomAlert("err_success", ` ${netName} (${finalCoinsReward}🪙)`, true);
-                }
-            } catch (err) {
+                // 2. Mark Daily Task 't14' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t14")) {
+                        tasks.push("t14");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                showCustomAlert("err_success", ` ${netName} (${finalCoinsReward}🪙)`, true);
+                
+            }).catch(() => {
                 alert("Task Verified but couldn't sync with server. Try again.");
-            } finally {
+            }).finally(() => {
                 resetModalUI();
-            }
+            });
         }
     </script>
 </body>

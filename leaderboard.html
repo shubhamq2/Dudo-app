@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -15,14 +20,13 @@
             --primary-blue: #3b82f6;
             --accent-cyan: #06b6d4;
             --accent-green: #10b981;
-            --accent-gold: #facc15;
+            --accent-gold: #fbbf24;
             --accent-pink: #f43f5e;
-            --accent-purple: #a855f7;
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 80% 20%, rgba(244, 63, 94, 0.1) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 80% 20%, rgba(244, 63, 94, 0.1) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
         
         /* Premium Sync Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-pink); backdrop-filter: blur(10px); }
@@ -30,14 +34,18 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
 
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
+        
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
 
-        /* Profile Balance Ribbon */
+        /* Profile Balance Ribbon - Upgraded */
         .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-pink); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(244, 63, 94, 0.2); backdrop-filter: blur(10px); }
-        .balance-card span { font-size: 18px; font-weight: 900; }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(250,204,21,0.2); }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 900; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
         /* 📢 ADMIN CONNECTED AD BANNER SLOT */
         .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(244, 63, 94, 0.4); margin: 5px 0; box-sizing: border-box; }
@@ -52,10 +60,12 @@
         .claim-drop-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4); }
         .claim-drop-btn:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
-        /* 🔒 SYSTEM VALIDATION COUNTER MODULE OVERLAY */
+        /* 🔒 SYSTEM SHIELD COUNTER MODULE */
         .validation-panel { display: none; background: rgba(0,0,0,0.5); border-radius: 16px; padding: 20px; border: 2px dashed var(--accent-gold); margin-top: 20px; box-shadow: inset 0 0 20px rgba(250, 204, 21, 0.15); text-align: center; }
         .validation-panel h4 { margin: 0 0 8px 0; font-size: 16px; color: var(--accent-gold); font-weight: 900; text-transform: uppercase; }
         .validation-clock { font-size: 38px; font-weight: 900; color: #fff; margin: 10px 0; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+
+        .security-box { border: 1px dashed var(--accent-pink); background: rgba(244, 63, 94, 0.05); border-radius: 14px; padding: 15px 18px; font-size: 12px; color: #cbd5e1; display: flex; gap: 10px; line-height: 1.6; margin-top: 10px; font-weight: 600; }
 
         /* 🏆 PREMIUM LEADERBOARD STYLING */
         .leaderboard-box { background: var(--card-bg); border-radius: 24px; padding: 25px 20px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); margin-top: 10px; backdrop-filter: blur(10px); }
@@ -77,7 +87,8 @@
         .rank-2-card .rank-badge { background: #cbd5e1; color: #000; border-color: #fff; }
         .rank-3-card .rank-badge { background: #cd7f32; color: #000; border-color: #fff; }
 
-        .rank-avatar { width: 42px; height: 42px; border-radius: 50%; background: #0f172a; display: flex; justify-content: center; align-items: center; font-weight: 900; color: #fff; font-size: 18px; border: 2px solid rgba(255,255,255,0.2); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .rank-avatar { width: 42px; height: 42px; border-radius: 50%; background: #0f172a; display: flex; justify-content: center; align-items: center; font-weight: 900; color: #fff; font-size: 18px; border: 2px solid rgba(255,255,255,0.2); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); overflow: hidden; }
+        .rank-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .rank-1-card .rank-avatar, .rank-2-card .rank-avatar, .rank-3-card .rank-avatar { border-color: rgba(255,255,255,0.8); }
         
         .rank-info { display: flex; flex-direction: column; text-align: left; }
@@ -98,6 +109,13 @@
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-pink); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(244, 63, 94, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -108,28 +126,43 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Hourly Task</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 15s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="hb_title">Hourly Rewards</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="main-container">
         
         <div class="balance-card">
-            <span data-i18n="hb_wallet">Wallet Balance</span>
+            <span style="color:var(--text-sub); font-size:14px; text-transform:uppercase; letter-spacing:1px;">⏳ Hourly Bonus</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
 
-        <!-- 📢 ADMIN CONNECTED AD BANNER SLOT -->
-        <div class="ad-banner-slot" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <!-- 📢 ADMIN CONNECTED AD BANNER SLOT 1 -->
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="countdown-card">
             <div id="timerLabelTxt" data-i18n="hb_next">Next Hourly Bonus In</div>
@@ -144,9 +177,8 @@
             <p style="font-size: 11.5px; color: var(--text-sub); margin: 0; text-align: center; font-weight: 600;" data-i18n="hb_analyze">Verifying engagement. Please do not close early.</p>
         </div>
 
-        <!-- 📢 ADMIN CONNECTED AD BANNER SLOT -->
-        <div class="ad-banner-slot" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <!-- 📢 ADMIN CONNECTED AD BANNER SLOT 2 -->
+        <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
         <div class="leaderboard-box">
             <div class="board-title"><i class="fa-solid fa-trophy" style="color: var(--accent-gold);"></i> Top 10 Global Earners</div>
@@ -155,31 +187,47 @@
             </div>
         </div>
 
-        <!-- 📢 ADMIN CONNECTED AD BANNER SLOT -->
-        <div class="ad-banner-slot" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <!-- 📢 ADMIN CONNECTED AD BANNER SLOT 3 & 4 -->
+        <div class="ad-banner-slot" id="adminBannerSlot3"></div>
+        <div class="ad-banner-slot" id="adminBannerSlot4"></div>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & COINS 🔥
+        let globalAdTimerSeconds = 15; // Default time
+        let hourlyRewardCoinsPool = 25; // Default coins
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "hb_title": "Hourly Rewards", "hb_wallet": "Wallet Balance", "hb_next": "Next Hourly Bonus In", "hb_claim": "Claim Hourly Bonus", "hb_shield": "System Verification", "hb_analyze": "Verifying engagement. Please do not close early.", "err_early": "❌ Verification Interrupted! Please keep the sponsor page open.", "err_invalid": "❌ Validation Alert! Please stay on the sponsor page to complete verification.", "err_success": "🎉 Success! Points added to your balance." },
-            "hi": { "hb_title": "हर घंटे का इनाम", "hb_wallet": "वॉलेट बैलेंस", "hb_next": "अगला बोनस मिलेगा", "hb_claim": "बोनस प्राप्त करें", "hb_shield": "सिस्टम सत्यापन", "hb_analyze": "सत्यापन जारी है। कृपया जल्दी बंद न करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर पेज खुला रखें।", "err_invalid": "❌ सिस्टम अलर्ट! कृपया स्पॉन्सर पेज पर बने रहें।", "err_success": "🎉 सफलता! आपके बैलेंस में पॉइंट्स जुड़ गए।" },
-            "bn": { "hb_title": "ঘণ্টায় পুরস্কার", "hb_wallet": "ওয়ালেট ব্যালেন্স", "hb_next": "পরবর্তী বোনাস পাবেন", "hb_claim": "বোনাস সংগ্রহ করুন", "hb_shield": "সিস্টেম যাচাইকরণ", "hb_analyze": "যাচাই চলছে। তাড়াতাড়ি বন্ধ করবেন না।", "err_early": "❌ যাচাই অসম্পূর্ণ! স্পনসর পেজটি খোলা রাখুন।", "err_invalid": "❌ অ্যালার্ট! স্পনসর পেজেই থাকুন।", "err_success": "🎉 সফল! আপনার ব্যালেন্সে পয়েন্ট যোগ হয়েছে।" },
-            "te": { "hb_title": "గంటకో రివార్డ్", "hb_wallet": "వాలెట్ బ్యాలెన్స్", "hb_next": "తదుపరి బోనస్ సమయం", "hb_claim": "బోనస్ పొందండి", "hb_shield": "సిస్టమ్ ధృవీకరణ", "hb_analyze": "ధృవీకరిస్తోంది. దయచేసి వేచి ఉండండి.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని తెరిచి ఉంచండి.", "err_invalid": "❌ హెచ్చరిక! దయచేసి స్పాన్సర్ పేజీలోనే ఉండండి.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి." },
-            "mr": { "hb_title": "तासाला बक्षीस", "hb_wallet": "वॉलेट शिल्लक", "hb_next": "पुढील बोनस वेळ", "hb_claim": "बोनस मिळवा", "hb_shield": "सिस्टम पडताळणी", "hb_analyze": "पडताळणी सुरू आहे. कृपया थांबा.", "err_early": "❌ अपूर्ण! कृपया स्पॉन्सर पेज उघडा ठेवा.", "err_invalid": "❌ अलर्ट! कृपया स्पॉन्सर पेजवरच राहा.", "err_success": "🎉 यशस्वी! तुमच्या खात्यात पॉइंट्स जमा झाले आहेत." },
+            "en": { "hb_title": "Hourly Rewards", "hb_wallet": "Wallet Balance", "hb_next": "Next Hourly Bonus In", "hb_claim": "Claim Hourly Bonus", "hb_shield": "System Verification", "hb_analyze": "Verifying engagement. Please do not close early.", "err_early": "❌ Verification Interrupted! Please keep the sponsor page open.", "err_invalid": "❌ Validation Alert! App minimized. Please stay on the page to complete verification.", "err_success": "🎉 Success! Points added to your balance." },
+            "hi": { "hb_title": "हर घंटे का इनाम", "hb_wallet": "वॉलेट बैलेंस", "hb_next": "अगला बोनस मिलेगा", "hb_claim": "बोनस प्राप्त करें", "hb_shield": "सिस्टम सत्यापन", "hb_analyze": "सत्यापन जारी है। कृपया जल्दी बंद न करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर पेज खुला रखें।", "err_invalid": "❌ सिस्टम अलर्ट! ऐप बंद करना मना है। कृपया पेज पर बने रहें।", "err_success": "🎉 सफलता! आपके बैलेंस में पॉइंट्स जुड़ गए।" },
+            "bn": { "hb_title": "ঘণ্টায় পুরস্কার", "hb_wallet": "ওয়ালেট ব্যালেন্স", "hb_next": "পরবর্তী বোনাস পাবেন", "hb_claim": "বোনাস সংগ্রহ করুন", "hb_shield": "সিস্টেম যাচাইকরণ", "hb_analyze": "যাচাই চলছে। তাড়াতাড়ি বন্ধ করবেন না।", "err_early": "❌ যাচাই অসম্পূর্ণ! স্পনসর পেজটি খোলা রাখুন।", "err_invalid": "❌ অ্যালার্ট! অ্যাপ বন্ধ করবেন না।", "err_success": "🎉 সফল! আপনার ব্যালেন্সে পয়েন্ট যোগ হয়েছে।" },
+            "te": { "hb_title": "గంటకో రివార్డ్", "hb_wallet": "వాలెట్ బ్యాలెన్స్", "hb_next": "తదుపరి బోనస్ సమయం", "hb_claim": "బోనస్ పొందండి", "hb_shield": "సిస్టమ్ ధృవీకరణ", "hb_analyze": "ధృవీకరిస్తోంది. దయచేసి వేచి ఉండండి.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని తెరిచి ఉంచండి.", "err_invalid": "❌ హెచ్చరిక! యాప్ మినిమైజ్ చేయవద్దు.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి." },
+            "mr": { "hb_title": "तासाला बक्षीस", "hb_wallet": "वॉलेट शिल्लक", "hb_next": "पुढील बोनस वेळ", "hb_claim": "बोनस मिळवा", "hb_shield": "सिस्टम पडताळणी", "hb_analyze": "पडताळणी सुरू आहे. कृपया थांबा.", "err_early": "❌ अपूर्ण! कृपया स्पॉन्सर पेज उघडा ठेवा.", "err_invalid": "❌ अलर्ट! कृपया पेजवरच राहा.", "err_success": "🎉 यशस्वी! तुमच्या खात्यात पॉइंट्स जमा झाले आहेत." },
             "ta": { "hb_title": "மணிநேர வெகுமதி", "hb_wallet": "வாலட் இருப்பு", "hb_next": "அடுத்த போனஸ் நேரம்", "hb_claim": "போனஸ் பெறுங்கள்", "hb_shield": "அமைப்பு சரிபார்ப்பு", "hb_analyze": "சரிபார்க்கப்படுகிறது. காத்திருக்கவும்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ எச்சரிக்கை! அதே பக்கத்தில் இருக்கவும்.", "err_success": "🎉 வெற்றி! புள்ளிகள் சேர்க்கப்பட்டன." },
-            "ur": { "hb_title": "ہر گھنٹے کا انعام", "hb_wallet": "والیٹ بیلنس", "hb_next": "اگلا بونس کا وقت", "hb_claim": "بونس حاصل کریں", "hb_shield": "سسٹم کی تصدیق", "hb_analyze": "تصدیق ہو رہی ہے۔ براہ کرم انتظار کریں۔", "err_early": "❌ نامکمل! براہ کرم پیج کھلا رکھیں۔", "err_invalid": "❌ الرٹ! براہ کرم اسپانسر پیج پر رہیں۔", "err_success": "🎉 کامیابی! پوائنٹس شامل ہو گئے۔" },
-            "gu": { "hb_title": "દર કલાકે ઇનામ", "hb_wallet": "વૉલેટ બેલેન્સ", "hb_next": "આગળનો બોનસ સમય", "hb_claim": "બોનસ મેળવો", "hb_shield": "સિસ્ટમ ચકાસણી", "hb_analyze": "ચકાસણી ચાલુ છે. કૃપા કરીને રાહ જુઓ.", "err_early": "❌ અધૂરું! કૃપા કરીને પેજ ખુલ્લું રાખો.", "err_invalid": "❌ ચેતવણી! કૃપા કરીને સ્પોન્સર પેજ પર જ રહો.", "err_success": "🎉 સફળતા! પોઇન્ટ્સ ઉમેરાયા છે." },
-            "es": { "hb_title": "Recompensas por Hora", "hb_wallet": "Saldo de Cartera", "hb_next": "Siguiente bono en", "hb_claim": "Reclamar Bono", "hb_shield": "Verificación del Sistema", "hb_analyze": "Verificando. No cierre temprano.", "err_early": "❌ ¡Incompleto! Mantenga la página abierta.", "err_invalid": "❌ ¡Alerta! Permanezca en la página del patrocinador.", "err_success": "🎉 ¡Éxito! Puntos añadidos a su saldo." },
-            "fr": { "hb_title": "Récompenses Horaires", "hb_wallet": "Solde du Portefeuille", "hb_next": "Prochain bonus dans", "hb_claim": "Réclamer le Bonus", "hb_shield": "Vérification Système", "hb_analyze": "Vérification. Ne fermez pas.", "err_early": "❌ Incomplet ! Gardez la page ouverte.", "err_invalid": "❌ Alerte ! Restez sur la page du sponsor.", "err_success": "🎉 Succès ! Points ajoutés au solde." },
-            "ar": { "hb_title": "مكافآت كل ساعة", "hb_wallet": "رصيد المحفظة", "hb_next": "المكافأة التالية في", "hb_claim": "المطالبة بالمكافأة", "hb_shield": "تحقق النظام", "hb_analyze": "جاري التحقق. لا تغلق مبكراً.", "err_early": "❌ غير مكتمل! أبقِ الصفحة مفتوحة.", "err_invalid": "❌ تنبيه! يرجى البقاء في صفحة الراعي.", "err_success": "🎉 نجاح! تمت إضافة النقاط إلى رصيدك." },
-            "pt": { "hb_title": "Recompensas por Hora", "hb_wallet": "Saldo da Carteira", "hb_next": "Próximo bônus em", "hb_claim": "Reivindicar Bônus", "hb_shield": "Verificação do Sistema", "hb_analyze": "Verificando. Não feche cedo.", "err_early": "❌ Incompleto! Mantenha a página aberta.", "err_invalid": "❌ Alerta! Fique na página do patrocinador.", "err_success": "🎉 Sucesso! Pontos adicionados ao saldo." },
-            "ru": { "hb_title": "Ежечасные награды", "hb_wallet": "Баланс кошелька", "hb_next": "Следующий бонус через", "hb_claim": "Получить бонус", "hb_shield": "Проверка системы", "hb_analyze": "Проверка. Не закрывайте рано.", "err_early": "❌ Не завершено! Держите страницу открытой.", "err_invalid": "❌ Внимание! Оставайтесь на странице спонсора.", "err_success": "🎉 Успех! Очки добавлены на баланс." }
+            "ur": { "hb_title": "ہر گھنٹے کا انعام", "hb_wallet": "والیٹ بیلنس", "hb_next": "اگلا بونس کا وقت", "hb_claim": "بونس حاصل کریں", "hb_shield": "سسٹم کی تصدیق", "hb_analyze": "تصدیق ہو رہی ہے۔ براہ کرم انتظار کریں۔", "err_early": "❌ نامکمل! براہ کرم پیج کھلا رکھیں۔", "err_invalid": "❌ الرٹ! براہ کرم پیج پر رہیں۔", "err_success": "🎉 کامیابی! پوائنٹس شامل ہو گئے۔" },
+            "gu": { "hb_title": "દર કલાકે ઇનામ", "hb_wallet": "વૉલેટ બેલેન્સ", "hb_next": "આગળનો બોનસ સમય", "hb_claim": "બોનસ મેળવો", "hb_shield": "સિસ્ટમ ચકાસણી", "hb_analyze": "ચકાસણી ચાલુ છે. કૃપા કરીને રાહ જુઓ.", "err_early": "❌ અધૂરું! કૃપા કરીને પેજ ખુલ્લું રાખો.", "err_invalid": "❌ ચેતવણી! કૃપા કરીને પેજ પર જ રહો.", "err_success": "🎉 સફળતા! પોઇન્ટ્સ ઉમેરાયા છે." },
+            "es": { "hb_title": "Recompensas por Hora", "hb_wallet": "Saldo de Cartera", "hb_next": "Siguiente bono en", "hb_claim": "Reclamar Bono", "hb_shield": "Verificación del Sistema", "hb_analyze": "Verificando. No cierre temprano.", "err_early": "❌ ¡Incompleto! Mantenga la página abierta.", "err_invalid": "❌ ¡Alerta! Permanezca en la página.", "err_success": "🎉 ¡Éxito! Puntos añadidos a su saldo." },
+            "fr": { "hb_title": "Récompenses Horaires", "hb_wallet": "Solde du Portefeuille", "hb_next": "Prochain bonus dans", "hb_claim": "Réclamer le Bonus", "hb_shield": "Vérification Système", "hb_analyze": "Vérification. Ne fermez pas.", "err_early": "❌ Incomplet ! Gardez la page ouverte.", "err_invalid": "❌ Alerte ! Restez sur la page.", "err_success": "🎉 Succès ! Points ajoutés au solde." },
+            "ar": { "hb_title": "مكافآت كل ساعة", "hb_wallet": "رصيد المحفظة", "hb_next": "المكافأة التالية في", "hb_claim": "المطالبة بالمكافأة", "hb_shield": "تحقق النظام", "hb_analyze": "جاري التحقق. لا تغلق مبكراً.", "err_early": "❌ غير مكتمل! أبقِ الصفحة مفتوحة.", "err_invalid": "❌ تنبيه! يرجى البقاء في الصفحة.", "err_success": "🎉 نجاح! تمت إضافة النقاط إلى رصيدك." },
+            "pt": { "hb_title": "Recompensas por Hora", "hb_wallet": "Saldo da Carteira", "hb_next": "Próximo bônus em", "hb_claim": "Reivindicar Bônus", "hb_shield": "Verificação do Sistema", "hb_analyze": "Verificando. Não feche cedo.", "err_early": "❌ Incompleto! Mantenha a página aberta.", "err_invalid": "❌ Alerta! Fique na página.", "err_success": "🎉 Sucesso! Pontos adicionados ao saldo." },
+            "ru": { "hb_title": "Ежечасные награды", "hb_wallet": "Баланс кошелька", "hb_next": "Следующий бонус через", "hb_claim": "Получить бонус", "hb_shield": "Проверка системы", "hb_analyze": "Проверка. Не закрывайте рано.", "err_early": "❌ Не завершено! Держите страницу открытой.", "err_invalid": "❌ Внимание! Оставайтесь на странице.", "err_success": "🎉 Успех! Очки добавлены на баланс." }
         };
 
         function changeLanguage(langCode) {
@@ -187,13 +235,13 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) {
+                if(transObj[key]) { 
                     if (elem.tagName === "BUTTON") {
                         if(!elem.disabled) elem.innerHTML = `<i class="fa-solid fa-gift"></i> ${transObj[key]}`;
                     } else if (elem.tagName === "H4") {
                         elem.innerHTML = `<i class="fa-solid fa-shield-halved"></i> ${transObj[key]}`;
                     } else {
-                        elem.innerText = transObj[key];
+                        elem.innerText = transObj[key]; 
                     }
                 }
             });
@@ -201,66 +249,117 @@
             executeValidateHourlyTimerStatus(); 
         }
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
 
+        const uid = localStorage.getItem("userId");
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
-        let hourlyRewardCoinsPool = 25; 
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
+            
+            // Sync Language from Home Page
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
-            executeLiveLeaderboardSync();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance & Smart Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync (Matches ho.html)
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            function createEmojiURI(emoji) {
+                                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+                                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+                            }
+
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Link & Amount from hourly_bonus node)
+                    db.ref('global_system_runtime_configurations/hourly_bonus').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME AND COINS
+                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            if (adminData.reward_amount) { hourlyRewardCoinsPool = parseInt(adminData.reward_amount); }
+
+                            // Load Banners
+                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+
+                            // Link
+                            if (adminData.task_ad_link) {
+                                activeAdminSmartlinkUrl = adminData.task_ad_link;
+                            }
+                        } else {
+                            // Fallback
+                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
+                                if(globalSnap.exists()) activeAdminSmartlinkUrl = globalSnap.val();
+                            });
+                        }
+                    });
+
+                    // 3. 🏆 FETCH REALTIME LEADERBOARD DIRECTLY FROM FIREBASE DB
+                    executeLiveFirebaseLeaderboardSync();
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+
             executeValidateHourlyTimerStatus();
         });
 
-        // 📡 FETCH USER, BANNERS AND CONFIGS FROM NODE.JS API
-        async function fetchDataFromAdminServer() {
-            try {
-                // Fetch User Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                }
-
-                // Fetch Admin Banners and Smartlink
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
-                    }
-                    if (confData.globalSmartlink) {
-                        activeAdminSmartlinkUrl = confData.globalSmartlink;
-                    }
-                    if (confData.hourlyRewardAmount) {
-                        hourlyRewardCoinsPool = parseInt(confData.hourlyRewardAmount) || 25;
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
-        }
-
-        // 🏆 FETCH LEADERBOARD FROM NODE.JS API
-        async function executeLiveLeaderboardSync() {
+        // 🏆 FIREBASE NATIVE LEADERBOARD ENGINE
+        function executeLiveFirebaseLeaderboardSync() {
             const listContainer = document.getElementById("leaderboardListSlot");
-            try {
-                const res = await fetch(`${API_BASE_URL}/leaderboard`);
-                const data = await res.json();
-
-                if(data.success && data.leaderboard && data.leaderboard.length > 0) {
+            
+            // Query Firebase 'users' node, sort by 'coins', get top 10
+            db.ref('users').orderByChild('coins').limitToLast(10).on('value', (snapshot) => {
+                if (snapshot.exists()) {
                     listContainer.innerHTML = "";
-                    data.leaderboard.forEach((user, index) => {
+                    let usersArray = [];
+                    
+                    snapshot.forEach((childSnap) => {
+                        let userData = childSnap.val();
+                        if(userData.coins && userData.coins > 0) {
+                            usersArray.push(userData);
+                        }
+                    });
+
+                    // Reverse array because limitToLast returns ascending order
+                    usersArray.reverse();
+
+                    if(usersArray.length === 0) {
+                        listContainer.innerHTML = `<p class="empty-txt">No active rank metrics loaded yet.</p>`;
+                        return;
+                    }
+
+                    usersArray.forEach((user, index) => {
                         let currentRank = index + 1;
                         let cardClass = "rank-card";
                         if(currentRank === 1) cardClass += " rank-1-card";
@@ -270,7 +369,10 @@
                         let badgeEmoji = currentRank;
                         if(currentRank === 1) badgeEmoji = '<i class="fa-solid fa-crown"></i>';
 
-                        let initial = user.name.charAt(0).toUpperCase();
+                        let userName = user.name || "Player";
+                        
+                        // Use Dicebear if no profile pic exists
+                        let avatarSrc = user.profile_pic ? user.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName}&backgroundColor=b6e3f4`;
 
                         let rankCard = document.createElement("div");
                         rankCard.className = cardClass;
@@ -278,9 +380,9 @@
                         rankCard.innerHTML = `
                             <div class="rank-left-section">
                                 <div class="rank-badge">${badgeEmoji}</div>
-                                <div class="rank-avatar">${initial}</div>
+                                <div class="rank-avatar"><img src="${avatarSrc}" alt="avatar"></div>
                                 <div class="rank-info">
-                                    <h4>${user.name}</h4>
+                                    <h4>${userName}</h4>
                                     <p>Global Earner</p>
                                 </div>
                             </div>
@@ -293,23 +395,14 @@
                 } else {
                     listContainer.innerHTML = `<p class="empty-txt">No active rank metrics loaded yet.</p>`;
                 }
-            } catch(e) {
+            }, (error) => {
                 listContainer.innerHTML = `<p class="empty-txt">Could not connect to leaderboard server.</p>`;
-            }
+            });
         }
 
         let isTimerActiveState = true;
         let clockInterval = null;
         let validationTimer = null;
-        let validationTimeInt = 15;
-        let targetAdWindowProxy = null;
-        let totalAdSecondsActive = 0;
-
-        // 🔥 ADDED TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { window.hasMainTabHidden = true; }
-        });
 
         function showCustomAlert(msgKey, isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
@@ -387,76 +480,79 @@
             clockInterval = setInterval(updateClock, 1000);
         }
 
-        // 🚀 SECURE SYSTEM SHIELD (15 SECONDS)
+        // 🚀 SECURE SYSTEM SHIELD WITH IN-APP VIEWER
         function executeSystemValidationAndClaim() {
             const btn = document.getElementById("claimDropBtn");
             btn.style.display = "none";
             
             document.getElementById("validationCardBox").style.display = "block";
             
-            validationTimeInt = 15;
-            totalAdSecondsActive = 0;
-            window.hasMainTabHidden = false; // Reset tracker
+            let validationTimeInt = globalAdTimerSeconds;
 
-            targetAdWindowProxy = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${validationTimeInt}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
+
+            if (validationTimer) clearInterval(validationTimer);
 
             validationTimer = setInterval(() => {
-                if(targetAdWindowProxy && targetAdWindowProxy.closed) {
+                validationTimeInt--;
+                
+                document.getElementById("validationClockTxt").innerText = `${validationTimeInt}s`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${validationTimeInt}s`;
+
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if(document.hidden) {
                     clearInterval(validationTimer);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
                     executeResetValidationUI();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     return;
                 }
-
-                if(!document.hidden && window.hasMainTabHidden) {
-                    if(totalAdSecondsActive < 14) {
-                        clearInterval(validationTimer);
-                        executeResetValidationUI();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalAdSecondsActive++;
-                validationTimeInt--;
-                document.getElementById("validationClockTxt").innerText = `${validationTimeInt}s`;
 
                 if(validationTimeInt <= 0) {
                     clearInterval(validationTimer);
                     document.getElementById("validationClockTxt").innerText = "0s";
-                    executeRewardSyncWithNodeServer();
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
-        // 💰 REWARD ENGINE: Calls Node.js API, Syncs t7
-        async function executeRewardSyncWithNodeServer() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: hourlyRewardCoinsPool, 
-                        action: "hourly_bonus_claim",
-                        syncTask: "t7" // Completes Daily Task 't7'
-                    })
-                });
+        // 💰 REWARD ENGINE: Firebase Direct Sync, Syncs t7
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+
+            // Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + hourlyRewardCoinsPool;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    
-                    localStorage.setItem("lastHourlyClaimedTime", Date.now().toString());
-                    
-                    executeResetValidationUI();
-                    executeValidateHourlyTimerStatus(); 
-                    showCustomAlert("err_success", true);
-                }
-            } catch (err) {
+                // Mark Daily Task 't7' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t7")) {
+                        tasks.push("t7");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                localStorage.setItem("lastHourlyClaimedTime", Date.now().toString());
+                executeResetValidationUI();
+                executeValidateHourlyTimerStatus(); 
+                showCustomAlert("err_success", true);
+                
+            }).catch(() => {
                 executeResetValidationUI();
                 alert("Task Verified but couldn't sync with server. Try again.");
-            }
+            });
         }
 
         function executeResetValidationUI() {
@@ -465,7 +561,7 @@
             let currentLang = localStorage.getItem("selectedLang") || "en";
             document.getElementById("claimDropBtn").innerHTML = `<i class="fa-solid fa-gift"></i> ${langData[currentLang]["hb_claim"] || "Claim Hourly Bonus"}`;
             document.getElementById("claimDropBtn").disabled = false;
-            document.getElementById("validationClockTxt").innerText = "15s";
+            document.getElementById("validationClockTxt").innerText = `${globalAdTimerSeconds}s`;
         }
     </script>
 </body>

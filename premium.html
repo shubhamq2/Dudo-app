@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -22,24 +27,32 @@
             --text-sub: #94a3b8;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(255, 87, 34, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(255, 87, 34, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
         
+        /* 🔥 FIX 1: Main Container Alignment */
+        .main-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
         /* Premium Sync Header (Deep Orange Theme) */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-orange); backdrop-filter: blur(10px); }
         .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-orange); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(255, 87, 34, 0.15); transition: 0.2s; border: 1px solid rgba(255, 87, 34, 0.3); }
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-orange); font-weight: bold; cursor: pointer; }
 
-        /* Profile Balance Ribbon */
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-orange)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
+
+        /* PLAY STORE SAFE: Single Balance Ribbon (Only Coins) */
         .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-orange); padding: 15px 20px; border-radius: 16px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(255, 87, 34, 0.2); backdrop-filter: blur(10px); }
         .balance-card span { font-size: 18px; font-weight: 900; }
         .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
-        /* Banner Ads Slots */
-        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(255, 87, 34, 0.4); box-sizing: border-box; }
+        /* 🔥 FIX 2: Banner Ads Slots Proper CSS */
+        .ad-banner-slot { width: 92%; max-width: 440px; min-height: 52px; background: rgba(255,255,255,0.03); margin: 15px 0; border-radius: 12px; display: none; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(255, 87, 34, 0.4); box-sizing: border-box; }
+        .grid-container .ad-banner-slot { width: 100%; max-width: 100%; margin: 0; }
 
         /* Grid Layout Components */
         .section-label { width: 92%; max-width: 440px; font-size: 14.5px; font-weight: 900; color: var(--accent-orange); text-transform: uppercase; letter-spacing: 0.8px; margin: 15px 0 10px 0; text-align: left; border-left: 4px solid var(--accent-orange); padding-left: 8px; }
@@ -78,6 +91,13 @@
         .task-action-btn:disabled { opacity: 0.6; cursor: not-allowed; background: #475569; box-shadow: none; }
         .close-task-modal { background: none; border: none; color: var(--accent-pink); font-size: 13.5px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 18px; padding: 8px 15px; display: inline-block; transition: 0.2s; }
         .close-task-modal:active { background: rgba(239, 68, 68, 0.1); border-radius: 8px; }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-orange); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -88,13 +108,24 @@
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Ad Verification</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <!-- 🎬 PREMIUM DIJAIN: TASK DESCRIPTION POPUP -->
     <div class="modal-overlay-task" id="taskInstructionModal">
         <div class="modal-card-task">
             <div class="modal-title-task" id="modalTaskTitle">🚀 Premium Ad Task</div>
             <div class="modal-desc-task" id="modalTaskInstructions">Task instructions details text...</div>
             
-            <button class="task-action-btn" id="btnStartTask" onclick="executeTaskRedirection()">Watch & Earn (25s)</button>
+            <button class="task-action-btn" id="btnStartTask" onclick="executeTaskRedirection()">Watch & Earn</button>
             <br>
             <button class="close-task-modal" onclick="closeTaskInstructionModal()">Cancel ×</button>
         </div>
@@ -103,122 +134,150 @@
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="mt_title">Premium Ads</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
-    </div>
-
-    <div class="balance-card">
-        <span id="liveUserBalance">₹0.00</span>
-        <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
-    </div>
-    
-    <div class="ad-container-block">
-        <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
-        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
-        <!-- 📢 ADMIN CONNECTED AD SLOT 2 -->
-        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
-    </div>
-
-    <div class="section-label" data-i18n="mt_label1">Premium Ad Formats</div>
-
-    <div class="grid-container">
-        <div class="zone-card" onclick="openTaskInstruction('smartlink', '🚀', 'Smartlink Ads')">
-            <div class="zone-badge badge-top" data-i18n="mt_top">Highest Pay</div>
-            <div class="zone-icon">🚀</div>
-            <h3 data-i18n="mt_smartlink">Smartlinks</h3>
-            <p data-i18n="mt_smartlink_desc">Direct high CPM links</p>
-        </div>
-
-        <div class="zone-card" onclick="openTaskInstruction('popunder', '🖱️', 'Popunder Ads')">
-            <div class="zone-badge badge-popular" data-i18n="mt_pop">Popular</div>
-            <div class="zone-icon">🖱️</div>
-            <h3 data-i18n="mt_popunder">Popunders</h3>
-            <p data-i18n="mt_popunder_desc">Click & background view</p>
-        </div>
-
-        <div class="zone-card" onclick="openTaskInstruction('push', '🔔', 'Push Notifications')">
-            <div class="zone-icon">🔔</div>
-            <h3 data-i18n="mt_push">Push Ads</h3>
-            <p data-i18n="mt_push_desc">Subscribe to alerts</p>
-        </div>
-
-        <div class="zone-card" onclick="openTaskInstruction('interstitial', '🖼️', 'Interstitial Ads')">
-            <div class="zone-icon">🖼️</div>
-            <h3 data-i18n="mt_inter">Interstitials</h3>
-            <p data-i18n="mt_inter_desc">Full screen premium ads</p>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
         </div>
     </div>
 
-    <div class="section-label" data-i18n="mt_label2">Quick Engagements</div>
+    <div class="main-container">
 
-    <div class="grid-container">
-        <div class="zone-card" onclick="openTaskInstruction('inpage', '📱', 'In-Page Push Ads')">
-            <div class="zone-badge badge-new" data-i18n="mt_new">Easy</div>
-            <div class="zone-icon">📱</div>
-            <h3 data-i18n="mt_inpage">In-Page Push</h3>
-            <p data-i18n="mt_inpage_desc">Banner style alerts</p>
+        <!-- PLAY STORE SAFE: Only show Coins -->
+        <div class="balance-card">
+            <span style="color:var(--text-sub); font-size:14px; text-transform:uppercase; letter-spacing:1px;">📺 Premium Ads</span>
+            <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
+        </div>
+        
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
+
+        <div class="section-label" data-i18n="mt_label1">Premium Ad Formats</div>
+
+        <div class="grid-container">
+            <!-- Play Store Safe Terms applied below -->
+            <div class="zone-card" onclick="openTaskInstruction('smartlink', '🚀', 'Smartlink Ads')">
+                <div class="zone-badge badge-top" data-i18n="mt_top">Premium</div>
+                <div class="zone-icon">🚀</div>
+                <h3 data-i18n="mt_smartlink">Smartlinks</h3>
+                <p data-i18n="mt_smartlink_desc">Direct link views</p>
+            </div>
+
+            <div class="zone-card" onclick="openTaskInstruction('popunder', '🖱️', 'Popunder Ads')">
+                <div class="zone-badge badge-popular" data-i18n="mt_pop">Popular</div>
+                <div class="zone-icon">🖱️</div>
+                <h3 data-i18n="mt_popunder">Popunders</h3>
+                <p data-i18n="mt_popunder_desc">Background view</p>
+            </div>
+
+            <div class="ad-banner-slot" style="grid-column: span 2;" id="adminBannerSlot2"></div>
+
+            <div class="zone-card" onclick="openTaskInstruction('push', '🔔', 'Push Notifications')">
+                <div class="zone-icon">🔔</div>
+                <h3 data-i18n="mt_push">Push Ads</h3>
+                <p data-i18n="mt_push_desc">Subscribe to alerts</p>
+            </div>
+
+            <div class="zone-card" onclick="openTaskInstruction('interstitial', '🖼️', 'Interstitial Ads')">
+                <div class="zone-icon">🖼️</div>
+                <h3 data-i18n="mt_inter">Interstitials</h3>
+                <p data-i18n="mt_inter_desc">Full screen premium ads</p>
+            </div>
         </div>
 
-        <div class="zone-card" onclick="openTaskInstruction('reward', '🎁', 'Reward Links')">
-            <div class="zone-icon">🎁</div>
-            <h3 data-i18n="mt_reward">Reward Ads</h3>
-            <p data-i18n="mt_reward_desc">Watch full to get coins</p>
+        <div class="section-label" data-i18n="mt_label2">Quick Engagements</div>
+
+        <div class="grid-container">
+            <div class="zone-card" onclick="openTaskInstruction('inpage', '📱', 'In-Page Push Ads')">
+                <div class="zone-badge badge-new" data-i18n="mt_new">Easy</div>
+                <div class="zone-icon">📱</div>
+                <h3 data-i18n="mt_inpage">In-Page Push</h3>
+                <p data-i18n="mt_inpage_desc">Banner style alerts</p>
+            </div>
+
+            <div class="zone-card" onclick="openTaskInstruction('reward', '🎁', 'Reward Links')">
+                <div class="zone-icon">🎁</div>
+                <h3 data-i18n="mt_reward">Reward Ads</h3>
+                <p data-i18n="mt_reward_desc">Watch full to get coins</p>
+            </div>
+        </div>
+
+        <div class="ad-banner-slot" id="adminBannerSlot3"></div>
+        <div class="ad-banner-slot" id="adminBannerSlot4"></div>
+
+        <div class="security-box">
+            <span style="font-size: 18px;">🛡️</span>
+            <span data-i18n="mt_security">View ads completely to register your activity securely. Engaging with ads helps complete verification faster.</span>
         </div>
     </div>
 
-    <div class="ad-container-block">
-        <!-- 📢 ADMIN CONNECTED AD SLOT 3 -->
-        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
-        <!-- 📢 ADMIN CONNECTED AD SLOT 4 -->
-        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
-    </div>
-
-    <div class="security-box">
-        <span style="font-size: 18px;">🛡️</span>
-        <span data-i18n="mt_security">View ads completely to register your activity securely. Clicking on valid ad elements helps complete verification faster.</span>
-    </div>
-
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & COINS 🔥
+        let globalAdTimerSeconds = 25; // Default time
+        let globalRewardCoins = 30;    // Default coins
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS (Play Store Safe)
         const langData = {
-            "en": { "mt_title": "Premium Ads", "mt_label1": "Premium Ad Formats", "mt_label2": "Quick Engagements", "mt_smartlink": "Smartlinks", "mt_smartlink_desc": "Direct high CPM links", "mt_popunder": "Popunders", "mt_popunder_desc": "Click & background view", "mt_push": "Push Ads", "mt_push_desc": "Subscribe to alerts", "mt_inter": "Interstitials", "mt_inter_desc": "Full screen premium ads", "mt_inpage": "In-Page Push", "mt_inpage_desc": "Banner style alerts", "mt_reward": "Reward Ads", "mt_reward_desc": "Watch full to get coins", "mt_top": "Highest Pay", "mt_pop": "Popular", "mt_new": "Easy", "mt_security": "View ads completely to register your activity securely. Engaging with ads helps complete verification faster.", "err_early": "❌ Verification Incomplete! Please stay on the ad page for the required time.", "err_invalid": "❌ Tracking Interrupted! Please avoid switching tabs during the ad view.", "err_success": "🎉 Task Verified! 30 Points added via ", "verifying": "Watching... ", "start_task": "Watch & Earn (25s)",
+            "en": { 
+                "mt_title": "Premium Ads", "mt_label1": "Premium Ad Formats", "mt_label2": "Quick Engagements", 
+                "mt_smartlink": "Smartlinks", "mt_smartlink_desc": "Direct link views", "mt_popunder": "Popunders", "mt_popunder_desc": "Background view", 
+                "mt_push": "Push Ads", "mt_push_desc": "Subscribe to alerts", "mt_inter": "Interstitials", "mt_inter_desc": "Full screen premium ads", 
+                "mt_inpage": "In-Page Push", "mt_inpage_desc": "Banner style alerts", "mt_reward": "Reward Ads", "mt_reward_desc": "Watch full to get coins", 
+                "mt_top": "Premium", "mt_pop": "Popular", "mt_new": "Easy", 
+                "mt_security": "View ads completely to register your activity securely. Engaging with ads helps complete verification faster.", 
+                "err_early": "❌ Verification Incomplete! Please stay on the ad page for the required time.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please avoid switching tabs during the ad view.", "err_success": "🎉 Task Verified! Points added via ", "verifying": "Watching... ", "start_task": "Watch & Earn",
                 "inst_smartlink": "👉 <b>STEPS TO EARN:</b><br>1. Click the button to open the Smartlink Ad.<br>2. Wait on the page and interact with the content.<br>3. Do not close the window before the timer finishes.",
-                "inst_popunder": "👉 <b>STEPS TO EARN:</b><br>1. Open the link (it may open a background tab).<br>2. View the loaded website completely.<br>3. Wait for 25 seconds to sync your view.",
-                "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Click below to load the Premium Advertisement.<br>2. If asked, allow notifications or click 'Next'.<br>3. Stay active for 25 seconds to register your view."
+                "inst_popunder": "👉 <b>STEPS TO EARN:</b><br>1. Open the link (it may open a background tab).<br>2. View the loaded website completely.<br>3. Wait for the required time to sync your view.",
+                "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Click below to load the Premium Advertisement.<br>2. If asked, allow notifications or click 'Next'.<br>3. Stay active until the timer finishes to register your view."
             },
-            "hi": { "mt_title": "प्रीमियम विज्ञापन", "mt_label1": "प्रीमियम विज्ञापन", "mt_label2": "क्विक अर्निंग", "mt_smartlink": "स्मार्टलिंक्स", "mt_smartlink_desc": "डायरेक्ट हाई CPM लिंक", "mt_popunder": "पॉपअंडर एड्स", "mt_popunder_desc": "बैकग्राउंड में देखें", "mt_push": "पुश एड्स", "mt_push_desc": "अलर्ट्स सब्सक्राइब करें", "mt_inter": "इंटरस्टीशियल", "mt_inter_desc": "फुल स्क्रीन विज्ञापन", "mt_inpage": "इन-पेज पुश", "mt_inpage_desc": "बैनर स्टाइल अलर्ट्स", "mt_reward": "रिवॉर्ड एड्स", "mt_reward_desc": "पूरा देखकर पॉइंट्स पाएं", "mt_top": "सबसे ज्यादा", "mt_pop": "लोकप्रिय", "mt_new": "आसान", "mt_security": "अपनी गतिविधि दर्ज करने के लिए विज्ञापन पूरा देखें। विज्ञापन पर क्लिक करने से सत्यापन जल्दी पूरा होता है।", "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए विज्ञापन पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: कृपया विज्ञापन देखते समय टैब बदलने से बचें।", "err_success": "🎉 टास्क पूरा हुआ! आपके वॉलेट में 30 पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "चेक हो रहा है... ", "start_task": "देखें और कमाएं (25s)",
+            "hi": { 
+                "mt_title": "प्रीमियम विज्ञापन", "mt_label1": "प्रीमियम विज्ञापन", "mt_label2": "क्विक अर्निंग", 
+                "mt_smartlink": "स्मार्टलिंक्स", "mt_smartlink_desc": "डायरेक्ट विज्ञापन", "mt_popunder": "पॉपअंडर एड्स", "mt_popunder_desc": "बैकग्राउंड में देखें", 
+                "mt_push": "पुश एड्स", "mt_push_desc": "अलर्ट्स सब्सक्राइब करें", "mt_inter": "इंटरस्टीशियल", "mt_inter_desc": "फुल स्क्रीन विज्ञापन", 
+                "mt_inpage": "इन-पेज पुश", "mt_inpage_desc": "बैनर स्टाइल अलर्ट्स", "mt_reward": "रिवॉर्ड एड्स", "mt_reward_desc": "पूरा देखकर पॉइंट्स पाएं", 
+                "mt_top": "प्रीमियम", "mt_pop": "लोकप्रिय", "mt_new": "आसान", 
+                "mt_security": "अपनी गतिविधि दर्ज करने के लिए विज्ञापन पूरा देखें। विज्ञापन पर क्लिक करने से सत्यापन जल्दी पूरा होता है।", 
+                "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए विज्ञापन पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: ऐप मिनीमाइज करना मना है। कृपया टैब बदलने से बचें।", "err_success": "🎉 टास्क पूरा हुआ! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "चेक हो रहा है... ", "start_task": "देखें और कमाएं",
                 "inst_smartlink": "👉 <b>पूरा करने के नियम:</b><br>1. स्मार्टलिंक एड खोलने के लिए बटन दबाएं।<br>2. पेज पर रुकें और कंटेंट को देखें।<br>3. टाइमर खत्म होने से पहले विंडो बंद न करें।",
-                "inst_popunder": "👉 <b>पूरा करने के नियम:</b><br>1. लिंक खोलें (यह एक बैकग्राउंड टैब खोल सकता है)।<br>2. पूरी वेबसाइट को लोड होने दें और देखें।<br>3. अपने पैसे क्रेडिट होने के लिए 25 सेकंड इंतज़ार करें।",
-                "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. विज्ञापन लोड करने के लिए नीचे क्लिक करें।<br>2. अगर पूछा जाए, तो नोटिफिकेशन Allow करें या Next दबाएं।<br>3. 25 सेकंड तक सक्रिय रहें।"
+                "inst_popunder": "👉 <b>पूरा करने के नियम:</b><br>1. लिंक खोलें (यह एक बैकग्राउंड टैब खोल सकता है)।<br>2. पूरी वेबसाइट को लोड होने दें और देखें।<br>3. अपने पॉइंट्स क्रेडिट होने के लिए इंतज़ार करें।",
+                "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. विज्ञापन लोड करने के लिए नीचे क्लिक करें।<br>2. अगर पूछा जाए, तो नोटिफिकेशन Allow करें या Next दबाएं।<br>3. टाइमर खत्म होने तक सक्रिय रहें।"
             },
-            "bn": { "mt_title": "প্রিমিয়াম বিজ্ঞাপন", "mt_label1": "প্রিমিয়াম অ্যাডস", "mt_label2": "দ্রুত আয়", "mt_smartlink": "স্মার্টলিংক", "mt_smartlink_desc": "সরাসরি লিংক", "mt_popunder": "পপআন্ডার", "mt_popunder_desc": "ব্যাকগ্রাউন্ড ভিউ", "mt_push": "পুশ অ্যাড", "mt_push_desc": "অ্যালার্ট সাবস্ক্রাইব", "mt_inter": "ইন্টারস্টিশিয়াল", "mt_inter_desc": "ফুল স্ক্রিন বিজ্ঞাপন", "mt_inpage": "ইন-পেজ পুশ", "mt_inpage_desc": "ব্যানার অ্যালার্ট", "mt_reward": "রিওয়ার্ড অ্যাড", "mt_reward_desc": "পুরো দেখুন ও আয় করুন", "mt_top": "সর্বোচ্চ", "mt_pop": "জনপ্রিয়", "mt_new": "সহজ", "mt_security": "পুরস্কার পেতে বিজ্ঞাপনগুলো সম্পূর্ণ দেখুন।", "err_early": "❌ অসম্পূর্ণ! আপনাকে ২৫ সেকেন্ড অপেক্ষা করতে হবে।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: অ্যাড পেজে থাকুন।", "err_success": "🎉 টাস্ক ভেরিফাইড! ৩০ পয়েন্ট যোগ করা হয়েছে: ", "verifying": "অ্যাড চলছে... ", "start_task": "দেখুন এবং আয় করুন (25s)",
-                "inst_smartlink": "👉 <b>নির্দেশনা:</b><br>১. স্মার্টলিংক খুলতে ক্লিক করুন।<br>২. পেজে থাকুন এবং দেখুন।<br>৩. ২৫ সেকেন্ডের আগে বন্ধ করবেন না।",
-                "inst_popunder": "👉 <b>নির্দেশনা:</b><br>১. লিংকটি খুলুন।<br>২. পুরো ওয়েবসাইটটি লোড হতে দিন।<br>৩. অন্তত ২৫ সেকেন্ড অপেক্ষা করুন।",
-                "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. বিজ্ঞাপন দেখতে নিচে ক্লিক করুন।<br>২. নিয়ম মেনে কাজ করুন।<br>৩. অন্তত ২৫ সেকেন্ড অপেক্ষা করুন।"
+            "bn": { "mt_title": "প্রিমিয়াম বিজ্ঞাপন", "mt_label1": "প্রিমিয়াম অ্যাডস", "mt_label2": "দ্রুত আয়", "mt_smartlink": "স্মার্টলিংক", "mt_smartlink_desc": "সরাসরি লিংক", "mt_popunder": "পপআন্ডার", "mt_popunder_desc": "ব্যাকগ্রাউন্ড ভিউ", "mt_push": "পুশ অ্যাড", "mt_push_desc": "অ্যালার্ট সাবস্ক্রাইব", "mt_inter": "ইন্টারস্টিশিয়াল", "mt_inter_desc": "ফুল স্ক্রিন বিজ্ঞাপন", "mt_inpage": "ইন-পেজ পুশ", "mt_inpage_desc": "ব্যানার অ্যালার্ট", "mt_reward": "রিওয়ার্ড অ্যাড", "mt_reward_desc": "পুরো দেখুন ও আয় করুন", "mt_top": "প্রিমিয়াম", "mt_pop": "জনপ্রিয়", "mt_new": "সহজ", "mt_security": "পুরস্কার পেতে বিজ্ঞাপনগুলো সম্পূর্ণ দেখুন।", "err_early": "❌ অসম্পূর্ণ! আপনাকে সম্পূর্ণ সময় অপেক্ষা করতে হবে।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: অ্যাড পেজেই থাকুন।", "err_success": "🎉 টাস্ক ভেরিফাইড! পয়েন্ট যোগ করা হয়েছে: ", "verifying": "অ্যাড চলছে... ", "start_task": "দেখুন এবং আয় করুন",
+                "inst_smartlink": "👉 <b>নির্দেশনা:</b><br>১. স্মার্টলিংক খুলতে ক্লিক করুন।<br>২. পেজে থাকুন এবং দেখুন।<br>৩. সময় শেষ হওয়ার আগে বন্ধ করবেন না।",
+                "inst_popunder": "👉 <b>নির্দেশনা:</b><br>১. লিংকটি খুলুন।<br>২. পুরো ওয়েবসাইটটি লোড হতে দিন।<br>৩. অন্তত প্রয়োজনীয় সময় অপেক্ষা করুন।",
+                "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. বিজ্ঞাপন দেখতে নিচে ক্লিক করুন।<br>২. নিয়ম মেনে কাজ করুন।<br>৩. সময় শেষ হওয়া পর্যন্ত অপেক্ষা করুন।"
             },
-            "te": { "mt_title": "ప్రీమియం యాడ్స్", "mt_security": "యాడ్స్‌ను పూర్తిగా చూడండి.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి యాడ్ పేజీలోనే ఉండండి.", "err_success": "🎉 విజయం! 30 పాయింట్లు జోడించబడ్డాయి: " },
-            "mr": { "mt_title": "प्रीमियम जाहिराती", "mt_security": "जाहिरात पूर्णपणे पहा.", "err_early": "❌ अपूर्ण! कृपया टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया जाहिरात पेजवरच थांबा.", "err_success": "🎉 यशस्वी! 30 पॉइंट्स जोडले गेले: " },
-            "ta": { "mt_title": "பிரீமியம் விளம்பரங்கள்", "mt_security": "விளம்பரங்களை முழுமையாக பார்க்கவும்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ விளம்பரப் பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 வெற்றி! 30 புள்ளிகள் சேர்க்கப்பட்டன: " },
-            "ur": { "mt_title": "پریمیم اشتہارات", "mt_security": "اشتہارات کو مکمل دیکھیں۔", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم ایڈ پیج پر رہیں۔", "err_success": "🎉 کامیابی! 30 پوائنٹس شامل کر دیے گئے: " },
-            "gu": { "mt_title": "પ્રીમિયમ જાહેરાતો", "mt_security": "જાહેરાતો સંપૂર્ણપણે જુઓ.", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને એડ પેજ પર રહો.", "err_success": "🎉 સફળતા! 30 પોઇન્ટ્સ ઉમેરાયા: " },
-            "es": { "mt_title": "Anuncios Premium", "mt_security": "Vea los anuncios completamente.", "err_early": "❌ ¡Incompleto! Mantenga la pestaña abierta.", "err_invalid": "❌ Quédese en la página del anuncio.", "err_success": "🎉 ¡Éxito! 30 puntos añadidos: " },
-            "fr": { "mt_title": "Annonces Premium", "mt_security": "Voir les annonces complètement.", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page de l'annonce.", "err_success": "🎉 Succès ! 30 points ajoutés : " },
-            "ar": { "mt_title": "إعلانات مميزة", "mt_security": "شاهد الإعلانات بالكامل.", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في صفحة الإعلان.", "err_success": "🎉 نجاح! تمت إضافة 30 نقطة: " },
-            "pt": { "mt_title": "Anúncios Premium", "mt_security": "Veja os anúncios completamente.", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página do anúncio.", "err_success": "🎉 Sucesso! 30 pontos adicionados: " },
-            "ru": { "mt_title": "Премиум реклама", "mt_security": "Просматривайте рекламу полностью.", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице рекламы.", "err_success": "🎉 Успех! Добавлено 30 очков: " }
+            "te": { "mt_title": "ప్రీమియం యాడ్స్", "mt_security": "యాడ్స్‌ను పూర్తిగా చూడండి.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి యాడ్ పేజీలోనే ఉండండి.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి: ", "start_task": "ప్రారంభించండి" },
+            "mr": { "mt_title": "प्रीमियम जाहिराती", "mt_security": "जाहिरात पूर्णपणे पहा.", "err_early": "❌ अपूर्ण! कृपया टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया जाहिरात पेजवरच थांबा.", "err_success": "🎉 यशस्वी! पॉइंट्स जोडले गेले: ", "start_task": "सुरू करा" },
+            "ta": { "mt_title": "பிரீமியம் விளம்பரங்கள்", "mt_security": "விளம்பரங்களை முழுமையாக பார்க்கவும்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ விளம்பரப் பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 வெற்றி! புள்ளிகள் சேர்க்கப்பட்டன: ", "start_task": "தொடங்கு" },
+            "ur": { "mt_title": "پریمیم اشتہارات", "mt_security": "اشتہارات کو مکمل دیکھیں۔", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم ایڈ پیج پر رہیں۔", "err_success": "🎉 کامیابی! پوائنٹس شامل کر دیے گئے: ", "start_task": "شروع کریں" },
+            "gu": { "mt_title": "પ્રીમિયમ જાહેરાતો", "mt_security": "જાહેરાતો સંપૂર્ણપણે જુઓ.", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને એડ પેજ પર રહો.", "err_success": "🎉 સફળતા! પોઇન્ટ્સ ઉમેરાયા: ", "start_task": "શરૂ કરો" },
+            "es": { "mt_title": "Anuncios Premium", "mt_security": "Vea los anuncios completamente.", "err_early": "❌ ¡Incompleto! Mantenga la pestaña abierta.", "err_invalid": "❌ Quédese en la página del anuncio.", "err_success": "🎉 ¡Éxito! Puntos añadidos: ", "start_task": "Empezar" },
+            "fr": { "mt_title": "Annonces Premium", "mt_security": "Voir les annonces complètement.", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page de l'annonce.", "err_success": "🎉 Succès ! Points ajoutés : ", "start_task": "Commencer" },
+            "ar": { "mt_title": "إعلانات مميزة", "mt_security": "شاهد الإعلانات بالكامل.", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في صفحة الإعلان.", "err_success": "🎉 نجاح! تمت إضافة نقاط: ", "start_task": "ابدأ المهمة" },
+            "pt": { "mt_title": "Anúncios Premium", "mt_security": "Veja os anúncios completamente.", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página do anúncio.", "err_success": "🎉 Sucesso! Pontos adicionados: ", "start_task": "Iniciar" },
+            "ru": { "mt_title": "Премиум реклама", "mt_security": "Просматривайте рекламу полностью.", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице рекламы.", "err_success": "🎉 Успех! Добавлено очков: ", "start_task": "Начать" }
         };
 
         function changeLanguage(langCode) {
@@ -229,77 +288,107 @@
                 if(transObj[key]) elem.innerText = transObj[key];
             });
             document.getElementById("appLanguage").value = langCode;
-        }
-
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-
-        // 🔥 DYNAMIC ROUTING MAP FOR ALL 6 AD CATEGORIES (Fetched from Admin)
-        let monetagLinksAdminConfig = {
-            smartlink: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            popunder: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            push: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            interstitial: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            inpage: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            reward: "https://www.highperformanceformat.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
-        };
-
-        document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
-            let savedLang = localStorage.getItem("selectedLang") || "en";
-            changeLanguage(savedLang);
-
-            fetchDataFromAdminServer();
-        });
-
-        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                }
-
-                // 2. Fetch Admin Banners and Specific Links
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    // Banners Injection
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
-                        if(confData.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.banners[3];
-                    }
-                    
-                    // Ad Links Injection
-                    if (confData.adLinks) {
-                        Object.keys(monetagLinksAdminConfig).forEach(key => {
-                            monetagLinksAdminConfig[key] = confData.adLinks[key] || confData.globalSmartlink || monetagLinksAdminConfig[key];
-                        });
-                    } else if (confData.globalSmartlink) {
-                        Object.keys(monetagLinksAdminConfig).forEach(key => {
-                            monetagLinksAdminConfig[key] = confData.globalSmartlink;
-                        });
-                    }
-                }
-            } catch (err) {
-                console.log("Using default cached configuration.");
+            
+            // Re-render modal if open
+            if(document.getElementById("taskInstructionModal").style.display === "flex") {
+                openTaskInstruction(currentActiveTaskKey, '', document.getElementById("modalTaskTitle").innerText.replace(/.*?(?=[a-zA-Z])/,''));
             }
         }
 
-        // 🔥 STATE VEHICLE PARAMETERS FOR ACTIVE TASK VIEWPORT
+        const uid = localStorage.getItem("userId");
+
+        // 🔥 DYNAMIC ROUTING MAP FOR ALL 6 AD CATEGORIES (Fetched from Admin)
+        let monetagLinksAdminConfig = {
+            smartlink: "", popunder: "", push: "", interstitial: "", inpage: "", reward: "",
+            default_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
+        };
+
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid) { window.location.replace("index.html"); return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Time, Coins & All 6 Ad Links)
+                    db.ref('global_system_runtime_configurations/premium_ads_configs').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME AND COINS
+                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            if (adminData.reward_coins) { globalRewardCoins = parseInt(adminData.reward_coins); }
+                            
+                            // Load Banners
+                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+
+                            // Load Ad Links Configuration
+                            monetagLinksAdminConfig.smartlink = adminData.link_smartlink || "";
+                            monetagLinksAdminConfig.popunder = adminData.link_popunder || "";
+                            monetagLinksAdminConfig.push = adminData.link_push || "";
+                            monetagLinksAdminConfig.interstitial = adminData.link_interstitial || "";
+                            monetagLinksAdminConfig.inpage = adminData.link_inpage || "";
+                            monetagLinksAdminConfig.reward = adminData.link_reward || "";
+                        } else {
+                            // Fallback to Global Smartlink
+                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
+                                if(globalSnap.exists()) {
+                                    monetagLinksAdminConfig.default_link = globalSnap.val();
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+        });
+
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+
         let currentActiveTaskKey = "";
         let activeWatchSession = null;
         let targetWindow = null;
         let offerTimer = null;
-        let totalSecondsOpen = 0;
+        let isValidationActive = false;
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
@@ -337,7 +426,7 @@
             
             let startBtn = document.getElementById("btnStartTask");
             startBtn.disabled = false;
-            startBtn.innerText = transObj["start_task"] || "Watch & Earn (25s)";
+            startBtn.innerText = transObj["start_task"] ? `${transObj["start_task"]} (${globalAdTimerSeconds}s)` : `Watch & Earn (${globalAdTimerSeconds}s)`;
 
             document.getElementById("taskInstructionModal").style.display = "flex";
         }
@@ -345,94 +434,101 @@
         function closeTaskInstructionModal() {
             document.getElementById("taskInstructionModal").style.display = "none";
             activeWatchSession = null;
+            isValidationActive = false;
         }
 
-        // 🚀 PLAY STORE SAFE SYSTEM VALIDATION LOGIC (25 SECONDS)
+        // 🚀 PLAY STORE SAFE IN-APP SYSTEM VALIDATION LOGIC
         function executeTaskRedirection() {
+            if(isValidationActive) return;
+            isValidationActive = true;
+
             let taskKey = currentActiveTaskKey;
             activeWatchSession = { taskKey: taskKey, isValid: true };
 
             const startBtn = document.getElementById("btnStartTask");
             let lang = localStorage.getItem("selectedLang") || "en";
-            let verifyText = langData[lang] && langData[lang]["verifying"] ? langData[lang]["verifying"] : "Watching... ";
+            let verifyText = langData[lang] && langData[lang]["verifying"] ? langData[lang]["verifying"] : "Verifying tracking... ";
 
             startBtn.disabled = true;
 
-            // Redirect smoothly to dynamic admin link
-            let targetDestinationUrl = monetagLinksAdminConfig[taskKey];
-            targetWindow = window.open(targetDestinationUrl, '_blank', 'noopener,noreferrer');
+            // Target link logic
+            let targetDestinationUrl = monetagLinksAdminConfig[taskKey] || monetagLinksAdminConfig.default_link;
+            let countdownTime = globalAdTimerSeconds;
 
-            let countdownTime = 25;
-            totalSecondsOpen = 0;
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = targetDestinationUrl;
             
             if(offerTimer) clearInterval(offerTimer);
 
             offerTimer = setInterval(() => {
                 countdownTime--;
                 startBtn.innerText = `${verifyText}(${countdownTime}s)`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
 
-                // Safe Validation 1: Tab closed early
-                if (targetWindow && targetWindow.closed) {
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if (document.hidden) { 
                     clearInterval(offerTimer);
                     closeTaskInstructionModal();
-                    showCustomAlert("err_early");
-                    activeWatchSession = null;
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
+                    showCustomAlert("err_invalid");
                     return;
                 }
-
-                // Safe Validation 2: Invalid tab switching
-                if (!document.hidden) {
-                    if (totalSecondsOpen < 24) { 
-                        clearInterval(offerTimer);
-                        closeTaskInstructionModal();
-                        showCustomAlert("err_invalid");
-                        activeWatchSession = null;
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
 
                 if (countdownTime <= 0) {
                     clearInterval(offerTimer);
                     startBtn.innerText = "SAVING...";
-                    evaluateTaskRewardViaNodeServer(taskKey);
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
-        async function evaluateTaskRewardViaNodeServer(taskKey) {
+        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION (PURE FIREBASE)
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            evaluateTaskRewardViaFirebase(currentActiveTaskKey);
+        }
+
+        function evaluateTaskRewardViaFirebase(taskKey) {
             document.getElementById("taskInstructionModal").style.display = "none";
-            if (!activeWatchSession || !activeWatchSession.isValid) { activeWatchSession = null; return; }
+            if (!activeWatchSession || !activeWatchSession.isValid) { 
+                activeWatchSession = null; 
+                isValidationActive = false;
+                return; 
+            }
 
             let nameDisplay = taskKey.toUpperCase();
 
-            try {
-                // Call API to add 30 Points and Sync Daily Task 't3'
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: 30, 
-                        action: `ad_task_${nameDisplay}`,
-                        syncTask: "t3" // Tells backend to complete task 't3'
-                    })
-                });
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + globalRewardCoins;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
-                    
-                    showCustomAlert("err_success", `${nameDisplay} Ad`, true);
-                }
-            } catch (err) {
-                alert("Task Verified but couldn't sync with server. Try again.");
-            }
+                // 2. Mark Daily Task 't3' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t3")) {
+                        tasks.push("t3");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
 
-            activeWatchSession = null;
+                showCustomAlert("err_success", `${nameDisplay} Ad (${globalRewardCoins} 🪙)`, true);
+                
+            }).catch(() => {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            }).finally(() => {
+                activeWatchSession = null;
+                isValidationActive = false;
+            });
         }
     </script>
 </body>

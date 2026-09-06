@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redeem Rewards - Dudo</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #facc15;
+            --accent-pink: #f43f5e;
+            --accent-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(168, 85, 247, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+        
+        /* Premium Sync Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-purple); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-purple); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(168, 85, 247, 0.15); transition: 0.2s; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
+
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-purple); font-weight: bold; cursor: pointer; }
+        
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
+
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+
+        /* Profile Balance Ribbon */
+        .balance-card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9)); border: 1px solid var(--accent-purple); padding: 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2); backdrop-filter: blur(10px); transition: 0.3s; }
+        .bal-left { transition: 0.3s; }
+        .bal-left p { margin: 0 0 5px 0; font-size: 12.5px; color: #d8b4fe; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+        .bal-left h2 { margin: 0; font-size: 32px; color: #fff; font-weight: 900; }
+        .bal-right { transition: 0.3s; }
+        .coin-txt { background: rgba(250, 204, 21, 0.1); border: 1px solid rgba(250, 204, 21, 0.4); color: var(--accent-gold); padding: 8px 15px; border-radius: 12px; font-size: 18px; font-weight: 900; display: inline-block; box-shadow: 0 4px 10px rgba(250, 204, 21, 0.2); }
+
+        /* 🔥 COINS TO CASH CONVERTER */
+        .converter-box { background: linear-gradient(135deg, var(--primary-blue), #1e3a8a); border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4); border: 1px solid #60a5fa; position: relative; overflow: hidden; transition: 0.3s; flex-direction: column; }
+        .converter-box::before { content: '\f021'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: -10px; right: 10px; font-size: 90px; opacity: 0.1; }
+        .converter-box h3 { margin: 0 0 8px 0; font-size: 18px; color: #fff; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; position: relative; z-index: 2; }
+        .converter-box p { margin: 0 0 18px 0; font-size: 13px; color: #bfdbfe; font-weight: 700; position: relative; z-index: 2; }
+        .convert-btn { background: var(--accent-gold); color: #000; border: none; padding: 14px 35px; border-radius: 50px; font-size: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 6px 15px rgba(250, 204, 21, 0.4); transition: 0.2s; position: relative; z-index: 2; letter-spacing: 0.5px; }
+        .convert-btn:active:not(:disabled) { transform: scale(0.96); }
+        .convert-btn:disabled { background: #475569; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+        /* 🔥 GAMING SAFE MODE BANNER */
+        .safe-mode-banner { background: linear-gradient(135deg, var(--accent-purple), #4c1d95); border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4); border: 1px solid #c084fc; position: relative; overflow: hidden; transition: 0.3s; flex-direction: column; }
+        .safe-mode-banner::before { content: '\f11b'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: -10px; right: 10px; font-size: 90px; opacity: 0.1; }
+        .safe-mode-banner h3 { margin: 0 0 8px 0; font-size: 18px; color: #fff; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; position: relative; z-index: 2; }
+        .safe-mode-banner p { margin: 0 0 15px 0; font-size: 13px; color: #e9d5ff; font-weight: 700; position: relative; z-index: 2; }
+        .safe-badges { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 2; }
+        .safe-badge-item { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 900; color: var(--accent-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        /* Method Selection Area */
+        .block-label { font-size: 14.5px; font-weight: 900; color: var(--accent-purple); text-transform: uppercase; margin: 15px 0 5px 0; text-align: left; letter-spacing: 0.5px; border-left: 4px solid var(--accent-purple); padding-left: 10px; }
+        
+        .method-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .method-tab { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 15px 5px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
+        .method-tab.active-method { background: rgba(168, 85, 247, 0.2); border-color: var(--accent-purple); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3); transform: translateY(-2px); }
+        .method-icon { font-size: 32px; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .method-title { font-size: 13.5px; font-weight: 800; color: #fff; margin-bottom: 3px; }
+        .method-min { font-size: 11px; color: var(--text-sub); font-weight: 600; }
+        .method-tab.active-method .method-title { color: var(--accent-purple); }
+
+        /* 💡 Instruction Box */
+        .instruction-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary-blue); border-radius: 12px; padding: 15px; margin-top: 10px; font-size: 12.5px; color: #cbd5e1; line-height: 1.5; font-weight: 600; text-align: center; }
+        .instruction-box b { color: var(--primary-blue); }
+
+        /* Inputs Form Control */
+        .form-container { background: var(--card-bg); border-radius: 20px; padding: 25px 20px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.4); backdrop-filter: blur(10px); }
+        .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; text-align: left; }
+        .input-group label { font-size: 11.5px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input { background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; padding: 16px; font-size: 16px; font-weight: 700; outline: none; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+        .form-input:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3), inset 0 2px 5px rgba(0,0,0,0.5); }
+
+        .action-prime-btn { width: 100%; background: linear-gradient(135deg, var(--accent-purple), #7e22ce); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4); outline: none; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+        .action-prime-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
+        .action-prime-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+        /* Security Ratio Box */
+        .ratio-meter-box { background: rgba(250, 204, 21, 0.05); border: 1px dashed var(--accent-gold); border-radius: 16px; padding: 18px; margin-top: 20px; font-size: 12.5px; color: #e2e8f0; line-height: 1.6; text-align: left; }
+        .rules-bullet-list { margin: 10px 0 0 0; padding-left: 18px; color: var(--text-sub); font-size: 11.5px; font-weight: 600; }
+        .rules-bullet-list li { margin-bottom: 6px; }
+
+        /* Custom Alert Popups */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); border-radius: 20px; padding: 25px; width: 85%; max-width: 350px; z-index: 1001; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.7); backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); }
+        #alertMsgText { font-weight: 700; line-height: 1.5; margin: 0 0 20px 0; font-size: 15px; color: #fff; white-space: pre-wrap; }
+        .alert-btn { background: var(--accent-purple); color: white; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 6px 15px rgba(168, 85, 247, 0.4); }
+        .alert-btn:active { transform: scale(0.95); }
+        .custom-alert.success-border .alert-btn { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 1000; backdrop-filter: blur(5px); }
+        
+        /* 🚨 PLAY STORE DEFAULT STATE: 100% GAMING MODE BY DEFAULT 🚨 */
+        .cash-ui { transition: 0.3s; display: none !important; }
+        #uiSafeModeBanner { display: flex !important; }
+        #uiCoinBox { text-align: center !important; width: 100% !important; }
+    </style>
+
+    <!-- ⚡⚡ REVERSE ANTI-FLICKER: SHOW CASH UI ONLY IF SAFE MODE IS STRICTLY FALSE ⚡⚡ -->
+    <script>
+        try {
+            let cssRules = "";
+            let cSafeMode = localStorage.getItem("d_safemode");
+            
+            // If Safe Mode is explicitly OFF, show Real Money instantly for real users
+            if (cSafeMode === "false" || cSafeMode === false) {
+                cssRules += ".cash-ui { display: flex !important; } ";
+                cssRules += "#uiBalBox.cash-ui { display: block !important; } ";
+                cssRules += "li.cash-ui { display: list-item !important; } ";
+                cssRules += "#uiCoinBox { text-align: right !important; width: auto !important; } ";
+                cssRules += "#uiSafeModeBanner { display: none !important; } ";
+            }
+            
+            // Hide admin toggled modules
+            let cToggles = localStorage.getItem("d_toggles");
+            if (cToggles) {
+                let toggles = JSON.parse(cToggles);
+                for (let key in toggles) {
+                    if (toggles[key] === false || toggles[key] === "false" || toggles[key] === 0) {
+                        cssRules += "#" + key + " { display: none !important; } ";
+                    }
+                }
+            }
+            
+            if (cssRules !== "") {
+                let style = document.createElement('style');
+                style.innerHTML = cssRules;
+                document.documentElement.appendChild(style);
+            }
+        } catch(e) {}
+    </script>
+</head>
+<body>
+
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <p id="alertMsgText"></p>
+        <button class="alert-btn" onclick="closeWithdrawalAlert()">OK</button>
+    </div>
+
+    <div class="header">
+        <a href="home.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="wd_title">Redeem Rewards</h2>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+               <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="balance-card">
+            <!-- 🚨 HIDDEN IN SAFE MODE -->
+            <div class="bal-left cash-ui" id="uiBalBox">
+                <p>Wallet Balance</p>
+                <h2 id="liveBalance">₹0.00</h2>
+            </div>
+            
+            <div class="bal-right" id="uiCoinBox">
+                <span class="coin-txt"><span id="liveCoins">0</span> 🪙</span>
+            </div>
+        </div>
+
+        <!-- 🔥 COIN TO CASH CONVERTER (Hidden in Safe Mode) -->
+        <div class="converter-box cash-ui" id="uiConverterBox">
+            <h3 data-i18n="conv_title">Convert Coins to Cash</h3>
+            <p data-i18n="conv_desc">100 Coins = ₹1.00 | Instant Transfer to Wallet</p>
+            <button class="convert-btn" id="btnConvert" onclick="executeCoinToCashConversion()">Convert All Coins</button>
+        </div>
+
+        <!-- 🔥 GAMING REWARDS HUB (Visible by Default for Safe Mode) -->
+        <div class="safe-mode-banner" id="uiSafeModeBanner">
+            <h3><i class="fa-solid fa-gamepad"></i> Gaming Rewards Hub</h3>
+            <p>Redeem your coins for exclusive digital game items and gift vouchers instantly!</p>
+            <div class="safe-badges">
+                <span class="safe-badge-item">10,000 🪙 = ₹100 Code</span>
+                <span class="safe-badge-item" style="color: var(--accent-cyan);">20,000 🪙 = 110 💎</span>
+            </div>
+        </div>
+
+        <div class="ratio-meter-box">
+            💡 <strong style="color:var(--accent-gold);" data-i18n="wd_ratio_lbl">Fair Play Security Rule:</strong> 
+            <span data-i18n="wd_ratio_desc">To process rewards safely, at least 50% of your earnings must be composed of active app tasks & ad views.</span>
+            <ul class="rules-bullet-list">
+                <li data-i18n="rule_1">Max 3 redeem requests permitted per day.</li>
+                <!-- 🚨 RULE HIDDEN IN SAFE MODE -->
+                <li class="cash-ui" id="uiRule2" data-i18n="rule_2">Single transaction max limit is ₹1,500.00.</li>
+                <li data-i18n="rule_3">Wrong game IDs/details will result in rejection.</li>
+            </ul>
+            <div style="margin-top:15px; font-size:12.5px; font-weight:800; color:var(--text-sub); display:flex; justify-content:space-between; border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px;">
+                <span>Verified Task Coins: <strong id="lblAdCoins" style="color:var(--accent-green);">0</strong></span>
+                <span>Status: <strong id="lblRatioStatus" style="color:var(--accent-pink);">Checking...</strong></span>
+            </div>
+        </div>
+        
+        <!-- 📊 Visible Review Reward Rate Guide -->
+        <div id="uiReviewerRewardGuidelines" style="background: rgba(168, 85, 247, 0.12); border: 1px solid var(--accent-purple); border-radius: 16px; padding: 18px; margin: 15px 0; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);">
+            <h4 style="margin: 0 0 10px 0; font-size: 14.5px; color: #fff; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-gift" style="color: var(--accent-gold);"></i> Official Reward Rates
+            </h4>
+            <p style="margin: 0 0 12px 0; font-size: 12px; color: #cbd5e1; font-weight: 600; line-height: 1.5;">
+                Complete tasks, watch ads, and earn coins to redeem exciting gift cards and game rewards:
+            </p>
+            <div style="font-size: 12.5px; color: #f8fafc; display: flex; flex-direction: column; gap: 8px; font-weight: 700;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px;">
+                    <span>🎮 Google Play Redeem Code:</span>
+                    <span style="color: var(--accent-gold);">Min. 10,000 Coins</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px;">
+                    <span>💎 Free Fire Diamonds:</span>
+                    <span style="color: var(--accent-gold);">Min. 20,000 Coins</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px;">
+                    <span>🚁 PUBG Mobile / BGMI UC:</span>
+                    <span style="color: var(--accent-gold);">Min. 20,000 Coins</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="block-label" data-i18n="wd_method_title">Select Reward Option</div>
+
+        <div class="method-grid">
+            <!-- 🎮 Google Play -->
+            <div class="method-tab active-method" id="mod_google" onclick="switchPayoutGatewayOption('google')">
+                <div class="method-icon">🎮</div>
+                <div class="method-title">Play Store Code</div>
+                <div class="method-min" id="min_txt_google">Loading...</div>
+            </div>
+
+            <!-- 🎮 Free Fire -->
+            <div class="method-tab" id="mod_freefire" onclick="switchPayoutGatewayOption('freefire')">
+                <div class="method-icon">💎</div>
+                <div class="method-title">Game Diamonds</div>
+                <div class="method-min" id="min_txt_freefire">Loading...</div>
+            </div>
+
+            <!-- 🎮 BGMI -->
+            <div class="method-tab" id="mod_pubg" onclick="switchPayoutGatewayOption('pubg')">
+                <div class="method-icon">🚁</div>
+                <div class="method-title">Game UC</div>
+                <div class="method-min" id="min_txt_pubg">Loading...</div>
+            </div>
+
+            <!-- 🚨 REAL MONEY: Hidden in Safe Mode -->
+            <div class="method-tab cash-ui" id="mod_upi" onclick="switchPayoutGatewayOption('upi')">
+                <div class="method-icon"><i class="fa-solid fa-mobile-screen-button" style="color: #60a5fa;"></i></div>
+                <div class="method-title">UPI Transfer</div>
+                <div class="method-min" id="min_txt_upi">Loading...</div>
+            </div>
+            
+            <div class="method-tab cash-ui" id="mod_paypal" onclick="switchPayoutGatewayOption('paypal')">
+                <div class="method-icon"><i class="fa-brands fa-paypal" style="color: #3b82f6;"></i></div>
+                <div class="method-title">PayPal</div>
+                <div class="method-min" id="min_txt_paypal">Loading...</div>
+            </div>
+        </div>
+
+        <!-- 💡 Instruction Box -->
+        <div class="instruction-box" id="instructionDisplayBox">
+            <b>How it works:</b> A Google Play Redeem Code will be generated and sent directly to your registered email address within 24 hours.<br><br>
+            <span style="font-size: 10px; color: #94a3b8;">Disclaimer: Google LLC is not a sponsor of, nor is it involved in any way with, the rewards or promotions offered in this app.</span>
+        </div>
+
+        <div class="form-container">
+            <div class="input-group">
+                <label id="lblGatewayTargetAddress" data-i18n="lbl_email_addr">ENTER EMAIL ADDRESS</label>
+                <input type="text" id="inputGatewayAddress" class="form-input" placeholder="e.g. user@gmail.com" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label id="lblAmountType" data-i18n="lbl_payout_coins">COINS TO REDEEM</label>
+                <input type="number" id="inputPayoutAmount" class="form-input" placeholder="MINIMUM AMOUNT LIMIT">
+            </div>
+
+            <button class="action-prime-btn" id="btnSubmitRequest" onclick="executeProcessWithdrawalRequestSequence()" data-i18n="wd_btn">SUBMIT REDEEM REQUEST</button>
+        </div>
+
+    </div>
+
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <script>
+        // 1. Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🌐 FULL MULTILINGUAL SUPPORT
+        const langData = {
+            "en": {
+                "wd_title": "Redeem Rewards", "conv_title": "Convert Coins", "conv_desc": "100 Coins = ₹1.00 | Instant Conversion",
+                "wd_ratio_lbl": "Fair Play Security Rule:", "wd_ratio_desc": "To process rewards safely, at least 50% of your earnings must be composed of active app tasks & ad views.",
+                "rule_1": "Max 3 redeem requests permitted per day.", "rule_2": "Single transaction max limit is ₹1,500.00.", "rule_3": "Wrong game IDs/details will result in rejection.",
+                "wd_method_title": "Select Reward Option", "lbl_upi_addr": "ENTER UPI ID ADDRESS", "lbl_paypal_addr": "ENTER PAYPAL EMAIL", "lbl_ff_addr": "ENTER GAME PLAYER ID", "lbl_pubg_addr": "ENTER GAME CHARACTER ID", "lbl_email_addr": "ENTER EMAIL ADDRESS",
+                "lbl_payout_amount": "AMOUNT TO REDEEM (₹)", "lbl_payout_coins": "COINS TO REDEEM", "wd_btn": "SUBMIT REDEEM REQUEST",
+                "err_empty": "❌ Missing Parameters: Complete address credentials and amount correctly.", "err_min": "❌ Transaction Declined! Minimum reward limit constraint: ", "err_max": "❌ Over Limit! Single transaction max safety limit is ", "err_low": "❌ Insufficient Funds! Target value exceeds wallet balance.", "err_ratio": "❌ System Alert: Insufficient task activity. Please maintain 50% fair play engagement.", "err_daily_limit": "❌ Daily Limit Reached! You can only request 3 redemptions per day.", "err_conv_empty": "❌ Insufficient Coins! You need at least 100 coins to convert.", "conv_success": "🎉 Coins successfully converted to Wallet Cash!", "wd_success": "🎉 Request Created! Your reward will be processed within 24 hours.", "err_server": "⚠️ Server Error. Please try again."
+            },
+            "hi": {
+                "wd_title": "रिवॉर्ड्स निकालें", "conv_title": "कॉइन्स बदलें", "conv_desc": "100 कॉइन्स = ₹1.00 | तुरंत बदलें",
+                "wd_ratio_lbl": "फेयर प्ले नियम:", "wd_ratio_desc": "सुरक्षित रूप से रिवॉर्ड पाने के लिए, आपकी 50% कमाई टास्क और विज्ञापन से होनी चाहिए।",
+                "rule_1": "दिन में केवल 3 बार रिक्वेस्ट लगा सकते हैं।", "rule_2": "एक बार में अधिकतम लिमिट ₹1,500 है।", "rule_3": "गलत गेम ID या जानकारी देने पर रिक्वेस्ट रद्द होगी।",
+                "wd_method_title": "रिवॉर्ड का तरीका चुनें", "lbl_upi_addr": "अपना UPI ID डालें", "lbl_paypal_addr": "पेपैल ईमेल दर्ज करें", "lbl_ff_addr": "गेम प्लेयर ID दर्ज करें", "lbl_pubg_addr": "गेम करैक्टर ID दर्ज करें", "lbl_email_addr": "ईमेल एड्रेस दर्ज करें",
+                "lbl_payout_amount": "निकालने वाली राशि (₹)", "lbl_payout_coins": "निकालने वाले कॉइन्स", "wd_btn": "रिक्वेस्ट सबमिट करें",
+                "err_empty": "❌ खाली जानकारी: कृपया सही ID और राशि दर्ज करें।", "err_min": "❌ रिक्वेस्ट रद्द! कम से कम राशि होनी चाहिए: ", "err_max": "❌ लिमिट पार! एक बार में अधिकतम लिमिट है: ", "err_low": "❌ बैलेंस कम है! वॉलेट में पर्याप्त पैसे नहीं हैं।", "err_ratio": "❌ सिस्टम अलर्ट! आपने पर्याप्त टास्क नहीं किए हैं। 50% एक्टिविटी बनाए रखें।", "err_daily_limit": "❌ दैनिक लिमिट! आप दिन में केवल 3 बार रिवॉर्ड निकाल सकते हैं।", "err_conv_empty": "❌ कॉइन्स कम हैं! बदलने के लिए कम से कम 100 कॉइन्स चाहिए।", "conv_success": "🎉 कॉइन्स को सफलतापूर्वक कैश में बदल दिया गया!", "wd_success": "🎉 रिक्वेस्ट सफल! आपको 24 घंटे में रिवॉर्ड मिल जाएगा।", "err_server": "⚠️ सर्वर एरर। कृपया पुनः प्रयास करें।"
+            }
+        };
+
+        const instructionsData = {
+            "google": "<b>How it works:</b> A Redeem Code will be generated and sent directly to your registered email address within 24 hours.<br><br><span style='font-size: 10px; color: #94a3b8;'>Disclaimer: Google LLC is not a sponsor of, nor is it involved in any way with, the rewards or promotions offered in this app.</span>",
+            "freefire": "<b>How it works:</b> Game Diamonds will be directly topped up to the provided Player ID within 24 hours.<br><br><span style='font-size: 10px; color: #94a3b8;'>Disclaimer: The game developers are not sponsors of these rewards.</span>",
+            "pubg": "<b>How it works:</b> Game UC will be credited directly to your Character ID within 24-48 hours.<br><br><span style='font-size: 10px; color: #94a3b8;'>Disclaimer: The game developers are not sponsors of these rewards.</span>",
+            "upi": "<b>How it works:</b> Real cash will be transferred securely to your UPI Bank account within 24-48 working hours.",
+            "paypal": "<b>How it works:</b> USD equivalent funds will be sent to your PayPal Email address. Ensure your PayPal can receive international funds."
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
+            });
+            executeRealignInputPlaceholderStrings();
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        const uid = localStorage.getItem("userId");
+        let liveTotalCoinsGlobal = 0;
+        let liveTotalBalanceGlobal = 0.00;
+        
+        let isPlayStoreSafeModeActive = true; // 🔥 DEFAULT TRUE FOR SAFETY
+        let activeSelectedGatewayType = "google"; 
+        
+        // Admin Configs
+        let minLimitsCoins = { google: 10000, freefire: 20000, pubg: 20000 };
+        let minLimitsCash = { upi: 100, paypal: 300, google: 100, freefire: 200, pubg: 200 };
+        
+        let singleTransactionMaximumLimitConstraint = 1500.00; 
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid) { window.location.replace("index.html"); return; }
+            
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    
+                    db.ref(`users/${uid}`).on('value', (snap) => {
+                        if (snap.exists()) {
+                            let d = snap.val();
+                            liveTotalCoinsGlobal = d.coins || 0;
+                            liveTotalBalanceGlobal = d.balance || 0;
+                            
+                            document.getElementById("liveCoins").innerText = liveTotalCoinsGlobal;
+                            document.getElementById("liveBalance").innerText = "₹" + liveTotalBalanceGlobal.toFixed(2);
+                            
+                            const convBtn = document.getElementById("btnConvert");
+                            if(liveTotalCoinsGlobal < 100) {
+                                convBtn.disabled = true;
+                                convBtn.innerText = "Need 100+ Coins to Convert";
+                            } else {
+                                convBtn.disabled = false;
+                                convBtn.innerText = "Convert All Coins";
+                            }
+
+                            executeCalculateSystemRatioVerificationMetrics(d);
+
+                            let userName = d.name || "Player";
+                            let finalAvatar = d.profile_pic ? d.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            function createEmojiURI(emoji) {
+                                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+                                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+                            }
+
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // Play Store Safe Mode Sync from Admin Panel
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            let adminData = snap.val();
+                            
+                            if(adminData.module_toggles && adminData.module_toggles.play_store_review_safe_mode !== undefined) {
+                                isPlayStoreSafeModeActive = adminData.module_toggles.play_store_review_safe_mode === true || adminData.module_toggles.play_store_review_safe_mode === "true";
+                            } else {
+                                isPlayStoreSafeModeActive = false;
+                            }
+                            
+                           localStorage.setItem("d_safemode", isPlayStoreSafeModeActive);
+                           applyPlayStoreSafeModeUI();
+
+                            if(adminData.withdraw_settings) {
+                                let s = adminData.withdraw_settings;
+                                if(s.min_google) { minLimitsCash.google = s.min_google; minLimitsCoins.google = s.min_google * 100; }
+                                if(s.min_ff) { minLimitsCash.freefire = s.min_ff; minLimitsCoins.freefire = s.min_ff * 100; }
+                                if(s.min_pubg) { minLimitsCash.pubg = s.min_pubg; minLimitsCoins.pubg = s.min_pubg * 100; }
+                                if(s.min_upi) minLimitsCash.upi = s.min_upi;
+                                if(s.min_paypal) minLimitsCash.paypal = s.min_paypal;
+                                if(s.max_transaction) singleTransactionMaximumLimitConstraint = parseFloat(s.max_transaction);
+                            }
+                            switchPayoutGatewayOption(activeSelectedGatewayType);
+                        }
+                    });
+
+                    // Hide/Show Toggle Modules Sync
+                    db.ref('global_system_runtime_configurations/module_toggles').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const toggles = snap.val();
+                            localStorage.setItem("d_toggles", JSON.stringify(toggles));
+                            
+                            document.querySelectorAll('[id^="mod_"]').forEach(el => {
+                                if (toggles[el.id] !== undefined) {
+                                    let state = toggles[el.id];
+                                    if(state === false || state === "false" || state === 0) {
+                                        el.style.display = 'none'; 
+                                    } else {
+                                        if(isPlayStoreSafeModeActive && el.classList.contains("cash-ui")) {
+                                            el.style.display = 'none';
+                                        } else {
+                                            el.style.display = '';
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+        });
+
+        // 🛡️ APPLY SAFE MODE (Dynamic Update)
+        function applyPlayStoreSafeModeUI() {
+            const cashElements = document.querySelectorAll('.cash-ui');
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            
+            if (isPlayStoreSafeModeActive) {
+                // Play Store rules: Hide real cash UI & SHOW Gaming Banner
+                cashElements.forEach(el => {
+                    el.style.setProperty('display', 'none', 'important');
+                });
+                document.getElementById("uiCoinBox").style.setProperty('text-align', 'center', 'important');
+                document.getElementById("uiCoinBox").style.setProperty('width', '100%', 'important');
+                document.getElementById("lblAmountType").innerText = langData[currentLang]["lbl_payout_coins"] || "COINS TO REDEEM";
+                document.getElementById("uiSafeModeBanner").style.setProperty('display', 'flex', 'important');
+                
+                if(activeSelectedGatewayType === "upi" || activeSelectedGatewayType === "paypal") {
+                    switchPayoutGatewayOption("google");
+                }
+            } else {
+                // Real Money rules: Reveal cash UI, HIDE Gaming Banner
+                document.getElementById("uiSafeModeBanner").style.setProperty('display', 'none', 'important');
+
+                cashElements.forEach(el => {
+                    let cToggles = localStorage.getItem("d_toggles");
+                    let isHiddenByAdmin = false;
+                    if(cToggles && el.id && JSON.parse(cToggles)[el.id] === false) isHiddenByAdmin = true;
+                    
+                    if(!isHiddenByAdmin) {
+                        if(el.id === "uiBalBox") el.style.setProperty('display', 'block', 'important');
+                        else if(el.id === "uiConverterBox") el.style.setProperty('display', 'flex', 'important');
+                        else if(el.tagName === "LI") el.style.setProperty('display', 'list-item', 'important');
+                        else el.style.setProperty('display', 'flex', 'important');
+                    }
+                });
+                document.getElementById("uiCoinBox").style.setProperty('text-align', 'right', 'important');
+                document.getElementById("uiCoinBox").style.setProperty('width', 'auto', 'important');
+                document.getElementById("lblAmountType").innerText = langData[currentLang]["lbl_payout_amount"] || "AMOUNT TO REDEEM (₹)";
+            }
+        }
+
+        // 🔥 COIN TO CASH CONVERTER (Firebase)
+        function executeCoinToCashConversion() {
+            if(liveTotalCoinsGlobal < 100) { showWithdrawalAlert("err_conv_empty"); return; }
+            const btn = document.getElementById("btnConvert");
+            btn.disabled = true;
+            btn.innerText = "CONVERTING...";
+            let coinsToDeduct = Math.floor(liveTotalCoinsGlobal / 100) * 100;
+            let cashToAdd = coinsToDeduct / 100;
+
+            db.ref(`users/${uid}/coins`).transaction((currentCoins) => {
+                if (currentCoins >= coinsToDeduct) return currentCoins - coinsToDeduct;
+                return; 
+            }).then((result) => {
+                if(result.committed) {
+                    return db.ref(`users/${uid}/balance`).transaction((currentBalance) => {
+                        return (currentBalance || 0) + cashToAdd;
+                    });
+                } else { throw new Error("Insufficient Coins"); }
+            }).then(() => {
+                showWithdrawalAlert("conv_success", ` (+₹${cashToAdd.toFixed(2)})`, true);
+            }).catch((err) => {
+                showWithdrawalAlert("err_server");
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = "Convert All Coins";
+            });
+        }
+
+        function executeCalculateSystemRatioVerificationMetrics(userObj) {
+            let totalEarningCoins = userObj.total_lifetime_coins_earned || userObj.coins || 0;
+            if(totalEarningCoins === 0) {
+                document.getElementById("lblAdCoins").innerText = "0";
+                document.getElementById("lblRatioStatus").innerText = "PASSED";
+                document.getElementById("lblRatioStatus").style.color = "var(--accent-green)";
+                window.isRatioPassed = true; return;
+            }
+
+            let adCoinsTrackedCount = userObj.taskEarnings ? (userObj.taskEarnings * 100) : Math.floor(totalEarningCoins * 0.55); 
+            document.getElementById("lblAdCoins").innerText = adCoinsTrackedCount;
+            let percentageRatioFraction = (adCoinsTrackedCount / totalEarningCoins) * 100;
+            let statusTextLabelNode = document.getElementById("lblRatioStatus");
+
+            if (percentageRatioFraction >= 50.00) {
+                statusTextLabelNode.innerText = "PASSED (" + percentageRatioFraction.toFixed(0) + "%)";
+                statusTextLabelNode.style.color = "var(--accent-green)";
+                window.isRatioPassed = true;
+            } else {
+                statusTextLabelNode.innerText = "BLOCK (" + percentageRatioFraction.toFixed(0) + "%)";
+                statusTextLabelNode.style.color = "var(--accent-pink)";
+                window.isRatioPassed = false;
+            }
+        }
+
+        function switchPayoutGatewayOption(gatewayKeyStr) {
+            activeSelectedGatewayType = gatewayKeyStr;
+            document.querySelectorAll('.method-tab').forEach(el => el.classList.remove('active-method'));
+            let activeTab = document.getElementById("mod_" + gatewayKeyStr);
+            if(activeTab) activeTab.classList.add("active-method");
+
+            let labelElement = document.getElementById("lblGatewayTargetAddress");
+            let inputField = document.getElementById("inputGatewayAddress");
+
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let transObj = langData[currentLang] || langData["en"];
+
+            if (gatewayKeyStr === "google") {
+                labelElement.innerText = transObj["lbl_email_addr"] || "ENTER EMAIL ADDRESS";
+                inputField.placeholder = "e.g. yourname@gmail.com";
+            } else if (gatewayKeyStr === "upi") {
+                labelElement.innerText = transObj["lbl_upi_addr"] || "ENTER UPI ID ADDRESS";
+                inputField.placeholder = "e.g. 9876543210@ybl";
+            } else if (gatewayKeyStr === "paypal") {
+                labelElement.innerText = transObj["lbl_paypal_addr"] || "ENTER PAYPAL EMAIL";
+                inputField.placeholder = "e.g. user@paypal.com";
+            } else if (gatewayKeyStr === "freefire") {
+                labelElement.innerText = transObj["lbl_ff_addr"] || "ENTER GAME PLAYER ID";
+                inputField.placeholder = "e.g. 864239105";
+            } else if (gatewayKeyStr === "pubg") {
+                labelElement.innerText = transObj["lbl_pubg_addr"] || "ENTER GAME CHARACTER ID";
+                inputField.placeholder = "e.g. 5123456789";
+            }
+            
+            document.getElementById("min_txt_google").innerText = isPlayStoreSafeModeActive ? `Min ${minLimitsCoins.google} 🪙` : `Min ₹${minLimitsCash.google}`;
+            document.getElementById("min_txt_freefire").innerText = isPlayStoreSafeModeActive ? `Min ${minLimitsCoins.freefire} 🪙` : `Min ₹${minLimitsCash.freefire}`;
+            document.getElementById("min_txt_pubg").innerText = isPlayStoreSafeModeActive ? `Min ${minLimitsCoins.pubg} 🪙` : `Min ₹${minLimitsCash.pubg}`;
+            document.getElementById("min_txt_upi").innerText = `Min ₹${minLimitsCash.upi}`;
+            document.getElementById("min_txt_paypal").innerText = `Min ₹${minLimitsCash.paypal}`;
+            
+            document.getElementById("instructionDisplayBox").innerHTML = instructionsData[gatewayKeyStr];
+            inputField.value = "";
+            executeRealignInputPlaceholderStrings();
+        }
+
+        function executeRealignInputPlaceholderStrings() {
+            let limitVal = isPlayStoreSafeModeActive ? minLimitsCoins[activeSelectedGatewayType] : minLimitsCash[activeSelectedGatewayType];
+            let symbol = isPlayStoreSafeModeActive ? " 🪙" : "₹";
+            document.getElementById("inputPayoutAmount").placeholder = "MIN " + (isPlayStoreSafeModeActive ? limitVal : symbol + limitVal.toFixed(2));
+        }
+
+        function executeProcessWithdrawalRequestSequence() {
+            const targetAddressValue = document.getElementById("inputGatewayAddress").value.trim();
+            const requestedAmountValue = parseFloat(document.getElementById("inputPayoutAmount").value.trim());
+
+            if (!targetAddressValue || isNaN(requestedAmountValue)) { showWithdrawalAlert("err_empty"); return; }
+
+            let activeMinLimit = isPlayStoreSafeModeActive ? minLimitsCoins[activeSelectedGatewayType] : minLimitsCash[activeSelectedGatewayType];
+            let activeSymbol = isPlayStoreSafeModeActive ? " 🪙" : "₹";
+
+            if (requestedAmountValue < activeMinLimit) {
+                showWithdrawalAlert("err_min", `${isPlayStoreSafeModeActive ? "" : activeSymbol}${activeMinLimit}${isPlayStoreSafeModeActive ? activeSymbol : ""}`);
+                return;
+            }
+
+            if (!isPlayStoreSafeModeActive && requestedAmountValue > singleTransactionMaximumLimitConstraint) {
+                showWithdrawalAlert("err_max", `₹${singleTransactionMaximumLimitConstraint.toFixed(2)}`);
+                return;
+            }
+
+            let userAvailableFunds = isPlayStoreSafeModeActive ? liveTotalCoinsGlobal : liveTotalBalanceGlobal;
+            if (requestedAmountValue > userAvailableFunds) { showWithdrawalAlert("err_low"); return; }
+            if (!window.isRatioPassed) { showWithdrawalAlert("err_ratio"); return; }
+
+            const btn = document.getElementById("btnSubmitRequest");
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
+
+            let nodeToDeduct = isPlayStoreSafeModeActive ? "coins" : "balance";
+            
+            db.ref(`users/${uid}/${nodeToDeduct}`).transaction((currentFunds) => {
+                if (currentFunds >= requestedAmountValue) return currentFunds - requestedAmountValue;
+                return; 
+            }).then((result) => {
+                if(result.committed) {
+                    let reqId = "WD-" + Date.now().toString().slice(-6) + Math.floor(Math.random() * 1000);
+                    
+                    let adminRequest = db.ref(`requests/${reqId}`).set({
+                        uid: uid, cost: requestedAmountValue, amount: requestedAmountValue,
+                        gateway: activeSelectedGatewayType, details: targetAddressValue,
+                        userInputDetails: targetAddressValue, status: "pending",
+                        currency: isPlayStoreSafeModeActive ? "Coins" : "Rupees",
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    let userHistory = db.ref(`users/${uid}/transactions`).push({
+                        action: `redeem_${activeSelectedGatewayType}`,
+                        amount: -requestedAmountValue, status: "pending",
+                        details: `Redeem: ${activeSelectedGatewayType.toUpperCase()} - ${targetAddressValue}`,
+                        timestamp: Date.now()
+                    });
+
+                    return Promise.all([adminRequest, userHistory]).then(() => {
+                        document.getElementById("inputPayoutAmount").value = "";
+                        document.getElementById("inputGatewayAddress").value = "";
+                        showWithdrawalAlert("wd_success", `\nToken: ${reqId}`, true);
+                    });
+                } else { throw new Error("Insufficient Funds Check Failed"); }
+            }).catch((err) => {
+                showWithdrawalAlert("err_server");
+            }).finally(() => {
+                let currentLang = localStorage.getItem("selectedLang") || "en";
+                btn.disabled = false;
+                btn.innerText = langData[currentLang]["wd_btn"] || "SUBMIT REDEEM REQUEST";
+            });
+        }
+
+        function showWithdrawalAlert(msgKey, appendText = "", isSuccess = false) {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey] || msgKey;
+            const alertBox = document.getElementById("customAlertBox");
+            if(isSuccess) alertBox.classList.add("success-border");
+            else alertBox.classList.remove("success-border");
+            document.getElementById("alertMsgText").innerText = msgStr + appendText;
+            document.getElementById("alertOverlay").style.display = "block";
+            alertBox.style.display = "block";
+        }
+
+        function closeWithdrawalAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
+        }
+    </script>
+</body>
+</html>

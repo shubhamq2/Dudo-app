@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -30,9 +35,19 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
 
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-gold); font-weight: bold; cursor: pointer; }
+        
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-pink); }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; }
+
+        /* PLAY STORE SAFE: Only show Coins */
+        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-gold); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(234, 179, 8, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 14px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
+        .coin-txt { color: var(--accent-gold) !important; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 20px !important; }
 
         /* 📢 AD SLOTS */
         .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(234, 179, 8, 0.4); box-sizing: border-box; }
@@ -110,17 +125,28 @@
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="wd_title">Weekly Drop</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="main-container">
         
+        <!-- PLAY STORE SAFE: Only show Coins -->
+        <div class="balance-card">
+            <span data-i18n="wd_wallet">🎟️ Weekly Drop</span>
+            <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
+        </div>
+
         <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
@@ -145,7 +171,7 @@
 
         <!-- Claim Terminal Card -->
         <div class="entry-pass-card">
-            <div class="pass-cost-badge"><i class="fa-solid fa-ticket"></i> <span data-i18n="wd_cost">1 Entry Pass = 50 Coins</span></div>
+            <div class="pass-cost-badge"><i class="fa-solid fa-ticket"></i> <span id="passCostDisplay">1 Entry Pass = 50 Coins</span></div>
             <button class="buy-action-btn" id="btnClaimPass" onclick="executeClaimEntryPass()"><span data-i18n="wd_btn_claim">Claim Entry Pass</span> 🎟️</button>
             
             <!-- User Personal Active List -->
@@ -162,27 +188,38 @@
 
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+       const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH 100% PLAY STORE SAFE TERMS
         const langData = {
             "en": {
-                "wd_title": "Weekly Drop", "wd_hero_sub": "🔥 Weekly Mega Reward 🔥", "wd_hero_main": "🎁 SURPRISE COINS", "wd_hero_desc": "More Entry Passes = Higher Chances!",
-                "wd_total": "Total Participants", "wd_yours": "Your Entry Passes", "wd_cost": "1 Entry Pass = 50 Coins", "wd_btn_claim": "Claim Entry Pass",
+                "wd_title": "Weekly Drop", "wd_wallet": "🎟️ Weekly Drop", "wd_hero_sub": "🔥 Weekly Mega Reward 🔥", "wd_hero_main": "🎁 SURPRISE COINS", "wd_hero_desc": "More Entry Passes = Higher Chances!",
+                "wd_total": "Total Participants", "wd_yours": "Your Entry Passes", "wd_cost_pre": "1 Entry Pass = ", "wd_cost_post": " Coins", "wd_btn_claim": "Claim Entry Pass",
                 "wd_active_list": "Your Active Pass Codes", "wd_no_pass": "You don't hold any passes for this week yet.",
-                "err_nsf_title": "❌ INSUFFICIENT COINS", "err_nsf_desc": "Not enough coins! Complete more tasks to earn 50 coins.",
+                "err_nsf_title": "❌ INSUFFICIENT COINS", "err_nsf_desc": "Not enough coins! Complete more tasks to earn more.",
                 "pass_success_title": "🎉 PASS CLAIMED", "pass_success_desc": "acquired successfully! Keep participating to increase your chances.",
                 "win_title": "CONGRATULATIONS!", "win_desc": "You are the Champion of this week's Mega Drop!", "win_btn": "Claim Reward 🪙"
             },
             "hi": {
-                "wd_title": "साप्ताहिक ड्रॉप", "wd_hero_sub": "🔥 साप्ताहिक मेगा रिवॉर्ड 🔥", "wd_hero_main": "🎁 सरप्राइज कॉइन्स", "wd_hero_desc": "अधिक पास = जीतने के अधिक अवसर!",
-                "wd_total": "कुल प्रतिभागी", "wd_yours": "आपके एंट्री पास", "wd_cost": "1 एंट्री पास = 50 कॉइन्स", "wd_btn_claim": "एंट्री पास प्राप्त करें",
+                "wd_title": "साप्ताहिक ड्रॉप", "wd_wallet": "🎟️ साप्ताहिक ड्रॉप", "wd_hero_sub": "🔥 साप्ताहिक मेगा रिवॉर्ड 🔥", "wd_hero_main": "🎁 सरप्राइज कॉइन्स", "wd_hero_desc": "अधिक पास = जीतने के अधिक अवसर!",
+                "wd_total": "कुल प्रतिभागी", "wd_yours": "आपके एंट्री पास", "wd_cost_pre": "1 एंट्री पास = ", "wd_cost_post": " कॉइन्स", "wd_btn_claim": "एंट्री पास प्राप्त करें",
                 "wd_active_list": "आपके सक्रिय पास कोड", "wd_no_pass": "आपके पास इस सप्ताह के लिए कोई पास नहीं है।",
-                "err_nsf_title": "❌ अपर्याप्त कॉइन्स", "err_nsf_desc": "पर्याप्त कॉइन्स नहीं हैं! 50 कॉइन्स कमाने के लिए और टास्क पूरे करें।",
-                "pass_success_title": "🎉 पास प्राप्त हुआ", "pass_success_desc": "सफलतापूर्वक प्राप्त हुआ! जीतने के अवसर बढ़ाने के लिए भाग लेते रहें।",
+                "err_nsf_title": "❌ अपर्याप्त कॉइन्स", "err_nsf_desc": "पर्याप्त कॉइन्स नहीं हैं! कमाने के लिए और टास्क पूरे करें।",
+                "pass_success_title": "🎉 पास प्राप्त हुआ", "pass_success_desc": "सफलतापूर्वक प्राप्त हुआ! अवसर बढ़ाने के लिए भाग लेते रहें।",
                 "win_title": "बधाई हो!", "win_desc": "आप इस सप्ताह के मेगा ड्रॉप के चैंपियन हैं!", "win_btn": "रिवॉर्ड क्लेम करें 🪙"
             },
             "bn": { "wd_title": "সাপ্তাহিক ড্রপ", "wd_hero_main": "🎁 সারপ্রাইজ কয়েন", "wd_btn_claim": "এন্ট্রি পাস নিন", "err_nsf_title": "❌ কয়েন নেই", "pass_success_title": "🎉 পাস পেয়েছেন", "win_title": "অভিনন্দন!" },
@@ -206,84 +243,138 @@
                 if(transObj[key]) elem.innerText = transObj[key];
             });
             document.getElementById("appLanguage").value = langCode;
+            updateCostText();
+        }
+
+        function updateCostText() {
+            let lang = localStorage.getItem("selectedLang") || "en";
+            let pre = langData[lang]["wd_cost_pre"] || "1 Entry Pass = ";
+            let post = langData[lang]["wd_cost_post"] || " Coins";
+            document.getElementById("passCostDisplay").innerText = pre + singlePassCostInt + post;
+        }
+
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
         }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-        
         let userMasterCoinsCounter = 0;
-        const singlePassCostInt = 50;
+        let singlePassCostInt = 50; 
+        let jackpotAmountInt = 5000;
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    
+                    // 1. Live Balance Sync (Coins) & Smart Avatar
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            userMasterCoinsCounter = data.coins || 0;
+                            document.getElementById("liveUserCoins").innerText = userMasterCoinsCounter;
+                            
+                            // Smart Avatar Sync
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch User's Passes
+                    db.ref(`users/${uid}/weekly_passes`).on('value', (snap) => {
+                        const wrapper = document.getElementById("myActivePassesBox");
+                        wrapper.innerHTML = "";
+                        let currentLang = localStorage.getItem("selectedLang") || "en";
+                        let noPassTxt = langData[currentLang]["wd_no_pass"] || "You don't hold any passes for this week yet.";
+
+                        if (snap.exists()) {
+                            let codes = [];
+                            snap.forEach(child => { codes.push(child.val().code); });
+                            
+                            document.getElementById("myPassesCount").innerText = codes.length;
+                            
+                            codes.forEach(code => {
+                                let pill = document.createElement("span");
+                                pill.className = "pass-tag-pill";
+                                pill.innerText = "🎟️ " + code;
+                                wrapper.appendChild(pill);
+                            });
+                        } else {
+                            document.getElementById("myPassesCount").innerText = "0";
+                            wrapper.innerHTML = `<span class="no-passes-txt">${noPassTxt}</span>`;
+                        }
+                    });
+
+                    // 3. Fetch Admin Data & Banners
+                    db.ref('global_system_runtime_configurations/weekly_drop_configs').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // Load Banners
+                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+
+                            if(adminData.pass_cost) {
+                                singlePassCostInt = parseInt(adminData.pass_cost);
+                                updateCostText();
+                            }
+                            if(adminData.jackpot_amount) {
+                                jackpotAmountInt = parseInt(adminData.jackpot_amount);
+                            }
+                        }
+                    });
+
+                    // 4. Fetch Global Stats & Jackpot Winner
+                    db.ref('weekly_drop').on('value', (snap) => {
+                        if(snap.exists()) {
+                            let data = snap.val();
+                            
+                            document.getElementById("globalPoolSold").innerText = data.global_passes_count || 0;
+
+                            // Check for Jackpot Winner
+                            if(data.winner_uid === uid) {
+                                db.ref(`users/${uid}/claimed_jackpot`).once('value', (cSnap) => {
+                                    if(!cSnap.exists() || cSnap.val() !== true) {
+                                        document.getElementById("winnerCoinsYieldDisplay").innerText = `+${jackpotAmountInt} COINS`;
+                                        document.getElementById("lotteryWinnerModalFrame").style.display = "flex";
+                                    }
+                                });
+                            }
+                        } else {
+                            document.getElementById("globalPoolSold").innerText = "0";
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch User Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    userMasterCoinsCounter = userData.user.coins || 0;
-                }
-
-                // 2. Fetch Weekly Drop Stats & Banners
-                const confRes = await fetch(`${API_BASE_URL}/drop/stats/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    // Inject Banners
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                    }
-
-                    // Inject Live Trackers
-                    document.getElementById("globalPoolSold").innerText = confData.stats.totalGlobalPasses || 0;
-                    document.getElementById("myPassesCount").innerText = confData.stats.userPassesCount || 0;
-
-                    // Inject Active Passes
-                    const wrapper = document.getElementById("myActivePassesBox");
-                    wrapper.innerHTML = "";
-                    let currentLang = localStorage.getItem("selectedLang") || "en";
-                    let noPassTxt = langData[currentLang]["wd_no_pass"] || "You don't hold any passes for this week yet.";
-
-                    if (confData.stats.userPassCodes && confData.stats.userPassCodes.length > 0) {
-                        confData.stats.userPassCodes.forEach(code => {
-                            let pill = document.createElement("span");
-                            pill.className = "pass-tag-pill";
-                            pill.innerText = "🎟️ " + code;
-                            wrapper.appendChild(pill);
-                        });
-                    } else {
-                        wrapper.innerHTML = `<span class="no-passes-txt">${noPassTxt}</span>`;
-                    }
-
-                    // Check for Unclaimed Win
-                    if (confData.winnerData && confData.winnerData.isWinner && !confData.winnerData.claimed) {
-                        document.getElementById("winnerCoinsYieldDisplay").innerText = `+${confData.winnerData.winAmount} COINS`;
-                        document.getElementById("lotteryWinnerModalFrame").style.display = "flex";
-                    }
-                }
-            } catch (err) {
-                console.log("Error loading drop data.");
-                document.getElementById("globalPoolSold").innerText = "-";
-                document.getElementById("myPassesCount").innerText = "-";
-                document.getElementById("myActivePassesBox").innerHTML = `<span class="no-passes-txt">Offline Mode</span>`;
-            }
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
-        // 🚀 CLAIM PASS (CALLS NODE API)
-        async function executeClaimEntryPass() {
+        // 🚀 CLAIM PASS (PURE FIREBASE TRANSACTION)
+        function executeClaimEntryPass() {
             let currentLang = localStorage.getItem("selectedLang") || "en";
             
             if (userMasterCoinsCounter < singlePassCostInt) {
@@ -295,48 +386,78 @@
             btn.disabled = true;
             btn.innerText = "PROCESSING...";
 
-            try {
-                const res = await fetch(`${API_BASE_URL}/drop/claim-pass`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid, cost: singlePassCostInt })
-                });
-
-                const data = await res.json();
-                
-                if (data.success) {
-                    let descTxt = langData[currentLang]["pass_success_desc"] || "acquired successfully! Keep participating.";
-                    showCustomAlert("pass_success_title", `Pass Code ${data.passCode} ${descTxt}`, true);
-                    fetchDataFromAdminServer(); // Refresh entire dashboard securely
-                } else {
-                    showCustomAlert("err_nsf_title", "Transaction failed.", false);
+            // 1. Deduct Coins safely
+            db.ref(`users/${uid}/coins`).transaction((currentCoins) => {
+                if (currentCoins >= singlePassCostInt) {
+                    return currentCoins - singlePassCostInt;
                 }
-            } catch (err) {
-                alert("Network error. Please try again later.");
-            } finally {
+                return; // Abort
+            }).then((result) => {
+                if(result.committed) {
+                    // Generate pseudo-random Code
+                    let newCode = "DRP-" + Math.floor(Math.random() * 900000 + 100000);
+                    
+                    // 2. Add pass to user
+                    db.ref(`users/${uid}/weekly_passes`).push({
+                        code: newCode,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    // 3. Increment global counter
+                    db.ref('weekly_drop/global_passes_count').transaction((count) => {
+                        return (count || 0) + 1;
+                    });
+
+                    // 4. Record Transaction History
+                    db.ref(`users/${uid}/transactions`).push({
+                        action: "buy_weekly_pass",
+                        amount: -singlePassCostInt,
+                        status: "SUCCESSFUL",
+                        details: `Weekly Pass: ${newCode}`,
+                        timestamp: Date.now()
+                    });
+
+                    let descTxt = langData[currentLang]["pass_success_desc"] || "acquired successfully! Keep participating.";
+                    showCustomAlert("pass_success_title", `Pass Code ${newCode} ${descTxt}`, true);
+                } else {
+                    throw new Error("Transaction aborted");
+                }
+            }).catch((err) => {
+                showCustomAlert("err_nsf_title", "Transaction failed.", false);
+            }).finally(() => {
                 let btnTxt = langData[currentLang]["wd_btn_claim"] || "Claim Entry Pass";
                 btn.disabled = false;
                 btn.innerHTML = `<span>${btnTxt}</span> 🎟️`;
-            }
+            });
         }
 
-        // 🏆 CLAIM MEGA REWARD
-        async function executeClaimJackpotPoolCredits() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/drop/claim-win`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid })
-                });
+        // 🏆 CLAIM MEGA REWARD (PURE FIREBASE TRANSACTION)
+        function executeClaimJackpotPoolCredits() {
+            const btn = document.querySelector(".winner-claim-btn");
+            btn.disabled = true;
+            btn.innerText = "CLAIMING...";
 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("lotteryWinnerModalFrame").style.display = "none";
-                    alert(`🔥 Reward Synchronized! Coins have been safely injected into your wallet.`);
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + jackpotAmountInt;
+            }).then((result) => {
+                if(result.committed) {
+                    db.ref(`users/${uid}/transactions`).push({
+                        action: "won_weekly_jackpot",
+                        amount: jackpotAmountInt,
+                        status: "SUCCESSFUL",
+                        details: `Weekly Mega Drop Winner!`,
+                        timestamp: Date.now()
+                    });
+                    return db.ref(`users/${uid}/claimed_jackpot`).set(true);
                 }
-            } catch(e) {
-                alert("Server error processing claim. Contact Support.");
-            }
+            }).then(() => {
+                document.getElementById("lotteryWinnerModalFrame").style.display = "none";
+                alert(`🔥 Reward Synchronized! ${jackpotAmountInt} Coins safely injected into your wallet.`);
+            }).catch((err) => {
+                alert("Error claiming reward. Try again or contact support.");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-gift"></i> Claim Reward 🪙`;
+            });
         }
 
         function showCustomAlert(headerKey, messageText, isSuccess = false) {

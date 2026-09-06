@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esports Arena - Dudo</title>
+    <title>Skills Arena - Dudo</title>
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- 🔥 Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg-dark: #0b0f19; --card-bg: rgba(30, 41, 59, 0.85); --primary: #f97316; --primary-dark: #ea580c;
@@ -22,16 +27,25 @@
         .back-btn { color: var(--primary); text-decoration: none; font-size: 20px; font-weight: bold; background: rgba(249, 115, 22, 0.15); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(249, 115, 22, 0.3); transition: 0.2s; }
         .back-btn:active { transform: scale(0.9); }
         .title { margin: 0; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); font-style: italic; }
-        
-        .wallets-container { display: flex; gap: 8px; }
-        .wallet-box { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 5px 10px; border-radius: 12px; font-weight: 800; color: var(--success); display: flex; align-items: center; gap: 4px; font-size: 13px; }
-        .wallet-box.rupee-box { background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); color: #60a5fa; }
 
-        .main-container { flex: 1; overflow-y: auto; padding: 15px; max-width: 500px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--primary); font-weight: bold; cursor: pointer; }
+        .wallet-box { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 12px; border-radius: 12px; font-weight: 800; color: var(--warning); display: flex; align-items: center; gap: 4px; font-size: 14px; }
 
-        .ff-banner { background: linear-gradient(135deg, #431407, #7c2d12); border-radius: 20px; padding: 25px 20px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3); margin-bottom: 20px; position: relative; overflow: hidden; }
-        .ff-banner h3 { margin: 0 0 8px 0; font-size: 24px; font-weight: 900; color: #fff; text-transform: uppercase; font-style: italic; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: 1px; }
-        .ff-banner p { margin: 0; font-size: 13.5px; color: #fdba74; font-weight: 600; }
+        /* Review Safe Mode Message */
+        #safeReviewMessage { width: 92%; max-width: 440px; margin: 20px auto; background: rgba(249, 115, 22, 0.1); border: 1px solid var(--primary); padding: 30px 20px; border-radius: 20px; text-align: center; display: none; }
+        #safeReviewMessage h3 { color: var(--primary); margin-top: 0; }
+        #safeReviewMessage p { color: var(--text-sub); font-size: 14px; line-height: 1.6; }
+
+        .main-container { flex: 1; overflow-y: auto; padding: 15px; max-width: 500px; margin: 0 auto; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
+
+        .arena-banner { background: linear-gradient(135deg, #431407, #7c2d12); border-radius: 20px; padding: 25px 20px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3); margin-bottom: 20px; position: relative; overflow: hidden; }
+        .arena-banner h3 { margin: 0 0 8px 0; font-size: 22px; font-weight: 900; color: #fff; text-transform: uppercase; font-style: italic; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: 1px; }
+        .arena-banner p { margin: 0; font-size: 13.5px; color: #fdba74; font-weight: 600; }
+
+        /* Banner Ads Slots */
+        .ad-container-block { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(249, 115, 22, 0.4); box-sizing: border-box; }
 
         /* TAB NAVIGATION */
         .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
@@ -55,28 +69,30 @@
 
         /* TOURNAMENT CARD */
         .match-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border-color); margin-bottom: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative; backdrop-filter: blur(10px); }
-        .match-code-badge { position: absolute; top: 0; left: 0; background: rgba(236, 72, 153, 0.2); color: #f472b6; font-size: 10px; padding: 4px 10px; border-bottom-right-radius: 12px; font-family: monospace; font-weight: 900; border-right: 1px solid rgba(236, 72, 153, 0.5); border-bottom: 1px solid rgba(236, 72, 153, 0.5); }
+        .match-code-badge { position: absolute; top: 0; left: 0; font-size: 10px; padding: 4px 10px; border-bottom-right-radius: 12px; font-family: monospace; font-weight: 900; }
         .match-header { background: rgba(0,0,0,0.3); padding: 20px 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
         .match-title { margin: 0; font-size: 16px; font-weight: 900; color: #818cf8; text-transform: uppercase; }
         .match-time { font-size: 12.5px; color: var(--text-sub); font-weight: 800; background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
         .match-body { padding: 20px 15px; }
+
         .prize-pool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
         .prize-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; text-align: center; }
         .prize-box span { display: block; font-size: 11.5px; color: var(--text-sub); text-transform: uppercase; font-weight: 800; margin-bottom: 4px; }
         .prize-box strong { display: block; font-size: 19px; color: var(--success); font-weight: 900; }
         .entry-box strong { color: var(--warning); }
+
         .map-details { font-size: 13px; color: var(--text-sub); display: flex; justify-content: space-between; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 10px; font-weight: 600; }
         .map-details b { color: #fff; }
-        
+
         .join-btn { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 900; font-size: 15px; cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4); }
         .join-btn:active { transform: scale(0.96); }
         .joined-btn { width: 100%; background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); padding: 16px; border-radius: 12px; font-weight: 900; font-size: 14.5px; text-transform: uppercase; text-align: center; margin-bottom: 10px; box-sizing: border-box; }
-        
+
         /* ALARM BUTTON */
         .alarm-btn { width: 100%; background: rgba(0,0,0,0.3); color: var(--accent-gold); border: 1px dashed rgba(251, 191, 36, 0.5); padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .alarm-btn:active { background: rgba(251, 191, 36, 0.15); }
 
-        .room-details-box { background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 18px; margin-top: 18px; text-align: center; display: none; }
+        .room-details-box { background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 18px; margin-top: 18px; text-align: center; }
         .id-pass-row { display: flex; justify-content: space-between; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13.5px; }
         .id-pass-row b { color: #fff; font-family: monospace; font-size: 15px; }
 
@@ -95,39 +111,67 @@
         .modal-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; margin-top: 15px; box-sizing: border-box; font-size: 15px; font-weight: bold; outline: none; text-align: center; }
         .modal-input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(249, 115, 22, 0.3); }
         .btn-cancel { background: rgba(255,255,255,0.05); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); box-shadow: none; margin-top: 10px; }
-        
+
         .loading-text { text-align: center; color: var(--text-sub); font-weight: bold; padding: 20px; }
     </style>
+    
+    <!-- ⚡⚡ ANTI-FLICKER SCRIPT FOR SAFE MODE ⚡⚡ -->
+    <script>
+        let cSafeMode = localStorage.getItem("d_safemode");
+        if(cSafeMode === "true") {
+            let style = document.createElement('style');
+            style.innerHTML = "#masterArenaContainer { display: none !important; } #safeReviewMessage { display: block !important; }";
+            document.head.appendChild(style);
+        }
+    </script>
 </head>
 <body>
 
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-        <h2 class="title">Esports Arena</h2>
-        <div class="wallets-container">
-            <div class="wallet-box rupee-box">₹ <span id="userRupees">0.00</span></div>
+        <h2 class="title" data-i18n="sa_title">Skills Arena</h2>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
             <div class="wallet-box">🪙 <span id="userCoins">0</span></div>
         </div>
     </div>
 
-    <div class="main-container">
+    <!-- 🚨 PLAY STORE REVIEW SAFE MESSAGE -->
+    <div id="safeReviewMessage">
+        <h3 data-i18n="ps_safe_title">System Maintenance</h3>
+        <p data-i18n="ps_safe_desc">This feature is temporarily unavailable due to scheduled server upgrades. Please check back later!</p>
+    </div>
+
+    <!-- 🚀 MASTER ARENA CONTAINER -->
+    <div class="main-container" id="masterArenaContainer">
+
         <!-- Play Store Safe Banner Text -->
-        <div class="ff-banner">
-            <h3>Bermuda Showdown</h3>
-            <p>Join Daily Custom Rooms & Win Premium Rewards!</p>
+        <div class="arena-banner">
+            <h3 data-i18n="sa_banner_title">Daily Skills Arena</h3>
+            <p data-i18n="sa_banner_desc">Join Custom Rooms & Win Premium Rewards!</p>
+        </div>
+
+        <div class="ad-container-block">
+            <div class="ad-slot-banner" id="adminBannerSlot1"></div>
         </div>
 
         <div class="tab-container">
-            <button class="tab-btn active" onclick="switchTab('upcoming')"><i class="fa-solid fa-gamepad"></i> Upcoming</button>
-            <button class="tab-btn" onclick="switchTab('results')"><i class="fa-solid fa-trophy"></i> Results</button>
+            <button class="tab-btn active" onclick="switchTab('upcoming')" data-i18n="tab_upcoming"><i class="fa-solid fa-gamepad"></i> Upcoming</button>
+            <button class="tab-btn" onclick="switchTab('results')" data-i18n="tab_results"><i class="fa-solid fa-trophy"></i> Results</button>
         </div>
 
         <!-- UPCOMING MATCHES TAB -->
         <div id="tab_upcoming" class="tab-content active">
-            
-            <!-- LIVE POLL (Admin Controlled) -->
+
+            <!-- 🔥 LIVE POLL (Admin Connected) -->
             <div class="poll-card" id="livePollContainer">
-                <h4 class="poll-title"><i class="fa-solid fa-chart-simple"></i> Player Voting <span>LIVE</span></h4>
+                <h4 class="poll-title"><i class="fa-solid fa-chart-simple"></i> <span data-i18n="poll_title" style="background:none; color:inherit; padding:0; animation:none; font-size:inherit;">Player Voting</span> <span>LIVE</span></h4>
                 <div class="poll-question" id="pollQuestion">Which match should we host next?</div>
                 <div id="pollOptionsSocket"></div>
                 <div class="voted-badge" id="votedThanksBadge"><i class="fa-solid fa-circle-check"></i> Thanks for voting! Results are live.</div>
@@ -140,16 +184,20 @@
         <div id="tab_results" class="tab-content">
             <div id="pastMatchesContainer"><div class="loading-text">No past results available.</div></div>
         </div>
+
+        <div class="ad-container-block">
+            <div class="ad-slot-banner" id="adminBannerSlot2"></div>
+        </div>
     </div>
 
     <!-- JOIN DETAILS MODAL -->
     <div class="modal-overlay" id="joinDetailsModal">
         <div class="modal-card">
-            <h2 style="color:var(--primary); margin:0 0 8px 0; font-weight:900;">Participation Details</h2>
-            <p style="color:var(--text-sub); font-size:12.5px; margin:0 0 15px 0; font-weight:600; line-height:1.5;">Enter your In-Game Name or Player ID so our system can verify your entry in the custom room.</p>
-            <input type="text" id="ffIdInput" class="modal-input" placeholder="In-Game Name / Player ID">
-            <button class="modal-btn" id="confirmJoinBtn" onclick="confirmJoinWithFFID()">Confirm Entry</button>
-            <button class="modal-btn btn-cancel" onclick="document.getElementById('joinDetailsModal').style.display='none'">Cancel</button>
+            <h2 style="color:var(--primary); margin:0 0 8px 0; font-weight:900;" data-i18n="modal_join_title">Participation Details</h2>
+            <p style="color:var(--text-sub); font-size:12.5px; margin:0 0 15px 0; font-weight:600; line-height:1.5;" data-i18n="modal_join_desc">Enter your Player ID / In-Game Name so our system can verify your entry.</p>
+            <input type="text" id="playerIdInput" class="modal-input" placeholder="In-Game Name / Player ID">
+            <button class="modal-btn" id="confirmJoinBtn" onclick="confirmJoinWithPlayerID()" data-i18n="btn_confirm">Confirm Entry</button>
+            <button class="modal-btn btn-cancel" onclick="document.getElementById('joinDetailsModal').style.display='none'" data-i18n="btn_cancel">Cancel</button>
         </div>
     </div>
 
@@ -157,199 +205,265 @@
     <div class="modal-overlay" id="successModal">
         <div class="modal-card">
             <div style="font-size: 55px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(16,185,129,0.4));">🎮✅</div>
-            <h2 style="color:var(--success); margin:0 0 12px 0; font-weight:900;">Registration Confirmed!</h2>
-            <p style="color:var(--text-sub); font-size:13.5px; font-weight:600; line-height:1.5;">You successfully registered for the match. Don't forget to click the <b>Alarm Bell</b> icon so we can remind you before it starts!</p>
+            <h2 style="color:var(--success); margin:0 0 12px 0; font-weight:900;" data-i18n="modal_succ_title">Registration Confirmed!</h2>
+            <p style="color:var(--text-sub); font-size:13.5px; font-weight:600; line-height:1.5;" data-i18n="modal_succ_desc">You successfully registered. Don't forget to click the <b>Alarm Bell</b> icon so we can remind you!</p>
             <button class="modal-btn" style="background:var(--success); box-shadow:0 6px 15px rgba(16,185,129,0.4);" onclick="document.getElementById('successModal').style.display='none'">Awesome!</button>
         </div>
     </div>
 
-    <!-- PURE NODE.JS API INTEGRATION -->
+    <!-- 🔥 FIREBASE ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🌐 LANGUAGE SUPPORT
+        const langData = {
+            "en": { 
+                "sa_title": "Skills Arena", "sa_banner_title": "Daily Skills Arena", "sa_banner_desc": "Join Custom Rooms & Win Premium Rewards!",
+                "tab_upcoming": "Upcoming", "tab_results": "Results", "poll_title": "Player Voting",
+                "modal_join_title": "Participation Details", "modal_join_desc": "Enter your Player ID / In-Game Name so our system can verify your entry.",
+                "btn_confirm": "Confirm Entry", "btn_cancel": "Cancel",
+                "modal_succ_title": "Registration Confirmed!", "modal_succ_desc": "You successfully registered. Click the Alarm Bell to get reminded!",
+                "ps_safe_title": "System Maintenance", "ps_safe_desc": "This feature is temporarily unavailable due to scheduled server upgrades."
+            },
+            "hi": { 
+                "sa_title": "स्किल्स एरिना", "sa_banner_title": "डेली स्किल्स एरिना", "sa_banner_desc": "कस्टम रूम्स ज्वाइन करें और इनाम जीतें!",
+                "tab_upcoming": "आने वाले", "tab_results": "परिणाम", "poll_title": "प्लेयर वोटिंग",
+                "modal_join_title": "भाग लेने की जानकारी", "modal_join_desc": "अपनी प्लेयर ID या इन-गेम नाम दर्ज करें ताकि हम आपकी प्रविष्टि सत्यापित कर सकें।",
+                "btn_confirm": "पुष्टि करें", "btn_cancel": "रद्द करें",
+                "modal_succ_title": "पंजीकरण सफल!", "modal_succ_desc": "आप सफलतापूर्वक रजिस्टर हो गए हैं। अलार्म बेल पर क्लिक करना न भूलें!",
+                "ps_safe_title": "सिस्टम मेंटेनेंस", "ps_safe_desc": "सर्वर अपग्रेड के कारण यह फीचर अभी उपलब्ध नहीं है।"
+            },
+            "bn": { "sa_title": "স্কিলস এরিনা" }, "te": { "sa_title": "స్కిల్స్ అరేనా" }, "mr": { "sa_title": "स्किल्स एरिना" },
+            "ta": { "sa_title": "திறன்கள் அரங்கம்" }, "ur": { "sa_title": "مہارت کا میدان" }, "gu": { "sa_title": "સ્કિલ્સ એરેના" },
+            "es": { "sa_title": "Arena de Habilidades" }, "fr": { "sa_title": "Arène de Compétences" }, "ru": { "sa_title": "Арена Навыков" }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) { 
+                    if(elem.tagName === "BUTTON") {
+                        if(!elem.disabled && !elem.innerHTML.includes("fa-")) elem.innerText = transObj[key];
+                    } else { elem.innerText = transObj[key]; }
+                }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-
         let currentCoins = 0;
-        let currentRupees = 0;
-        let joinedMatchesList = {};
         let activeJoiningMatch = null;
         let currentPollData = null;
-        let autoRefreshInterval = null;
+        let allMatches = {};
+        let allParticipants = {};
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab_' + tab).classList.add('active');
-            event.target.classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
-            
-            // Initial Data Load
-            fetchUserData();
-            fetchEsportsData();
+            if (!uid) { window.location.replace("index.html"); return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
 
-            // Auto-refresh data every 15 seconds to keep Matches and Polls "Live"
-            autoRefreshInterval = setInterval(() => {
-                fetchUserData();
-                fetchEsportsData();
-            }, 15000);
-        });
-
-        async function fetchUserData() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.success && data.user) {
-                    currentCoins = data.user.coins || 0;
-                    currentRupees = data.user.balance || 0;
-                    document.getElementById("userCoins").innerText = currentCoins;
-                    document.getElementById("userRupees").innerText = currentRupees.toFixed(2);
-                }
-            } catch (err) { console.error("Wallet sync failed"); }
-        }
-
-        async function fetchEsportsData() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/esports/data?userId=${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                
-                if(data.success) {
-                    joinedMatchesList = data.participants || {}; // Lists all participants per match
+            auth.onAuthStateChanged((user) => {
+                if (user) {
                     
-                    if(data.poll && data.poll.active) {
-                        currentPollData = data.poll;
-                        renderPollUI();
-                    } else {
-                        document.getElementById("livePollContainer").style.display = "none";
-                    }
+                    // 1. Live Wallet Sync
+                    db.ref(`users/${uid}`).on('value', (snap) => {
+                        if(snap.exists()) { currentCoins = snap.val().coins || 0; document.getElementById("userCoins").innerText = currentCoins; }
+                    });
 
-                    renderMatches(data.matches || {});
-                }
-            } catch (err) {
-                console.error("Failed to fetch matches");
-            }
-        }
+                    // 2. Fetch Admin Module Controls & Banners
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 PLAY STORE INVISIBLE SWITCH (Master Toggle)
+                            let isArenaActive = true;
+                            if(adminData.module_toggles && adminData.module_toggles.esports_zone !== undefined) {
+                                isArenaActive = adminData.module_toggles.esports_zone === true || adminData.module_toggles.esports_zone === "true";
+                            }
+                            // If Safe Mode (play_store_review_safe_mode) is ON, force close Arena too
+                            if(adminData.module_toggles && (adminData.module_toggles.play_store_review_safe_mode === true || adminData.module_toggles.play_store_review_safe_mode === "true")) {
+                                isArenaActive = false;
+                            }
+                            localStorage.setItem("d_safemode", !isArenaActive);
+                            
+                            if (isArenaActive) {
+                                document.getElementById("safeReviewMessage").style.display = "none";
+                                document.getElementById("masterArenaContainer").style.display = "flex";
+                            } else {
+                                document.getElementById("safeReviewMessage").style.display = "block";
+                                document.getElementById("masterArenaContainer").style.display = "none";
+                            }
+
+                            // Setup Banners
+                            if(adminData.banner_ads) {
+                                if(adminData.banner_ads.slot1 && adminData.banner_ads.slot1.active) setAdHTML(document.getElementById("adminBannerSlot1"), adminData.banner_ads.slot1.code);
+                                if(adminData.banner_ads.slot2 && adminData.banner_ads.slot2.active) setAdHTML(document.getElementById("adminBannerSlot2"), adminData.banner_ads.slot2.code);
+                            }
+                        }
+                    });
+
+                    // 3. 📊 LIVE POLL SYSTEM (Safe Database Path)
+                    db.ref('arena_game_1/live_poll').on('value', (snap) => {
+                        const pollBox = document.getElementById("livePollContainer");
+                        if(snap.exists() && snap.val().active) {
+                            pollBox.style.display = "block";
+                            currentPollData = snap.val();
+                            renderPollUI();
+                        } else {
+                            pollBox.style.display = "none";
+                        }
+                    });
+
+                    // 4. 🔥 LIVE MATCHES SYNC (Play Store Safe Paths)
+                    function updateMatchesUI() { renderMatchesList(); }
+
+                    db.ref('arena_game_1/matches').on('value', (snap) => {
+                        if(snap.exists()) { let data = snap.val(); Object.keys(data).forEach(k => { data[k]._game = 'game_1'; allMatches[k] = data[k]; }); }
+                        updateMatchesUI();
+                    });
+
+                    db.ref('arena_game_2/matches').on('value', (snap) => {
+                        if(snap.exists()) { let data = snap.val(); Object.keys(data).forEach(k => { data[k]._game = 'game_2'; allMatches[k] = data[k]; }); }
+                        updateMatchesUI();
+                    });
+
+                    db.ref('arena_game_1/participants').on('value', (snap) => {
+                        if(snap.exists()) { let data = snap.val(); Object.keys(data).forEach(matchId => { allParticipants[matchId] = data[matchId]; }); }
+                        updateMatchesUI();
+                    });
+
+                    db.ref('arena_game_2/participants').on('value', (snap) => {
+                        if(snap.exists()) { let data = snap.val(); Object.keys(data).forEach(matchId => { allParticipants[matchId] = data[matchId]; }); }
+                        updateMatchesUI();
+                    });
+
+                } else { window.location.replace("index.html"); }
+            });
+        });
 
         // 🔥 POLL RENDERING ENGINE
         function renderPollUI() {
-            const container = document.getElementById("livePollContainer");
             const socket = document.getElementById("pollOptionsSocket");
             const qNode = document.getElementById("pollQuestion");
-            
-            container.style.display = "block";
             qNode.innerText = currentPollData.question || "Which match should we host next?";
-            
+
             let totalVotes = 0;
             let options = currentPollData.options || {};
-            
             Object.keys(options).forEach(k => { totalVotes += (options[k].votes || 0); });
 
-            let userVoted = localStorage.getItem("voted_poll_id") === currentPollData.poll_id;
-            let newHtml = "";
+            db.ref(`users/${uid}/poll_voted/${currentPollData.poll_id}`).once('value').then(votedSnap => {
+                let userVoted = votedSnap.exists();
+                let newHtml = "";
 
-            Object.keys(options).forEach(optKey => {
-                let opt = options[optKey];
-                let optVotes = opt.votes || 0;
-                let percent = totalVotes === 0 ? 0 : Math.round((optVotes / totalVotes) * 100);
+                Object.keys(options).forEach(optKey => {
+                    let opt = options[optKey];
+                    let optVotes = opt.votes || 0;
+                    let percent = totalVotes === 0 ? 0 : Math.round((optVotes / totalVotes) * 100);
 
-                let clickAction = userVoted ? "" : `onclick="castVote('${optKey}')"`;
-                let cursorStyle = userVoted ? "cursor:default;" : "cursor:pointer;";
+                    if(userVoted) {
+                        newHtml += `
+                            <div class="poll-option" style="cursor:default;">
+                                <div class="poll-fill" style="width: ${percent}%;"></div>
+                                <div class="poll-text"><span>${opt.text}</span><span style="color:#d946ef;">${percent}% (${optVotes})</span></div>
+                            </div>
+                        `;
+                    } else {
+                        newHtml += `
+                            <div class="poll-option" style="cursor:pointer;" onclick="castVote('${optKey}')">
+                                <div class="poll-fill" style="width: 0%;"></div>
+                                <div class="poll-text"><span>${opt.text}</span><span>Tap to Vote</span></div>
+                            </div>
+                        `;
+                    }
+                });
 
-                newHtml += `
-                    <div class="poll-option" style="${cursorStyle}" ${clickAction}>
-                        <div class="poll-fill" style="width: ${userVoted ? percent : 0}%;"></div>
-                        <div class="poll-text">
-                            <span>${opt.text}</span>
-                            <span>${userVoted ? percent + "%" : "Tap to Vote"}</span>
-                        </div>
-                    </div>
-                `;
+                socket.innerHTML = newHtml;
+                document.getElementById("votedThanksBadge").style.display = userVoted ? "block" : "none";
             });
-
-            socket.innerHTML = newHtml;
-            document.getElementById("votedThanksBadge").style.display = userVoted ? "block" : "none";
         }
 
-        async function castVote(optionKey) {
+        function castVote(optionKey) {
             if(!currentPollData || !currentPollData.poll_id) return;
-            
-            try {
-                const res = await fetch(`${API_BASE_URL}/esports/vote`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ pollId: currentPollData.poll_id, optionKey: optionKey })
-                });
-                const data = await res.json();
-                
-                if(data.success) {
-                    localStorage.setItem("voted_poll_id", currentPollData.poll_id);
-                    fetchEsportsData(); // Instantly refresh poll data
-                }
-            } catch (err) {}
+            // 1. Mark user as voted
+            db.ref(`users/${uid}/poll_voted/${currentPollData.poll_id}`).set(true).then(() => {
+                // 2. Increment global vote count
+                db.ref(`arena_game_1/live_poll/options/${optionKey}/votes`).set(firebase.database.ServerValue.increment(1));
+            });
         }
 
         // 🔥 MATCHES RENDERING ENGINE
-        function renderMatches(matches) {
+        function renderMatchesList() {
             const activeBox = document.getElementById("activeMatchesContainer");
             const pastBox = document.getElementById("pastMatchesContainer");
-            
-            let activeHtml = "";
-            let pastHtml = "";
-            
-            let keys = Object.keys(matches).reverse();
+            let activeHtml = ""; let pastHtml = ""; let keys = Object.keys(allMatches).sort().reverse(); 
 
             if (keys.length === 0) {
-                activeBox.innerHTML = "<div class='loading-text'>No active matches available right now.</div>";
+                activeBox.innerHTML = "<div class='loading-text'>No active matches right now.</div>";
                 pastBox.innerHTML = "<div class='loading-text'>No past results yet.</div>";
                 return;
             }
 
             keys.forEach(k => {
-                let m = matches[k];
-                // Check if the current user UID is in the participants list for this match
-                let isJoined = (joinedMatchesList[k] && joinedMatchesList[k][uid] !== undefined);
-                
-                if(m.status === 'active') {
-                    activeHtml += buildMatchCard(k, m, isJoined, true);
-                } else if (m.status === 'completed') {
-                    pastHtml += buildMatchCard(k, m, false, false);
-                }
+                let m = allMatches[k];
+                let matchParts = allParticipants[k] || {};
+                let isJoined = (matchParts[uid] !== undefined);
+
+                if(m.status === 'active') { activeHtml += buildMatchCard(k, m, isJoined, true, matchParts); } 
+                else if (m.status === 'completed') { pastHtml += buildMatchCard(k, m, false, false, matchParts); }
             });
 
             activeBox.innerHTML = activeHtml || "<div class='loading-text'>No active matches right now.</div>";
             pastBox.innerHTML = pastHtml || "<div class='loading-text'>No past results yet.</div>";
         }
 
-        function buildMatchCard(id, m, isJoined, isActive) {
-            let joinBtnHTML = "";
-            let roomBoxHTML = "";
-            let winnerHTML = "";
+        function buildMatchCard(id, m, isJoined, isActive, matchParts) {
+            let joinBtnHTML = ""; let roomBoxHTML = ""; let winnerHTML = "";
+            let feeSym = m.feeType === 'rupees' ? '₹' : '🪙';
+            let przSym = m.prizeType === 'rupees' ? '₹' : '🪙';
+            let feeString = `${feeSym}${m.fee || m.registration || 0}`;
+            let rewardString = `${przSym}${m.prizePool || m.rewardPool || 0}`;
 
-            let feeSymbol = m.feeType === 'rupees' ? '₹' : '';
-            let feeSuffix = m.feeType === 'coins' ? ' 🪙' : '';
-            let prizeSymbol = m.prizeType === 'rupees' ? '₹' : '';
-            let prizeSuffix = m.prizeType === 'coins' ? ' 🪙' : '';
+            let gameType = m._game || 'game_1';
+            let badgeColor = gameType === 'game_1' ? 'rgba(249, 115, 22, 0.2)' : 'rgba(234, 179, 8, 0.2)';
+            let badgeTextColor = gameType === 'game_1' ? '#fdba74' : '#fde047';
+            let badgeText = gameType === 'game_1' ? '🔥 ARENA 1' : '🪖 ARENA 2'; // SAFE NAMES FOR PLAY STORE
 
-            // Play Store Safe Terminologies used in HTML rendering
             if(isActive) {
                 if(isJoined) {
-                    let myFfId = joinedMatchesList[id][uid].ff_id || "N/A";
-                    
+                    let myPlayerId = matchParts[uid].game_uid || matchParts[uid].ff_id || matchParts[uid].playerId || "N/A";
                     let alarmBtn = `<button class="alarm-btn" onclick="setMatchReminder('${m.title}', '${m.time}')"><i class="fa-solid fa-bell"></i> Set Reminder</button>`;
-                    
-                    joinBtnHTML = `
-                        <div class="joined-btn" style="display:block;"><i class="fa-solid fa-circle-check"></i> REGISTERED: ${myFfId}</div>
-                        ${alarmBtn}
-                    `;
-                    
+                    joinBtnHTML = `<div class="joined-btn" style="display:block;"><i class="fa-solid fa-circle-check"></i> REGISTERED: ${myPlayerId}</div>${alarmBtn}`;
                     roomBoxHTML = `
                         <div class="room-details-box" style="display:block;">
                             <h4 style="color:var(--success); margin:0 0 12px 0;"><i class="fa-solid fa-key"></i> Room Access Details</h4>
@@ -358,35 +472,30 @@
                             <p style="font-size:11px; color:var(--warning); margin:8px 0 0 0;">Credentials update 10 mins before start.</p>
                         </div>`;
                 } else {
-                    joinBtnHTML = `<button class="join-btn" onclick="openJoinModal('${id}', ${m.fee}, '${m.feeType}', '${m.title}')">PARTICIPATE NOW (${feeSymbol}${m.fee}${feeSuffix})</button>`;
+                    joinBtnHTML = `<button class="join-btn" onclick="openJoinModal('${id}', ${m.fee || m.registration || 0}, '${m.title}', '${gameType}')">PARTICIPATE NOW (${feeString})</button>`;
                 }
             } else {
-                let w1 = m.win1Name ? `<div class="win-row"><span>🥇 1st: <b>${m.win1Name}</b></span><span class="win-prize">+${prizeSymbol}${m.win1Prize}${prizeSuffix}</span></div>` : '';
-                let w2 = m.win2Name ? `<div class="win-row"><span>🥈 2nd: <b>${m.win2Name}</b></span><span class="win-prize">+${prizeSymbol}${m.win2Prize}${prizeSuffix}</span></div>` : '';
-                let w3 = m.win3Name ? `<div class="win-row"><span>🥉 3rd: <b>${m.win3Name}</b></span><span class="win-prize">+${prizeSymbol}${m.win3Prize}${prizeSuffix}</span></div>` : '';
-
-                winnerHTML = `
-                    <div class="winner-card">
-                        <h4><i class="fa-solid fa-crown"></i> Match Champions</h4>
-                        ${w1} ${w2} ${w3}
-                    </div>`;
+                let w1 = m.win1Name ? `<div class="win-row"><span>🥇 1st: <b>${m.win1Name}</b></span><span class="win-prize">+${m.win1Prize || m.win1Reward || 0} ${przSym}</span></div>` : '';
+                let w2 = m.win2Name ? `<div class="win-row"><span>🥈 2nd: <b>${m.win2Name}</b></span><span class="win-prize">+${m.win2Prize || m.win2Reward || 0} ${przSym}</span></div>` : '';
+                let w3 = m.win3Name ? `<div class="win-row"><span>🥉 3rd: <b>${m.win3Name}</b></span><span class="win-prize">+${m.win3Prize || m.win3Reward || 0} ${przSym}</span></div>` : '';
+                winnerHTML = `<div class="winner-card"><h4><i class="fa-solid fa-crown"></i> Match Champions</h4>${w1} ${w2} ${w3}</div>`;
             }
 
             return `
             <div class="match-card">
-                <div class="match-code-badge">ID: ${id}</div>
+                <div class="match-code-badge" style="background:${badgeColor}; color:${badgeTextColor}; border-color:${badgeTextColor};">${badgeText}</div>
                 <div class="match-header">
                     <h3 class="match-title">${m.title}</h3>
                     <span class="match-time"><i class="fa-regular fa-clock"></i> ${m.time}</span>
                 </div>
                 <div class="match-body">
                     <div class="prize-pool-grid">
-                        <div class="prize-box"><span>Rewards Pool</span><strong>${prizeSymbol}${m.prizePool}${prizeSuffix}</strong></div>
-                        <div class="prize-box entry-box"><span>Participation</span><strong>${feeSymbol}${m.fee}${feeSuffix}</strong></div>
+                        <div class="prize-box"><span>Reward Pool</span><strong>${rewardString}</strong></div>
+                        <div class="prize-box entry-box"><span>Registration</span><strong>${feeString}</strong></div>
                     </div>
                     <div class="map-details">
-                        <div><i class="fa-solid fa-map-location-dot"></i> Map: <b>${m.map}</b></div>
-                        <div><i class="fa-solid fa-users-viewfinder"></i> Type: <b>${m.type}</b></div>
+                        <div><i class="fa-solid fa-map-location-dot"></i> Map: <b>${m.map || 'Bermuda'}</b></div>
+                        <div><i class="fa-solid fa-users-viewfinder"></i> Type: <b>${m.type || 'Solo'}</b></div>
                     </div>
                     ${joinBtnHTML}
                     ${roomBoxHTML}
@@ -395,67 +504,60 @@
             </div>`;
         }
 
-        // ALARM SYSTEM
         function setMatchReminder(title, time) {
             if ("Notification" in window) {
                 Notification.requestPermission().then(permission => {
-                    if(permission === "granted") {
-                        alert(`🔔 Alarm Synced!\n\nWe have set a local reminder for: [${title}].\nYou will receive a notification 15 mins before ${time}.`);
-                    } else {
-                        alert("⚠️ Please allow Notifications in your browser to use the Alarm feature!");
-                    }
+                    if(permission === "granted") { alert(`🔔 Alarm Synced!\n\nWe have set a local reminder for: [${title}].\nYou will receive a notification 15 mins before ${time}.`); } 
+                    else { alert("⚠️ Please allow Notifications in your browser to use the Alarm feature!"); }
                 });
-            } else {
-                alert(`🔔 Reminder Saved! Check the app 15 minutes before ${time}.`);
-            }
+            } else { alert(`🔔 Reminder Saved! Check the app 15 minutes before ${time}.`); }
         }
 
-        // JOINING LOGIC
-        function openJoinModal(matchId, fee, feeType, title) {
-            activeJoiningMatch = { id: matchId, fee: fee, feeType: feeType, title: title };
-            document.getElementById("ffIdInput").value = "";
+        // JOINING LOGIC & HISTORY UPDATE
+        function openJoinModal(matchId, registrationPoints, title, gameType) {
+            activeJoiningMatch = { id: matchId, fee: registrationPoints, title: title, game: gameType };
+            document.getElementById("playerIdInput").value = "";
             document.getElementById("joinDetailsModal").style.display = "flex";
         }
 
-        async function confirmJoinWithFFID() {
-            let ffIdValue = document.getElementById("ffIdInput").value.trim();
-            if(!ffIdValue) { alert("Please enter your In-Game Name or Player ID!"); return; }
+        function confirmJoinWithPlayerID() {
+            let playerIdValue = document.getElementById("playerIdInput").value.trim();
+            if(!playerIdValue) { alert("Please enter your Player ID!"); return; }
+            if(currentCoins < activeJoiningMatch.fee) { alert(`❌ Insufficient Coins! You need ${activeJoiningMatch.fee} coins to register.`); return; }
 
             const btn = document.getElementById("confirmJoinBtn");
-            btn.disabled = true;
-            btn.innerText = "PROCESSING...";
+            btn.disabled = true; btn.innerText = "PROCESSING...";
 
-            try {
-                const res = await fetch(`${API_BASE_URL}/esports/join`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        matchId: activeJoiningMatch.id, 
-                        ffId: ffIdValue,
-                        fee: activeJoiningMatch.fee,
-                        feeType: activeJoiningMatch.feeType,
-                        title: activeJoiningMatch.title
-                    })
-                });
-
-                const data = await res.json();
-                
-                if (data.success) {
-                    document.getElementById('joinDetailsModal').style.display = 'none';
-                    document.getElementById("successModal").style.display = "flex";
-                    fetchUserData();   // Refresh balances instantly
-                    fetchEsportsData(); // Refresh UI to show "Registered"
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                if (current >= activeJoiningMatch.fee) { return current - activeJoiningMatch.fee; } return; 
+            }, (error, committed) => {
+                if (error || !committed) {
+                    alert("❌ Transaction failed due to network or insufficient balance."); resetJoinBtn(btn);
                 } else {
-                    alert(data.message || "❌ Insufficient balance or match is full.");
+                    // Register participant in Safe Arena node
+                    let p1 = db.ref(`arena_${activeJoiningMatch.game}/participants/${activeJoiningMatch.id}/${uid}`).set({
+                        game_uid: playerIdValue, joinedAt: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    // 🔥 Add to Global Ledger (History) 🔥
+                    let p2 = db.ref(`users/${uid}/transactions`).push({ 
+                        action: `Arena Reg: ${activeJoiningMatch.title}`, 
+                        amount: -activeJoiningMatch.fee, 
+                        status: "SUCCESSFUL",
+                        details: `Match ID: ${activeJoiningMatch.id}`,
+                        timestamp: Date.now() 
+                    });
+
+                    Promise.all([p1, p2]).then(() => {
+                        document.getElementById('joinDetailsModal').style.display = 'none';
+                        document.getElementById("successModal").style.display = "flex";
+                        resetJoinBtn(btn);
+                    });
                 }
-            } catch (err) {
-                alert("⚠️ Network Error. Try again.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Confirm Entry";
-            }
+            });
         }
+
+        function resetJoinBtn(btn) { btn.disabled = false; let lang = localStorage.getItem("selectedLang") || "en"; btn.innerText = langData[lang]["btn_confirm"] || "Confirm Entry"; }
     </script>
 </body>
 </html>

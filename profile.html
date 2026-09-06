@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - Dudo</title>
-    
+
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- 🔥 Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -23,54 +28,56 @@
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); padding-bottom: 40px; min-height: 100vh; }
-        
+
         /* Corporate Clean Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); }
         .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-cyan); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(6, 182, 212, 0.15); transition: 0.2s; border: 1px solid rgba(6, 182, 212, 0.3); }
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; letter-spacing: 0.5px; }
-        
+
         /* Language Dropdown */
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: #fff; font-weight: bold; cursor: pointer; }
 
         /* Professional User Info Section */
         .profile-header { width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); padding: 35px 20px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-bottom: 1px solid rgba(59, 130, 246, 0.3); backdrop-filter: blur(10px); }
         .avatar-container { position: relative; margin-bottom: 12px; }
-        .avatar { width: 85px; height: 85px; background: #1e293b; color: #fff; font-size: 32px; font-weight: 900; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 3px solid var(--primary-blue); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); object-fit: cover; }
+        .avatar { width: 85px; height: 85px; background: #1e293b; color: #fff; font-size: 32px; font-weight: 900; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 3px solid var(--primary-blue); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); object-fit: cover; overflow: hidden; }
         .edit-icon { position: absolute; bottom: 0; right: -5px; background: var(--accent-green); color: #fff; width: 28px; height: 28px; border-radius: 50%; font-size: 12px; display: flex; justify-content: center; align-items: center; border: 2px solid var(--bg-dark); cursor: pointer; text-decoration: none; }
-        
-        .user-name { margin: 0; font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; }
+
+        .user-name { margin: 0; font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; text-transform: capitalize; }
         .user-phone { margin: 5px 0 15px 0; font-size: 13px; color: var(--accent-gold); font-weight: 600; }
-        
+
         /* Corporate UID Badge */
         .uid-tag { display: inline-flex; align-items: center; background: rgba(0,0,0,0.4); padding: 8px 18px; border-radius: 20px; font-size: 12.5px; font-weight: 800; color: #e2e8f0; cursor: pointer; border: 1px dashed rgba(255,255,255,0.2); transition: 0.2s; }
         .uid-tag:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
         .uid-tag span { color: var(--accent-cyan); margin-right: 6px; }
 
-        /* Financial Dashboard Card */
-        .finance-card { width: 90%; max-width: 420px; background: var(--card-bg); border-radius: 20px; padding: 22px; margin-top: -25px; box-sizing: border-box; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); }
-        .balance-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 18px; margin-bottom: 18px; }
-        .bal-item h4 { margin: 0; font-size: 26px; color: #fff; font-weight: 900; }
-        .bal-item p { margin: 4px 0 0 0; font-size: 11px; color: var(--text-sub); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .action-buttons { display: flex; justify-content: space-between; gap: 12px; }
-        .action-btn { flex: 1; padding: 12px 0; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center; transition: 0.2s; border: 1px solid transparent; }
+        /* Financial Dashboard Card (Coins Only) */
+        .finance-card { width: 90%; max-width: 420px; background: var(--card-bg); border-radius: 20px; padding: 25px 22px; margin-top: -25px; box-sizing: border-box; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); }
+
+        .balance-row { display: flex; justify-content: center; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 22px; margin-bottom: 20px; text-align: center; }
+        .bal-item h4 { margin: 0; font-size: 38px; color: var(--accent-gold); font-weight: 900; text-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+        .bal-item p { margin: 5px 0 0 0; font-size: 13px; color: var(--text-sub); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* 🚨 FLEXIBLE BUTTON GRID */
+        .action-buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .action-btn { flex: 1; min-width: 90px; padding: 12px 0; border-radius: 14px; font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center; transition: 0.2s; border: 1px solid transparent; }
         .action-btn:active { transform: scale(0.95); }
-        
+
         .btn-withdraw { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border-color: rgba(16, 185, 129, 0.3); }
         .btn-deposit { background: rgba(59, 130, 246, 0.15); color: var(--primary-blue); border-color: rgba(59, 130, 246, 0.3); }
         .btn-history { background: rgba(255, 255, 255, 0.05); color: #e2e8f0; border-color: rgba(255, 255, 255, 0.15); }
-        .btn-icon { font-size: 20px; margin-bottom: 6px; }
+        .btn-icon { font-size: 22px; margin-bottom: 8px; }
 
         /* Admin Ad Banner Slots */
-        .ad-banner-slot { width: 90%; max-width: 420px; min-height: 52px; margin: 18px 0; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); }
+        .ad-banner-slot { width: 90%; max-width: 420px; min-height: 52px; margin: 18px 0; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); display: none; }
 
         /* Settings Menu List */
-        .menu-list { width: 90%; max-width: 420px; background: var(--card-bg); border-radius: 18px; padding: 8px 18px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 25px rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
+        .menu-list { width: 90%; max-width: 420px; background: var(--card-bg); border-radius: 18px; padding: 8px 18px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 25px rgba(0,0,0,0.3); backdrop-filter: blur(10px); display: flex; flex-direction: column; }
         .menu-item { display: flex; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: none; color: #fff; transition: 0.2s; }
         .menu-item:last-child { border-bottom: none; }
         .menu-item:active { transform: translateX(5px); }
-        
+
         .menu-icon { font-size: 20px; margin-right: 18px; width: 28px; text-align: center; color: var(--accent-cyan); }
         .menu-text { flex-grow: 1; font-size: 14.5px; font-weight: 700; }
         .menu-arrow { color: var(--text-sub); font-weight: bold; font-size: 12px; }
@@ -79,13 +86,30 @@
         .danger-zone { width: 90%; max-width: 420px; display: flex; gap: 12px; margin-top: 25px; }
         .logout-btn { flex: 1; background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .logout-btn:active { background: rgba(255,255,255,0.1); }
-        
+
         .delete-btn { flex: 1; background: rgba(239, 68, 68, 0.15); color: var(--accent-pink); border: 1px solid rgba(239, 68, 68, 0.4); padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .delete-btn:active { background: rgba(239, 68, 68, 0.3); }
-        
+
         /* Overlays */
         #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.98); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; }
     </style>
+
+    <!-- ⚡⚡ ANTI-FLICKER SCRIPT: PREVENTS BUTTON BLINKING COMPLETELY ⚡⚡ -->
+    <script>
+        let cToggles = localStorage.getItem("d_toggles");
+        if(cToggles) {
+            let toggles = JSON.parse(cToggles);
+            let style = document.createElement('style');
+            let cssRules = "";
+            for(let key in toggles) {
+                if(toggles[key] === false) {
+                    cssRules += "#" + key + " { display: none !important; } ";
+                }
+            }
+            style.innerHTML = cssRules;
+            document.head.appendChild(style);
+        }
+    </script>
 </head>
 <body>
 
@@ -112,42 +136,38 @@
     <!-- 👤 Profile Header -->
     <div class="profile-header">
         <div class="avatar-container">
-            <img id="profilePageAvatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=1e293b&color=fff" alt="Avatar">
+            <div id="profilePageAvatar" class="avatar">👤</div>
             <a href="editprofile.html" class="edit-icon"><i class="fa-solid fa-pen"></i></a>
         </div>
-        
+
         <h2 class="user-name" id="userName">Loading...</h2>
         <p class="user-phone" id="userPhone">Loading...</p>
-        
+
         <div class="uid-tag" onclick="copyUID()">
             <span>UID:</span> <span id="userUIDText">--------</span> <i class="fa-regular fa-copy" style="margin-left: 5px;"></i>
         </div>
     </div>
 
-    <!-- 💳 Finance Card -->
+    <!-- 💳 Finance Card (Coins Only) -->
     <div class="finance-card">
         <div class="balance-row">
-            <div class="bal-item">
-                <h4 id="statBal">₹ 0.00</h4>
-                <p data-i18n="total_bal">My Balance</p>
-            </div>
-            <div class="bal-item" style="text-align: right;">
-                <h4 id="statCoins" style="color: var(--accent-gold);">0</h4>
+            <div class="bal-item" id="uiCoinBox">
+                <h4 id="statCoins">0</h4>
                 <p data-i18n="total_coins">Total Points</p>
             </div>
         </div>
-        
+
         <div class="action-buttons">
-            <a href="my_points.html" class="action-btn btn-withdraw" id="mod_my_points">
+            <a href="redeem.html" class="action-btn btn-withdraw" id="mod_my_points">
                 <span class="btn-icon"><i class="fa-solid fa-vault"></i></span>
                 <span data-i18n="withdraw">My Ledger</span>
             </a>
-            
-            <a href="add_points.html" class="action-btn btn-deposit" id="mod_add_points" style="display:none;">
+
+            <a href="add_points.html" class="action-btn btn-deposit" id="mod_add_points">
                 <span class="btn-icon"><i class="fa-solid fa-plus-circle"></i></span>
                 <span data-i18n="deposit">Add Points</span>
             </a>
-            
+
             <a href="history.html" class="action-btn btn-history" id="mod_history">
                 <span class="btn-icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
                 <span data-i18n="history">History</span>
@@ -156,12 +176,11 @@
     </div>
 
     <!-- 📢 Admin Ad Slot 1 -->
-    <div class="ad-banner-slot" id="adminBannerSlot1"> <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+    <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
     <!-- ⚙️ Settings Menu -->
     <div class="menu-list">
-        <a href="refer.html" class="menu-item">
+        <a href="refer.html" class="menu-item" id="mod_refer">
             <div class="menu-icon" style="color: var(--accent-gold);"><i class="fa-solid fa-users"></i></div>
             <div class="menu-text" data-i18n="refer_earn">Refer & Earn</div>
             <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
@@ -173,7 +192,7 @@
             <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
         </a>
 
-        <a href="changepassword.html" class="menu-item">
+        <a href="change_password.html" class="menu-item">
             <div class="menu-icon" style="color: var(--accent-purple);"><i class="fa-solid fa-lock"></i></div>
             <div class="menu-text" data-i18n="change_pass">Change Passcode</div>
             <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
@@ -193,10 +212,9 @@
     </div>
 
     <!-- 📢 Admin Ad Slot 2 -->
-    <div class="ad-banner-slot" id="adminBannerSlot2"> <script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+    <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
-    <!-- 🛑 Danger Zone (Logout & Delete Account) -->
+    <!-- 🛑 Danger Zone -->
     <div class="danger-zone">
         <button class="logout-btn" onclick="logoutUser()">
             <i class="fa-solid fa-right-from-bracket" style="margin-right: 5px;"></i> <span data-i18n="logout">Logout</span>
@@ -206,104 +224,80 @@
         </button>
     </div>
 
-    <!-- 🟢 NODE.JS API SCRIPT (Firebase Removed) -->
+    <!-- ⚡⚡ INSTANT USER DATA CACHE ⚡⚡ -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        function createEmojiURICache(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
 
-        // PLAY STORE COMPLIANT TRANSLATIONS (13+ Languages)
+        let cCoins = localStorage.getItem("d_coins");
+        let cName = localStorage.getItem("d_name");
+        let cPhone = localStorage.getItem("d_phone");
+        let cUid = localStorage.getItem("d_uid");
+        let cImg = localStorage.getItem("d_img");
+        
+        if(cCoins) document.getElementById("statCoins").innerText = cCoins;
+        if(cName) document.getElementById("userName").innerText = cName;
+        if(cPhone) document.getElementById("userPhone").innerText = cPhone;
+        if(cUid) {
+            let shortUID = cUid.substring(cUid.length - 8).toUpperCase();
+            document.getElementById("userUIDText").innerText = shortUID;
+        }
+        if(cImg) {
+            let avatarContainer = document.getElementById("profilePageAvatar");
+            if (cImg.startsWith("http") || cImg.startsWith("data:")) {
+                avatarContainer.innerHTML = `<img src="${cImg}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            } else {
+                avatarContainer.innerHTML = `<img src="${createEmojiURICache(cImg)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            }
+        }
+    </script>
+
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <script>
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🌐 TRANSLATIONS (13+ Languages)
         const langData = {
             "en": {
-                "profile_title": "Profile", "total_bal": "My Balance", "total_coins": "Total Points",
+                "profile_title": "Profile", "total_coins": "Total Points",
                 "withdraw": "My Ledger", "deposit": "Add Points", "history": "History",
                 "refer_earn": "Refer & Earn", "edit_profile": "Edit Profile", "change_pass": "Change Passcode", 
                 "priv_policy": "Privacy Policy", "help_support": "Help & Support", "logout": "Logout", 
                 "delete_acc": "Delete Account", "uid_copied": "UID Copied!"
             },
             "hi": {
-                "profile_title": "प्रोफाइल", "total_bal": "वॉलेट बैलेंस", "total_coins": "कुल पॉइंट्स",
+                "profile_title": "प्रोफाइल", "total_coins": "कुल पॉइंट्स",
                 "withdraw": "रिवॉर्ड देखें", "deposit": "पॉइंट्स जोड़ें", "history": "लेन-देन",
                 "refer_earn": "रेफर एंड अर्न", "edit_profile": "प्रोफाइल बदलें", "change_pass": "पासकोड बदलें", 
                 "priv_policy": "प्राइवेसी पॉलिसी", "help_support": "सहायता", "logout": "लॉगआउट", 
                 "delete_acc": "अकाउंट डिलीट करें", "uid_copied": "UID कॉपी हो गया!"
             },
-            "bn": { 
-                "profile_title": "প্রোফাইল", "total_bal": "ব্যালেন্স", "total_coins": "মোট পয়েন্ট", 
-                "withdraw": "আমার লেজার", "deposit": "পয়েন্ট যোগ করুন", "history": "ইতিহাস", 
-                "refer_earn": "রেফার ও আয়", "edit_profile": "প্রোফাইল এডিট", "change_pass": "পাসকোড পরিবর্তন", 
-                "priv_policy": "গোপনীয়তা নীতি", "help_support": "সাপোর্ট", "logout": "লগআউট", 
-                "delete_acc": "অ্যাকাউন্ট মুছুন", "uid_copied": "UID কপি করা হয়েছে!" 
-            },
-            "te": { 
-                "profile_title": "ప్రొఫైల్", "total_bal": "నా బ్యాలెన్స్", "total_coins": "మొత్తం పాయింట్లు", 
-                "withdraw": "నా లెడ్జర్", "deposit": "పాయింట్లను జోడించండి", "history": "చరిత్ర", 
-                "refer_earn": "రిఫర్ & ఎర్న్", "edit_profile": "ప్రొఫైల్ సవరించండి", "change_pass": "పాస్‌కోడ్ మార్చండి", 
-                "priv_policy": "గోప్యతా విధానం", "help_support": "సహాయం & మద్దతు", "logout": "లాగ్అవుట్", 
-                "delete_acc": "ఖాతాను తొలగించండి", "uid_copied": "UID కాపీ చేయబడింది!" 
-            },
-            "mr": { 
-                "profile_title": "प्रोफाइल", "total_bal": "माझी शिल्लक", "total_coins": "एकूण पॉइंट्स", 
-                "withdraw": "माझे लेजर", "deposit": "पॉइंट्स जोडा", "history": "इतिहास", 
-                "refer_earn": "रेफर आणि कमवा", "edit_profile": "प्रोफाइल संपादित करा", "change_pass": "पासकोड बदला", 
-                "priv_policy": "गोपनीयता धोरण", "help_support": "मदत आणि सपोर्ट", "logout": "लॉगआउट", 
-                "delete_acc": "खाते हटवा", "uid_copied": "UID कॉपी केले!" 
-            },
-            "ta": { 
-                "profile_title": "சுயவிவரம்", "total_bal": "என் இருப்பு", "total_coins": "மொத்த புள்ளிகள்", 
-                "withdraw": "என் லெட்ஜர்", "deposit": "புள்ளிகளைச் சேர்", "history": "வரலாறு", 
-                "refer_earn": "பரிந்துரை & சம்பாதி", "edit_profile": "சுயவிவரத்தை திருத்து", "change_pass": "கடவுச்சொல்லை மாற்று", 
-                "priv_policy": "தனியுரிமை கொள்கை", "help_support": "உதவி & ஆதரவு", "logout": "வெளியேறு", 
-                "delete_acc": "கணக்கை நீக்கு", "uid_copied": "UID நகலெடுக்கப்பட்டது!" 
-            },
-            "ur": { 
-                "profile_title": "پروفائل", "total_bal": "میرا بیلنس", "total_coins": "کل پوائنٹس", 
-                "withdraw": "میرا لیجر", "deposit": "پوائنٹس شامل کریں", "history": "تاریخ", 
-                "refer_earn": "ریفر اور کمائیں", "edit_profile": "پروفائل میں ترمیم", "change_pass": "پاس کوڈ تبدیل کریں", 
-                "priv_policy": "پرائیویسی پالیسی", "help_support": "مدد اور سپورٹ", "logout": "لاگ آؤٹ", 
-                "delete_acc": "اکاؤنٹ حذف کریں", "uid_copied": "UID کاپی ہو گیا!" 
-            },
-            "gu": { 
-                "profile_title": "પ્રોફાઇલ", "total_bal": "મારું બેલેન્સ", "total_coins": "કુલ પોઇન્ટ્સ", 
-                "withdraw": "મારું લેજર", "deposit": "પોઈન્ટ્સ ઉમેરો", "history": "ઇતિહાસ", 
-                "refer_earn": "રેફર એન્ડ અર્ન", "edit_profile": "પ્રોફાઇલ સંપાદિત કરો", "change_pass": "પાસકોડ બદલો", 
-                "priv_policy": "ગોપનીયતા નીતિ", "help_support": "સહાય અને સપોર્ટ", "logout": "લોગઆઉટ", 
-                "delete_acc": "એકાઉન્ટ કાઢી નાખો", "uid_copied": "UID કૉપિ થઈ ગયું!" 
-            },
-            "es": { 
-                "profile_title": "Perfil", "total_bal": "Mi Saldo", "total_coins": "Puntos Totales", 
-                "withdraw": "Mi Libro", "deposit": "Añadir Puntos", "history": "Historial", 
-                "refer_earn": "Recomendar y Ganar", "edit_profile": "Editar Perfil", "change_pass": "Cambiar Código", 
-                "priv_policy": "Política de Privacidad", "help_support": "Ayuda y Soporte", "logout": "Cerrar Sesión", 
-                "delete_acc": "Borrar Cuenta", "uid_copied": "¡UID Copiado!" 
-            },
-            "fr": { 
-                "profile_title": "Profil", "total_bal": "Mon Solde", "total_coins": "Points Totaux", 
-                "withdraw": "Mon Grand Livre", "deposit": "Ajouter des Points", "history": "Historique", 
-                "refer_earn": "Parrainer et Gagner", "edit_profile": "Modifier le Profil", "change_pass": "Changer le Code", 
-                "priv_policy": "Politique de Confidentialité", "help_support": "Aide et Support", "logout": "Déconnexion", 
-                "delete_acc": "Supprimer le Compte", "uid_copied": "UID Copié !" 
-            },
-            "ar": { 
-                "profile_title": "الملف الشخصي", "total_bal": "رصيدي", "total_coins": "إجمالي النقاط", 
-                "withdraw": "سجلي", "deposit": "إضافة نقاط", "history": "السجل", 
-                "refer_earn": "إحالة وكسب", "edit_profile": "تعديل الملف", "change_pass": "تغيير الرمز", 
-                "priv_policy": "سياسة الخصوصية", "help_support": "المساعدة والدعم", "logout": "تسجيل الخروج", 
-                "delete_acc": "حذف الحساب", "uid_copied": "تم نسخ UID!" 
-            },
-            "pt": { 
-                "profile_title": "Perfil", "total_bal": "Meu Saldo", "total_coins": "Pontos Totais", 
-                "withdraw": "Meu Livro", "deposit": "Adicionar Pontos", "history": "Histórico", 
-                "refer_earn": "Indique e Ganhe", "edit_profile": "Editar Perfil", "change_pass": "Mudar Código", 
-                "priv_policy": "Política de Privacidade", "help_support": "Ajuda e Suporte", "logout": "Sair", 
-                "delete_acc": "Excluir Conta", "uid_copied": "UID Copiado!" 
-            },
-            "ru": { 
-                "profile_title": "Профиль", "total_bal": "Мой баланс", "total_coins": "Всего очков", 
-                "withdraw": "Мой счет", "deposit": "Добавить очки", "history": "История", 
-                "refer_earn": "Пригласи и заработай", "edit_profile": "Редактировать профиль", "change_pass": "Изменить код", 
-                "priv_policy": "Конфиденциальность", "help_support": "Помощь и поддержка", "logout": "Выйти", 
-                "delete_acc": "Удалить аккаунт", "uid_copied": "UID скопирован!" 
-            }
+            "bn": { "profile_title": "প্রোফাইল", "total_coins": "মোট পয়েন্ট", "withdraw": "আমার লেজার", "deposit": "পয়েন্ট যোগ করুন", "history": "ইতিহাস", "refer_earn": "রেফার ও আয়", "edit_profile": "প্রোফাইল এডিট", "change_pass": "পাসকোড পরিবর্তন", "priv_policy": "গোপনীয়তা নীতি", "help_support": "সাপোর্ট", "logout": "লগআউট", "delete_acc": "অ্যাকাউন্ট মুছুন", "uid_copied": "UID কপি করা হয়েছে!" },
+            "te": { "profile_title": "ప్రొఫైల్", "total_coins": "మొత్తం పాయింట్లు", "withdraw": "నా లెడ్జర్", "deposit": "జోడించండి", "history": "చరిత్ర", "refer_earn": "రిఫర్ & ఎర్న్", "edit_profile": "ప్రొఫైల్ సవరించండి", "change_pass": "పాస్‌కోడ్ మార్చండి", "priv_policy": "గోప్యతా విధానం", "help_support": "మద్దతు", "logout": "లాగ్అవుట్", "delete_acc": "ఖాతాను తొలగించండి", "uid_copied": "కాపీ చేయబడింది!" },
+            "mr": { "profile_title": "प्रोफाइल", "total_coins": "एकूण पॉइंट्स", "withdraw": "माझे लेजर", "deposit": "पॉइंट्स जोडा", "history": "इतिहास", "refer_earn": "रेफर आणि कमवा", "edit_profile": "संपादित करा", "change_pass": "पासकोड बदला", "priv_policy": "गोपनीयता धोरण", "help_support": "सपोर्ट", "logout": "लॉगआउट", "delete_acc": "खाते हटवा", "uid_copied": "कॉपी केले!" },
+            "ta": { "profile_title": "சுயவிவரம்", "total_coins": "மொத்த புள்ளிகள்", "withdraw": "என் லெட்ஜர்", "deposit": "புள்ளிகளைச் சேர்", "history": "வரலாறு", "refer_earn": "பரிந்துரை & சம்பாதி", "edit_profile": "சுயவிவரத்தை திருத்து", "change_pass": "கடவுச்சொல்", "priv_policy": "தனியுரிமை", "help_support": "ஆதரவு", "logout": "வெளியேறு", "delete_acc": "கணக்கை நீக்கு", "uid_copied": "நகலெடுக்கப்பட்டது!" },
+            "ur": { "profile_title": "پروفائل", "total_coins": "کل پوائنٹس", "withdraw": "میرا لیجر", "deposit": "پوائنٹس شامل کریں", "history": "تاریخ", "refer_earn": "ریفر اور کمائیں", "edit_profile": "پروفائل میں ترمیم", "change_pass": "پاس کوڈ تبدیل کریں", "priv_policy": "پرائیویسی پالیسی", "help_support": "مدد اور سپورٹ", "logout": "لاگ آؤٹ", "delete_acc": "اکاؤنٹ حذف کریں", "uid_copied": "UID کاپی ہو گیا!" },
+            "gu": { "profile_title": "પ્રોફાઇલ", "total_coins": "કુલ પોઇન્ટ્સ", "withdraw": "મારું લેજર", "deposit": "પોઈન્ટ્સ ઉમેરો", "history": "ઇતિહાસ", "refer_earn": "રેફર એન્ડ અર્ન", "edit_profile": "પ્રોફાઇલ સંપાદિત કરો", "change_pass": "પાસકોડ બદલો", "priv_policy": "ગોપનીયતા નીતિ", "help_support": "સહાય અને સપોર્ટ", "logout": "લોગઆઉટ", "delete_acc": "એકાઉન્ટ કાઢી નાખો", "uid_copied": "UID કૉપિ થઈ ગયું!" },
+            "es": { "profile_title": "Perfil", "total_coins": "Puntos Totales", "withdraw": "Mi Libro", "deposit": "Añadir Puntos", "history": "Historial", "refer_earn": "Recomendar", "edit_profile": "Editar Perfil", "change_pass": "Cambiar Código", "priv_policy": "Política Privacidad", "help_support": "Soporte", "logout": "Cerrar Sesión", "delete_acc": "Borrar Cuenta", "uid_copied": "¡Copiado!" },
+            "fr": { "profile_title": "Profil", "total_coins": "Points Totaux", "withdraw": "Mon Livre", "deposit": "Ajouter Points", "history": "Historique", "refer_earn": "Parrainer", "edit_profile": "Modifier Profil", "change_pass": "Changer Code", "priv_policy": "Confidentialité", "help_support": "Support", "logout": "Déconnexion", "delete_acc": "Supprimer Compte", "uid_copied": "Copié !" },
+            "ar": { "profile_title": "الملف الشخصي", "total_coins": "إجمالي النقاط", "withdraw": "سجلي", "deposit": "إضافة نقاط", "history": "السجل", "refer_earn": "إحالة", "edit_profile": "تعديل الملف", "change_pass": "تغيير الرمز", "priv_policy": "الخصوصية", "help_support": "الدعم", "logout": "خروج", "delete_acc": "حذف الحساب", "uid_copied": "تم النسخ!" },
+            "pt": { "profile_title": "Perfil", "total_coins": "Pontos Totais", "withdraw": "Meu Livro", "deposit": "Adicionar Pontos", "history": "Histórico", "refer_earn": "Indicar", "edit_profile": "Editar Perfil", "change_pass": "Mudar Código", "priv_policy": "Privacidade", "help_support": "Suporte", "logout": "Sair", "delete_acc": "Excluir Conta", "uid_copied": "Copiado!" },
+            "ru": { "profile_title": "Профиль", "total_coins": "Всего очков", "withdraw": "Мой счет", "deposit": "Добавить", "history": "История", "refer_earn": "Пригласи", "edit_profile": "Редактировать", "change_pass": "Изменить код", "priv_policy": "Конфиденциальность", "help_support": "Поддержка", "logout": "Выйти", "delete_acc": "Удалить аккаунт", "uid_copied": "Скопирован!" }
         };
 
         function changeLanguage(langCode) {
@@ -320,13 +314,17 @@
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
         window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
 
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
         let currentUID = ""; 
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.href = "index.html"; return; }
 
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
@@ -335,59 +333,90 @@
             let shortUID = currentUID.substring(currentUID.length - 8).toUpperCase();
             document.getElementById("userUIDText").innerText = shortUID;
 
-            fetchUserProfileData();
-            fetchAdminConfigs();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+
+                    // 1. Fetch Live User Data & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+
+                            let fName = data.name || "Player";
+                            let fPhone = data.email || user.email || "Not Set";
+                            let fCoins = data.coins || 0;
+                            
+                            document.getElementById("userName").innerText = fName;
+                            document.getElementById("userPhone").innerText = fPhone;
+                            document.getElementById("statCoins").innerText = fCoins;
+
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${fName || uid}&backgroundColor=b6e3f4`;
+
+                            let avatarContainer = document.getElementById("profilePageAvatar");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                // Convert raw emojis into safe image
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                            
+                            // Save to Cache for next reload
+                            localStorage.setItem("d_coins", fCoins);
+                            localStorage.setItem("d_name", fName);
+                            localStorage.setItem("d_phone", fPhone);
+                            localStorage.setItem("d_uid", currentUID);
+                            localStorage.setItem("d_img", finalAvatar);
+                        }
+                    });
+
+                    // 2. Admin Module Toggles Connect
+                    db.ref('global_system_runtime_configurations/module_toggles').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const toggles = snap.val();
+                            localStorage.setItem("d_toggles", JSON.stringify(toggles));
+                            for (let modId in toggles) {
+                                let el = document.getElementById(modId);
+                                if (el) {
+                                    el.style.display = toggles[modId] ? 'flex' : 'none';
+                                }
+                            }
+                        }
+                    });
+
+                    // 3. Admin Ad Banners (Profile Page Configs)
+                    db.ref('global_system_runtime_configurations/profile_page_configs').on('value', (snap) => {
+                        if(snap.exists()) {
+                            let adminData = snap.val();
+                            
+                            if(adminData.slot1_code) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code);
+                            } else {
+                                document.getElementById("adminBannerSlot1").style.display = "none";
+                            }
+
+                            if(adminData.slot2_code) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code);
+                            } else {
+                                document.getElementById("adminBannerSlot2").style.display = "none";
+                            }
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH DATA FROM NODE.JS ADMIN PANEL
-        async function fetchUserProfileData() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                
-                if (data.success && data.user) {
-                    let fName = data.user.name || "Player";
-                    
-                    document.getElementById("userName").innerText = fName;
-                    document.getElementById("userPhone").innerText = data.user.email || "Not Set";
-                    
-                    // Avatar Sync Logic
-                    if (data.user.profile_pic) {
-                        document.getElementById("profilePageAvatar").src = data.user.profile_pic;
-                    } else {
-                        document.getElementById("profilePageAvatar").src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fName)}&background=1e293b&color=fff`;
-                    }
-
-                    document.getElementById("statBal").innerText = "₹ " + (data.user.balance || 0).toFixed(2);
-                    document.getElementById("statCoins").innerText = data.user.coins || 0;
-                }
-            } catch (err) {
-                console.error("Error loading profile data");
-            }
-        }
-
-        // 📡 FETCH ADMIN BANNERS & TOGGLES
-        async function fetchAdminConfigs() {
-            try {
-                // Fetch Ads
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                if (confData.success && confData.banners) {
-                    if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                    if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                }
-
-                // Simulate Toggles (If Admin sets Add Points to visible via Nav Config API)
-                const navRes = await fetch(`${API_BASE_URL}/app-config/nav-buttons`);
-                const navData = await navRes.json();
-                if(navData.success) {
-                    // Logic: If Admin adds 'add_points' in nav setup, make it visible here too
-                    let showAddPoints = navData.navButtons.some(btn => btn.targetUrl.includes('add_points'));
-                    if(showAddPoints) document.getElementById('mod_add_points').style.display = 'flex';
-                }
-            } catch (e) { console.log("Config Load Failed"); }
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
         // 📋 COPY UID
@@ -402,43 +431,41 @@
         // 🚪 LOGOUT (Safe Clear)
         function logoutUser() {
             if(confirm("Are you sure you want to Logout?")) {
-                localStorage.removeItem("userId");
-                localStorage.removeItem("userToken");
-                localStorage.removeItem("userName");
-                window.location.replace("index.html");
+                auth.signOut().then(() => {
+                    localStorage.clear();
+                    window.location.replace("index.html");
+                });
             }
         }
 
-        // 🛑 PLAY STORE MANDATORY: DELETE ACCOUNT
-        async function deleteUserAccount() {
+        // 🛑 PLAY STORE MANDATORY: PURE FIREBASE DELETE ACCOUNT
+        function deleteUserAccount() {
             if(confirm("⚠️ WARNING: Are you sure you want to PERMANENTLY delete your account? All your points and data will be lost. This cannot be undone.")) {
-                
+
                 let doubleCheck = prompt("Type 'DELETE' to confirm account deletion:");
                 if(doubleCheck !== "DELETE") {
                     alert("Account deletion cancelled.");
                     return;
                 }
 
-                try {
-                    const response = await fetch(`${API_BASE_URL}/user/delete-account`, {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}` 
-                        },
-                        body: JSON.stringify({ userId: uid })
-                    });
-                    
-                    const result = await response.json();
-                    if(result.success) {
+                let user = auth.currentUser;
+                if(user) {
+                    // 1. Erase Data from Realtime Database
+                    db.ref('users/' + uid).remove()
+                    .then(() => {
+                        // 2. Delete user from Firebase Authentication
+                        return user.delete();
+                    })
+                    .then(() => {
                         alert("Your account has been deleted permanently.");
                         localStorage.clear();
                         window.location.replace("index.html");
-                    } else {
-                        alert("Error deleting account: " + result.message);
-                    }
-                } catch (e) {
-                    alert("Network error. Could not delete account.");
+                    })
+                    .catch((error) => {
+                        alert("Error deleting account: " + error.message + "\n\nPlease Re-login and try again for security reasons.");
+                    });
+                } else {
+                    alert("No active session found.");
                 }
             }
         }

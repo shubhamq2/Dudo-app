@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -22,7 +27,7 @@
             --text-sub: #94a3b8;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
         
         /* Premium Sync Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-green); backdrop-filter: blur(10px); }
@@ -30,12 +35,17 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-green); font-weight: bold; cursor: pointer; }
+        
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-green)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
-        /* Wallet Status info bar */
+        /* Wallet Status info bar (Upgraded) */
         .info-bar { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(6, 78, 59, 0.9), rgba(6, 95, 70, 0.9)); padding: 18px 20px; border-radius: 16px; margin-top: 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--accent-green); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25); backdrop-filter: blur(10px); }
-        .info-bar p { margin: 0 0 5px 0; font-size: 12.5px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .info-bar h3 { margin: 0; font-size: 24px; color: #fff; font-weight: 900; }
+        .info-bar p { margin: 0; font-size: 14px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 900; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 12px; }
 
         /* Banner Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
@@ -80,12 +90,40 @@
         /* Custom Alert Popups */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
-        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; white-space: pre-wrap; }
         .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-green); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
+    
+    <!-- ⚡⚡ ANTI-FLICKER SCRIPT: PREVENTS BUTTON & CASH UI BLINKING ⚡⚡ -->
+    <script>
+        try {
+            let cssRules = "";
+            let cToggles = localStorage.getItem("d_toggles");
+            if (cToggles) {
+                let toggles = JSON.parse(cToggles);
+                for (let key in toggles) {
+                    if (toggles[key] === false || toggles[key] === "false" || toggles[key] === 0) {
+                        cssRules += "#" + key + " { display: none !important; } ";
+                    }
+                }
+            }
+            if (cssRules !== "") {
+                let style = document.createElement('style');
+                style.innerHTML = cssRules;
+                document.documentElement.appendChild(style);
+            }
+        } catch(e) {}
+    </script>
 </head>
 <body>
 
@@ -95,33 +133,42 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Check-In</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 10s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="dc_title">Daily Check-in</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="info-bar">
-        <div>
-            <p data-i18n="wallet_bal">Wallet Balance</p>
-            <h3 id="wallBal">₹0.00</h3>
-        </div>
-        <div style="text-align: right;">
-            <p data-i18n="total_coins">Total Coins</p>
-            <h3 id="wallCoins">0🪙</h3>
-        </div>
+        <p>📅 Daily Check-in</p>
+        <span class="coin-txt"><span id="wallCoins">0</span> 🪙</span>
     </div>
 
     <div class="ad-container-block">
         <!-- 📢 AD SLOT 1 -->
-        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot1"></div>
     </div>
 
     <div class="daily-container">
@@ -144,7 +191,7 @@
         <div class="system-validation-card" id="systemVerificationPanel">
             <div class="verification-label"><i class="fa-solid fa-spinner fa-spin"></i> <span id="verificationLabelText">Verifying Action...</span></div>
             <div class="verification-clock" id="verificationTimerClock">10s</div>
-            <div class="verification-desc" id="verificationSubLabel">Please interact with the sponsor page tab. Do not minimize.</div>
+            <div class="verification-desc" id="verificationSubLabel">Please interact with the sponsor page. Do not minimize the app.</div>
         </div>
 
         <div class="streak-text" id="streakDisplay">🔥 Streak: 0 Days</div>
@@ -152,36 +199,47 @@
 
     <div class="ad-container-block">
         <!-- 📢 AD SLOT 2 -->
-        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"></div>
         <!-- 📢 AD SLOT 3 -->
-        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot3"></div>
         <!-- 📢 AD SLOT 4 -->
-        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"></div>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 10; // Default 10s for Check-in
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "dc_title": "Daily Check-in", "wallet_bal": "Wallet Balance", "total_coins": "Total Coins", "claim_rewards": "Claim Rewards", "btn_claim": "Claim Reward", "already_btn": "Already Claimed", "dc_instruction": "Check-in every day to grow your streak. Rewards get bigger up to Day 7, and remain at a maximum premium amount thereafter!", "d1":"Day 1","d2":"Day 2","d3":"Day 3","d4":"Day 4","d5":"Day 5","d6":"Day 6","d7":"Day 7+ 🔥", "alert_success": "🎉 Success! You claimed your daily reward of", "alert_tomorrow": "Come back tomorrow for more coins!", "err_early": "❌ Verification Incomplete! Please keep the sponsor tab open for the required time.", "err_invalid": "❌ Tracking Interrupted: Please stay on the sponsor page to complete verification.", "err_server": "⚠️ Server Error. Please try again later." },
-            "hi": { "dc_title": "रोजाना चेक-इन", "wallet_bal": "वॉलेट बैलेंस", "total_coins": "कुल पॉइंट्स", "claim_rewards": "इनाम प्राप्त करें", "btn_claim": "क्लेम करें", "already_btn": "आज का क्लेम हो गया", "dc_instruction": "अपनी स्ट्रीक बढ़ाने के लिए हर दिन चेक-इन करें। दिन 7 तक पुरस्कार बड़े होते जाते हैं, और उसके बाद अधिकतम राशि पर स्थिर रहते हैं!", "d1":"दिन 1","d2":"दिन 2","d3":"दिन 3","d4":"दिन 4","d5":"दिन 5","d6":"दिन 6","d7":"दिन 7+ 🔥", "alert_success": "🎉 बधाई हो! आपने प्राप्त किए", "alert_tomorrow": "और अधिक सिक्कों के लिए कल वापस आएं!", "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए स्पॉन्सर टैब खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: कृपया स्पॉन्सर पेज पर ही रहें।", "err_server": "⚠️ सर्वर एरर। बाद में प्रयास करें।" },
-            "bn": { "dc_title": "দৈনিক চেক-ইন", "wallet_bal": "ব্যালেন্স", "total_coins": "মোট কয়েন", "claim_rewards": "পুরস্কার দাবি করুন", "btn_claim": "দাবি করুন", "already_btn": "আজকের দাবি শেষ", "dc_instruction": "আপনার স্ট্রিক বাড়ানোর জন্য প্রতিদিন চেক-ইন করুন।", "d1":"দিন ১","d2":"দিন ২","d3":"দিন ৩","d4":"দিন ৪","d5":"দিন ৫","d6":"দিন ৬","d7":"দিন ৭+ 🔥", "alert_success": "🎉 সফল হয়েছে! আপনি পেয়েছেন", "alert_tomorrow": "আগামীকাল আবার আসুন!", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি আরও কিছুক্ষণ খোলা রাখুন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে: স্পনসর পেজে থাকুন।", "err_server": "⚠️ সার্ভার ত্রুটি।" },
-            "te": { "dc_title": "డైలీ చెక్-ఇన్", "wallet_bal": "బ్యాలెన్స్", "total_coins": "మొత్తం నాణేలు", "claim_rewards": "రివార్డులు పొందండి", "btn_claim": "క్లెయిమ్ రివార్డ్", "already_btn": "ఇప్పటికే క్లెయిమ్ చేయబడింది", "dc_instruction": "మీ స్ట్రీక్‌ను పెంచుకోవడానికి ప్రతిరోజూ చెక్-ఇన్ చేయండి.", "d1":"డే 1","d2":"డే 2","d3":"డే 3","d4":"డే 4","d5":"డే 5","d6":"డే 6","d7":"డే 7+ 🔥", "alert_success": "🎉 విజయం! మీరు క్లెయిమ్ చేసారు", "alert_tomorrow": "రేపు తిరిగి రండి!", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని కొద్దిసేపు తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి స్పాన్సర్ పేజీలోనే ఉండండి.", "err_server": "⚠️ సర్వర్ లోపం." },
-            "mr": { "dc_title": "डेली चेक-इन", "wallet_bal": "शिल्लक", "total_coins": "एकूण नाणी", "claim_rewards": "बक्षिसे मिळवा", "btn_claim": "बक्षीस मिळवा", "already_btn": "आजचे बक्षीस घेतले", "dc_instruction": "तुमची streak वाढवण्यासाठी दररोज चेक-इन करा.", "d1":"दिवस १","d2":"दिवस २","d3":"दिवस ३","d4":"दिवस ४","d5":"दिवस ५","d6":"दिवस ६","d7":"दिवस ७+ 🔥", "alert_success": "🎉 यशस्वी! आपण मिळवले", "alert_tomorrow": "अधिक नाण्यांसाठी उद्या परत या!", "err_early": "❌ अपूर्ण! कृपया स्पॉन्सर टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया स्पॉन्सर पेजवरच थांबा.", "err_server": "⚠️ सर्व्हर त्रुटी." },
-            "ta": { "dc_title": "தினசரி செக்-இன்", "wallet_bal": "வாலட் இருப்பு", "total_coins": "மொத்த நாணயங்கள்", "claim_rewards": "ரிவார்டு பெறு", "btn_claim": "ரிவார்டு பெறு", "already_btn": "ஏற்கனவே பெறப்பட்டது", "dc_instruction": "உங்கள் தொடர்ச்சியை அதிகரிக்க தினமும் செக்-இன் செய்யுங்கள்.", "d1":"நாள் 1","d2":"நாள் 2","d3":"நாள் 3","d4":"நாள் 4","d5":"நாள் 5","d6":"நாள் 6","d7":"நாள் 7+ 🔥", "alert_success": "🎉 வெற்றி! நீங்கள் பெற்றுள்ளீர்கள்", "alert_tomorrow": "நாளை மீண்டும் வாருங்கள்!", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ விளம்பரப் பக்கத்திலேயே இருக்கவும்.", "err_server": "⚠️ சர்வர் பிழை." },
-            "ur": { "dc_title": "روزانہ چیک ان", "wallet_bal": "بیلنس", "total_coins": "کل سکے", "claim_rewards": "انعام حاصل کریں", "btn_claim": "کلیم کریں", "already_btn": "پہلے ہی کلیم شدہ", "dc_instruction": "اسٹریک بڑھانے کے لیے روزانہ چیک ان کریں۔", "d1":"دن 1","d2":"دن 2","d3":"دن 3","d4":"دن 4","d5":"دن 5","d6":"دن 6","d7":"دن 7+ 🔥", "alert_success": "🎉 کامیابی! آپ نے حاصل کیا", "alert_tomorrow": "کل دوبارہ آئیں!", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم سپانسر پیج پر رہیں۔", "err_server": "⚠️ سرور کا مسئلہ۔" },
-            "gu": { "dc_title": "દૈનિક ચેક-ઇન", "wallet_bal": "બેલેન્સ", "total_coins": "કુલ સિક્કા", "claim_rewards": "ઇનામ મેળવો", "btn_claim": "ક્લેમ કરો", "already_btn": "આજે ક્લેમ થઈ ગયું", "dc_instruction": "તમારી સ્ટ્રીક વધારવા માટે દરરોજ ચેક-ઇન કરો.", "d1":"દિવસ ૧","d2":"દિવસ ૨","d3":"દિવસ ૩","d4":"દિવસ ૪","d5":"દિવસ ૫","d6":"દિવસ ૬","d7":"દિવસ ૭+ 🔥", "alert_success": "🎉 સફળતા! તમે મેળવ્યું છે", "alert_tomorrow": "આવતીકાલે પાછા આવો!", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને સ્પોન્સર પેજ પર રહો.", "err_server": "⚠️ સર્વર સમસ્યા." },
-            "es": { "dc_title": "Control Diario", "wallet_bal": "Saldo", "total_coins": "Monedas", "claim_rewards": "Reclamar Premios", "btn_claim": "Reclamar", "already_btn": "Ya Reclamado", "dc_instruction": "Regístrate todos los días para aumentar tu racha.", "d1":"Día 1","d2":"Día 2","d3":"Día 3","d4":"Día 4","d5":"Día 5","d6":"Día 6","d7":"Día 7+ 🔥", "alert_success": "🎉 ¡Éxito! Reclamaste", "alert_tomorrow": "¡Vuelve mañana!", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página del patrocinador.", "err_server": "⚠️ Error de servidor." },
-            "fr": { "dc_title": "Check-in Quotidien", "wallet_bal": "Solde", "total_coins": "Pièces", "claim_rewards": "Récupérer Prix", "btn_claim": "Réclamer", "already_btn": "Déjà Réclamé", "dc_instruction": "Connectez-vous chaque jour pour augmenter votre série.", "d1":"Jour 1","d2":"Jour 2","d3":"Jour 3","d4":"Jour 4","d5":"Jour 5","d6":"Jour 6","d7":"Jour 7+ 🔥", "alert_success": "🎉 Succès! Vous avez réclamé", "alert_tomorrow": "Revenez demain !", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page du sponsor.", "err_server": "⚠️ Erreur serveur." },
-            "ar": { "dc_title": "تسجيل الدخول اليومي", "wallet_bal": "الرصيد", "total_coins": "العملات", "claim_rewards": "المطالبة بالمكافآت", "btn_claim": "مطالبة", "already_btn": "تم المطالبة", "dc_instruction": "سجل دخولك كل يوم لزيادة تتابعك.", "d1":"اليوم 1","d2":"اليوم 2","d3":"اليوم 3","d4":"اليوم 4","d5":"اليوم 5","d6":"اليوم 6","d7":"اليوم 7+ 🔥", "alert_success": "🎉 نجاح! لقد حصلت على", "alert_tomorrow": "عد غدًا!", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في صفحة الراعي.", "err_server": "⚠️ خطأ خادم." },
-            "pt": { "dc_title": "Check-in Diário", "wallet_bal": "Saldo", "total_coins": "Moedas", "claim_rewards": "Reivindicar Prêmios", "btn_claim": "Reivindicar", "already_btn": "Já Reivindicado", "dc_instruction": "Faça check-in todos os dias para aumentar sua sequência.", "d1":"Dia 1","d2":"Dia 2","d3":"Dia 3","d4":"Dia 4","d5":"Dia 5","d6":"Dia 6","d7":"Dia 7+ 🔥", "alert_success": "🎉 Sucesso! Você reivindicou", "alert_tomorrow": "Volte amanhã!", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página do patrocinador.", "err_server": "⚠️ Erro no servidor." },
-            "ru": { "dc_title": "Ежедневный вход", "wallet_bal": "Баланс", "total_coins": "Монеты", "claim_rewards": "Забрать награды", "btn_claim": "Получить", "already_btn": "Получено", "dc_instruction": "Отмечайтесь каждый день, чтобы увеличить серию.", "d1":"День 1","d2":"День 2","d3":"День 3","d4":"День 4","d5":"День 5","d6":"День 6","d7":"День 7+ 🔥", "alert_success": "🎉 Успех! Вы получили", "alert_tomorrow": "Возвращайтесь завтра!", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице спонсора.", "err_server": "⚠️ Ошибка сервера." }
+            "en": { "dc_title": "Daily Check-in", "wallet_bal": "Wallet Balance", "total_coins": "Total Coins", "claim_rewards": "Claim Rewards", "btn_claim": "Claim Reward", "already_btn": "Already Claimed", "dc_instruction": "Check-in every day to grow your streak. Rewards get bigger up to Day 7, and remain at a maximum premium amount thereafter!", "d1":"Day 1","d2":"Day 2","d3":"Day 3","d4":"Day 4","d5":"Day 5","d6":"Day 6","d7":"Day 7+ 🔥", "alert_success": "🎉 Success! You claimed your daily reward of", "alert_tomorrow": "Come back tomorrow for more coins!", "err_early": "❌ Verification Incomplete! Please spend the required time on the page.", "err_invalid": "❌ Tracking Interrupted: Task minimized. Please stay on the page.", "err_server": "⚠️ Server Error. Please try again later." },
+            "hi": { "dc_title": "रोजाना चेक-इन", "wallet_bal": "वॉलेट बैलेंस", "total_coins": "कुल पॉइंट्स", "claim_rewards": "इनाम प्राप्त करें", "btn_claim": "क्लेम करें", "already_btn": "आज का क्लेम हो गया", "dc_instruction": "अपनी स्ट्रीक बढ़ाने के लिए हर दिन चेक-इन करें। दिन 7 तक पुरस्कार बड़े होते जाते हैं, और उसके बाद अधिकतम राशि पर स्थिर रहते हैं!", "d1":"दिन 1","d2":"दिन 2","d3":"दिन 3","d4":"दिन 4","d5":"दिन 5","d6":"दिन 6","d7":"दिन 7+ 🔥", "alert_success": "🎉 बधाई हो! आपने प्राप्त किए", "alert_tomorrow": "और अधिक सिक्कों के लिए कल वापस आएं!", "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: ऐप बंद करना मना है। कृपया पेज पर ही रहें।", "err_server": "⚠️ सर्वर एरर। बाद में प्रयास करें।" },
+            "bn": { "dc_title": "দৈনিক চেক-ইন", "wallet_bal": "ব্যালেন্স", "total_coins": "মোট কয়েন", "claim_rewards": "পুরস্কার দাবি করুন", "btn_claim": "দাবি করুন", "already_btn": "আজকের দাবি শেষ", "dc_instruction": "আপনার স্ট্রিক বাড়ানোর জন্য প্রতিদিন চেক-ইন করুন।", "d1":"দিন ১","d2":"দিন ২","d3":"দিন ৩","d4":"দিন ৪","d5":"দিন ৫","d6":"দিন ৬","d7":"দিন ৭+ 🔥", "alert_success": "🎉 সফল হয়েছে! আপনি পেয়েছেন", "alert_tomorrow": "আগামীকাল আবার আসুন!", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি আরও কিছুক্ষণ খোলা রাখুন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে: পেজেই থাকুন।", "err_server": "⚠️ সার্ভার ত্রুটি।" },
+            "te": { "dc_title": "డైలీ చెక్-ఇన్", "wallet_bal": "బ్యాలెన్స్", "total_coins": "మొత్తం నాణేలు", "claim_rewards": "రివార్డులు పొందండి", "btn_claim": "క్లెయిమ్ రివార్డ్", "already_btn": "ఇప్పటికే క్లెయిమ్ చేయబడింది", "dc_instruction": "మీ స్ట్రీక్‌ను పెంచుకోవడానికి ప్రతిరోజూ చెక్-ఇన్ చేయండి.", "d1":"డే 1","d2":"డే 2","d3":"డే 3","d4":"డే 4","d5":"డే 5","d6":"డే 6","d7":"డే 7+ 🔥", "alert_success": "🎉 విజయం! మీరు క్లెయిమ్ చేసారు", "alert_tomorrow": "రేపు తిరిగి రండి!", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని కొద్దిసేపు తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి పేజీలోనే ఉండండి.", "err_server": "⚠️ సర్వర్ లోపం." },
+            "mr": { "dc_title": "डेली चेक-इन", "wallet_bal": "शिल्लक", "total_coins": "एकूण नाणी", "claim_rewards": "बक्षिसे मिळवा", "btn_claim": "बक्षीस मिळवा", "already_btn": "आजचे बक्षीस घेतले", "dc_instruction": "तुमची streak वाढवण्यासाठी दररोज चेक-इन करा.", "d1":"दिवस १","d2":"दिवस २","d3":"दिवस ३","d4":"दिवस ४","d5":"दिवस ५","d6":"दिवस ६","d7":"दिवस ७+ 🔥", "alert_success": "🎉 यशस्वी! आपण मिळवले", "alert_tomorrow": "अधिक नाण्यांसाठी उद्या परत या!", "err_early": "❌ अपूर्ण! कृपया टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया पेजवरच थांबा.", "err_server": "⚠️ सर्व्हर त्रुटी." },
+            "ta": { "dc_title": "தினசரி செக்-இன்", "wallet_bal": "வாலட் இருப்பு", "total_coins": "மொத்த நாணயங்கள்", "claim_rewards": "ரிவார்டு பெறு", "btn_claim": "ரிவார்டு பெறு", "already_btn": "ஏற்கனவே பெறப்பட்டது", "dc_instruction": "உங்கள் தொடர்ச்சியை அதிகரிக்க தினமும் செக்-இன் செய்யுங்கள்.", "d1":"நாள் 1","d2":"நாள் 2","d3":"நாள் 3","d4":"நாள் 4","d5":"நாள் 5","d6":"நாள் 6","d7":"நாள் 7+ 🔥", "alert_success": "🎉 வெற்றி! நீங்கள் பெற்றுள்ளீர்கள்", "alert_tomorrow": "நாளை மீண்டும் வாருங்கள்!", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ பக்கத்திலேயே இருக்கவும்.", "err_server": "⚠️ சர்வர் பிழை." },
+            "ur": { "dc_title": "روزانہ چیک ان", "wallet_bal": "بیلنس", "total_coins": "کل سکے", "claim_rewards": "انعام حاصل کریں", "btn_claim": "کلیم کریں", "already_btn": "پہلے ہی کلیم شدہ", "dc_instruction": "اسٹریک بڑھانے کے لیے روزانہ چیک ان کریں۔", "d1":"دن 1","d2":"دن 2","d3":"دن 3","d4":"دن 4","d5":"دن 5","d6":"دن 6","d7":"دن 7+ 🔥", "alert_success": "🎉 کامیابی! آپ نے حاصل کیا", "alert_tomorrow": "کل دوبارہ آئیں!", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم پیج پر رہیں۔", "err_server": "⚠️ سرور کا مسئلہ۔" },
+            "gu": { "dc_title": "દૈનિક ચેક-ઇન", "wallet_bal": "બેલેન્સ", "total_coins": "કુલ સિક્કા", "claim_rewards": "ઇનામ મેળવો", "btn_claim": "ક્લેમ કરો", "already_btn": "આજે ક્લેમ થઈ ગયું", "dc_instruction": "તમારી સ્ટ્રીક વધારવા માટે દરરોજ ચેક-ઇન કરો.", "d1":"દિવસ ૧","d2":"દિવસ ૨","d3":"દિવસ ૩","d4":"દિવસ ૪","d5":"દિવસ ૫","d6":"દિવસ ૬","d7":"દિવસ ૭+ 🔥", "alert_success": "🎉 સફળતા! તમે મેળવ્યું છે", "alert_tomorrow": "આવતીકાલે પાછા આવો!", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને પેજ પર રહો.", "err_server": "⚠️ સર્વર સમસ્યા." },
+            "es": { "dc_title": "Control Diario", "wallet_bal": "Saldo", "total_coins": "Monedas", "claim_rewards": "Reclamar Premios", "btn_claim": "Reclamar", "already_btn": "Ya Reclamado", "dc_instruction": "Regístrate todos los días para aumentar tu racha.", "d1":"Día 1","d2":"Día 2","d3":"Día 3","d4":"Día 4","d5":"Día 5","d6":"Día 6","d7":"Día 7+ 🔥", "alert_success": "🎉 ¡Éxito! Reclamaste", "alert_tomorrow": "¡Vuelve mañana!", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página.", "err_server": "⚠️ Error de servidor." },
+            "fr": { "dc_title": "Check-in Quotidien", "wallet_bal": "Solde", "total_coins": "Pièces", "claim_rewards": "Récupérer Prix", "btn_claim": "Réclamer", "already_btn": "Déjà Réclamé", "dc_instruction": "Connectez-vous chaque jour pour augmenter votre série.", "d1":"Jour 1","d2":"Jour 2","d3":"Jour 3","d4":"Jour 4","d5":"Jour 5","d6":"Jour 6","d7":"Jour 7+ 🔥", "alert_success": "🎉 Succès! Vous avez réclamé", "alert_tomorrow": "Revenez demain !", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page.", "err_server": "⚠️ Erreur serveur." },
+            "ar": { "dc_title": "تسجيل الدخول اليومي", "wallet_bal": "الرصيد", "total_coins": "العملات", "claim_rewards": "المطالبة بالمكافآت", "btn_claim": "مطالبة", "already_btn": "تم المطالبة", "dc_instruction": "سجل دخولك كل يوم لزيادة تتابعك.", "d1":"اليوم 1","d2":"اليوم 2","d3":"اليوم 3","d4":"اليوم 4","d5":"اليوم 5","d6":"اليوم 6","d7":"اليوم 7+ 🔥", "alert_success": "🎉 نجاح! لقد حصلت على", "alert_tomorrow": "عد غدًا!", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في الصفحة.", "err_server": "⚠️ خطأ خادم." },
+            "pt": { "dc_title": "Check-in Diário", "wallet_bal": "Saldo", "total_coins": "Moedas", "claim_rewards": "Reivindicar Prêmios", "btn_claim": "Reivindicar", "already_btn": "Já Reivindicado", "dc_instruction": "Faça check-in todos os dias para aumentar sua sequência.", "d1":"Dia 1","d2":"Dia 2","d3":"Dia 3","d4":"Dia 4","d5":"Dia 5","d6":"Dia 6","d7":"Dia 7+ 🔥", "alert_success": "🎉 Sucesso! Você reivindicou", "alert_tomorrow": "Volte amanhã!", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página.", "err_server": "⚠️ Erro no servidor." },
+            "ru": { "dc_title": "Ежедневный вход", "wallet_bal": "Баланс", "total_coins": "Монеты", "claim_rewards": "Забрать награды", "btn_claim": "Получить", "already_btn": "Получено", "dc_instruction": "Отмечайтесь каждый день, чтобы увеличить серию.", "d1":"День 1","d2":"День 2","d3":"День 3","d4":"День 4","d5":"День 5","d6":"День 6","d7":"День 7+ 🔥", "alert_success": "🎉 Успех! Вы получили", "alert_tomorrow": "Возвращайтесь завтра!", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице.", "err_server": "⚠️ Ошибка сервера." }
         };
 
         function changeLanguage(langCode) {
@@ -201,9 +259,18 @@
             calculateDailyGridStatus();
         }
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
 
+        const uid = localStorage.getItem("userId");
         const rewardScale = [10, 20, 30, 40, 50, 60, 100];
         let currentStreak = 0;
         let lastCheckInTimestamp = 0;
@@ -211,53 +278,78 @@
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
+            
+            // Sync Language from Home Page
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live User Data & Smart Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("wallCoins").innerText = (data.coins || 0);
+                            
+                            // Load Streak Values
+                            currentStreak = data.checkInStreak || 0;
+                            lastCheckInTimestamp = data.lastCheckInTime || 0;
+                            
+                            document.getElementById("streakDisplay").innerText = "🔥 Streak: " + currentStreak + " Days";
+                            calculateDailyGridStatus();
+
+                            // Smart Avatar Sync
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            function createEmojiURI(emoji) {
+                                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+                                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+                            }
+
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Check-in Link, Timer)
+                    db.ref('global_system_runtime_configurations/checkin_configs').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME
+                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            
+                            // Banners
+                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+
+                            // Link
+                            if (adminData.checkin_link) {
+                                activeAdminSmartlinkUrl = adminData.checkin_link;
+                            }
+                        } else {
+                            // Fallback
+                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
+                                if(globalSnap.exists()) activeAdminSmartlinkUrl = globalSnap.val();
+                            });
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Data & Check-in Details
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("wallCoins").innerText = (userData.user.coins || 0) + " 🪙";
-                    document.getElementById("wallBal").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                    
-                    currentStreak = userData.user.checkInStreak || 0;
-                    lastCheckInTimestamp = userData.user.lastCheckInTime || 0;
-                    
-                    document.getElementById("streakDisplay").innerText = "🔥 Streak: " + currentStreak + " Days";
-                    calculateDailyGridStatus();
-                }
-
-                // 2. Fetch Admin Banners & Smartlink
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
-                        if(confData.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.banners[3];
-                    }
-                    if (confData.globalSmartlink) {
-                        activeAdminSmartlinkUrl = confData.globalSmartlink;
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
-        }
-
-        // 🔥 MIDNIGHT CALENDAR DYNAMIC RESOLUTION SHIELD
+        // 🔥 CLIENT-SIDE MIDNIGHT CALENDAR RESOLUTION (7-DAY STREAK LOGIC)
         function calculateDailyGridStatus() {
             for (let i = 1; i <= 7; i++) {
                 document.getElementById(`dayBox${i}`).classList.remove("active", "claimed");
@@ -335,56 +427,55 @@
 
         let systemValidationTimer = null;
         let verificationSecondsLeft = 10;
-        let adTabProxyWindow = null;
-        let totalSecondsOpen = 0;
 
-        // 🔥 ADDED TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { window.hasMainTabHidden = true; }
-        });
-
-        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC (10 SECONDS)
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH IN-APP VIEWER
         function processDailyCheckIn() {
-            verificationSecondsLeft = 10;
-            totalSecondsOpen = 0;
-            window.hasMainTabHidden = false; // Reset tracker
+            verificationSecondsLeft = globalAdTimerSeconds;
 
             document.getElementById("claimRewardBtn").style.display = "none";
             document.getElementById("systemVerificationPanel").style.display = "block";
-            document.getElementById("verificationTimerClock").innerText = "10s";
+            document.getElementById("verificationTimerClock").innerText = `${verificationSecondsLeft}s`;
 
-            adTabProxyWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${verificationSecondsLeft}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
+
+            if (systemValidationTimer) clearInterval(systemValidationTimer);
 
             systemValidationTimer = setInterval(() => {
-                // Validation 1: Early Close Guard
-                if (adTabProxyWindow && adTabProxyWindow.closed) {
+                verificationSecondsLeft--;
+                
+                document.getElementById("verificationTimerClock").innerText = `${verificationSecondsLeft}s`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${verificationSecondsLeft}s`;
+
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if (document.hidden) { 
                     clearInterval(systemValidationTimer);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
                     executeResetVerificationUI();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     return;
                 }
-
-                // Validation 2: Rapid Tab Switching Guard
-                if (!document.hidden && window.hasMainTabHidden) {
-                    if (totalSecondsOpen < 9) {
-                        clearInterval(systemValidationTimer);
-                        executeResetVerificationUI();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
-                verificationSecondsLeft--;
-                document.getElementById("verificationTimerClock").innerText = `${verificationSecondsLeft}s`;
 
                 if (verificationSecondsLeft <= 0) {
                     clearInterval(systemValidationTimer);
                     document.getElementById("verificationTimerClock").innerText = "0s";
-                    executeFinalizeCheckInDatabaseUpdate();
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
+        }
+
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            executeFinalizeCheckInDatabaseUpdate();
         }
 
         function executeResetVerificationUI() {
@@ -392,41 +483,60 @@
             document.getElementById("systemVerificationPanel").style.display = "none";
         }
 
-        // 💰 REWARD SYNC API WITH NODE.JS SERVER
-        async function executeFinalizeCheckInDatabaseUpdate() {
+        // 💰 REWARD SYNC API DIRECT TO FIREBASE
+        function executeFinalizeCheckInDatabaseUpdate() {
             executeResetVerificationUI();
             
-            try {
-                // Call Node.js API to process the daily checkin logic safely
-                const res = await fetch(`${API_BASE_URL}/user/daily-checkin`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid })
-                });
-                
-                const data = await res.json();
-                
-                if (data.success) {
-                    // Update UI with new values returned from Server
-                    document.getElementById("wallBal").innerText = "₹" + data.newBalance.toFixed(2);
-                    document.getElementById("wallCoins").innerText = data.newCoins + " 🪙";
-                    
-                    currentStreak = data.currentStreak;
-                    lastCheckInTimestamp = Date.now(); // Local update for UI mapping
-                    
-                    document.getElementById("streakDisplay").innerText = "🔥 Streak: " + currentStreak + " Days";
-                    calculateDailyGridStatus();
-                    
-                    let lang = localStorage.getItem("selectedLang") || "en";
-                    let appendStr = ` ${data.rewardCoins} 🪙\n\n${langData[lang]["alert_tomorrow"]}`;
-                    
-                    showCustomAlert("alert_success", appendStr, true);
-                } else {
-                    showCustomAlert(data.messageKey || "err_server");
-                }
-            } catch (err) {
-                showCustomAlert("err_server");
+            // Re-calculate streak and reward securely
+            let now = new Date();
+            let todayStr = now.toDateString();
+            let lastClaimDateStr = lastCheckInTimestamp ? new Date(lastCheckInTimestamp).toDateString() : "";
+            
+            if (todayStr === lastClaimDateStr) {
+                showCustomAlert("already_btn");
+                return;
             }
+            
+            let yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            let newStreak = currentStreak || 0;
+            if (lastClaimDateStr === yesterday.toDateString()) {
+                newStreak++;
+            } else {
+                newStreak = 1;
+            }
+            
+            let rewardIndex = Math.min(newStreak - 1, 6);
+            let rewardCoins = rewardScale[rewardIndex];
+            
+            // Execute Database Updates
+            const updates = {
+                checkInStreak: newStreak,
+                lastCheckInTime: now.getTime()
+            };
+
+            // Read existing tasks and update coins
+            db.ref(`users/${uid}`).once('value').then((snap) => {
+                let user = snap.val();
+                let currentTotalCoins = user.coins || 0;
+                updates.coins = currentTotalCoins + rewardCoins;
+                
+                let tasks = user.completed_daily_tasks || [];
+                if(!tasks.includes("t1")) {
+                    tasks.push("t1");
+                    updates.completed_daily_tasks = tasks;
+                }
+
+                // Apply all updates simultaneously
+                return db.ref(`users/${uid}`).update(updates);
+            }).then(() => {
+                let lang = localStorage.getItem("selectedLang") || "en";
+                let appendStr = ` ${rewardCoins} 🪙\n\n${langData[lang]["alert_tomorrow"]}`;
+                showCustomAlert("alert_success", appendStr, true);
+            }).catch(() => {
+                showCustomAlert("err_server");
+            });
         }
     </script>
 </body>

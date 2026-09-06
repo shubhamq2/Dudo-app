@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1v1 Battle Arena - Dudo</title>
+    <title>AdGem Games - Dudo</title>
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
     
     <style>
         :root {
@@ -25,9 +30,15 @@
 
         /* HEADER */
         .header { background: rgba(15, 23, 42, 0.9); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 10; backdrop-filter: blur(12px); }
-        .back-btn { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: bold; padding: 5px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
-        .title { margin: 0; font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); }
-        .wallet-box { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px; font-weight: 800; color: var(--success); display: flex; align-items: center; gap: 6px; font-size: 14px; }
+        .back-btn { color: var(--danger); text-decoration: none; font-size: 20px; font-weight: bold; padding: 5px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); transition: 0.2s; }
+        .back-btn:active { transform: scale(0.9); }
+        .title { margin: 0; font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fff; flex-grow: 1; text-align: center; }
+        
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: var(--primary); font-weight: bold; cursor: pointer; }
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; transition: 0.3s; }
+        
+        .wallet-box { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px; font-weight: 800; color: var(--success); display: flex; align-items: center; gap: 6px; font-size: 14px; margin-right: 10px; }
 
         .main-container { flex: 1; overflow-y: auto; padding: 20px; position: relative; max-width: 440px; width: 100%; margin: 0 auto; box-sizing: border-box; }
 
@@ -59,7 +70,7 @@
         
         .versus-header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px; border-radius: 16px; border: 1px solid var(--border-glow); }
         .player-box { text-align: center; width: 40%; }
-        .player-avatar { width: 55px; height: 55px; background: #0f172a; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 5px; border: 2px solid var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.3); }
+        .player-avatar { width: 55px; height: 55px; background: #0f172a; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 5px; border: 2px solid var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.3); overflow: hidden;}
         .opponent-avatar { border-color: var(--danger); box-shadow: 0 0 10px rgba(239,68,68,0.3); }
         .player-name { font-size: 12px; font-weight: 800; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .vs-badge { font-size: 20px; font-weight: 900; color: var(--warning); font-style: italic; }
@@ -85,64 +96,101 @@
         #resTitle { font-size: 22px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; }
         #resMsg { font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; font-weight: 600; }
         .res-btn { background: linear-gradient(135deg, var(--primary), #2563eb); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+
+        #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-cyan); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
 
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;">Retry Connection</button>
+    </div>
+
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Secure Ad Task</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & RETURN</button>
+        </div>
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
+    <!-- HEADER -->
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-        <h2 class="title">Battle Arena</h2>
-        <div class="wallet-box">🪙 <span id="userBalance">0</span></div>
+        <h2 class="title" data-i18n="arena_title">Arena</h2>
+        
+        <div class="header-controls">
+            <div class="wallet-box">🪙 <span id="userBalance">0</span></div>
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option><option value="ru">RU</option>
+            </select>
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="main-container">
         
         <!-- Admin Dynamic Banner Slot 1 -->
-        <div class="ad-banner-slot" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <!-- LOBBY SCREEN -->
         <div id="lobbyScreen">
             <div class="arena-card">
-                <h3 class="arena-title">Rock Paper Scissors</h3>
-                <p class="arena-desc">Play 1v1 tactical matches against live challengers. Win rewards instantly!</p>
+                <h3 class="arena-title" data-i18n="rps_title">Rock Paper Scissors</h3>
+                <p class="arena-desc" data-i18n="rps_desc">Play 1v1 tactical matches against live challengers. Win rewards instantly!</p>
                 
                 <div class="battle-tier">
                     <div class="tier-info">
-                        <h4>Starter Battle</h4>
-                        <p>Participation: 10 Pts | Reward: <span class="win-amt">18 Pts</span></p>
+                        <h4 data-i18n="tier_starter">Starter Battle</h4>
+                        <p><span data-i18n="participation">Participation:</span> 10 Pts | <span data-i18n="reward">Reward:</span> <span class="win-amt">18 Pts</span></p>
                     </div>
-                    <button class="play-btn" onclick="startMatchmaking(10, 18)">Play 10</button>
+                    <button class="play-btn" onclick="startMatchmaking(10, 18)" data-i18n="btn_play">Play 10</button>
                 </div>
 
                 <div class="battle-tier">
                     <div class="tier-info">
-                        <h4>Pro Arena</h4>
-                        <p>Participation: 50 Pts | Reward: <span class="win-amt">90 Pts</span></p>
+                        <h4 data-i18n="tier_pro">Pro Arena</h4>
+                        <p><span data-i18n="participation">Participation:</span> 50 Pts | <span data-i18n="reward">Reward:</span> <span class="win-amt">90 Pts</span></p>
                     </div>
-                    <button class="play-btn" onclick="startMatchmaking(50, 90)">Play 50</button>
+                    <button class="play-btn" onclick="startMatchmaking(50, 90)" data-i18n="btn_play">Play 50</button>
                 </div>
 
                 <div class="battle-tier" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.05);">
                     <div class="tier-info">
-                        <h4 style="color: var(--warning);">High Roller</h4>
-                        <p>Participation: 100 Pts | Reward: <span class="win-amt">180 Pts</span></p>
+                        <h4 style="color: var(--warning);" data-i18n="tier_high">High Roller</h4>
+                        <p><span data-i18n="participation">Participation:</span> 100 Pts | <span data-i18n="reward">Reward:</span> <span class="win-amt">180 Pts</span></p>
                     </div>
-                    <button class="play-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="startMatchmaking(100, 180)">Play 100</button>
+                    <button class="play-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="startMatchmaking(100, 180)" data-i18n="btn_play">Play 100</button>
                 </div>
             </div>
 
             <div class="arena-card" style="background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.3); text-align: center; padding: 15px;">
-                <h4 style="margin: 0 0 4px 0; color: var(--primary); font-size: 14px;">Game Rules</h4>
-                <p style="margin: 0; font-size: 11.5px; color: var(--text-muted);">Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.</p>
+                <h4 style="margin: 0 0 4px 0; color: var(--primary); font-size: 14px;" data-i18n="rules_title">Game Rules</h4>
+                <p style="margin: 0; font-size: 11.5px; color: var(--text-muted);" data-i18n="rules_desc">Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.</p>
             </div>
         </div>
 
         <!-- MATCHMAKING SCREEN -->
         <div id="matchmakingScreen">
             <div class="radar-animation"></div>
-            <div class="finding-text">Matching with Challenger...</div>
-            <p style="color: var(--text-muted); font-size: 12px; margin-top: 10px;">Please keep the app open during matchmaking.</p>
+            <div class="finding-text" data-i18n="matching_text">Matching with Challenger...</div>
+            <p style="color: var(--text-muted); font-size: 12px; margin-top: 10px;" data-i18n="matching_warn">Please keep the app open during matchmaking.</p>
         </div>
 
         <!-- BATTLE SCREEN -->
@@ -176,8 +224,7 @@
         </div>
 
         <!-- Admin Dynamic Banner Slot 2 -->
-        <div class="ad-banner-slot" id="adminBannerSlot2" style="margin-top: 15px;"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-banner-slot" id="adminBannerSlot2" style="margin-top: 15px;"></div>
 
     </div>
 
@@ -187,18 +234,60 @@
             <div id="resIcon">🏆</div>
             <h2 id="resTitle">Victory!</h2>
             <p id="resMsg">Reward added to your balance.</p>
-            <button class="res-btn" onclick="returnToLobby()">Return to Arena</button>
+            <button class="res-btn" onclick="returnToLobby()" data-i18n="btn_return">Return to Arena</button>
         </div>
     </div>
 
-    <!-- NODE.JS API SERVER SCRIPT INTEGRATION -->
+    <!-- 🟢 PURE FIREBASE ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-        let storedName = localStorage.getItem("userName") || "Player";
+        let adPartnerLink = ""; 
+        let globalAdTimerSeconds = 25; // 🔥 Admin Controlled Ad Timer Default
+
+        // Check Network Status
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
+        // Translations Dictionary
+        const langData = {
+            "en": { "arena_title": "Arena", "rps_title": "Rock Paper Scissors", "rps_desc": "Play 1v1 tactical matches against live challengers. Win rewards instantly!", "tier_starter": "Starter Battle", "tier_pro": "Pro Arena", "tier_high": "High Roller", "participation": "Participation:", "reward": "Reward:", "btn_play": "Play", "rules_title": "Game Rules", "rules_desc": "Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.", "matching_text": "Matching with Challenger...", "matching_warn": "Please keep the app open during matchmaking.", "btn_return": "Return to Arena" },
+            "hi": { "arena_title": "एरिना", "rps_title": "रॉक पेपर सीज़र्स", "rps_desc": "लाइव चैलेंजर्स के खिलाफ 1v1 मैच खेलें। तुरंत इनाम जीतें!", "tier_starter": "स्टार्टर बैटल", "tier_pro": "प्रो एरिना", "tier_high": "हाई रोलर", "participation": "प्रवेश:", "reward": "इनाम:", "btn_play": "खेलें", "rules_title": "खेल के नियम", "rules_desc": "समय खत्म होने से पहले रॉक ✊, पेपर ✋, या सीज़र्स ✌️ चुनें।", "matching_text": "चैलेंजर खोज रहे हैं...", "matching_warn": "कृपया मैचमेकिंग के दौरान ऐप को खुला रखें।", "btn_return": "वापस जाएँ" }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) { elem.innerText = transObj[key]; }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
 
         let currentBalance = 0;
         let activeBet = 0;
@@ -206,6 +295,7 @@
         let myChoice = null;
         let myChoiceIcon = '❓';
         let countdownInterval;
+        let isMatchmakingActive = false;
         
         const virtualNames = ["Rahul_99", "ProGamer_X", "Aman_Destroyer", "Vikas.123", "Neha_Queen", "KillerBoy", "ShadowNinja", "Rajput_Don"];
         const virtualAvatars = ["🎯", "🦊", "🥷", "🦁", "🐉", "🦅", "💀", "👦"];
@@ -217,91 +307,96 @@
         ];
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) {
-                window.location.href = "index.html";
-                return;
-            }
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
+            
+            // Sync Language
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
 
-            document.getElementById("myName").innerText = storedName.split(" ")[0];
-            fetchUserProfileData();
-            fetchAdminBanners();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const uid = user.uid;
+                    
+                    // 1. Live Balance & Smart Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            currentBalance = data.coins || 0;
+                            document.getElementById("userBalance").innerText = currentBalance;
+                            
+                            let userName = data.name || "Player";
+                            document.getElementById("myName").innerText = userName.split(" ")[0];
+
+                            // Smart Avatar Sync
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            document.getElementById("headerProfileIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            document.getElementById("myAvatarIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                        }
+                    });
+
+                    // 📡 2. FETCH ADMIN BANNERS, REWARD LINK & TIMER (Direct from rps_game Node)
+                    db.ref('global_system_runtime_configurations/rps_game').on('value', (snap) => {
+                        if (snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // Load Post Match Ad Link
+                            if (adminData.battle_link && adminData.battle_link.trim() !== "") {
+                                adPartnerLink = adminData.battle_link;
+                            }
+                            
+                            // 🔥 Fetch Ad Timer from Admin Panel
+                            if (adminData.ad_timer) {
+                                globalAdTimerSeconds = parseInt(adminData.ad_timer);
+                            }
+                            
+                            // Load Banner Slot 1
+                            if (adminData.slot1_code && adminData.active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code);
+                            } else {
+                                document.getElementById("adminBannerSlot1").style.display = "none";
+                            }
+                            
+                            // Load Banner Slot 2
+                            if (adminData.slot2_code && adminData.active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code);
+                            } else {
+                                document.getElementById("adminBannerSlot2").style.display = "none";
+                            }
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH USER DATA & PROFILE PIC FROM NODE.JS BACKEND
-        async function fetchUserProfileData() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                
-                if (data.success && data.user) {
-                    currentBalance = Number(data.user.coins) || 0;
-                    document.getElementById("userBalance").innerText = currentBalance;
-                    
-                    if (data.user.name) {
-                        storedName = data.user.name;
-                        document.getElementById("myName").innerText = storedName.split(" ")[0];
-                    }
-
-                    if (data.user.profile_pic) {
-                        document.getElementById("myAvatarIcon").innerHTML = `<img src="${data.user.profile_pic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                    }
-                }
-            } catch (err) {
-                console.error("Failed to load user session balance");
-            }
-        }
-
-        // 📡 FETCH ADMIN BANNERS FROM RENDER BACKEND
-        async function fetchAdminBanners() {
-            try {
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                if (confData.success && confData.banners) {
-                    if (confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                    if (confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                }
-            } catch (e) { console.log("Ad banners load failed"); }
-        }
-
-        // STEP 1: MATCHMAKING & SERVER BALANCE UPDATE
-        async function startMatchmaking(entryFee, winPrize) {
+        // ⚔️ STEP 1: MATCHMAKING & FIREBASE DEDUCTION
+        function startMatchmaking(entryFee, winPrize) {
             if (Number(currentBalance) < Number(entryFee)) {
-                alert("❌ Insufficient Points! You need at least " + entryFee + " points to participate. Current Balance: " + currentBalance);
+                alert("❌ Insufficient Points! You need at least " + entryFee + " points to participate.");
                 return;
             }
 
             activeBet = Number(entryFee);
             activeWinPrize = Number(winPrize);
+            isMatchmakingActive = true;
 
-            // Deduct entry fee via Node.js server API
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid, pointsToAdd: -activeBet, action: "battle_entry" })
-                });
-                const data = await res.json();
+            document.getElementById("lobbyScreen").style.display = "none";
+            document.getElementById("matchmakingScreen").style.display = "flex";
 
-                if (data.success) {
-                    currentBalance = data.newCoins;
-                    document.getElementById("userBalance").innerText = currentBalance;
+            // Instant Fee Deduction via Firebase
+            const uid = localStorage.getItem("userId");
+            db.ref(`users/${uid}/coins`).transaction(current => (current || 0) - activeBet);
 
-                    document.getElementById("lobbyScreen").style.display = "none";
-                    document.getElementById("matchmakingScreen").style.display = "flex";
-
-                    let delay = Math.floor(Math.random() * 2000) + 2000;
-                    setTimeout(startBattle, delay);
-                } else {
-                    alert("❌ Transaction failed. Try again.");
-                }
-            } catch (e) {
-                alert("⚠️ Server connection error.");
-            }
+            let delay = Math.floor(Math.random() * 2000) + 2000;
+            setTimeout(startBattle, delay);
         }
 
-        // STEP 2: START BATTLE
+        // ⚔️ STEP 2: START BATTLE
         function startBattle() {
             let randomIdx = Math.floor(Math.random() * virtualNames.length);
             document.getElementById("oppName").innerText = virtualNames[randomIdx];
@@ -339,7 +434,7 @@
             });
         }
 
-        // STEP 3: PLAYER CHOOSES MOVE
+        // ⚔️ STEP 3: PLAYER CHOOSES MOVE
         function selectMove(moveId, icon) {
             if (myChoice !== null) return; 
             
@@ -354,8 +449,24 @@
             });
         }
 
-        // STEP 4: RESOLVE MATCH
+        // 🛡️ ANTI-CHEAT: AUTO CANCEL ON MINIMIZE (Safe with In-App Ad because Ad is an Overlay, not background)
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && isMatchmakingActive) {
+                clearInterval(countdownInterval);
+                document.getElementById("battleScreen").style.display = "none";
+                document.getElementById("matchmakingScreen").style.display = "none";
+                
+                alert("❌ Match cancelled because app was minimized. Participation fee lost.");
+                
+                isMatchmakingActive = false;
+                document.getElementById("lobbyScreen").style.display = "flex";
+            }
+        });
+
+        // ⚔️ STEP 4: RESOLVE MATCH & ADD REWARD (FIREBASE)
         function resolveMatch() {
+            isMatchmakingActive = false;
+
             if (myChoice === null) {
                 let randomMyMove = moves[Math.floor(Math.random() * moves.length)];
                 myChoice = randomMyMove.id;
@@ -387,13 +498,14 @@
             setTimeout(() => { showResultModal(result); }, 1500);
         }
 
-        // STEP 5: SHOW MODAL & UPDATE SERVER BALANCE
-        async function showResultModal(result) {
+        function showResultModal(result) {
             const modal = document.getElementById("resultModal");
             const resBox = document.getElementById("resCardBox");
             const resIcon = document.getElementById("resIcon");
             const resTitle = document.getElementById("resTitle");
             const resMsg = document.getElementById("resMsg");
+
+            const uid = localStorage.getItem("userId");
 
             if (result === "WIN") {
                 resBox.style.borderColor = "var(--success)";
@@ -403,18 +515,8 @@
                 resTitle.style.color = "var(--success)";
                 resMsg.innerText = `Awesome! You won ${activeWinPrize} Points.`;
                 
-                try {
-                    const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ userId: uid, pointsToAdd: activeWinPrize, action: "battle_win" })
-                    });
-                    const data = await res.json();
-                    if(data.success) {
-                        currentBalance = data.newCoins;
-                        document.getElementById("userBalance").innerText = currentBalance;
-                    }
-                } catch(e) {}
+                // Add Winning via Firebase Transaction
+                db.ref(`users/${uid}/coins`).transaction(current => (current || 0) + activeWinPrize);
 
             } else if (result === "LOSS") {
                 resBox.style.borderColor = "var(--danger)";
@@ -432,28 +534,63 @@
                 resTitle.style.color = "var(--warning)";
                 resMsg.innerText = `Participation fee of ${activeBet} Points has been refunded.`;
                 
-                try {
-                    const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ userId: uid, pointsToAdd: activeBet, action: "battle_draw" })
-                    });
-                    const data = await res.json();
-                    if(data.success) {
-                        currentBalance = data.newCoins;
-                        document.getElementById("userBalance").innerText = currentBalance;
-                    }
-                } catch(e) {}
+                // Refund Fee via Firebase Transaction
+                db.ref(`users/${uid}/coins`).transaction(current => (current || 0) + activeBet);
             }
 
             modal.style.display = "flex";
         }
 
+        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC 🔥
+        let adTimerInterval = null;
+
+        function openInAppAdViewer(adUrl, rewardCoinsAmount, timerSeconds, taskName = "ad_task") {
+            let countdownTime = timerSeconds;
+            
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            document.getElementById("adIframe").src = adUrl;
+
+            adTimerInterval = setInterval(() => {
+                countdownTime--;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+
+                if(countdownTime <= 0) {
+                    clearInterval(adTimerInterval);
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block";
+                }
+            }, 1000);
+        }
+
+        // 🔥 MODIFIED RETURN LOGIC: SHOWS IN-APP AD INSTEAD OF CHROME 🔥
         function returnToLobby() {
+            document.getElementById("resultModal").style.display = "none";
+            
+            if (adPartnerLink && adPartnerLink.trim() !== "") {
+                // Open Ad inside App (Reward is 0 because coins were already given in Result Modal)
+                openInAppAdViewer(adPartnerLink, 0, globalAdTimerSeconds, 'rps_post_match_ad');
+            } else {
+                executeReturnToLobbyUI();
+            }
+        }
+
+        // Jab user X button dabayega tab usko wapas lobby me bhej diya jayega
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            executeReturnToLobbyUI();
+        }
+
+        function executeReturnToLobbyUI() {
             document.getElementById("resultModal").style.display = "none";
             document.getElementById("battleScreen").style.display = "none";
             document.getElementById("lobbyScreen").style.display = "flex";
-            fetchUserProfileData();
+            isMatchmakingActive = false;
+            resetBattleUI();
         }
     </script>
 </body>

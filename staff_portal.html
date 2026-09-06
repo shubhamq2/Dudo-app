@@ -7,6 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-base: #060913; 
@@ -146,16 +151,28 @@
         <div id="errorMsg" class="error-txt"><i class="fa-solid fa-triangle-exclamation"></i> Invalid ID or Passcode!</div>
 
         <div class="security-badge">
-            <i class="fa-solid fa-lock"></i> End-to-End Encrypted Node
+            <i class="fa-solid fa-lock"></i> Master Admin Controlled End-to-End Encrypted Node
         </div>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        async function authenticateAgentLogin() {
+        function authenticateAgentLogin() {
             let user = document.getElementById("agentUsernameInput").value.trim().toLowerCase();
             let pass = document.getElementById("agentPasscodeInput").value.trim();
             let errBox = document.getElementById("errorMsg");
@@ -171,36 +188,56 @@
             loginBtn.disabled = true;
             loginBtn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> AUTHENTICATING...";
 
-            try {
-                // Node.js Backend API Call for Staff Login
-                const res = await fetch(`${API_BASE_URL}/staff/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: user, passcode: pass })
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    // Save Token & Permissions securely
-                    localStorage.setItem("agentAutoLogin", user);
-                    localStorage.setItem("agentToken", data.token); // Secure JWT Token
+            // 🛡️ ROLE-BASED ACCESS CONTROL (RBAC) CHECK VIA FIREBASE
+            // Master Admin creates accounts in the 'staff_accounts' node
+            db.ref('staff_accounts/' + user).once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    const staffData = snapshot.val();
                     
-                    // Redirect to System Core 99 (Admin Panel file name)
-                    // Ensure you change 'admin_core.html' to whatever your actual admin file is named
-                    window.location.href = "admin_core.html"; 
+                    // Verify Password
+                    if (staffData.password === pass) {
+                        
+                        // Check if Master Admin has suspended this staff account
+                        if (staffData.status === "suspended") {
+                            errBox.innerHTML = "<i class='fa-solid fa-ban'></i> Your account is suspended by Master Admin.";
+                            errBox.style.display = "block";
+                            resetLoginButton(loginBtn);
+                            return;
+                        }
+
+                        // Save Login Details and PERMISSIONS securely
+                        localStorage.setItem("agentAutoLogin", user);
+                        localStorage.setItem("agentToken", "staff-auth-" + Date.now()); // Local session token
+                        
+                        // 🔥 The Magic: Save permissions chosen by Master Admin
+                        // Examples: "withdrawals", "banners", "tasks", "users"
+                        let permissionsString = JSON.stringify(staffData.permissions || []);
+                        localStorage.setItem("agentPermissions", permissionsString); 
+                        
+                        // Redirect to the actual Admin Panel
+                        // The Admin Panel will read 'agentPermissions' and hide/show tabs accordingly!
+                        window.location.href = "system_core_99.html"; 
+                        
+                    } else {
+                        errBox.innerHTML = "<i class='fa-solid fa-circle-xmark'></i> Incorrect Passcode!";
+                        errBox.style.display = "block";
+                        resetLoginButton(loginBtn);
+                    }
                 } else {
-                    errBox.innerHTML = `<i class='fa-solid fa-circle-xmark'></i> ${data.message || "Incorrect Passcode or ID!"}`;
+                    errBox.innerHTML = "<i class='fa-solid fa-user-xmark'></i> Staff ID not found!";
                     errBox.style.display = "block";
-                    loginBtn.disabled = false;
-                    loginBtn.innerText = "Login to Dashboard";
+                    resetLoginButton(loginBtn);
                 }
-            } catch (error) {
+            }).catch((error) => {
                 errBox.innerHTML = "<i class='fa-solid fa-wifi'></i> Server Connection Error!";
                 errBox.style.display = "block";
-                loginBtn.disabled = false;
-                loginBtn.innerText = "Login to Dashboard";
-            }
+                resetLoginButton(loginBtn);
+            });
+        }
+
+        function resetLoginButton(btn) {
+            btn.disabled = false;
+            btn.innerText = "Login to Dashboard";
         }
 
         // Allow pressing Enter key to login

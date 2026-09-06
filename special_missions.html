@@ -7,7 +7,12 @@
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -22,20 +27,25 @@
             --text-sub: #94a3b8;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
-        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
+
         /* Premium Sync Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-green); backdrop-filter: blur(10px); }
         .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-green); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); transition: 0.2s; border: 1px solid rgba(16, 185, 129, 0.3); }
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
 
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-green); font-weight: bold; cursor: pointer; }
+        
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-green)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Profile Balance Ribbon */
-        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-green); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); backdrop-filter: blur(10px); }
+        /* PLAY STORE SAFE: Only show Coins */
+        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-green); padding: 15px 20px; border-radius: 16px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); backdrop-filter: blur(10px); }
         .balance-card span { font-size: 18px; font-weight: 900; }
         .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
@@ -47,7 +57,7 @@
         .gateway-card h3 { margin: 0 0 10px 0; font-size: 20px; color: var(--accent-green); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .gateway-card p { margin: 0 0 25px 0; font-size: 13.5px; color: var(--text-sub); font-weight: 600; line-height: 1.5; }
 
-        /* 🔥 UPGRADED: Server Grid Buttons Pipeline Layout */
+        /* 🔥 UPGRADED: Dynamic Server Grid Layout */
         .server-btn-node { width: 100%; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1); padding: 20px 22px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; cursor: pointer; box-sizing: border-box; transition: 0.2s; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
         .server-btn-node:active { transform: scale(0.96); border-color: var(--accent-green); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
         .server-btn-node .meta-left { text-align: left; display: flex; flex-direction: column; gap: 6px; }
@@ -55,21 +65,21 @@
         .server-btn-node .meta-left .srv-status { font-size: 11px; color: var(--accent-green); font-weight: 900; text-transform: uppercase; background: rgba(16, 185, 129, 0.15); padding: 4px 10px; border-radius: 8px; width: fit-content; border: 1px solid rgba(16, 185, 129, 0.3); }
         .server-btn-node .reward-right { background: var(--accent-gold); color: #000; padding: 8px 15px; border-radius: 10px; font-size: 14.5px; font-weight: 900; box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4); }
 
-        /* 🔥 UPGRADED: Timer Loading Mask Engine Overlay */
+        /* Timer Loading Mask Engine Overlay */
         .verification-mask-panel { display: none; background: rgba(0,0,0,0.6); border-radius: 20px; padding: 30px 20px; border: 2px dashed var(--accent-pink); margin-top: 15px; text-align: center; box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.2); animation: pulseBorder 1.5s infinite alternate; }
         @keyframes pulseBorder { 100% { box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.4); border-color: #f87171; } }
-        
+
         .verification-mask-panel h4 { margin: 0 0 10px 0; font-size: 16px; color: var(--accent-pink); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .verification-mask-panel .ticker-countdown { font-size: 45px; font-weight: 900; color: var(--accent-gold); margin: 15px 0; letter-spacing: 2px; text-shadow: 0 0 15px rgba(250, 204, 21, 0.5); }
         .verification-mask-panel p { font-size: 12.5px; color: var(--text-sub); margin: 0; font-weight: 600; line-height: 1.5; }
-        
+
         .claim-payout-btn { width: 100%; background: linear-gradient(135deg, var(--accent-green), #059669); color: #fff; border: none; padding: 18px; border-radius: 16px; font-size: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); text-transform: uppercase; margin-top: 20px; display: none; transition: 0.2s; letter-spacing: 1px; }
         .claim-payout-btn:active { transform: scale(0.96); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
 
         /* Security Safe Box */
         .security-box { border: 1px dashed var(--accent-green); background: rgba(16, 185, 129, 0.05); border-radius: 16px; padding: 15px 18px; font-size: 12.5px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-top: 5px; font-weight: 600; }
 
-        /* Custom Modern Alert Modal Popup style */
+        /* Custom Modern Alert Popup */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
@@ -77,6 +87,13 @@
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-green); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -87,20 +104,37 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-server" style="color:var(--accent-green);"></i> Secure Cloud Connection</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 20s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="sb_title">Secure Cloud</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="main-container">
-        
+
+        <!-- PLAY STORE SAFE: Only show Coins -->
         <div class="balance-card">
             <span data-i18n="sb_wallet">Wallet Balance</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
@@ -113,42 +147,18 @@
             <h3 data-i18n="sb_h3">Premium Link Access</h3>
             <p data-i18n="sb_p">Select any high-speed secure mirror stream below. Complete the validation to claim your distributed cloud tokens.</p>
 
+            <!-- 🔥 DYNAMIC SERVER LIST CONTAINER -->
             <div id="serversListWrapper">
-                <!-- Server Node 1 -->
-                <div class="server-btn-node" onclick="executeStartValidationSequence('server1')">
-                    <div class="meta-left">
-                        <span class="srv-title"><i class="fa-solid fa-bolt" style="color: #facc15;"></i> <span data-i18n="sb_s1">High-Speed Mirror 1</span></span>
-                        <span class="srv-status" data-i18n="sb_s1_sub">Stable (99ms)</span>
-                    </div>
-                    <span class="reward-right">+30 🪙</span>
-                </div>
-
-                <!-- Server Node 2 -->
-                <div class="server-btn-node" onclick="executeStartValidationSequence('server2')">
-                    <div class="meta-left">
-                        <span class="srv-title"><i class="fa-solid fa-shield-halved" style="color: #3b82f6;"></i> <span data-i18n="sb_s2">Secure Encrypted 2</span></span>
-                        <span class="srv-status" data-i18n="sb_s2_sub">Optimized</span>
-                    </div>
-                    <span class="reward-right">+30 🪙</span>
-                </div>
-
-                <!-- Server Node 3 -->
-                <div class="server-btn-node" onclick="executeStartValidationSequence('server3')">
-                    <div class="meta-left">
-                        <span class="srv-title"><i class="fa-solid fa-globe" style="color: #a855f7;"></i> <span data-i18n="sb_s3">Global Traffic Server 3</span></span>
-                        <span class="srv-status" data-i18n="sb_s3_sub">Pathway Clear</span>
-                    </div>
-                    <span class="reward-right">+30 🪙</span>
-                </div>
+                <p style="color: var(--text-sub);"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading Nodes...</p>
             </div>
 
             <!-- 🔥 Live Ticking Active Validation Tracking Box -->
             <div class="verification-mask-panel" id="verificationMaskCard">
                 <h4 id="maskLabelTxt" data-i18n="sb_decrypt"><i class="fa-solid fa-circle-notch fa-spin"></i> Verifying Connection...</h4>
                 <div class="ticker-countdown" id="validationCountdownClock">20s</div>
-                <p id="maskSubDesc" data-i18n="sb_stay">Please stay on the sponsor page for 20 seconds. Closing early will cancel your reward.</p>
-                
-                <button class="claim-payout-btn" id="claimValidationRewardBtn" onclick="executeCreditValidationTokens()"><i class="fa-solid fa-gift"></i> <span data-i18n="sb_claim">Claim Secure Reward Tokens</span></button>
+                <p id="maskSubDesc" data-i18n="sb_stay">Please stay on the sponsor page to complete the validation. Closing early will cancel your reward.</p>
+
+                <button class="claim-payout-btn" id="claimValidationRewardBtn" onclick="executeCreditValidationTokens()"><i class="fa-solid fa-gift"></i> <span data-i18n="sb_claim">Claim Secure Tokens</span></button>
             </div>
         </div>
 
@@ -163,26 +173,36 @@
 
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 20; // Default time
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "sb_title": "Secure Cloud", "sb_wallet": "Wallet Balance", "sb_h3": "Premium Link Access", "sb_p": "Select any high-speed secure mirror stream below. Complete the validation to claim cloud tokens.", "sb_s1": "High-Speed Mirror 1", "sb_s1_sub": "Stable (99ms)", "sb_s2": "Secure Encrypted 2", "sb_s2_sub": "Optimized", "sb_s3": "Global Traffic Server 3", "sb_s3_sub": "Pathway Clear", "sb_decrypt": "Verifying Connection...", "sb_stay": "Please stay on the sponsor page for 20 seconds. Closing early will cancel your reward.", "sb_claim": "Claim Secure Reward Tokens", "sb_security": "Security protocols are active. Switching applications or tabs during the verification process will pause synchronization and cancel rewards.", "err_early": "❌ Verification Incomplete! You closed the secure window early.", "err_invalid": "❌ Tracking Interrupted! Please stay active on the site for 20s.", "err_success": "🎉 Verification Success! Points added to your balance.", "msg_success": "🔒 CONNECTION SECURED!" },
-            "hi": { "sb_title": "सिक्योर सर्वर", "sb_wallet": "वॉलेट बैलेंस", "sb_h3": "प्रीमियम लिंक एक्सेस", "sb_p": "नीचे दिए गए किसी भी हाई-स्पीड सर्वर को चुनें। टोकन का दावा करने के लिए विज्ञापन सत्यापन पूरा करें।", "sb_s1": "हाई-स्पीड मिरर 1", "sb_s1_sub": "स्थिर (99ms)", "sb_s2": "सिक्योर एन्क्रिप्टेड 2", "sb_s2_sub": "ऑप्टिमाइज़", "sb_s3": "ग्लोबल ट्रैफिक सर्वर 3", "sb_s3_sub": "पाथवे क्लियर", "sb_decrypt": "कनेक्शन वेरीफाई हो रहा है...", "sb_stay": "कृपया स्पॉन्सर टैब पर 20 सेकंड तक रुकें। जल्दी बंद करने से रिवॉर्ड नहीं मिलेगा।", "sb_claim": "रिवॉर्ड टोकन क्लेम करें", "sb_security": "सिक्योरिटी प्रोटोकॉल सक्रिय है। ऐप बदलने या स्प्लिट स्क्रीन करने पर रिवॉर्ड कैंसिल हो जाएगा।", "err_early": "❌ सत्यापन अधूरा! आपने विंडो को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया 20 सेकंड तक साइट पर बने रहें।", "err_success": "🎉 सफलता! टोकन आपके वॉलेट में सुरक्षित रूप से जुड़ गए हैं।", "msg_success": "🔒 लिंक सफलतापूर्वक वेरीफाई हो गया!" },
-            "bn": { "sb_title": "নিরাপদ সার্ভার", "sb_wallet": "ওয়ালেট ব্যালেন্স", "sb_h3": "প্রিমিয়াম লিংক অ্যাক্সেস", "sb_p": "নিচের যেকোনো দ্রুত সার্ভার নির্বাচন করুন। টোকেন পেতে যাচাইকরণ সম্পূর্ণ করুন।", "sb_s1": "হাই-স্পিড মিরর ১", "sb_s1_sub": "স্থিতিশীল", "sb_s2": "সিকিউর এনক্রিপ্টেড ২", "sb_s2_sub": "অপ্টিমাইজড", "sb_s3": "গ্লোবাল ট্রাফিক সার্ভার ৩", "sb_s3_sub": "ক্লিয়ার", "sb_decrypt": "লিংক যাচাই করা হচ্ছে...", "sb_stay": "দয়া করে ২০ সেকেন্ড স্পনসর ট্যাবে থাকুন। আগে বন্ধ করলে রিওয়ার্ড পাবেন না।", "sb_claim": "রিওয়ার্ড টোকেন নিন", "sb_security": "নিরাপত্তা প্রটোকল চালু আছে। অ্যাপ পরিবর্তন করলে রিওয়ার্ড বাতিল হবে।", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি উইন্ডোটি আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! দয়া করে ২০ সেকেন্ড থাকুন।", "err_success": "🎉 সফল! টোকেন আপনার ওয়ালেটে যোগ হয়েছে।", "msg_success": "🔒 লিংক সফলভাবে যাচাই করা হয়েছে!" },
-            "te": { "sb_title": "సురక్షిత సర్వర్", "sb_security": "దయచేసి ట్యాబ్‌లను మార్చవద్దు.", "err_early": "❌ అసంపూర్ణం! త్వరగా మూసివేశారు.", "err_invalid": "❌ ట్యాబ్ మార్చవద్దు.", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "msg_success": "🔒 లింక్ ధృవీకరించబడింది!" },
-            "mr": { "sb_title": "सुरक्षित सर्व्हर", "sb_security": "कृपया टॅब बदलू नका.", "err_early": "❌ अपूर्ण! लवकर बंद केले.", "err_invalid": "❌ टॅब बदलू नका.", "err_success": "🎉 सत्यापित! पॉइंट्स जोडले गेले: ", "msg_success": "🔒 लिंक सत्यापित झाली!" },
-            "ta": { "sb_title": "பாதுகாப்பான சர்வர்", "sb_security": "தாவல்களை மாற்ற வேண்டாம்.", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ தாவல்களை மாற்ற வேண்டாம்.", "err_success": "🎉 சரிபார்க்கப்பட்டது! ", "msg_success": "🔒 இணைப்பு சரிபார்க்கப்பட்டது!" },
-            "ur": { "sb_title": "محفوظ سرور", "sb_security": "ٹیب تبدیل نہ کریں۔", "err_early": "❌ نامکمل! جلدی بند کر دیا۔", "err_invalid": "❌ ٹیب تبدیل نہ کریں۔", "err_success": "🎉 تصدیق ہو گئی! ", "msg_success": "🔒 لنک کی تصدیق ہو گئی!" },
-            "gu": { "sb_title": "સુરક્ષિત સર્વર", "sb_security": "ટેબ બદલશો નહીં.", "err_early": "❌ અધૂરું! વહેલું બંધ કર્યું.", "err_invalid": "❌ ટેબ બદલશો નહીં.", "err_success": "🎉 ચકાસાયેલ! ", "msg_success": "🔒 લિંક ચકાસાયેલ!" },
-            "es": { "sb_title": "Servidor Seguro", "sb_security": "No cambies de pestaña.", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ No cambies de pestaña.", "err_success": "🎉 ¡Verificado! ", "msg_success": "🔒 ¡ENLACE VERIFICADO!" },
-            "fr": { "sb_title": "Serveur Sécurisé", "sb_security": "Ne changez pas d'onglet.", "err_early": "❌ Incomplet!", "err_invalid": "❌ Ne changez pas d'onglet.", "err_success": "🎉 Vérifié ! ", "msg_success": "🔒 LIEN VÉRIFIÉ !" },
-            "ar": { "sb_title": "خادم آمن", "sb_security": "لا تبدل التبويبات.", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ لا تبدل التبويبات.", "err_success": "🎉 تم التحقق! ", "msg_success": "🔒 تم التحقق من الرابط!" },
-            "pt": { "sb_title": "Servidor Seguro", "sb_security": "Não mude de aba.", "err_early": "❌ Incompleto!", "err_invalid": "❌ Não mude de aba.", "err_success": "🎉 Verificado! ", "msg_success": "🔒 LINK VERIFICADO!" },
-            "ru": { "sb_title": "Защищенный сервер", "sb_security": "Не меняйте вкладки.", "err_early": "❌ Не завершено!", "err_invalid": "❌ Не меняйте вкладки.", "err_success": "🎉 Проверено! ", "msg_success": "🔒 СВЯЗЬ ПОДТВЕРЖДЕНА!" }
+            "en": { "sb_title": "Secure Cloud", "sb_wallet": "Wallet Balance", "sb_h3": "Premium Link Access", "sb_p": "Select any high-speed secure mirror stream below. Complete the validation to claim cloud tokens.", "sb_decrypt": "Verifying Connection...", "sb_stay": "Please stay on the sponsor page to complete the validation. Closing early will cancel your reward.", "sb_claim": "Claim Secure Tokens", "sb_security": "Security protocols are active. Switching applications or tabs during the verification process will pause synchronization and cancel rewards.", "err_early": "❌ Verification Incomplete! You closed the secure window early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay active on the page.", "err_success": "🎉 Verification Success! Points added to your balance.", "msg_success": "🔒 CONNECTION SECURED!" },
+            "hi": { "sb_title": "सिक्योर सर्वर", "sb_wallet": "वॉलेट बैलेंस", "sb_h3": "प्रीमियम लिंक एक्सेस", "sb_p": "नीचे दिए गए किसी भी हाई-स्पीड सर्वर को चुनें। टोकन का दावा करने के लिए विज्ञापन सत्यापन पूरा करें।", "sb_decrypt": "कनेक्शन वेरीफाई हो रहा है...", "sb_stay": "कृपया स्पॉन्सर पेज पर रुकें। जल्दी बंद करने से रिवॉर्ड नहीं मिलेगा।", "sb_claim": "रिवॉर्ड टोकन क्लेम करें", "sb_security": "सिक्योरिटी प्रोटोकॉल सक्रिय है। ऐप बंद करने या स्प्लिट स्क्रीन करने पर रिवॉर्ड कैंसिल हो जाएगा।", "err_early": "❌ सत्यापन अधूरा! आपने विंडो को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और साइट पर बने रहें।", "err_success": "🎉 सफलता! टोकन आपके वॉलेट में सुरक्षित रूप से जुड़ गए हैं।", "msg_success": "🔒 लिंक सफलतापूर्वक वेरीफाई हो गया!" },
+            "bn": { "sb_title": "নিরাপদ সার্ভার", "sb_wallet": "ওয়ালেট ব্যালেন্স" }, "te": { "sb_title": "సురక్షిత సర్వర్" }, 
+            "mr": { "sb_title": "सुरक्षित सर्व्हर" }, "ta": { "sb_title": "பாதுகாப்பான சர்வர்" }, 
+            "ur": { "sb_title": "محفوظ سرور" }, "gu": { "sb_title": "સુરક્ષિત સર્વર" }, 
+            "es": { "sb_title": "Servidor Seguro" }, "fr": { "sb_title": "Serveur Sécurisé" }, 
+            "ar": { "sb_title": "خادم آمن" }, "pt": { "sb_title": "Servidor Seguro" }, 
+            "ru": { "sb_title": "Защищенный сервер" }
         };
 
         function changeLanguage(langCode) {
@@ -191,7 +211,7 @@
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
                 if(transObj[key]) {
-                    if (elem.tagName === "H4" && elem.id === "maskLabelTxt" && !elem.innerText.includes("VERIFIED")) {
+                    if (elem.tagName === "H4" && elem.id === "maskLabelTxt" && !elem.innerText.includes("VERIFIED") && !elem.innerText.includes("SECURED")) {
                         elem.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${transObj[key]}`;
                     } else if (elem.tagName === "BUTTON" && elem.id === "claimValidationRewardBtn") {
                         elem.innerHTML = `<i class="fa-solid fa-gift"></i> ${transObj[key]}`;
@@ -203,56 +223,161 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
 
+        const uid = localStorage.getItem("userId");
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+        
+        let currentTaskRewardCoinsInt = 30; // Variable to store specific server reward
+        let currentTaskLinkString = "";
+
+        // Design Presets to make unlimited servers look beautiful automatically
+        const serverDesignPresets = [
+            { icon: "fa-bolt", color: "#facc15" },
+            { icon: "fa-shield-halved", color: "#3b82f6" },
+            { icon: "fa-globe", color: "#a855f7" },
+            { icon: "fa-rocket", color: "#ec4899" },
+            { icon: "fa-server", color: "#10b981" },
+            { icon: "fa-wifi", color: "#06b6d4" },
+            { icon: "fa-microchip", color: "#f97316" }
+        ];
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Time & Dynamic Servers)
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME (From secure_cloud_configs)
+                            if(adminData.secure_cloud_configs && adminData.secure_cloud_configs.ad_timer) {
+                                globalAdTimerSeconds = parseInt(adminData.secure_cloud_configs.ad_timer);
+                            }
+
+                            // Load Banners
+                            if(adminData.banner_ads) {
+                                if(adminData.banner_ads.slot1 && adminData.banner_ads.slot1.active) setAdHTML(document.getElementById("adminBannerSlot1"), adminData.banner_ads.slot1.code);
+                                if(adminData.banner_ads.slot2 && adminData.banner_ads.slot2.active) setAdHTML(document.getElementById("adminBannerSlot2"), adminData.banner_ads.slot2.code);
+                                if(adminData.banner_ads.slot3 && adminData.banner_ads.slot3.active) setAdHTML(document.getElementById("adminBannerSlot3"), adminData.banner_ads.slot3.code);
+                            }
+
+                            // Global Link Fallback
+                            if (adminData.globalSmartlink) activeAdminSmartlinkUrl = adminData.globalSmartlink;
+
+                            // 🔄 RENDER DYNAMIC SERVERS
+                            renderDynamicServersList(adminData.secure_cloud_configs);
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH USER DATA AND ADMIN BANNERS/LINKS
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                }
-
-                // 2. Fetch Admin Banners and Smartlinks
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    // Inject Banners
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
-                    }
-                    
-                    if (confData.globalSmartlink) {
-                        activeAdminSmartlinkUrl = confData.globalSmartlink;
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
+
+        // 🔄 DYNAMIC TASK RENDERER ENGINE
+        function renderDynamicServersList(configData) {
+            const wrapper = document.getElementById("serversListWrapper");
+            wrapper.innerHTML = ""; // Clear existing
+
+            let serversArray = [];
+
+            // Check if admin config exists, otherwise load defaults
+            if (configData) {
+                // Loop through possible keys (s1 to s20 supported)
+                for (let i = 1; i <= 20; i++) {
+                    if (configData[`s${i}_name`] && configData[`s${i}_link`]) {
+                        serversArray.push({
+                            name: configData[`s${i}_name`],
+                            sub: configData[`s${i}_sub`] || "Active & Ready",
+                            reward: parseInt(configData[`s${i}_reward`]) || 30,
+                            link: configData[`s${i}_link`]
+                        });
+                    }
+                }
+            }
+
+            // Fallback to Defaults if no servers found in Admin Panel
+            if (serversArray.length === 0) {
+                serversArray = [
+                    { name: "High-Speed Mirror 1", sub: "Stable (99ms)", reward: 30, link: activeAdminSmartlinkUrl },
+                    { name: "Secure Encrypted 2", sub: "Optimized", reward: 35, link: activeAdminSmartlinkUrl },
+                    { name: "Global Traffic Server 3", sub: "Pathway Clear", reward: 40, link: activeAdminSmartlinkUrl }
+                ];
+            }
+
+            // Generate UI Elements safely without breaking design
+            serversArray.forEach((srv, index) => {
+                let design = serverDesignPresets[index % serverDesignPresets.length]; // Infinite looping of colors
+
+                let srvNode = document.createElement('div');
+                srvNode.className = "server-btn-node";
+                // Escaping strings safely for onclick
+                let safeLink = srv.link.replace(/'/g, "\\'");
+                srvNode.setAttribute('onclick', `executeStartValidationSequence('${safeLink}', ${srv.reward})`);
+
+                srvNode.innerHTML = `
+                    <div class="meta-left">
+                        <span class="srv-title"><i class="fa-solid ${design.icon}" style="color: ${design.color};"></i> <span>${srv.name}</span></span>
+                        <span class="srv-status">${srv.sub}</span>
+                    </div>
+                    <span class="reward-right">+${srv.reward} 🪙</span>
+                `;
+                wrapper.appendChild(srvNode);
+            });
+        }
+
+        let activeValidationInterval = null;
+        let targetValidationWindow = null;
+
+        // 🔥 ADDED TAB TRACKER 
+        window.hasMainTabHidden = false;
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) { window.hasMainTabHidden = true; }
+        });
 
         function showCustomAlert(msgKey, isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
+            let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey] || msgKey;
 
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");
@@ -268,107 +393,105 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        let validationCountdownInt = 20;
-        let totalSecondsOpenedInt = 0;
-        let activeValidationInterval = null;
-        let targetValidationWindow = null;
-        const taskRewardCoinsInt = 30; // Server 1,2,3 same payout for now
+        // 🚀 PLAY STORE SAFE VALIDATION LOGIC WITH IN-APP VIEWER
+        function executeStartValidationSequence(linkArg, rewardAmt) {
+            currentTaskLinkString = linkArg || activeAdminSmartlinkUrl;
+            currentTaskRewardCoinsInt = rewardAmt || 30;
 
-        // 🔥 ADDED TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { window.hasMainTabHidden = true; }
-        });
-
-        // 🚀 PLAY STORE SAFE VALIDATION LOGIC (20 SECONDS)
-        function executeStartValidationSequence(serverIdString) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            validationCountdownInt = 20;
-            totalSecondsOpenedInt = 0;
+            
+            let countdownTime = globalAdTimerSeconds;
             window.hasMainTabHidden = false;
 
             document.getElementById("serversListWrapper").style.display = "none";
             document.getElementById("verificationMaskCard").style.display = "block";
             document.getElementById("validationCountdownClock").style.display = "block";
             document.getElementById("claimValidationRewardBtn").style.display = "none";
-            
+
             let verifyTxt = langData[currentLang]["sb_decrypt"] || "Verifying Connection...";
             document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${verifyTxt}`;
             document.getElementById("maskLabelTxt").style.color = "var(--accent-pink)";
             document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-pink)";
 
-            targetValidationWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            document.getElementById("validationCountdownClock").innerText = `${countdownTime}s`;
+
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = currentTaskLinkString;
 
             activeValidationInterval = setInterval(() => {
-                // Safe Validation 1: Tab closed early
-                if(targetValidationWindow && targetValidationWindow.closed) {
+                countdownTime--;
+                document.getElementById("validationCountdownClock").innerText = `${countdownTime}s`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if(document.hidden) {
                     clearInterval(activeValidationInterval);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
                     resetValidationDashboardLayout();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     return;
                 }
 
-                // Safe Validation 2: Invalid tab switching
-                if(!document.hidden && window.hasMainTabHidden) {
-                    if(totalSecondsOpenedInt < 19) {
-                        clearInterval(activeValidationInterval);
-                        resetValidationDashboardLayout();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsOpenedInt++;
-                validationCountdownInt--;
-                document.getElementById("validationCountdownClock").innerText = `${validationCountdownInt}s`;
-
-                if(validationCountdownInt <= 0) {
+                if(countdownTime <= 0) {
                     clearInterval(activeValidationInterval);
-                    
+
                     let successTxt = langData[currentLang]["msg_success"] || "🔒 CONNECTION SECURED!";
                     document.getElementById("validationCountdownClock").style.display = "none";
                     document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-lock"></i> ${successTxt}`;
                     document.getElementById("maskLabelTxt").style.color = "var(--accent-green)";
                     document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-green)";
-                    document.getElementById("claimValidationRewardBtn").style.display = "block";
+                    
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t10)
-        async function executeCreditValidationTokens() {
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t10) via PURE FIREBASE
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            
+            let claimBtn = document.getElementById("claimValidationRewardBtn");
+            claimBtn.innerHTML = `<i class="fa-solid fa-gift"></i> Claim ${currentTaskRewardCoinsInt} Tokens`;
+            claimBtn.style.display = "block";
+            executeCreditValidationTokens();
+        }
+
+        function executeCreditValidationTokens() {
             const btn = document.getElementById("claimValidationRewardBtn");
             btn.disabled = true;
             btn.innerText = "SAVING...";
 
-            try {
-                // Call Node API to add 30 Points and Sync Daily Task 't10'
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: taskRewardCoinsInt, 
-                        action: "secure_server_claim",
-                        syncTask: "t10" // Completes Daily Task 't10'
-                    })
-                });
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + currentTaskRewardCoinsInt;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
-                    
-                    showCustomAlert("err_success", true);
-                }
-            } catch (err) {
+                // 2. Mark Daily Task 't10' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t10")) {
+                        tasks.push("t10");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                showCustomAlert("err_success", true);
+                
+            }).catch(() => {
                 alert("Task Verified but couldn't sync with server. Try again.");
-            } finally {
+            }).finally(() => {
                 resetValidationDashboardLayout();
-                let currentLang = localStorage.getItem("selectedLang") || "en";
-                btn.innerHTML = `<i class="fa-solid fa-gift"></i> ${langData[currentLang]["sb_claim"] || "Claim Secure Reward Tokens"}`;
                 btn.disabled = false;
-            }
+            });
         }
 
         function resetValidationDashboardLayout() {

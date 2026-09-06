@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -22,7 +27,7 @@
             --text-sub: #94a3b8;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
         
         /* Premium Sync Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-cyan); backdrop-filter: blur(10px); }
@@ -30,17 +35,22 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-cyan); font-weight: bold; cursor: pointer; }
+
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Profile Balance Ribbon */
-        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-cyan); padding: 15px 20px; border-radius: 16px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(6, 182, 212, 0.2); backdrop-filter: blur(10px); }
-        .balance-card span { font-size: 18px; font-weight: 900; }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+        /* PLAY STORE SAFE: Only show Coins */
+        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-cyan); padding: 15px 20px; border-radius: 16px; margin-top: 5px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(6, 182, 212, 0.2); backdrop-filter: blur(10px); }
+        .balance-card span { font-size: 14px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
+        .coin-txt { color: var(--accent-gold) !important; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 18px !important; }
 
         /* Banner Ads Slots */
-        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); box-sizing: border-box; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); box-sizing: border-box; margin: 5px 0; }
 
         /* 🔥 PROMOTION ADVERTISER BOX */
         .promo-box { background: linear-gradient(135deg, #1e1b4b, #311042); border: 2px dashed var(--accent-purple); border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3); margin-bottom: 10px; position: relative; overflow: hidden; }
@@ -77,7 +87,7 @@
         .custom-alert.success-border button { background: var(--accent-green); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
 
-        /* 🎬 PREMIUM MODAL FOR INSTRUCTIONS */
+        /* 🎬 TASK INSTRUCTION MODAL */
         .modal-overlay-social { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.9); z-index: 1001; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
         .modal-card-social { width: 100%; max-width: 380px; background: var(--card-bg); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); padding: 25px 20px; box-sizing: border-box; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; }
         .modal-title-social { font-size: 19px; font-weight: 900; color: #fff; margin: 0 0 15px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -94,6 +104,13 @@
         .promo-email-box { background: rgba(0,0,0,0.5); border: 1px dashed var(--accent-purple); padding: 15px; border-radius: 12px; margin: 15px 0; font-size: 15px; font-weight: 900; color: var(--accent-cyan); letter-spacing: 1px; word-wrap: break-word; }
         .promo-action-btn { width: 100%; background: linear-gradient(135deg, var(--accent-purple), #7e22ce); color: #fff; border: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4); margin-bottom: 10px; }
         .promo-action-btn:active { transform: scale(0.96); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-cyan); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -104,19 +121,30 @@
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Social Task</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 15s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <!-- 🎬 TASK INSTRUCTION MODAL -->
     <div class="modal-overlay-social" id="socialInstructionModal">
         <div class="modal-card-social">
             <div class="modal-title-social" id="modalTaskTitle">✈️ Social Task</div>
             <div class="modal-desc-social" id="modalTaskInstructions">Task instructions details text...</div>
             
-            <button class="social-action-btn" id="btnStartSocialTask" onclick="executeSocialTaskRedirection()">Start Task (15s)</button>
+            <button class="social-action-btn" id="btnStartSocialTask" onclick="executeSocialTaskRedirection()">Start Task</button>
             <br>
             <button class="close-social-modal" onclick="closeSocialInstructionModal()">Cancel ×</button>
         </div>
     </div>
 
-    <!-- 🚀 PROMO CONTACT MODAL (FIXED) -->
+    <!-- 🚀 PROMO CONTACT MODAL -->
     <div class="modal-overlay-social" id="promoContactModal">
         <div class="modal-card-social">
             <div class="modal-title-social" style="color: var(--accent-purple);">🚀 Promote Content</div>
@@ -135,26 +163,31 @@
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="st_title">Social Tasks</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="main-container">
         
+        <!-- PLAY STORE SAFE: Only show Coins -->
         <div class="balance-card">
-            <span id="liveUserBalance">₹0.00</span>
+            <span data-i18n="st_wallet_lbl">👥 Social Rewards</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
 
         <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
-        <!-- 🔥 PROMOTION / ADVERTISER BOX (TRIGGERS NEW MODAL) -->
+        <!-- 🔥 PROMOTION / ADVERTISER BOX -->
         <div class="promo-box">
             <h3 data-i18n="pr_title">Promote Your Content!</h3>
             <p data-i18n="pr_desc">Want to feature your YouTube video, Telegram channel, or App here? Reach thousands of active users quickly.</p>
@@ -163,6 +196,7 @@
 
         <div class="section-label" data-i18n="st_label1">Direct Social Tasks</div>
         <div class="grid-container">
+            <!-- Dynamic Links Configured via JS/Admin -->
             <div class="zone-card" onclick="openSocialInstruction('telegram', '✈️', 'Join Telegram')">
                 <div class="zone-badge badge-top" data-i18n="st_top">Top</div>
                 <div class="zone-icon">✈️</div>
@@ -194,28 +228,28 @@
 
         <div class="section-label" data-i18n="st_label2">Micro Task Networks</div>
         <div class="grid-container">
-            <a href="timewall.html" class="zone-card">
+            <div class="zone-card" onclick="openSocialInstruction('timewall', '⚡', 'Timewall')">
                 <div class="zone-badge badge-popular" data-i18n="st_pop">Popular</div>
                 <div class="zone-icon">⚡</div>
-                <h3>Timewall</h3>
+                <h3 data-i18n="st_timewall">Timewall</h3>
                 <p data-i18n="st_clicks">Website Clicks</p>
-            </a>
+            </div>
 
             <div class="zone-card" onclick="openSocialInstruction('notik', '📝', 'Notik Me')">
                 <div class="zone-icon">📝</div>
-                <h3>Notik Me</h3>
+                <h3 data-i18n="st_notik">Notik Me</h3>
                 <p data-i18n="st_micro">Short Micro Tasks</p>
             </div>
 
             <div class="zone-card" onclick="openSocialInstruction('monlix', '🚀', 'Monlix Social')">
                 <div class="zone-icon">🚀</div>
-                <h3>Monlix Social</h3>
+                <h3 data-i18n="st_monlix">Monlix Social</h3>
                 <p data-i18n="st_engage">Engagement Tasks</p>
             </div>
 
             <div class="zone-card" onclick="openSocialInstruction('wannads', '🎯', 'Wannads')">
                 <div class="zone-icon">🎯</div>
-                <h3>Wannads</h3>
+                <h3 data-i18n="st_wannads">Wannads</h3>
                 <p data-i18n="st_clicks">Website Clicks</p>
             </div>
         </div>
@@ -230,46 +264,56 @@
 
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & COINS 🔥
+        let globalAdTimerSeconds = 15; // Default time
+        let globalRewardCoins = 10;    // Default coins
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
             "en": { 
-                "st_title": "Social Tasks", "st_label1": "Direct Social Tasks", "st_label2": "Micro Task Networks", 
+                "st_title": "Social Tasks", "st_wallet_lbl": "👥 Social Rewards", "st_label1": "Direct Social Tasks", "st_label2": "Micro Task Networks", 
                 "pr_title": "Promote Your Content!", "pr_desc": "Want to feature your YouTube video, Telegram channel, or App here? Reach thousands of active users quickly.", "pr_btn": "Contact Support",
                 "st_tg": "Join Telegram", "st_updates": "Get latest updates", "st_yt": "Subscribe YT", "st_watch": "Watch & Learn", "st_ig": "Follow Insta", "st_like": "Like & Comment", "st_wa": "Share on WA", "st_invite": "Invite friends", "st_clicks": "Website Clicks", "st_micro": "Short Micro Tasks", "st_engage": "Engagement Tasks", "st_top": "Top", "st_pop": "Popular", 
-                "st_security": "Please complete the social tasks genuinely. Ensuring proper engagement helps keep the reward ecosystem balanced and active.", "err_early": "❌ Verification Incomplete! You closed the window before the required 15 seconds.", "err_invalid": "❌ Tracking Interrupted! Please avoid switching tabs during the task.", "err_success": "🎉 Task Verified! 10 Points added via ", "verifying": "Verifying... ", "start_task": "Start Task",
-                "inst_telegram": "👉 <b>STEPS TO EARN:</b><br>1. Click the button below to open Telegram.<br>2. Join our official channel.<br>3. Stay active for the latest announcements.<br><br>⚠️ <i>Note: Genuine engagement ensures timely reward payouts.</i>",
-                "inst_youtube": "👉 <b>STEPS TO EARN:</b><br>1. Click below to open the YouTube channel.<br>2. Subscribe and watch the latest video.<br>3. Wait 15 seconds for tracking to complete.",
-                "inst_instagram": "👉 <b>STEPS TO EARN:</b><br>1. Click below to open our Instagram profile.<br>2. Follow the account and like the latest post.<br>3. Wait 15 seconds for verification.",
-                "inst_whatsapp": "👉 <b>STEPS TO EARN:</b><br>1. Click below to open WhatsApp.<br>2. Share the referral message with 3 friends.<br>3. Ensure they check the app.",
-                "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Open this micro offerwall.<br>2. Complete the required social actions.<br>3. Ensure you stay on the page for at least 15 seconds."
+                "st_timewall": "Timewall", "st_notik": "Notik Me", "st_monlix": "Monlix Social", "st_wannads": "Wannads",
+                "st_security": "Please complete the social tasks genuinely. Ensuring proper engagement helps keep the reward ecosystem balanced and active.", "err_early": "❌ Verification Incomplete! You closed the window before the required time.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please avoid switching tabs.", "err_success": "🎉 Verified! Points added via ", "verifying": "Verifying... ", "start_task": "Start Task",
+                "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Open this micro offerwall.<br>2. Complete the required social actions.<br>3. Ensure you stay on the page for the required time."
             },
             "hi": { 
-                "st_title": "सोशल टास्क", "st_label1": "डायरेक्ट सोशल टास्क", "st_label2": "माइक्रो टास्क नेटवर्क", 
-                "pr_title": "अपना कंटेंट प्रमोट करें!", "pr_desc": "क्या आप अपनी YouTube वीडियो या Telegram चैनल यहाँ दिखाना चाहते हैं? हज़ारों यूज़र्स तक पहुंचें।", "pr_btn": "संपर्क करें",
+                "st_title": "सोशल टास्क", "st_wallet_lbl": "👥 सोशल रिवार्ड्स", "st_label1": "डायरेक्ट सोशल टास्क", "st_label2": "माइक्रो टास्क नेटवर्क", 
+                "pr_title": "अपना कंटेंट प्रमोट करें!", "pr_desc": "क्या आप अपनी YouTube वीडियो या Telegram चैनल यहाँ दिखाना चाहते हैं? हज़ारों यूज़र्स तक पहुंचें।", "pr_btn": "संपर्क करें",
                 "st_tg": "टेलीग्राम से जुड़ें", "st_updates": "नवीनतम अपडेट पाएं", "st_yt": "यूट्यूब सब्सक्राइब", "st_watch": "देखें और सीखें", "st_ig": "इंस्टा फॉलो", "st_like": "लाइक और कमेंट", "st_wa": "WhatsApp पर शेयर", "st_invite": "दोस्तों को बुलाएं", "st_clicks": "वेबसाइट क्लिक", "st_micro": "छोटे टास्क", "st_engage": "इंगेजमेंट टास्क", "st_top": "टॉप", "st_pop": "लोकप्रिय", 
-                "st_security": "कृपया सोशल टास्क ईमानदारी से पूरे करें। सही एंगेजमेंट से रिवॉर्ड सिस्टम संतुलित रहता है।", "err_early": "❌ सत्यापन अधूरा! आपने 15 सेकंड से पहले विंडो बंद कर दी।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया टास्क के दौरान टैब न बदलें।", "err_success": "🎉 सत्यापित! 10 पॉइंट्स आपके खाते में जोड़े गए: ", "verifying": "चेक हो रहा है... ", "start_task": "टास्क शुरू करें",
-                "inst_telegram": "👉 <b>टास्क कैसे करें:</b><br>1. टेलीग्राम खोलने के लिए नीचे क्लिक करें।<br>2. हमारे ऑफिशियल चैनल को जॉइन करें।<br>3. 15 सेकंड तक वेट करें ताकि सिस्टम वेरीफाई कर सके।",
-                "inst_youtube": "👉 <b>टास्क कैसे करें:</b><br>1. यूट्यूब चैनल खोलने के लिए नीचे क्लिक करें।<br>2. सब्सक्राइब करें और वीडियो देखें।<br>3. 15 सेकंड तक वेट करें।",
-                "inst_instagram": "👉 <b>टास्क कैसे करें:</b><br>1. हमारा इंस्टाग्राम खोलने के लिए क्लिक करें।<br>2. फॉलो करें और लेटेस्ट पोस्ट को लाइक करें।",
-                "inst_whatsapp": "👉 <b>टास्क कैसे करें:</b><br>1. व्हाट्सएप खोलने के लिए क्लिक करें।<br>2. मैसेज को 3 दोस्तों के साथ शेयर करें।",
-                "inst_generic": "👉 <b>टास्क कैसे करें:</b><br>1. इस ऑफरवॉल को खोलें।<br>2. दिए गए निर्देशों का पालन करें।<br>3. ट्रैकिंग के लिए 15 सेकंड पेज पर रुकें।"
+                "st_timewall": "Timewall", "st_notik": "Notik Me", "st_monlix": "Monlix Social", "st_wannads": "Wannads",
+                "st_security": "कृपया सोशल टास्क ईमानदारी से पूरे करें। सही एंगेजमेंट से रिवॉर्ड सिस्टम संतुलित रहता है।", "err_early": "❌ सत्यापन अधूरा! आपने आवश्यक समय से पहले विंडो बंद कर दी।", "err_invalid": "❌ ट्रैकिंग रद्द! ऐप बंद करना मना है। कृपया टास्क के दौरान टैब न बदलें।", "err_success": "🎉 सत्यापित! पॉइंट्स आपके खाते में जोड़े गए: ", "verifying": "चेक हो रहा है... ", "start_task": "टास्क शुरू करें",
+                "inst_generic": "👉 <b>टास्क कैसे करें:</b><br>1. इस ऑफरवॉल को खोलें।<br>2. दिए गए निर्देशों का पालन करें।<br>3. ट्रैकिंग के लिए आवश्यक समय तक पेज पर रुकें।"
             },
-            "bn": { "st_title": "সোশ্যাল টাস্ক", "pr_title": "আপনার কন্টেন্ট প্রমোট করুন!", "pr_desc": "আপনার ভিডিও বা চ্যানেল প্রমোট করতে আমাদের সাথে যোগাযোগ করুন।", "pr_btn": "যোগাযোগ করুন", "st_security": "অনুগ্রহ করে টাস্কগুলো সততার সাথে সম্পূর্ণ করুন।", "err_early": "❌ অসম্পূর্ণ! ১৫ সেকেন্ডের আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! ট্যাব পরিবর্তন করবেন না।", "err_success": "🎉 ভেরিফাইড! ১০ পয়েন্ট যোগ হয়েছে: ", "start_task": "শروع করুন" },
-            "te": { "st_title": "సోషల్ టాస్క్", "pr_title": "ప్రమోట్ చేయండి!", "pr_btn": "సంప్రదించండి", "st_security": "నిజాయితీగా పూర్తి చేయండి.", "err_early": "❌ అసంపూర్ణం! త్వరగా మూసివేశారు.", "err_invalid": "❌ ట్యాబ్ మార్చవద్దు.", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "start_task": "ప్రారంభించండి" },
-            "mr": { "st_title": "सोशल टास्क", "pr_title": "प्रमोशन करा!", "pr_btn": "संपर्क साधा", "st_security": "प्रामाणिकपणे टास्क पूर्ण करा.", "err_early": "❌ अपूर्ण! लवकर बंद केले.", "err_invalid": "❌ टॅब बदलू नका.", "err_success": "🎉 सत्यापित! पॉइंट्स जोडले गेले: ", "start_task": "सुरू करा" },
-            "ta": { "st_title": "சமூக பணிகள்", "pr_title": "விளம்பரப்படுத்துங்கள்!", "pr_btn": "தொடர்பு கொள்க", "st_security": "நேர்மையாக முடிக்கவும்.", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ தாவல்களை மாற்ற வேண்டாம்.", "err_success": "🎉 சரிபார்க்கப்பட்டது! ", "start_task": "தொடங்கு" },
-            "ur": { "st_title": "سوشل ٹاسک", "pr_title": "پروموٹ کریں!", "pr_btn": "رابطہ کریں", "st_security": "ایمانداری سے مکمل کریں۔", "err_early": "❌ نامکمل! جلدی بند کر دیا۔", "err_invalid": "❌ ٹیب تبدیل نہ کریں۔", "err_success": "🎉 تصدیق ہو گئی! ", "start_task": "شروع کریں" },
-            "gu": { "st_title": "સોશિયલ ટાસ્ક", "pr_title": "પ્રમોટ કરો!", "pr_btn": "સંપર્ક કરો", "st_security": "પ્રામાણિકપણે પૂર્ણ કરો.", "err_early": "❌ અધૂરું! વહેલું બંધ કર્યું.", "err_invalid": "❌ ટેબ બદલશો નહીં.", "err_success": "🎉 ચકાસાયેલ! ", "start_task": "શરૂ કરો" },
-            "es": { "st_title": "Tareas Sociales", "pr_title": "¡Promociona tu contenido!", "pr_btn": "Contactar", "st_security": "Completa honestamente.", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ No cambies de pestaña.", "err_success": "🎉 ¡Verificado! ", "start_task": "Empezar" },
-            "fr": { "st_title": "Tâches Sociales", "pr_title": "Promouvoir!", "pr_btn": "Contacter", "st_security": "Complétez honnêtement.", "err_early": "❌ Incomplet!", "err_invalid": "❌ Ne changez pas d'onglet.", "err_success": "🎉 Vérifié ! ", "start_task": "Commencer" },
-            "ar": { "st_title": "المهام الاجتماعية", "pr_title": "روّج لمحتواك!", "pr_btn": "اتصل بنا", "st_security": "أكمل بصدق.", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ لا تبدل التبويبات.", "err_success": "🎉 تم التحقق! ", "start_task": "ابدأ" },
-            "pt": { "st_title": "Tarefas Sociais", "pr_title": "Promova seu conteúdo!", "pr_btn": "Contato", "st_security": "Complete honestamente.", "err_early": "❌ Incompleto!", "err_invalid": "❌ Não mude de aba.", "err_success": "🎉 Verificado! ", "start_task": "Iniciar" },
-            "ru": { "st_title": "Социальные Задания", "pr_title": "Продвижение!", "pr_btn": "Связаться", "st_security": "Выполняйте честно.", "err_early": "❌ Не завершено!", "err_invalid": "❌ Не меняйте вкладки.", "err_success": "🎉 Проверено! ", "start_task": "Начать" }
+            "bn": { "st_title": "সোশ্যাল টাস্ক", "st_wallet_lbl": "সোশ্যাল রিওয়ার্ডস", "pr_title": "আপনার কন্টেন্ট প্রমোট করুন!", "pr_desc": "আপনার ভিডিও বা চ্যানেল প্রমোট করতে আমাদের সাথে যোগাযোগ করুন।", "pr_btn": "যোগাযোগ করুন", "st_security": "অনুগ্রহ করে টাস্কগুলো সততার সাথে সম্পূর্ণ করুন।", "err_early": "❌ অসম্পূর্ণ! আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! ট্যাব পরিবর্তন করবেন না।", "err_success": "🎉 ভেরিফাইড! পয়েন্ট যোগ হয়েছে: ", "start_task": "শروع করুন", "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. লিংকটি খুলুন।<br>২. নিয়ম মেনে কাজ করুন।<br>৩. সময় শেষ হওয়া পর্যন্ত অপেক্ষা করুন।" },
+            "te": { "st_title": "సోషల్ టాస్క్", "st_wallet_lbl": "సోషల్ రివార్డ్స్", "pr_title": "ప్రమోట్ చేయండి!", "pr_btn": "సంప్రదించండి", "st_security": "నిజాయితీగా పూర్తి చేయండి.", "err_early": "❌ అసంపూర్ణం! త్వరగా మూసివేశారు.", "err_invalid": "❌ ట్యాబ్ మార్చవద్దు.", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "start_task": "ప్రారంభించండి" },
+            "mr": { "st_title": "सोशल टास्क", "st_wallet_lbl": "सोशल रिवॉर्ड्स", "pr_title": "प्रमोशन करा!", "pr_btn": "संपर्क साधा", "st_security": "प्रामाणिकपणे टास्क पूर्ण करा.", "err_early": "❌ अपूर्ण! लवकर बंद केले.", "err_invalid": "❌ टॅब बदलू नका.", "err_success": "🎉 सत्यापित! पॉइंट्स जोडले गेले: ", "start_task": "सुरू करा" },
+            "ta": { "st_title": "சமூக பணிகள்", "st_wallet_lbl": "சமூக பரிசுகள்", "pr_title": "விளம்பரப்படுத்துங்கள்!", "pr_btn": "தொடர்பு கொள்க", "st_security": "நேர்மையாக முடிக்கவும்.", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ தாவல்களை மாற்ற வேண்டாம்.", "err_success": "🎉 சரிபார்க்கப்பட்டது! ", "start_task": "தொடங்கு" },
+            "ur": { "st_title": "سوشل ٹاسک", "st_wallet_lbl": "سوشل انعامات", "pr_title": "پروموٹ کریں!", "pr_btn": "رابطہ کریں", "st_security": "ایمانداری سے مکمل کریں۔", "err_early": "❌ نامکمل! جلدی بند کر دیا۔", "err_invalid": "❌ ٹیب تبدیل نہ کریں۔", "err_success": "🎉 تصدیق ہو گئی! ", "start_task": "شروع کریں" },
+            "gu": { "st_title": "સોશિયલ ટાસ્ક", "st_wallet_lbl": "સોશિયલ ઇનામ", "pr_title": "પ્રમોટ કરો!", "pr_btn": "સંપર્ક કરો", "st_security": "પ્રામાણિકપણે પૂર્ણ કરો.", "err_early": "❌ અધૂરું! વહેલું બંધ કર્યું.", "err_invalid": "❌ ટેબ બદલશો નહીં.", "err_success": "🎉 ચકાસાયેલ! ", "start_task": "શરૂ કરો" },
+            "es": { "st_title": "Tareas Sociales", "st_wallet_lbl": "Recompensas Sociales", "pr_title": "¡Promociona tu contenido!", "pr_btn": "Contactar", "st_security": "Completa honestamente.", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ No cambies de pestaña.", "err_success": "🎉 ¡Verificado! ", "start_task": "Empezar" },
+            "fr": { "st_title": "Tâches Sociales", "st_wallet_lbl": "Récompenses Sociales", "pr_title": "Promouvoir!", "pr_btn": "Contacter", "st_security": "Complétez honnêtement.", "err_early": "❌ Incomplet!", "err_invalid": "❌ Ne changez pas d'onglet.", "err_success": "🎉 Vérifié ! ", "start_task": "Commencer" },
+            "ar": { "st_title": "المهام الاجتماعية", "st_wallet_lbl": "مكافآت اجتماعية", "pr_title": "روّج لمحتواك!", "pr_btn": "اتصل بنا", "st_security": "أكمل بصدق.", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ لا تبدل التبويبات.", "err_success": "🎉 تم التحقق! ", "start_task": "ابدأ" },
+            "pt": { "st_title": "Tarefas Sociais", "st_wallet_lbl": "Recompensas Sociais", "pr_title": "Promova seu conteúdo!", "pr_btn": "Contato", "st_security": "Complete honestamente.", "err_early": "❌ Incompleto!", "err_invalid": "❌ Não mude de aba.", "err_success": "🎉 Verificado! ", "start_task": "Iniciar" },
+            "ru": { "st_title": "Социальные Задания", "st_wallet_lbl": "Социальные Награды", "pr_title": "Продвижение!", "pr_btn": "Связаться", "st_security": "Выполняйте честно.", "err_early": "❌ Не завершено!", "err_invalid": "❌ Не меняйте вкладки.", "err_success": "🎉 Проверено! ", "start_task": "Начать" }
         };
 
         function changeLanguage(langCode) {
@@ -280,76 +324,115 @@
                 if(transObj[key]) elem.innerText = transObj[key];
             });
             document.getElementById("appLanguage").value = langCode;
+
+            // Re-render modal if open
+            if(document.getElementById("socialInstructionModal").style.display === "flex") {
+                openSocialInstruction(currentActiveTaskKey, '', document.getElementById("modalTaskTitle").innerText.replace(/.*?(?=[a-zA-Z])/,''));
+            }
+        }
+
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
         }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
         let supportEmailGlobal = "support@dudo.com";
+        let defaultInstructionNotice = "👉 <b>STEPS TO EARN:</b><br>1. Open this micro offerwall.<br>2. Complete the required social actions.<br>3. Ensure you stay on the page for at least 15 seconds.";
 
         // 🔥 DYNAMIC ROUTING MAP FOR SOCIAL TASKS (From Admin Panel)
         let socialLinksAdminConfig = {
-            telegram: "https://t.me/yourchannel",
-            youtube: "https://youtube.com/c/yourchannel",
-            instagram: "https://instagram.com/yourprofile",
-            whatsapp: "whatsapp://send?text=Download%20Dudo%20App",
-            notik: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            monlix: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            wannads: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
+            telegram: "", youtube: "", instagram: "", whatsapp: "",
+            notik: "", monlix: "", wannads: "", timewall: "",
+            default_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
         };
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync (Matches ho.html)
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Time, Coins, Social Links & Note)
+                    db.ref('global_system_runtime_configurations/social_tasks_configs').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME AND COINS
+                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            if (adminData.reward_coins) { globalRewardCoins = parseInt(adminData.reward_coins); }
+
+                            // Load Banners
+                            if(adminData.slot1_code) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            if(adminData.slot2_code) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            if(adminData.slot3_code) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+
+                            // Support Email & Instruction
+                            if(adminData.support_email) supportEmailGlobal = adminData.support_email;
+                            if(adminData.inst_generic) defaultInstructionNotice = adminData.inst_generic;
+                            
+                            // Load Social Links
+                            socialLinksAdminConfig.telegram = adminData.link_telegram || "";
+                            socialLinksAdminConfig.youtube = adminData.link_youtube || "";
+                            socialLinksAdminConfig.instagram = adminData.link_instagram || "";
+                            socialLinksAdminConfig.whatsapp = adminData.link_whatsapp || "";
+                            socialLinksAdminConfig.timewall = adminData.link_timewall || "";
+                            socialLinksAdminConfig.notik = adminData.link_notik || "";
+                            socialLinksAdminConfig.monlix = adminData.link_monlix || "";
+                            socialLinksAdminConfig.wannads = adminData.link_wannads || "";
+
+                        } else {
+                            // Global Fallback
+                            db.ref('global_system_runtime_configurations').once('value').then(globalSnap => {
+                                if(globalSnap.exists() && globalSnap.val().globalSmartlink) {
+                                    socialLinksAdminConfig.default_link = globalSnap.val().globalSmartlink;
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH USER DATA AND ADMIN CONFIGS
-        async function fetchDataFromAdminServer() {
-            try {
-                // Fetch User Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                }
-
-                // Fetch Admin Links & Banners
-                const confRes = await fetch(`${API_BASE_URL}/app-config/social-settings`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.settings.banners) {
-                        if(confData.settings.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.settings.banners[0];
-                        if(confData.settings.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.settings.banners[1];
-                        if(confData.settings.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.settings.banners[2];
-                    }
-                    
-                    if(confData.settings.support_email) supportEmailGlobal = confData.settings.support_email;
-
-                    // Update Social Links from Admin
-                    if (confData.settings.socialLinks) {
-                        Object.keys(socialLinksAdminConfig).forEach(key => {
-                            if(confData.settings.socialLinks[key]) {
-                                socialLinksAdminConfig[key] = confData.settings.socialLinks[key];
-                            }
-                        });
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
         let currentActiveTaskKey = "";
         let activeWatchSession = null;
         let targetWindow = null;
         let platformTimer = null;
-        let totalSecondsOpen = 0;
         let isValidationActive = false;
 
         // 🔥 ADDED TAB TRACKER 
@@ -360,11 +443,11 @@
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
+            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey] || msgKey;
 
             const alertBox = document.getElementById("customAlertBox");
             const overlay = document.getElementById("alertOverlay");
-            document.getElementById("alertMessage").innerText = msgStr + appendText;
+            document.getElementById("alertMessage").innerHTML = msgStr + appendText; // Allows HTML like <b>
             
             if(isSuccess) { alertBox.classList.add("success-border"); } 
             else { alertBox.classList.remove("success-border"); }
@@ -378,7 +461,7 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // ✉️ NEW: PROMOTION / ADVERTISER MODAL LOGIC
+        // ✉️ PROMOTION / ADVERTISER MODAL LOGIC
         function openPromoModal() {
             document.getElementById("adminEmailDisplay").innerText = supportEmailGlobal;
             document.getElementById("promoContactModal").style.display = "flex";
@@ -406,14 +489,12 @@
 
             document.getElementById("modalTaskTitle").innerHTML = `${icon} ${prettyTitle}`;
             
-            let instructionHTMLKey = `inst_${taskKey}`;
-            if (!transObj[instructionHTMLKey]) instructionHTMLKey = "inst_generic";
-            
-            document.getElementById("modalTaskInstructions").innerHTML = transObj[instructionHTMLKey] || langData["en"]["inst_generic"];
+            // Dynamic Instruction Injection
+            document.getElementById("modalTaskInstructions").innerHTML = defaultInstructionNotice;
             
             let startBtn = document.getElementById("btnStartSocialTask");
             startBtn.disabled = false;
-            startBtn.innerText = transObj["start_task"] || "Start Task (15s)";
+            startBtn.innerText = transObj["start_task"] ? `${transObj["start_task"]} (${globalAdTimerSeconds}s)` : `Start Task (${globalAdTimerSeconds}s)`;
 
             document.getElementById("socialInstructionModal").style.display = "flex";
         }
@@ -424,7 +505,7 @@
             isValidationActive = false;
         }
 
-        // 🚀 PLAY STORE SAFE VALIDATION (15 SECONDS)
+        // 🚀 PLAY STORE SAFE VALIDATION LOGIC WITH IN-APP VIEWER
         function executeSocialTaskRedirection() {
             if(isValidationActive) return;
             isValidationActive = true;
@@ -434,78 +515,78 @@
             let lang = localStorage.getItem("selectedLang") || "en";
             let verifyText = langData[lang]["verifying"] || "Verifying... ";
 
-            let targetUrl = socialLinksAdminConfig[currentActiveTaskKey];
-            targetWindow = window.open(targetUrl, '_blank', 'noopener,noreferrer');
+            let targetUrl = socialLinksAdminConfig[currentActiveTaskKey] || socialLinksAdminConfig.default_link;
+            
+            let countdownTime = globalAdTimerSeconds;
 
-            let countdownTime = 15;
-            totalSecondsOpen = 0;
-            window.hasMainTabHidden = false; // Reset tracker
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = targetUrl;
             
             if(platformTimer) clearInterval(platformTimer);
 
             platformTimer = setInterval(() => {
                 countdownTime--;
                 startBtn.innerText = `${verifyText}(${countdownTime}s)`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
 
-                // Safe Validation 1: Tab closed early
-                if (targetWindow && targetWindow.closed) {
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if (document.hidden) { 
                     clearInterval(platformTimer);
                     closeSocialInstructionModal();
-                    showCustomAlert("err_early");
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
+                    showCustomAlert("err_invalid");
                     return;
                 }
-
-                // Safe Validation 2: Invalid tab switching
-                if (!document.hidden && window.hasMainTabHidden) {
-                    if (totalSecondsOpen < 14) { 
-                        clearInterval(platformTimer);
-                        closeSocialInstructionModal();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
 
                 if (countdownTime <= 0) {
                     clearInterval(platformTimer);
                     startBtn.innerText = "SAVING...";
-                    evaluateSocialTaskRewardViaAPI(currentActiveTaskKey);
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5)
-        async function evaluateSocialTaskRewardViaAPI(taskKey) {
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5) via PURE FIREBASE
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            evaluateSocialTaskRewardViaFirebase(currentActiveTaskKey);
+        }
+
+        function evaluateSocialTaskRewardViaFirebase(taskKey) {
             document.getElementById("socialInstructionModal").style.display = "none";
             let nameDisplay = taskKey.toUpperCase();
 
-            try {
-                // Call API to add 10 Points and Sync Daily Task 't5'
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: 10, 
-                        action: `social_task_${nameDisplay}`,
-                        syncTask: "t5" // Completes Daily Task 't5'
-                    })
-                });
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + globalRewardCoins;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
-                    
-                    showCustomAlert("err_success", `${nameDisplay}`, true);
-                }
-            } catch (err) {
-                alert("Task Verified but couldn't sync with server. Try again.");
-            }
+                // 2. Mark Daily Task 't5' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t5")) {
+                        tasks.push("t5");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
 
-            activeWatchSession = null;
-            isValidationActive = false;
+                showCustomAlert("err_success", `<b>${nameDisplay} (${globalRewardCoins} 🪙)</b>`, true);
+                
+            }).catch(() => {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            }).finally(() => {
+                activeWatchSession = null;
+                isValidationActive = false;
+            });
         }
     </script>
 </body>

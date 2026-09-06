@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -34,7 +39,7 @@
         /* Live Synced Mini Dashboard for User Trust */
         .task-status-bar { width: 92%; max-width: 460px; background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary-blue); padding: 12px 18px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 800; color: #93c5fd; box-sizing: border-box; align-items: center; }
         .task-status-bar i { margin-right: 5px; }
-        .coin-accent { color: var(--accent-gold); font-size: 15px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(251,191,36,0.3); }
+        .coin-accent { color: var(--accent-gold); font-size: 15px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(251,191,36,0.3); transition: 0.3s; }
 
         .main-container { width: 100%; max-width: 500px; margin-top: 15px; box-sizing: border-box; flex-grow: 1; display: flex; flex-direction: column; padding: 0 10px; }
         .iframe-wrapper { width: 100%; height: 85vh; background: #ffffff; border-radius: 16px; overflow: hidden; border: 2px solid rgba(59, 130, 246, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -67,9 +72,22 @@
         </div>
     </div>
 
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+       const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
@@ -99,77 +117,41 @@
         }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-        
         let cpxAppId = "33205"; // Default CPX ID (Will be updated from Admin)
-        let backgroundSyncInterval = null;
+        let currentDisplayedCoins = -1;
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
+            
+            // Sync Language from Home Page
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            loadOfferwallContext();
-            
-            // Starts a silent background polling to update coins without refreshing page
-            // This is required because CPX sends reward data directly to Node.js Webhook, not to this HTML page.
-            backgroundSyncInterval = setInterval(fetchLiveCoinsOnly, 15000); // Check every 15 seconds
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    loadOfferwallContext(user);
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
         // 📡 FETCH ADMIN CPX ID & INJECT SECURE IFRAME
-        async function loadOfferwallContext() {
-            try {
-                // 1. Fetch User Data (For dynamic URL params)
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                
-                let uname = "Player";
-                let uemail = "user@gmail.com";
+        function loadOfferwallContext(user) {
+            let uname = "Player";
+            let uemail = user.email || "user@gmail.com";
 
-                if (userData.success && userData.user) {
-                    document.getElementById("liveTaskCoins").innerText = (userData.user.coins || 0) + " 🪙";
-                    uname = encodeURIComponent(userData.user.name || "Player");
-                    uemail = encodeURIComponent(userData.user.email || "user@gmail.com");
-                }
-
-                // 2. Fetch Admin Configurations (For CPX ID)
-                // Assuming admin panel has an endpoint to get the CPX App ID or general configs
-                const confRes = await fetch(`${API_BASE_URL}/app-config/wall-settings`); 
-                const confData = await confRes.json();
-                
-                if (confData.success && confData.cpxAppId) {
-                    cpxAppId = confData.cpxAppId;
-                }
-
-                // 3. Inject iFrame securely
-                let secureFrameSrc = `https://offers.cpx-research.com/index.php?app_id=${cpxAppId}&ext_user_id=${uid}&username=${uname}&email=${uemail}`;
-                
-                document.getElementById("offerwallLocation").innerHTML = `
-                    <iframe class="iframe-wrapper" src="${secureFrameSrc}" allow="clipboard-write; clipboard-read"></iframe>
-                `;
-            } catch (err) {
-                document.getElementById("offerwallLocation").innerHTML = `<div class="loading-wall" style="color:var(--accent-pink);">⚠️ Error loading offerwall. Please check your internet connection.</div>`;
-            }
-        }
-
-        // 📡 SILENT SYNC LOGIC (ANTI-CHEAT SAFE)
-        // Since iframe is cross-origin, we cannot track inside it. 
-        // We rely on CPX sending a postback to our Node.js Server.
-        // This function just updates the UI if the Node.js server confirms new coins were added.
-        async function fetchLiveCoinsOnly() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.success && data.user) {
+            // 1. Fetch User Data (For dynamic URL params and Live Wallet Sync)
+            db.ref('users/' + uid).on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    uname = encodeURIComponent(userData.name || "Player");
+                    
+                    const newCoins = userData.coins || 0;
                     const coinDisplay = document.getElementById("liveTaskCoins");
-                    const currentDisplayed = parseInt(coinDisplay.innerText);
-                    const newCoins = data.user.coins || 0;
 
-                    if (newCoins > currentDisplayed && !isNaN(currentDisplayed)) {
+                    // 🔥 MAGIC SILENT SYNC: If coins increase while user is on this page (via CPX Webhook to DB)
+                    if (currentDisplayedCoins !== -1 && newCoins > currentDisplayedCoins) {
                         // Visual effect to show user they got money while staying on page
                         coinDisplay.innerText = newCoins + " 🪙";
                         coinDisplay.style.color = "var(--accent-green)";
@@ -185,20 +167,38 @@
                     } else {
                         coinDisplay.innerText = newCoins + " 🪙";
                     }
+                    
+                    currentDisplayedCoins = newCoins; // Update tracker
                 }
-            } catch (e) {
-                // Silently fail to not interrupt user's task
-            }
+            });
+
+            // 2. Fetch Admin Configurations (For CPX ID from cpx_surveys node)
+            db.ref('global_system_runtime_configurations/cpx_surveys').once('value', (snap) => {
+                if(snap.exists()) {
+                    const adminData = snap.val();
+                    if(adminData.cpx_app_id) {
+                        cpxAppId = adminData.cpx_app_id;
+                    }
+                }
+
+                // 3. Inject iFrame securely once data is ready
+                let secureFrameSrc = `https://offers.cpx-research.com/index.php?app_id=${cpxAppId}&ext_user_id=${uid}&username=${uname}&email=${uemail}`;
+                
+                document.getElementById("offerwallLocation").innerHTML = `
+                    <iframe class="iframe-wrapper" src="${secureFrameSrc}" allow="clipboard-write; clipboard-read"></iframe>
+                `;
+            });
         }
 
-        async function syncDailyTaskCompletion() {
-            try {
-                await fetch(`${API_BASE_URL}/user/sync-daily-task`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid, syncTask: "t6" }) // 't6' = Complete 1 Math Quiz/CPX task in your map
-                });
-            } catch (e) {}
+        // 📝 AUTO-SYNC DAILY TASK 't6' WHEN REWARD DETECTED
+        function syncDailyTaskCompletion() {
+            db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                let tasks = snap.val() || [];
+                if (!tasks.includes("t6")) {
+                    tasks.push("t6");
+                    db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                }
+            });
         }
     </script>
 </body>

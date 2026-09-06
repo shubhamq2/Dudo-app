@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-color: #f8fafc;
@@ -16,6 +21,7 @@
             --accent-green: #10b981;
             --accent-red: #ef4444;
             --accent-purple: #a855f7;
+            --accent-gold: #f59e0b;
             --text-main: #1e293b;
             --text-sub: #64748b;
             --border-color: #e2e8f0;
@@ -28,9 +34,32 @@
         .back-btn { font-size: 20px; font-weight: bold; color: var(--text-main); text-decoration: none; padding: 5px 10px; margin-right: 15px; transition: 0.2s; }
         .back-btn:active { transform: scale(0.9); opacity: 0.7; }
         .header h2 { margin: 0; font-size: 19px; font-weight: 900; color: var(--text-main); flex-grow: 1; letter-spacing: 0.5px; }
+
+        /* 🔥 Account Health & Promo Tracker Box */
+        .health-card { width: 92%; max-width: 460px; margin: 20px auto 0 auto; border-radius: 16px; padding: 20px; box-sizing: border-box; transition: 0.3s; border: 2px solid transparent; }
+        .health-card h4 { margin: 0 0 15px 0; font-size: 15.5px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .health-green { background: rgba(16, 185, 129, 0.1); border-color: var(--accent-green); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); }
+        .health-green h4 { color: #065f46; }
+        .health-green .status-badge { background: var(--accent-green); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; }
+        
+        .health-red { background: rgba(239, 68, 68, 0.1); border-color: var(--accent-red); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.2); animation: pulseRed 2s infinite alternate; }
+        @keyframes pulseRed { 0% { box-shadow: 0 8px 25px rgba(239, 68, 68, 0.2); } 100% { box-shadow: 0 8px 35px rgba(239, 68, 68, 0.5); border-color: #dc2626; } }
+        .health-red h4 { color: #991b1b; }
+        .health-red .status-badge { background: var(--accent-red); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; }
+
+        .health-stats { display: flex; gap: 10px; margin-bottom: 12px; }
+        .stat-box { flex: 1; background: rgba(255,255,255,0.6); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
+        .stat-box span { display: block; font-size: 22px; font-weight: 900; color: var(--text-main); }
+        .stat-box label { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; }
+
+        .health-warning { margin: 0; font-size: 12px; font-weight: 700; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+        .health-green .health-warning { color: #065f46; }
+        .health-red .health-warning { color: #991b1b; }
         
         /* Tab Navigation */
-        .tab-navigation-bar { display: flex; background: #f1f5f9; border-radius: 12px; padding: 6px; margin: 20px auto; width: 92%; max-width: 460px; box-sizing: border-box; gap: 4px; border: 1px solid var(--border-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .tab-navigation-bar { display: flex; background: #f1f5f9; border-radius: 12px; padding: 6px; margin: 20px auto; width: 92%; max-width: 460px; box-sizing: border-box; gap: 4px; border: 1px solid var(--border-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); overflow-x: auto; }
+        .tab-navigation-bar::-webkit-scrollbar { display: none; }
         .tab-btn { flex: 1; background: transparent; border: none; padding: 12px 6px; text-align: center; font-size: 12.5px; font-weight: 800; color: var(--text-sub); cursor: pointer; border-radius: 8px; transition: 0.3s; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
         .tab-btn.active-tab { background: #ffffff; color: var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
@@ -44,12 +73,14 @@
         .badge-withdrawal { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.2); }
         .badge-deposit { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.2); }
         .badge-bonus { background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge-promo { background: rgba(245, 158, 11, 0.1); color: var(--accent-gold); border: 1px solid rgba(245, 158, 11, 0.2); }
         .badge-admin { background: rgba(168, 85, 247, 0.1); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.2); }
         
-        .amount-delta-ticker { position: absolute; top: 20px; right: 20px; font-size: 20px; font-weight: 900; text-align: right; }
+        .amount-delta-ticker { position: absolute; top: 20px; right: 20px; font-size: 18px; font-weight: 900; text-align: right; }
         .delta-positive { color: var(--accent-green); } 
-        .delta-negative { color: var(--accent-red); } 
+        .delta-negative { color: var(--text-main); } 
         .delta-admin { color: var(--accent-purple); }
+        .delta-promo { color: var(--accent-gold); }
 
         /* Deep Tracking Source Box */
         .source-detail-box { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-top: 15px; }
@@ -80,8 +111,28 @@
         <h2>Ledger History</h2>
     </div>
 
+    <!-- 🔥 ACCOUNT HEALTH & PROMO TRACKER -->
+    <div class="health-card health-green" id="accountHealthCard">
+        <h4>
+            <span><i class="fa-solid fa-shield-heart"></i> Account Health</span>
+            <span class="status-badge" id="healthBadgeTxt">SAFE</span>
+        </h4>
+        <div class="health-stats">
+            <div class="stat-box">
+                <span id="displayPromoCount">0</span>
+                <label>Promo Codes</label>
+            </div>
+            <div class="stat-box">
+                <span id="displayTaskCount">0</span>
+                <label>Ads / Tasks</label>
+            </div>
+        </div>
+        <p class="health-warning" id="healthWarningMsg">
+            <i class="fa-solid fa-circle-check"></i> Great job! Keep completing tasks to maintain a healthy account.
+        </p>
+    </div>
+
     <div class="tab-navigation-bar">
-        <!-- Play Store Safe Tab Names -->
         <button class="tab-btn active-tab" id="btnTabAll" onclick="executeFilterHistoryFeed('all')">All Logs</button>
         <button class="tab-btn" id="btnTabDeposit" onclick="executeFilterHistoryFeed('deposit')">Credits</button>
         <button class="tab-btn" id="btnTabBonus" onclick="executeFilterHistoryFeed('bonus')">Rewards</button>
@@ -95,241 +146,300 @@
         </div>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
         
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
 
         let localHistoryMasterCacheArray = [];
         let currentActiveFilterType = "all";
 
-        let rawRequestsDataMap = {};
-        let rawDepositsDataMap = {};
-        let rawEarningHistoryMap = {}; 
+        let totalPromoClaimed = 0;
+        let totalTasksCompleted = 0;
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
-            triggerLoadAndNormalizeTransactionHistory();
+            if (!uid) { window.location.href = "index.html"; return; }
+            
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    triggerLoadAndNormalizeFirebaseHistory();
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH ALL LEDGER DATA FROM NODE.JS SERVER
-        async function triggerLoadAndNormalizeTransactionHistory() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/history/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+        // 📡 FETCH BOTH TRANSACTIONS & ADMIN REQUESTS DATA
+        function triggerLoadAndNormalizeFirebaseHistory() {
+            const txnsRef = db.ref(`users/${uid}/transactions`);
+            const reqsRef = db.ref(`requests`); // For connecting directly with Admin Panel
+
+            let txnsData = [];
+            let reqsData = [];
+            let dataLoaded = { txns: false, reqs: false };
+
+            function mergeAndRender() {
+                if(!dataLoaded.txns || !dataLoaded.reqs) return; // Wait until both are loaded
+
+                localHistoryMasterCacheArray = [];
+                totalPromoClaimed = 0;
+                totalTasksCompleted = 0;
+
+                // 1. Process regular task/bonus transactions
+                txnsData.forEach(node => {
+                    let rawAction = (node.action || "").toString().toLowerCase();
+                    // IGNORE old pending redeems from transactions node to avoid duplicates
+                    if (rawAction.includes("redeem_") || rawAction.includes("withdraw") || rawAction.includes("payout")) return; 
+
+                    let processedTxn = executeTranslateNodeMetadata(node.key, node, false);
+                    localHistoryMasterCacheArray.push(processedTxn);
                 });
+
+                // 2. Process Admin Withdraw Requests (This gets the Real-Time Admin Status & Reject Notes!)
+                reqsData.forEach(node => {
+                    let processedTxn = executeTranslateNodeMetadata(node.key, node, true);
+                    localHistoryMasterCacheArray.push(processedTxn);
+                });
+
+                // Sort by Latest First
+                localHistoryMasterCacheArray.sort((a, b) => b.rawTimestamp - a.rawTimestamp);
                 
-                const data = await res.json();
-                
-                if(data.success) {
-                    rawRequestsDataMap = data.requests || {};
-                    rawDepositsDataMap = data.deposits || {};
-                    rawEarningHistoryMap = data.earning_history || {};
-                    
-                    executeProcessAndCompileUniqueFeed();
-                } else {
+                updateAccountHealthUI();
+                executeRenderHistoryFeedDisplay();
+
+                if (localHistoryMasterCacheArray.length === 0) {
                     document.getElementById("historyDynamicFeedBox").innerHTML = `
                         <div class="empty-history-txt">
-                            <i class="fa-solid fa-folder-open" style="font-size: 30px; color: #94a3b8;"></i>
+                            <i class="fa-solid fa-folder-open" style="font-size: 40px; color: #94a3b8; margin-bottom:10px;"></i>
                             No transaction records found.
                         </div>`;
                 }
-            } catch (err) {
-                document.getElementById("historyDynamicFeedBox").innerHTML = `
-                    <div class="empty-history-txt">
-                        <i class="fa-solid fa-wifi" style="font-size: 30px; color: #ef4444;"></i>
-                        Server connection failed. Please try again.
-                    </div>`;
-            }
-        }
-
-        // 🔥 UPGRADED DEEP-TRACKING TRANSLATOR ENGINE (100% Play Store Safe)
-        function executeProcessAndCompileUniqueFeed() {
-            let combinedUniqueKeysMap = {};
-
-            // 1. Process Payouts (Redemptions)
-            for (let txnKey in rawRequestsDataMap) {
-                combinedUniqueKeysMap[txnKey] = executeTranslateNodeMetadata(txnKey, rawRequestsDataMap[txnKey], 'requests');
             }
 
-            // 2. Process Manual Credits (Deposits)
-            for (let txnKey in rawDepositsDataMap) {
-                let translatedDeposit = executeTranslateNodeMetadata(txnKey, rawDepositsDataMap[txnKey], 'deposits');
-                if (combinedUniqueKeysMap[txnKey]) {
-                    if (translatedDeposit.status !== 'PENDING' && combinedUniqueKeysMap[txnKey].status === 'PENDING') {
-                        combinedUniqueKeysMap[txnKey] = translatedDeposit;
-                    }
-                } else {
-                    combinedUniqueKeysMap[txnKey] = translatedDeposit;
+            // Fetch Transactions
+            txnsRef.on('value', (snapshot) => {
+                txnsData = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnap => {
+                        let txn = childSnap.val();
+                        txn.key = childSnap.key;
+                        txnsData.push(txn);
+                    });
                 }
-            }
+                dataLoaded.txns = true;
+                mergeAndRender();
+            }, () => { dataLoaded.txns = true; mergeAndRender(); });
 
-            // 3. Process Micro-Task Earnings (Games, Ads, Admin Bonus)
-            for (let txnKey in rawEarningHistoryMap) {
-                combinedUniqueKeysMap[txnKey] = executeTranslateNodeMetadata(txnKey, rawEarningHistoryMap[txnKey], 'earning_history');
-            }
-
-            localHistoryMasterCacheArray = [];
-            for (let txnKey in combinedUniqueKeysMap) {
-                localHistoryMasterCacheArray.push(combinedUniqueKeysMap[txnKey]);
-            }
-
-            // Sort by Latest First
-            localHistoryMasterCacheArray.sort((a, b) => b.rawTimestamp - a.rawTimestamp);
-            executeRenderHistoryFeedDisplay();
+            // Fetch Requests (Filter by User)
+            reqsRef.on('value', (snapshot) => {
+                reqsData = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnap => {
+                        let r = childSnap.val();
+                        r.key = childSnap.key;
+                        // ONLY add if it belongs to this user
+                        if (r.uid === uid || r.userId === uid) {
+                            reqsData.push(r);
+                        }
+                    });
+                }
+                dataLoaded.reqs = true;
+                mergeAndRender();
+            }, () => { dataLoaded.reqs = true; mergeAndRender(); });
         }
 
-        // 🧠 TRANSLATOR ENGINE: Identifies Source, Sets Icons & Colors
-        function executeTranslateNodeMetadata(txnKey, node, originNodeString) {
-            let rawType = (node.type || node.Type || node.action || "").toString().replace(/\s+/g, '').toLowerCase();
-            let rawStatus = (node.status || node.Status || "pending").toString().replace(/\s+/g, '').toLowerCase();
-            let taskDetails = (node.task_details || node.details || node.activity || "").toString().toLowerCase();
+        // 🧠 DEEP TRACKING TRANSLATOR ENGINE (Connects Admin Status & Notes)
+        function executeTranslateNodeMetadata(txnKey, node, isRequestNode) {
+            // Force action to withdraw if it's coming from requests node
+            let rawAction = isRequestNode ? "withdraw" : (node.action || node.type || "unknown").toString().toLowerCase();
+            let rawStatus = (node.status || "completed").toString().toUpperCase();
+            
+            // Amount can be named differently in different tables
+            let rawAmount = parseFloat(node.amount || node.points || node.coins || node.cost || 0);
             
             let displayTitle = "Task Reward";
             let displayCategory = "bonus";
             let displayBadgeClass = "badge-bonus";
-            let amountPrefixSign = "+";
+            let amountPrefixSign = "+ ";
             let deltaStyleClass = "delta-positive";
             
             let sourceOriginName = "System Default";
             let sourceIcon = "⚡";
-            let rewardType = "Coins / Wallet Balance";
+            let rewardType = "Coins";
 
-            let isExplicitDeposit = (rawType === "paymenttask" || rawType === "deposit" || rawType.includes("credit"));
-            let isExplicitWithdrawal = (rawType === "receive" || rawType === "withdrawal" || rawType.includes("payout") || rawType.includes("redeem"));
+            // Determine if it is a deduction or a Withdraw Request
+            if (isRequestNode || rawAmount < 0 || rawAction.includes("redeem") || rawAction.includes("withdraw") || rawAction.includes("payout") || rawAction.includes("my_point1") || rawAction.includes("pass")) {
+                amountPrefixSign = "- ";
+                deltaStyleClass = "delta-negative"; // Dark color for negative
+                displayCategory = "withdrawal";     // Puts it in "Redeemed" tab
+                displayBadgeClass = "badge-withdrawal";
+                if(rawAmount < 0) rawAmount = Math.abs(rawAmount);
 
-            let isDeposit = isExplicitDeposit || (originNodeString === 'deposits');
-            let isWithdrawal = isExplicitWithdrawal || (originNodeString === 'requests' && !isExplicitDeposit);
-
-            if (isDeposit && originNodeString !== 'earning_history') {
-                displayTitle = "Points Credited";
+                if (isRequestNode || rawAction.includes("redeem") || rawAction.includes("payout") || rawAction.includes("withdraw")) {
+                    let gatewayStr = (node.gateway || "").toUpperCase();
+                    displayTitle = gatewayStr ? `Reward Redeemed (${gatewayStr})` : "Reward Redeemed";
+                    sourceOriginName = "Payout System";
+                    sourceIcon = "💸";
+                    rewardType = node.currency || "Wallet Transfer";
+                } else if (rawAction.includes("pass")) {
+                    displayTitle = "Purchased Pass";
+                    sourceOriginName = "Store / Marketplace";
+                    sourceIcon = "🛒";
+                    rewardType = "Digital Pass";
+                }
+            } 
+            else if (rawAction.includes("deposit") || rawAction.includes("topup") || rawAction.includes("add")) {
                 displayCategory = "deposit";
                 displayBadgeClass = "badge-deposit";
-                amountPrefixSign = "+";
-                deltaStyleClass = "delta-positive";
                 sourceOriginName = "Account Top-up";
                 sourceIcon = "💳";
-                rewardType = "Wallet Credit";
             }
-            else if (isWithdrawal && originNodeString !== 'earning_history') {
-                displayTitle = "Reward Redeemed (" + (node.gateway || "WALLET").toUpperCase() + ")";
-                displayCategory = "withdrawal";
-                displayBadgeClass = "badge-withdrawal";
-                amountPrefixSign = "-";
-                deltaStyleClass = "delta-negative";
-                sourceOriginName = "User Redemption Request";
-                sourceIcon = "🎁";
-                rewardType = "Reward Transfer";
+            // Other Categories
+            else if (rawAction.includes("promo") || rawAction.includes("code") || rawAction.includes("coupon")) {
+                displayTitle = "Promo Code Claim";
+                displayBadgeClass = "badge-promo";
+                deltaStyleClass = "delta-promo";
+                sourceOriginName = "Promotional Code System";
+                sourceIcon = "🎟️";
+                totalPromoClaimed++;
             }
-            else {
-                // Detailed Deep Parsing for Games, Ads & Admin Bonus
-                displayCategory = "bonus";
-                displayBadgeClass = "badge-bonus";
-                amountPrefixSign = "+";
-                deltaStyleClass = "delta-positive";
-                rewardType = "In-App Reward";
-                
-                if (taskDetails.includes("admin") || rawType.includes("admin")) {
-                    displayTitle = "Admin Special Bonus";
-                    displayBadgeClass = "badge-admin";
-                    deltaStyleClass = "delta-admin";
-                    sourceOriginName = "System Administrator";
-                    sourceIcon = "👨‍💻";
-                    rewardType = "Direct Account Credit";
-                } else if (taskDetails.includes("spin") || rawType.includes("spin")) {
-                    displayTitle = "Lucky Spin Wheel Reward";
-                    sourceOriginName = "Spin & Win Game";
-                    sourceIcon = "🎡";
-                } else if (taskDetails.includes("pool") || rawType.includes("pool")) {
-                    displayTitle = "Multiplayer Pool Winnings";
-                    sourceOriginName = "4-Player Pool Racing";
-                    sourceIcon = "🎱";
-                } else if (taskDetails.includes("dash") || taskDetails.includes("arcade")) {
-                    displayTitle = "Arcade High Score Reward";
-                    sourceOriginName = "Square Dash / Arcade Zone";
-                    sourceIcon = "🎮";
-                } else if (taskDetails.includes("timewall") || rawType.includes("timewall")) {
-                    displayTitle = "TimeWall Task Completion";
-                    sourceOriginName = "TimeWall Network";
-                    sourceIcon = "⏱️";
-                } else if (taskDetails.includes("survey") || rawType.includes("cpx") || rawType.includes("bitlabs")) {
-                    displayTitle = "Survey Completion Reward";
-                    sourceOriginName = "Partner Surveys";
-                    sourceIcon = "📊";
-                } else if (taskDetails.includes("ad") || taskDetails.includes("video") || rawType.includes("video")) {
-                    displayTitle = "Video Stream Reward";
-                    sourceOriginName = "Media Monetization Network";
-                    sourceIcon = "📺";
-                } else if (taskDetails.includes("daily") || rawType.includes("daily")) {
-                    displayTitle = "Daily Streak Bonus";
-                    sourceOriginName = "Daily Check-in System";
-                    sourceIcon = "📅";
-                } else if (taskDetails.includes("scratch") || rawType.includes("scratch")) {
-                    displayTitle = "Lucky Scratch Card";
-                    sourceOriginName = "Scratch & Win Module";
-                    sourceIcon = "🎟️";
-                } else if (taskDetails.includes("marketplace") || taskDetails.includes("pass") || rawType.includes("drop")) {
-                    displayTitle = "Marketplace / Drop Event";
-                    sourceOriginName = "Pass Unlock Event";
-                    sourceIcon = "🛒";
-                } else if (node.activity) {
-                    displayTitle = node.activity; 
-                    sourceOriginName = "In-App Activity Tracker";
-                    sourceIcon = "⚡";
-                } else {
-                    displayTitle = node.taskName || node.task_name || "Micro-Task Completed";
-                    sourceOriginName = "General Activity / Offer";
-                }
+            else if (rawAction.includes("admin")) {
+                displayTitle = "Admin Special Bonus";
+                displayBadgeClass = "badge-admin";
+                deltaStyleClass = "delta-admin";
+                sourceOriginName = "System Administrator";
+                sourceIcon = "👨‍💻";
+                rewardType = "Direct Account Credit";
+            } 
+            else if (rawAction.includes("signup") || rawAction.includes("register") || rawAction.includes("welcome")) {
+                displayTitle = "Welcome Registration Bonus";
+                sourceOriginName = "Account Setup";
+                sourceIcon = "🎉";
             }
-            
-            // 🔥 SMART DEDUCTION COLOR & SIGN LOGIC
-            let rawAmt = node.amount || node.cost;
-            if(!rawAmt && node.coins_credited) {
-                rawAmt = node.coins_credited / 100; // 100 coins = 1 Rupee base conversion for UI
+            else if (rawAction.includes("referral")) {
+                displayTitle = "Referral Bonus";
+                sourceOriginName = "Network Team Activity";
+                sourceIcon = "👥";
             }
-            
-            let numericAmt = parseFloat(rawAmt || 0);
-
-            // Check if amount is negative (Deduction/Purchase)
-            if (numericAmt < 0) {
-                amountPrefixSign = "-";
-                deltaStyleClass = "delta-negative"; // Turns RED
-                numericAmt = Math.abs(numericAmt); // Removes minus sign to prevent double negatives
+            else if (rawAction.includes("scratch")) {
+                displayTitle = "Lucky Scratch Card";
+                sourceOriginName = "Scratch & Win Module";
+                sourceIcon = "✨";
+                totalTasksCompleted++;
+            } 
+            else if (rawAction.includes("spin")) {
+                displayTitle = "Lucky Spin Wheel";
+                sourceOriginName = "Spin & Win Game";
+                sourceIcon = "🎡";
+                totalTasksCompleted++;
+            } 
+            else if (rawAction.includes("video")) {
+                displayTitle = "Video Stream Reward";
+                sourceOriginName = "Media Monetization Network";
+                sourceIcon = "📺";
+                if(rawAction.includes("adscend")) sourceOriginName = "Adscend Media Video";
+                if(rawAction.includes("lootably")) sourceOriginName = "Lootably Video Stream";
+                if(rawAction.includes("hideout")) sourceOriginName = "Hideout.tv Premium";
+                totalTasksCompleted++;
+            } 
+            else if (rawAction.includes("social")) {
+                displayTitle = "Social Engagement";
+                sourceOriginName = "Social Following Task";
+                sourceIcon = "👍";
+                totalTasksCompleted++;
+            } 
+            else if (rawAction.includes("web_stream") || rawAction.includes("smart_task") || rawAction.includes("web_visit")) {
+                displayTitle = "Premium Web Interaction";
+                sourceOriginName = "Smart Task Wall / Sponsor Visit";
+                sourceIcon = "🌐";
+                totalTasksCompleted++;
+            } 
+            else if (rawAction.includes("secure_server") || rawAction.includes("cloud")) {
+                displayTitle = "Secure Cloud Validation";
+                sourceOriginName = "High-Speed Mirror Access";
+                sourceIcon = "🛡️";
+                totalTasksCompleted++;
+            } 
+            else if (rawAction.includes("mega_drop") || rawAction.includes("jackpot")) {
+                displayTitle = "Mega Drop Jackpot";
+                sourceOriginName = "Weekly Drop Event";
+                sourceIcon = "👑";
+            }
+            else if (node.details) {
+                // If it's just a generic details string
+                displayTitle = node.details; 
+            } else {
+                displayTitle = "System Credit / Reward";
+                if (rawAmount == 25) displayTitle = "Welcome / Referral Bonus"; 
+                sourceOriginName = "System Balance Update";
+                sourceIcon = "⚙️";
             }
 
-            let formattedAmountValue = numericAmt.toFixed(2);
-            
             let displayDateString = node.timestamp ? new Date(node.timestamp).toLocaleString() : "Recent Sync Process";
-            let dynamicAdminNote = node.admin_note || node.message || null;
             
-            // Status normalizer
-            let normalizedDisplayStatus = "PENDING";
-            if (rawStatus === "approved" || rawStatus === "success" || rawStatus === "successful" || rawStatus === "completed" || originNodeString === 'earning_history') {
-                normalizedDisplayStatus = "SUCCESSFUL";
-            } else if (rawStatus === "rejected" || rawStatus === "failed" || rawStatus === "declined") {
-                normalizedDisplayStatus = "DECLINED";
-            }
+            // 🔥 CRITICAL FIX: Extract Admin Note correctly from Firebase Request Payload
+            let dynamicAdminNote = node.admin_note || node.adminNote || node.message || null;
             
+            // Normalize Display Status
+let normalizedDisplayStatus = "PENDING";
+// 🔥 FIX: Added SUCCESSFUL to the exact match list 🔥
+if (rawStatus === "APPROVED" || rawStatus === "SUCCESS" || rawStatus === "COMPLETED" || rawStatus === "SUCCESSFUL") {
+    normalizedDisplayStatus = "SUCCESSFUL";
+} else if (rawStatus === "REJECTED" || rawStatus === "FAILED" || rawStatus === "DECLINED") {
+    normalizedDisplayStatus = "DECLINED";
+}
+
             return {
                 title: displayTitle,
                 category: displayCategory,
                 badgeClass: displayBadgeClass,
                 amountSign: amountPrefixSign,
-                amountValue: formattedAmountValue,
+                amountValue: rawAmount,
                 deltaClass: deltaStyleClass,
                 date: displayDateString,
                 status: normalizedDisplayStatus,
                 adminCode: txnKey || "TXN-AUTO-LEDGER",
-                extraDetails: node.userInputDetails || node.details || node.utr || node.upi || node.redeemId || "Verified Activity Payload",
+                extraDetails: node.details || node.user_input || node.userInputDetails || node.code || "Verified Activity Payload",
                 rawTimestamp: node.timestamp || 0,
                 adminNote: dynamicAdminNote,
                 sourceOrigin: sourceOriginName,
                 sourceIcon: sourceIcon,
                 rewardType: rewardType
             };
+        }
+
+        // 🩺 ACCOUNT HEALTH LOGIC
+        function updateAccountHealthUI() {
+            document.getElementById("displayPromoCount").innerText = totalPromoClaimed;
+            document.getElementById("displayTaskCount").innerText = totalTasksCompleted;
+
+            const healthCard = document.getElementById("accountHealthCard");
+            const healthBadge = document.getElementById("healthBadgeTxt");
+            const healthMsg = document.getElementById("healthWarningMsg");
+
+            if (totalPromoClaimed > 0 && totalTasksCompleted === 0 || totalPromoClaimed > (totalTasksCompleted * 3)) {
+                healthCard.className = "health-card health-red";
+                healthBadge.innerText = "WARNING";
+                healthMsg.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Warning: High Promo Code usage without completing tasks may result in an account ban! Start doing tasks.`;
+            } else {
+                healthCard.className = "health-card health-green";
+                healthBadge.innerText = "SAFE";
+                healthMsg.innerHTML = `<i class="fa-solid fa-circle-check"></i> Great job! Keep completing tasks to maintain a healthy account.`;
+            }
         }
 
         // 🎨 RENDER ENGINE
@@ -345,7 +455,7 @@
             if (filteredArray.length === 0) {
                 container.innerHTML = `
                     <div class="empty-history-txt">
-                        <i class="fa-solid fa-box-open" style="font-size: 30px; color: #cbd5e1; margin-bottom: 10px;"></i>
+                        <i class="fa-solid fa-box-open" style="font-size: 40px; color: #cbd5e1; margin-bottom: 10px;"></i>
                         No transaction items found under this category.
                     </div>`;
                 return;
@@ -361,6 +471,7 @@
                 if (item.status === 'DECLINED') { statusColor = "#ef4444"; statusIcon = "<i class='fa-solid fa-circle-xmark'></i>"; } 
 
                 let noteHtml = "";
+                // Render Rejection Note
                 if (item.status === 'DECLINED' && item.adminNote) {
                     noteHtml = `
                         <div class="rejection-note-box">
@@ -368,6 +479,7 @@
                         </div>
                     `;
                 } 
+                // Render Generic Admin Note
                 else if (item.badgeClass === 'badge-admin' && item.adminNote) {
                     noteHtml = `
                         <div class="admin-note-box">
@@ -376,18 +488,21 @@
                     `;
                 }
 
-                // Show safe category names in badges
                 let safeCategoryName = item.category;
                 if(item.category === 'deposit') safeCategoryName = 'Credit';
                 if(item.category === 'withdrawal') safeCategoryName = 'Redeemed';
-                if(item.category === 'bonus') safeCategoryName = (item.badgeClass === 'badge-admin' ? 'Admin Gift' : 'Task Reward');
+                if(item.category === 'bonus') {
+                    if (item.badgeClass === 'badge-admin') safeCategoryName = 'Admin Gift';
+                    else if (item.badgeClass === 'badge-promo') safeCategoryName = 'Promo Code';
+                    else safeCategoryName = 'Task Reward';
+                }
 
                 card.innerHTML = `
                     <div class="badge-tag ${item.badgeClass}">
                         ${safeCategoryName}
                     </div>
                     <div class="amount-delta-ticker ${item.deltaClass}">
-                        ${item.amountSign}₹${item.amountValue}
+                        ${item.amountSign}${item.amountValue} 🪙
                     </div>
                     
                     <h4 style="margin: 0 0 12px 0; font-size:16px; font-weight:900; color:#0f172a; max-width:75%; line-height:1.4;">${item.title}</h4>

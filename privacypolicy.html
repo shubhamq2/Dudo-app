@@ -4,121 +4,231 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - Dudo</title>
-    <!-- Google Fonts -->
+    <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #334155;
-            --text-sub: #64748b;
-            --primary-blue: #2563eb;
-            --border-color: #e2e8f0;
+            --bg-color: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-sub: #cbd5e1;
+            --border-color: rgba(255,255,255,0.1);
+            --accent-pink: #f43f5e;
+            --accent-gold: #fbbf24;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 50px; line-height: 1.7; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 50px; line-height: 1.7; display: flex; flex-direction: column; align-items: center; }
         
         /* Corporate Premium Header */
-        .header { width: 100%; background: var(--card-bg); padding: 18px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-color); }
-        .back-btn { font-size: 20px; font-weight: bold; color: #0f172a; text-decoration: none; padding: 6px 12px; border-radius: 10px; background: #f1f5f9; border: 1px solid var(--border-color); margin-right: 15px; transition: 0.2s; }
-        .back-btn:active { background: #e2e8f0; transform: scale(0.95); }
-        .header h2 { margin: 0; font-size: 19px; color: #0f172a; font-weight: 800; letter-spacing: 0.5px; }
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--primary-blue); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--primary-blue); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); transition: 0.2s; }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; letter-spacing: 0.5px; text-align: center; flex-grow: 1; margin-right: 10px; }
+
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--primary-blue); font-weight: bold; cursor: pointer; }
+        
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
         
         /* Policy Container */
-        .policy-container { width: 92%; max-width: 600px; background: var(--card-bg); border-radius: 20px; padding: 30px 25px; margin: 25px auto; box-sizing: border-box; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.04); }
+        .policy-container { width: 92%; max-width: 600px; background: var(--card-bg); border-radius: 20px; padding: 30px 25px; margin: 25px auto; box-sizing: border-box; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.4); backdrop-filter: blur(10px); }
         
-        .last-updated { display: inline-block; background: #eff6ff; color: var(--primary-blue); font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #bfdbfe; }
+        .last-updated { display: inline-block; background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(59, 130, 246, 0.3); }
 
-        .intro-text { font-size: 14.5px; color: #475569; margin-bottom: 25px; font-weight: 600; }
+        .intro-text { font-size: 14.5px; color: var(--text-sub); margin-bottom: 25px; font-weight: 600; }
 
         /* Section Styling */
         .policy-section { margin-bottom: 30px; }
-        .policy-section h3 { color: #0f172a; font-size: 18px; margin: 0 0 12px 0; border-left: 4px solid var(--primary-blue); padding-left: 10px; display: flex; align-items: center; }
-        .policy-section h4 { color: #1e293b; font-size: 15px; margin: 15px 0 8px 0; font-weight: 800; }
+        .policy-section h3 { color: #fff; font-size: 18px; margin: 0 0 12px 0; border-left: 4px solid var(--primary-blue); padding-left: 10px; display: flex; align-items: center; }
+        .policy-section h4 { color: #f8fafc; font-size: 15px; margin: 15px 0 8px 0; font-weight: 800; }
         .policy-section p { font-size: 14px; margin: 0 0 12px 0; color: var(--text-sub); }
         
         ul { margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: var(--text-sub); }
         li { margin-bottom: 8px; }
-        li strong { color: #1e293b; }
+        li strong { color: #fff; }
 
         /* Highlighted Important Box */
-        .highlight-box { background: #fffbeb; border: 1px solid #fde047; border-radius: 12px; padding: 15px; margin-top: 15px; font-size: 13.5px; color: #854d0e; }
-        .highlight-box strong { color: #a16207; }
+        .highlight-box { background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 15px; margin-top: 15px; font-size: 13.5px; color: #fcd34d; }
+        .highlight-box strong { color: var(--accent-gold); }
 
         /* Deletion Box (Crucial for Play Store) */
-        .deletion-box { background: #fef2f2; border: 1px dashed #f87171; border-radius: 12px; padding: 15px; margin-top: 15px; font-size: 13.5px; color: #991b1b; }
-        .deletion-box strong { color: #7f1d1d; }
+        .deletion-box { background: rgba(244, 63, 94, 0.08); border: 1px dashed var(--accent-pink); border-radius: 12px; padding: 18px; margin-top: 15px; font-size: 13.5px; color: #fecdd3; line-height: 1.6; }
+        .deletion-box strong { color: var(--accent-pink); font-size: 15px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <a href="profile.html" class="back-btn">←</a>
-        <h2>Privacy Policy</h2>
+        <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="pp_title">Privacy Policy</h2>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="policy-container">
-        <div class="last-updated">Last Updated: August 2026</div>
+        <div class="last-updated" id="lastUpdatedDate">Last Updated: August 2026</div>
         
-        <p class="intro-text">Welcome to <strong>Dudo</strong>. We are committed to protecting your personal information and your right to privacy. This Privacy Policy outlines our practices regarding data collection, usage, and your rights in compliance with Google Play Developer Policies.</p>
+        <p class="intro-text">Welcome to <strong>Dudo</strong>. We are committed to protecting your personal information and your right to privacy. This Privacy Policy outlines our practices regarding data collection, usage, and your rights strictly in compliance with Google Play Developer Policies.</p>
         
         <div class="policy-section">
-            <h3>1. Information We Collect</h3>
+            <h3 data-i18n="sec_1">1. Information We Collect</h3>
             <p>To provide you with a seamless and rewarding experience, we collect specific data points when you use our application:</p>
             <ul>
-                <li><strong>Personal Information:</strong> Full Name, Registered Mobile Number, and Email Address provided during registration.</li>
-                <li><strong>Payment/Reward Details:</strong> Virtual IDs (e.g., Gaming IDs, UPI IDs) provided explicitly by you during reward redemptions.</li>
-                <li><strong>Device & Advertising Data:</strong> IP address, Device OS, Advertising IDs (AAID), and network activity. This is strictly used for fraud prevention and ad-tracking mechanisms by our partners.</li>
+                <li><strong>Personal Information:</strong> Full Name and Email Address provided during registration via Google Authentication.</li>
+                <li><strong>Reward Distribution Details:</strong> Virtual IDs (e.g., Gaming IDs, Wallet IDs) provided explicitly by you during reward redemptions.</li>
+                <li><strong>Device & Advertising Data:</strong> Device OS, Advertising IDs (AAID), and network activity. This is strictly used for fraud prevention and ad-tracking mechanisms.</li>
             </ul>
         </div>
 
         <div class="policy-section">
-            <h3>2. How We Use Your Information</h3>
+            <h3 data-i18n="sec_2">2. How We Use Your Information</h3>
             <p>We process your data strictly for legitimate business purposes and application functionality:</p>
             <ul>
-                <li>To create, manage, and authenticate your account securely.</li>
-                <li>To process reward payouts and maintain an accurate ledger of your earned coins.</li>
-                <li>To deliver personalized programmatic advertisements and tasks.</li>
+                <li>To create, manage, and authenticate your account securely via Firebase.</li>
+                <li>To process virtual reward payouts and maintain an accurate ledger of your earned coins.</li>
+                <li>To deliver personalized programmatic advertisements and app-discovery tasks.</li>
                 <li>To prevent fraudulent activities, cheating, and multiple account abuses.</li>
             </ul>
         </div>
 
         <div class="policy-section">
-            <h3>3. Third-Party Services & Trackers</h3>
+            <h3 data-i18n="sec_3">3. Third-Party Services & Trackers</h3>
             <p>We utilize trusted third-party SDKs to keep the platform optimized, secure, and operational. These services operate under their own strict privacy policies:</p>
             <ul>
-                <li><strong>Backend Infrastructure:</strong> Google Firebase & Node.js API clusters for secure, encrypted real-time data syncing.</li>
-                <li><strong>Advertising Partners:</strong> Networks like Adsterra, Monetag, etc., which may use Advertising IDs to serve relevant ads.</li>
-                <li><strong>Offerwalls & Surveys:</strong> Partners like CPX Research, Bitlabs, and Torox process your activity to credit rewards to your account automatically via secure server-to-server postbacks.</li>
+                <li><strong>Backend Infrastructure:</strong> Google Firebase Realtime Database and Authentication for secure, encrypted data syncing.</li>
+                <li><strong>Advertising Partners:</strong> Networks like Adsterra, Monetag, and others, which may use Advertising IDs to serve relevant ads.</li>
+                <li><strong>Offerwalls & Surveys:</strong> Partners like CPX Research, Bitlabs, and Torox process your activity to credit virtual rewards to your account automatically via secure postbacks.</li>
             </ul>
         </div>
 
         <div class="policy-section">
-            <h3>4. Data Retention & Deletion Policy</h3>
+            <h3 data-i18n="sec_4">4. Data Retention & Deletion Policy</h3>
             <p>We retain your personal information only for as long as your account is active or as needed to provide you with the services.</p>
+            
+            <!-- EXTREMELY IMPORTANT FOR PLAY STORE COMPLIANCE -->
             <div class="deletion-box">
-                <strong>Right to Delete Data:</strong> You have the absolute right to request the deletion of your account and associated personal data. 
+                <strong><i class="fa-solid fa-trash-can"></i> Right to Delete Data</strong><br><br>
+                You have the absolute right to request the complete deletion of your account and associated personal data at any time. 
                 <br><br>
-                To delete your data, you can navigate to the <strong>Profile &rarr; Account Settings &rarr; Delete Account</strong> section within the app, or contact our support team directly. Upon request, your profile, balances, and history will be permanently erased from our servers within 30 days.
+                To delete your data, navigate to the <strong>Profile &rarr; Delete Account</strong> section within the app. Upon confirmation, your profile, balances, and history will be permanently and irreversibly erased from our Firebase servers immediately.
             </div>
         </div>
 
         <div class="policy-section">
-            <h3>5. Data Security</h3>
-            <p>We implement premium administrative and technical security measures (such as SSL encryption and secure API tokens) to maintain the safety of your personal data. However, please remember that no method of transmission over the internet is 100% secure.</p>
+            <h3 data-i18n="sec_5">5. Data Security</h3>
+            <p>We implement premium administrative and technical security measures (such as SSL encryption and secure Firebase Rules) to maintain the safety of your personal data. However, please remember that no method of transmission over the internet is 100% secure.</p>
         </div>
 
         <div class="policy-section">
-            <h3>6. Children's Privacy (COPPA)</h3>
+            <h3 data-i18n="sec_6">6. Children's Privacy (COPPA)</h3>
             <p>Our services do not directly target anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13. If we discover that a child under 13 has provided us with personal information, we immediately delete this from our database.</p>
         </div>
 
         <div class="policy-section">
-            <h3>7. Contact Us</h3>
-            <p>If you have any questions, concerns, or requests regarding your data and this Privacy Policy, please contact our support desk through the "Help & Support" section inside the application.</p>
+            <h3 data-i18n="sec_7">7. Contact Us</h3>
+            <p>If you have any questions, concerns, or requests regarding your data and this Privacy Policy, please contact our support desk through the <strong>Help & Support</strong> section inside the application or email our developer team.</p>
         </div>
         
     </div>
 
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <script>
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🌐 TRANSLATIONS (Only UI Elements, Legal text remains English for universality)
+        const langData = {
+            "en": { "pp_title": "Privacy Policy", "sec_1": "1. Information We Collect", "sec_2": "2. How We Use Your Information", "sec_3": "3. Third-Party Services", "sec_4": "4. Data Retention & Deletion", "sec_5": "5. Data Security", "sec_6": "6. Children's Privacy", "sec_7": "7. Contact Us" },
+            "hi": { "pp_title": "गोपनीयता नीति", "sec_1": "1. हम क्या जानकारी लेते हैं", "sec_2": "2. जानकारी का उपयोग", "sec_3": "3. थर्ड-पार्टी सेवाएं", "sec_4": "4. डेटा हटाना (Deletion)", "sec_5": "5. डेटा सुरक्षा", "sec_6": "6. बच्चों की गोपनीयता", "sec_7": "7. संपर्क करें" },
+            "bn": { "pp_title": "গোপনীয়তা নীতি", "sec_1": "১. আমরা কী তথ্য সংগ্রহ করি", "sec_2": "২. তথ্যের ব্যবহার", "sec_3": "৩. থার্ড-পার্টি সার্ভিস", "sec_4": "৪. ডেটা মুছে ফেলা", "sec_5": "৫. ডেটা সুরক্ষা", "sec_6": "৬. শিশুদের গোপনীয়তা", "sec_7": "৭. যোগাযোগ করুন" },
+            // Fallbacks for UI
+            "te": { "pp_title": "గోప్యతా విధానం" }, "mr": { "pp_title": "गोपनीयता धोरण" }, "ta": { "pp_title": "தனியுரிமைக் கொள்கை" },
+            "ur": { "pp_title": "رازداری کی پالیسی" }, "gu": { "pp_title": "ગોપનીયતા નીતિ" }, "es": { "pp_title": "Política de Privacidad" },
+            "fr": { "pp_title": "Politique de Confidentialité" }, "ar": { "pp_title": "سياسة الخصوصية" }, "pt": { "pp_title": "Política de Privacidade" },
+            "ru": { "pp_title": "Политика конфиденциальности" }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
+        const uid = localStorage.getItem("userId");
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+            
+            // Auto Update Date
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const d = new Date();
+            document.getElementById("lastUpdatedDate").innerText = `Last Updated: ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+
+            if (uid) {
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        // Smart Avatar Sync (Matches ho.html)
+                        db.ref('users/' + uid).on('value', (snapshot) => {
+                            if (snapshot.exists()) {
+                                const data = snapshot.val();
+                                let userName = data.name || "Player";
+                                let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                                
+                                let avatarContainer = document.getElementById("headerProfileIcon");
+                                if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                    avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                                } else {
+                                    avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

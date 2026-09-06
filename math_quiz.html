@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -30,16 +35,20 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--primary-blue); font-weight: bold; cursor: pointer; }
 
-        /* Profile Balance Ribbon */
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
+
+        /* Profile Balance Ribbon - Upgraded (Rupees Removed) */
         .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--primary-blue); padding: 15px 20px; border-radius: 16px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); backdrop-filter: blur(10px); align-items: center; }
-        .balance-card span { font-size: 18px; font-weight: 900; }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 20px; font-weight: 900; }
 
         /* 🔥 DYNAMIC STREAK LEVEL MULTIPLIER RIBBON */
-        .multiplier-streak-ribbon { width: 92%; max-width: 440px; background: rgba(251, 191, 36, 0.1); border: 1px dashed var(--accent-gold); padding: 12px 18px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; font-size: 13.5px; font-weight: 800; color: var(--accent-gold); box-shadow: inset 0 0 15px rgba(251,191,36,0.1); }
-        .multiplier-badge { background: var(--accent-gold); color: #000; padding: 4px 12px; border-radius: 8px; text-transform: uppercase; font-weight: 900; box-shadow: 0 4px 10px rgba(251,191,36,0.4); }
+        .multiplier-streak-ribbon { width: 92%; max-width: 440px; background: rgba(251, 191, 36, 0.1); border: 1px dashed var(--accent-gold); padding: 12px 18px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; font-size: 13.5px; font-weight: 800; color: var(--accent-gold); box-shadow: inset 0 0 15px rgba(251,191,36,0.1); transition: 0.3s; }
+        .multiplier-badge { background: var(--accent-gold); color: #000; padding: 4px 12px; border-radius: 8px; text-transform: uppercase; font-weight: 900; box-shadow: 0 4px 10px rgba(251,191,36,0.4); transition: 0.3s; }
 
         /* Banner Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
@@ -49,7 +58,7 @@
         .quiz-main-card { width: 92%; max-width: 440px; background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         
         /* 🔥 UPGRADED: Modern Interactive Question Box display */
-        .question-display-box { background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 16px; padding: 35px 20px; font-size: 42px; font-weight: 900; color: var(--accent-gold); border: 2px solid var(--accent-purple); margin: 20px 0; letter-spacing: 4px; box-shadow: inset 0 0 30px rgba(168,85,247,0.3), 0 8px 25px rgba(0,0,0,0.4); text-shadow: 0 4px 10px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
+        .question-display-box { background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 16px; padding: 35px 15px; font-size: 38px; font-weight: 900; color: var(--accent-gold); border: 2px solid var(--accent-purple); margin: 20px 0; letter-spacing: 2px; box-shadow: inset 0 0 30px rgba(168,85,247,0.3), 0 8px 25px rgba(0,0,0,0.4); text-shadow: 0 4px 10px rgba(0,0,0,0.6); position: relative; overflow: hidden; word-wrap: break-word; }
         .question-display-box::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px); pointer-events: none; }
 
         /* 🔥 UPGRADED: Modern Input Grouping Field */
@@ -73,6 +82,13 @@
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -83,39 +99,53 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Math Task</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <div class="header">
         <a href="extra_bonus.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="mq_title">Math Quiz</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="balance-card">
-        <span id="liveUserBalance">₹0.00</span>
+        <span style="color:var(--text-sub); font-size:14px; text-transform:uppercase; letter-spacing:1px;">🧠 Math Quiz Zone</span>
         <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
     </div>
 
-    <div class="multiplier-streak-ribbon">
+    <!-- 🔥 DYNAMIC STREAK LEVEL MULTIPLIER RIBBON -->
+    <div class="multiplier-streak-ribbon" id="streakRibbonBox">
         <span id="quizStreakCountDisplay"><i class="fa-solid fa-fire"></i> LEVEL: 1</span>
-        <span class="multiplier-badge" id="quizBonusLabelDisplay">1X REWARD</span>
+        <span class="multiplier-badge" id="quizBonusLabelDisplay">10 COINS</span>
     </div>
 
     <!-- 📢 ADMIN CONNECTED TOP BANNERS -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
-        <div class="ad-slot-banner" id="adminBannerSlot2"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot1"></div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"></div>
     </div>
 
     <div class="quiz-main-card">
-        <h3 style="margin:0; font-size: 22px; color: var(--primary-blue); font-weight: 900;" data-i18n="mq_h3">Solve Arithmetic</h3>
-        <p style="font-size: 13.5px; color:var(--text-sub); margin: 8px 0 20px 0; font-weight: 600;" data-i18n="mq_p">Solve the math equation below correctly to claim your reward points!</p>
+        <h3 style="margin:0; font-size: 22px; color: var(--primary-blue); font-weight: 900;" data-i18n="mq_h3">Brain Teaser Math</h3>
+        <p style="font-size: 13.5px; color:var(--text-sub); margin: 8px 0 20px 0; font-weight: 600;" data-i18n="mq_p">Solve correctly to Level Up & multiply rewards! Wrong answer resets streak.</p>
         
         <div class="question-display-box" id="mathQuestionString"><i class="fa-solid fa-spinner fa-spin"></i></div>
 
@@ -126,10 +156,8 @@
 
     <!-- 📢 ADMIN CONNECTED BOTTOM BANNERS -->
     <div class="ad-container-block">
-        <div class="ad-slot-banner" id="adminBannerSlot3"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
-        <div class="ad-slot-banner" id="adminBannerSlot4"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+        <div class="ad-slot-banner" id="adminBannerSlot3"></div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"></div>
     </div>
 
     <div class="security-box">
@@ -137,26 +165,41 @@
         <span data-i18n="mq_security">Stay active and complete the verification process. Skipping ads or closing tabs early will cancel your reward.</span>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 25; // Default time
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
-            "en": { "mq_title": "Math Quiz", "mq_h3": "Solve Arithmetic", "mq_p": "Solve the math equation below correctly to claim your reward points!", "mq_btn": "SUBMIT ANSWER", "mq_security": "Stay active and complete the verification process. Skipping ads or closing tabs early will cancel your reward.", "err_wrong": "❌ Wrong Answer! Your streak reset to Level 1. Try again.", "err_early": "❌ Verification Incomplete! Please keep the sponsor tab open.", "err_invalid": "❌ Tracking Interrupted: Please stay on the sponsor page.", "err_success": "🎉 Correct! Points added to your account.", "wait_txt": "Verifying... " },
-            "hi": { "mq_title": "मैथ क्विज़", "mq_h3": "अंकगणित हल करें", "mq_p": "रिवॉर्ड पॉइंट्स प्राप्त करने के लिए नीचे दिए गए गणित समीकरण को सही ढंग से हल करें!", "mq_btn": "उत्तर सबमिट करें", "mq_security": "सक्रिय रहें और सत्यापन प्रक्रिया पूरी करें। विज्ञापन छोड़ने या टैब जल्दी बंद करने से रिवॉर्ड रद्द हो जाएगा।", "err_wrong": "❌ गलत उत्तर! आपका लेवल 1 पर रीसेट हो गया। पुनः प्रयास करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर टैब खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: कृपया स्पॉन्सर पेज पर ही रहें।", "err_success": "🎉 सही उत्तर! आपके खाते में पॉइंट्स जोड़ दिए गए हैं।", "wait_txt": "चेक हो रहा है... " },
-            "bn": { "mq_title": "গণিত কুইজ", "mq_h3": "পাটিগণিত সমাধান করুন", "mq_p": "রিওয়ার্ড পেতে নিচের সমীকরণটি সমাধান করুন!", "mq_btn": "উত্তর জমা দিন", "mq_security": "সক্রিয় থাকুন এবং যাচাইকরণ সম্পন্ন করুন।", "err_wrong": "❌ ভুল উত্তর! আপনার লেভেল ১-এ রিসেট হয়েছে।", "err_early": "❌ যাচাই অসম্পূর্ণ! স্পনসর পেজটি খোলা রাখুন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে: স্পনসর পেজে থাকুন।", "err_success": "🎉 সঠিক উত্তর! পয়েন্ট যোগ হয়েছে।", "wait_txt": "যাচাই করা হচ্ছে... " },
-            "te": { "mq_title": "మ్యాథ్ క్విజ్", "mq_h3": "సమస్యను పరిష్కరించండి", "mq_p": "రివార్డ్ పొందడానికి ఈ గణిత సమస్యను పరిష్కరించండి!", "mq_btn": "సమర్పించండి", "mq_security": "యాక్టివ్‌గా ఉండండి మరియు ధృవీకరణను పూర్తి చేయండి.", "err_wrong": "❌ తప్పు సమాధానం! మీరు లెవెల్ 1కి వచ్చారు.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని కొద్దిసేపు తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి స్పాన్సర్ పేజీలోనే ఉండండి.", "err_success": "🎉 సరైన సమాధానం! పాయింట్లు జోడించబడ్డాయి.", "wait_txt": "ధృవీకరిస్తోంది... " },
-            "mr": { "mq_title": "मॅथ क्विझ", "mq_h3": "गणित सोडवा", "mq_p": "रिवॉर्ड्स मिळवण्यासाठी खालील गणित अचूक सोडवा!", "mq_btn": "सबमिट करा", "mq_security": "सक्रिय राहा आणि पडताळणी पूर्ण करा. जाहिरात बंद केल्यास रिवॉर्ड रद्द होईल.", "err_wrong": "❌ चुकीचे उत्तर! तुम्ही लेव्हल 1 वर आला आहात.", "err_early": "❌ अपूर्ण! कृपया स्पॉन्सर टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया स्पॉन्सर पेजवरच थांबा.", "err_success": "🎉 बरोबर! पॉइंट्स जोडले गेले.", "wait_txt": "तपासत आहे... " },
-            "ta": { "mq_title": "கணித வினாடி வினா", "mq_h3": "கணிதத்தை தீர்க்கவும்", "mq_p": "சரியான பதிலை அளித்து புள்ளிகளைப் பெறுங்கள்!", "mq_btn": "சமர்ப்பி", "mq_security": "செயல்பாட்டில் இருந்து சரிபார்ப்பை முடிக்கவும்.", "err_wrong": "❌ தவறான பதில்! நிலை 1க்கு வந்துவிட்டீர்கள்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ விளம்பரப் பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 சரி! புள்ளிகள் சேர்க்கப்பட்டன.", "wait_txt": "சரிபார்க்கிறது... " },
-            "ur": { "mq_title": "میتھ کوئز", "mq_h3": "ریاضی حل کریں", "mq_p": "انعام حاصل کرنے کے لیے ریاضی کا سوال حل کریں!", "mq_btn": "جمع کریں", "mq_security": "فعال رہیں اور تصدیق مکمل کریں۔ اشتہار بند کرنے سے انعام منسوخ ہو جائے گا۔", "err_wrong": "❌ غلط جواب! آپ لیول 1 پر آ گئے ہیں۔", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم سپانسر پیج پر رہیں۔", "err_success": "🎉 صحیح جواب! پوائنٹس شامل کر دیے گئے۔", "wait_txt": "تصدیق ہو رہی ہے... " },
-            "gu": { "mq_title": "મેથ ક્વિઝ", "mq_h3": "ગણિત ઉકેલો", "mq_p": "ઇનામ મેળવવા માટે ગણિતનો પ્રશ્ન ઉકેલો!", "mq_btn": "સબમિટ કરો", "mq_security": "સક્રિય રહો અને ચકાસણી પૂર્ણ કરો.", "err_wrong": "❌ ખોટો જવાબ! તમે લેવલ 1 પર આવી ગયા છો.", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને સ્પોન્સર પેજ પર રહો.", "err_success": "🎉 સાચો જવાબ! પોઇન્ટ્સ ઉમેરાયા.", "wait_txt": "ચકાસણી... " },
-            "es": { "mq_title": "Quiz de Matemáticas", "mq_h3": "Resuelve la ecuación", "mq_p": "¡Resuelve la ecuación para ganar puntos!", "mq_btn": "ENVIAR RESPUESTA", "mq_security": "Mantente activo para completar la verificación.", "err_wrong": "❌ ¡Respuesta incorrecta! Nivel reiniciado.", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página del patrocinador.", "err_success": "🎉 ¡Correcto! Puntos añadidos.", "wait_txt": "Verificando... " },
-            "fr": { "mq_title": "Quiz de Maths", "mq_h3": "Résolvez l'équation", "mq_p": "Résolvez l'équation pour gagner des points !", "mq_btn": "SOUMETTRE", "mq_security": "Restez actif pour terminer la vérification.", "err_wrong": "❌ Mauvaise réponse ! Niveau réinitialisé.", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page du sponsor.", "err_success": "🎉 Correct ! Points ajoutés.", "wait_txt": "Vérification... " },
-            "ar": { "mq_title": "مسابقة الرياضيات", "mq_h3": "حل المعادلة", "mq_p": "حل المعادلة الرياضية لكسب النقاط!", "mq_btn": "إرسال", "mq_security": "ابق نشطاً لإكمال عملية التحقق.", "err_wrong": "❌ إجابة خاطئة! تم إعادة تعيين المستوى.", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في صفحة الراعي.", "err_success": "🎉 صحيح! أضيفت النقاط.", "wait_txt": "التحقق... " },
-            "pt": { "mq_title": "Quiz de Matemática", "mq_h3": "Resolva a Equação", "mq_p": "Resolva a equação para ganhar pontos!", "mq_btn": "ENVIAR", "mq_security": "Mantenha-se ativo para concluir a verificação.", "err_wrong": "❌ Resposta errada! Nível reiniciado.", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página do patrocinador.", "err_success": "🎉 Correto! Pontos adicionados.", "wait_txt": "Verificando... " },
-            "ru": { "mq_title": "Математика", "mq_h3": "Решите уравнение", "mq_p": "Решите уравнение, чтобы получить очки!", "mq_btn": "ОТПРАВИТЬ", "mq_security": "Оставайтесь активными для завершения проверки.", "err_wrong": "❌ Неправильно! Уровень сброшен.", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице спонсора.", "err_success": "🎉 Правильно! Очки добавлены.", "wait_txt": "Проверка... " }
+            "en": { "mq_title": "Math Quiz", "mq_h3": "Brain Teaser Math", "mq_p": "Solve correctly to Level Up & multiply rewards! Wrong answer resets streak.", "mq_btn": "SUBMIT ANSWER", "mq_security": "Stay active and complete the verification process to secure your points.", "err_wrong": "❌ Wrong Answer! Your streak reset to Level 1. Try again.", "err_early": "❌ Verification Incomplete! Please keep the sponsor page open.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "err_success": "🎉 Correct! Points added to your account.", "wait_txt": "Verifying... " },
+            "hi": { "mq_title": "मैथ क्विज़", "mq_h3": "ब्रेन टीज़र मैथ", "mq_p": "लेवल बढ़ाने और अधिक इनाम के लिए सही उत्तर दें! गलत उत्तर पर स्ट्रीक 0 हो जाएगी।", "mq_btn": "उत्तर सबमिट करें", "mq_security": "सक्रिय रहें और सत्यापन प्रक्रिया पूरी करें। विज्ञापन छोड़ने से रिवॉर्ड रद्द हो जाएगा।", "err_wrong": "❌ गलत उत्तर! आपका लेवल 1 पर रीसेट हो गया। पुनः प्रयास करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: कृपया ऐप को बंद न करें और पेज पर ही रहें।", "err_success": "🎉 सही उत्तर! आपके खाते में पॉइंट्स जोड़ दिए गए हैं।", "wait_txt": "चेक हो रहा है... " },
+            "bn": { "mq_title": "গণিত কুইজ", "mq_h3": "ব্রেইন টিজার ম্যাথ", "mq_p": "লেভেল আপ করতে সঠিক উত্তর দিন! ভুল উত্তর দিলে লেভেল ১-এ ফিরে যাবেন।", "mq_btn": "উত্তর জমা দিন", "mq_security": "সক্রিয় থাকুন এবং যাচাইকরণ সম্পন্ন করুন।", "err_wrong": "❌ ভুল উত্তর! আপনার লেভেল ১-এ রিসেট হয়েছে।", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি খোলা রাখুন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে: পেজেই থাকুন।", "err_success": "🎉 সঠিক উত্তর! পয়েন্ট যোগ হয়েছে।", "wait_txt": "যাচাই করা হচ্ছে... " },
+            "te": { "mq_title": "మ్యాథ్ క్విజ్", "mq_h3": "మెదడుకు మేత", "mq_p": "లెవెల్ అప్ అవ్వడానికి సరిగ్గా సమాధానం చెప్పండి! తప్పు సమాధానం ఇస్తే లెవెల్ 1 కి పడిపోతారు.", "mq_btn": "సమర్పించండి", "mq_security": "యాక్టివ్‌గా ఉండండి మరియు ధృవీకరణను పూర్తి చేయండి.", "err_wrong": "❌ తప్పు సమాధానం! మీరు లెవెల్ 1కి వచ్చారు.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి పేజీలోనే ఉండండి.", "err_success": "🎉 సరైన సమాధానం! పాయింట్లు జోడించబడ్డాయి.", "wait_txt": "ధృవీకరిస్తోంది... " },
+            "mr": { "mq_title": "मॅथ क्विझ", "mq_h3": "ब्रेन टीझर मॅथ", "mq_p": "लेव्हल वाढवण्यासाठी अचूक उत्तर द्या! चुकीचे उत्तर दिल्यास लेव्हल 1 वर जाल.", "mq_btn": "सबमिट करा", "mq_security": "सक्रिय राहा आणि पडताळणी पूर्ण करा.", "err_wrong": "❌ चुकीचे उत्तर! तुम्ही लेव्हल 1 वर आला आहात.", "err_early": "❌ अपूर्ण! कृपया स्पॉन्सर पेज उघडा ठेवा.", "err_invalid": "❌ कृपया पेजवरच थांबा.", "err_success": "🎉 बरोबर! पॉइंट्स जोडले गेले.", "wait_txt": "तपासत आहे... " },
+            "ta": { "mq_title": "கணித வினாடி வினா", "mq_h3": "கடினமான கணிதம்", "mq_p": "நிலை உயர சரியான பதில் அளியுங்கள்! தவறான பதில் நிலை 1க்கு கொண்டு செல்லும்.", "mq_btn": "சமர்ப்பி", "mq_security": "செயல்பாட்டில் இருந்து சரிபார்ப்பை முடிக்கவும்.", "err_wrong": "❌ தவறான பதில்! நிலை 1க்கு வந்துவிட்டீர்கள்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ அதே பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 சரி! புள்ளிகள் சேர்க்கப்பட்டன.", "wait_txt": "சரிபார்க்கிறது... " },
+            "ur": { "mq_title": "میتھ کوئز", "mq_h3": "دماغی ریاضی", "mq_p": "لیول بڑھانے کے لیے صحیح جواب دیں! غلط جواب پر آپ لیول 1 پر چلے جائیں گے۔", "mq_btn": "جمع کریں", "mq_security": "فعال رہیں اور تصدیق مکمل کریں۔", "err_wrong": "❌ غلط جواب! آپ لیول 1 پر آ گئے ہیں۔", "err_early": "❌ نامکمل! براہ کرم پیج کھلا رکھیں۔", "err_invalid": "❌ براہ کرم پیج پر رہیں۔", "err_success": "🎉 صحیح جواب! پوائنٹس شامل کر دیے گئے۔", "wait_txt": "تصدیق ہو رہی ہے... " },
+            "gu": { "mq_title": "મેથ ક્વિઝ", "mq_h3": "બ્રેઈન ટીઝર", "mq_p": "લેવલ વધારવા માટે સાચો જવાબ આપો! ખોટા જવાબ પર લેવલ 1 પર જશો.", "mq_btn": "સબમિટ કરો", "mq_security": "સક્રિય રહો અને ચકાસણી પૂર્ણ કરો.", "err_wrong": "❌ ખોટો જવાબ! તમે લેવલ 1 પર આવી ગયા છો.", "err_early": "❌ અધૂરું! કૃપા કરીને પેજ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને પેજ પર રહો.", "err_success": "🎉 સાચો જવાબ! પોઇન્ટ્સ ઉમેરાયા.", "wait_txt": "ચકાસણી... " },
+            "es": { "mq_title": "Quiz Matemático", "mq_h3": "Reto Mental", "mq_p": "¡Responde correctamente para subir de nivel! Una respuesta incorrecta te reinicia al Nivel 1.", "mq_btn": "ENVIAR", "mq_security": "Mantente activo para completar la verificación.", "err_wrong": "❌ ¡Respuesta incorrecta! Nivel reiniciado.", "err_early": "❌ ¡Incompleto! Mantén la página abierta.", "err_invalid": "❌ Quédate en la página.", "err_success": "🎉 ¡Correcto! Puntos añadidos.", "wait_txt": "Verificando... " },
+            "fr": { "mq_title": "Quiz de Maths", "mq_h3": "Casse-tête", "mq_p": "Répondez correctement pour monter de niveau ! Une mauvaise réponse vous ramène au niveau 1.", "mq_btn": "SOUMETTRE", "mq_security": "Restez actif pour terminer la vérification.", "err_wrong": "❌ Mauvaise réponse ! Niveau réinitialisé.", "err_early": "❌ Incomplet ! Gardez la page ouverte.", "err_invalid": "❌ Restez sur la page.", "err_success": "🎉 Correct ! Points ajoutés.", "wait_txt": "Vérification... " },
+            "ar": { "mq_title": "مسابقة الرياضيات", "mq_h3": "تحدي الدماغ", "mq_p": "أجب بشكل صحيح لرفع مستواك! إجابة خاطئة ستعيدك إلى المستوى 1.", "mq_btn": "إرسال", "mq_security": "ابق نشطاً لإكمال عملية التحقق.", "err_wrong": "❌ إجابة خاطئة! تم إعادة تعيين المستوى.", "err_early": "❌ غير مكتمل! أبقِ الصفحة مفتوحة.", "err_invalid": "❌ يرجى البقاء في الصفحة.", "err_success": "🎉 صحيح! أضيفت النقاط.", "wait_txt": "التحقق... " },
+            "pt": { "mq_title": "Quiz de Matemática", "mq_h3": "Desafio Mental", "mq_p": "Responda corretamente para subir de nível! Uma resposta errada reinicia para o Nível 1.", "mq_btn": "ENVIAR", "mq_security": "Mantenha-se ativo para concluir a verificação.", "err_wrong": "❌ Resposta errada! Nível reiniciado.", "err_early": "❌ Incompleto! Mantenha a página aberta.", "err_invalid": "❌ Fique na página.", "err_success": "🎉 Correto! Pontos adicionados.", "wait_txt": "Verificando... " },
+            "ru": { "mq_title": "Математика", "mq_h3": "Головоломка", "mq_p": "Ответьте правильно, чтобы повысить уровень! Неверный ответ сбросит вас на Уровень 1.", "mq_btn": "ОТПРАВИТЬ", "mq_security": "Оставайтесь активными для завершения проверки.", "err_wrong": "❌ Неправильно! Уровень сброшен.", "err_early": "❌ Не завершено! Держите страницу открытой.", "err_invalid": "❌ Оставайтесь на странице.", "err_success": "🎉 Правильно! Очки добавлены.", "wait_txt": "Проверка... " }
         };
 
         function changeLanguage(langCode) {
@@ -169,100 +212,136 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
 
+        const uid = localStorage.getItem("userId");
         let computedCorrectAnswer = 0;
         let consecutiveCorrectAnswersCount = 0;
+        let currentPayoutCoins = 10; // Base Reward
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
+            
+            // Sync Language from Home Page
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
-            generateHardMathQuestion(); // Initialize Hard Logic
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            function createEmojiURI(emoji) {
+                                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+                                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+                            }
+
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners & Link & Time)
+                    db.ref('global_system_runtime_configurations/math_quiz_configs').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME
+                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            
+                            // Load Banners
+                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+
+                            // Setup Game Link
+                            if (adminData.math_task_link) {
+                                activeAdminSmartlinkUrl = adminData.math_task_link;
+                            }
+                        } else {
+                            // Fallback to Global Smartlink
+                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
+                                if(globalSnap.exists()) activeAdminSmartlinkUrl = globalSnap.val();
+                            });
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+
+            generateHardMathQuestion(); 
         });
 
-        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                }
-
-                // 2. Fetch Admin Banners and Smartlink
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
-                        if(confData.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.banners[3];
-                    }
-                    if (confData.globalSmartlink) {
-                        activeAdminSmartlinkUrl = confData.globalSmartlink;
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
-        }
-
-        // 🔥 HARD MATH LOGIC ENGINE
+        // 🔥 DYNAMIC 5-LEVEL HARD MATH LOGIC ENGINE
         function generateHardMathQuestion() {
             document.getElementById("quizAnswerInput").value = "";
-            let num1, num2, num3;
-            let questionString = "";
+            let qStr = "";
+            let ans = 0;
 
-            // Difficulty scales with streak
             if (consecutiveCorrectAnswersCount < 3) {
-                // LEVEL 1: Basic Addition / Subtraction (Bigger numbers)
-                num1 = Math.floor(Math.random() * 50) + 20; 
-                num2 = Math.floor(Math.random() * 50) + 10;
-                let op = Math.random() > 0.5 ? '+' : '-';
-                
-                if (op === '-') {
-                    if (num1 < num2) [num1, num2] = [num2, num1]; // Prevent negative answers
-                    computedCorrectAnswer = num1 - num2;
-                } else {
-                    computedCorrectAnswer = num1 + num2;
-                }
-                questionString = `${num1} ${op} ${num2}`;
-
+                // LEVEL 1: (A + B) - C
+                let a = Math.floor(Math.random() * 50) + 20;
+                let b = Math.floor(Math.random() * 30) + 10;
+                let c = Math.floor(Math.random() * 20) + 5;
+                ans = (a + b) - c;
+                qStr = `(${a} + ${b}) - ${c}`;
             } else if (consecutiveCorrectAnswersCount >= 3 && consecutiveCorrectAnswersCount < 6) {
-                // LEVEL 2: Multiplication
-                num1 = Math.floor(Math.random() * 15) + 5; 
-                num2 = Math.floor(Math.random() * 10) + 2;
-                computedCorrectAnswer = num1 * num2;
-                questionString = `${num1} × ${num2}`;
-
+                // LEVEL 2: A × B + C
+                let a = Math.floor(Math.random() * 15) + 5;
+                let b = Math.floor(Math.random() * 12) + 3;
+                let c = Math.floor(Math.random() * 40) + 10;
+                ans = (a * b) + c;
+                qStr = `${a} × ${b} + ${c}`;
             } else if (consecutiveCorrectAnswersCount >= 6 && consecutiveCorrectAnswersCount < 10) {
-                // LEVEL 3: Division (Perfect multiples)
-                num2 = Math.floor(Math.random() * 12) + 3;
-                computedCorrectAnswer = Math.floor(Math.random() * 15) + 5; // Result
-                num1 = computedCorrectAnswer * num2; // Dividend
-                questionString = `${num1} ÷ ${num2}`;
-
+                // LEVEL 3: Squares & Subtraction -> A² - B
+                let a = Math.floor(Math.random() * 10) + 5; 
+                let b = Math.floor(Math.random() * 30) + 10;
+                ans = (a * a) - b;
+                qStr = `${a}² - ${b}`;
+            } else if (consecutiveCorrectAnswersCount >= 10 && consecutiveCorrectAnswersCount < 15) {
+                // LEVEL 4: Percentages -> X% of Y + Z
+                let percentagesList = [10, 20, 25, 50];
+                let per = percentagesList[Math.floor(Math.random() * percentagesList.length)];
+                let base = Math.floor(Math.random() * 20 + 5) * 10; 
+                let y = Math.floor(Math.random() * 50) + 10;
+                ans = (per / 100 * base) + y;
+                qStr = `${per}% of ${base} + ${y}`;
             } else {
-                // LEVEL 4 (EXTREME): BODMAS (A + B * C)
-                num1 = Math.floor(Math.random() * 20) + 10;
-                num2 = Math.floor(Math.random() * 10) + 2;
-                num3 = Math.floor(Math.random() * 5) + 2;
-                computedCorrectAnswer = num1 + (num2 * num3);
-                questionString = `${num1} + ${num2} × ${num3}`;
+                // LEVEL 5 (MAX): Complex BODMAS -> (A × B) - (C ÷ D)
+                let a = Math.floor(Math.random() * 12) + 6;
+                let b = Math.floor(Math.random() * 10) + 4;
+                let d = Math.floor(Math.random() * 5) + 2;
+                let c = d * (Math.floor(Math.random() * 10) + 2); 
+                ans = (a * b) - (c / d);
+                qStr = `(${a} × ${b}) - (${c} ÷ ${d})`;
             }
 
-            document.getElementById("mathQuestionString").innerText = questionString;
+            computedCorrectAnswer = ans;
+            document.getElementById("mathQuestionString").innerText = qStr;
         }
 
         function showCustomAlert(msgKey, isSuccess = false) {
@@ -283,29 +362,20 @@
         }
 
         let platformTimer = null;
-        let countdownTime = 25;
-        let targetWindow = null;
-        let totalSecondsOpen = 0;
         let isValidationActive = false;
 
-        // 🔥 ADDED TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { window.hasMainTabHidden = true; }
-        });
-
-        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC (25 SECONDS)
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC (WITH IN-APP VIEWER)
         function verifyQuizAnswerSubmit() {
             if (isValidationActive) return;
 
-            const userAnswer = parseInt(document.getElementById("quizAnswerInput").value.trim());
+            const userInput = parseFloat(document.getElementById("quizAnswerInput").value.trim());
             const btn = document.getElementById("quizSubmitBtn");
             let currentLang = localStorage.getItem("selectedLang") || "en";
 
-            if (isNaN(userAnswer)) return;
+            if (isNaN(userInput)) return;
 
-            // Incorrect Answer Handling -> Resets Hard Mode Progress
-            if (userAnswer !== computedCorrectAnswer) {
+            // Incorrect Answer Handling -> Resets Hard Mode
+            if (userInput !== computedCorrectAnswer) {
                 consecutiveCorrectAnswersCount = 0;
                 executeUpdateStreakVisualInterface();
                 showCustomAlert("err_wrong");
@@ -313,101 +383,111 @@
                 return;
             }
 
-            // Trigger Secure 25-second View Phase
+            // Trigger Secure View Phase (In-App)
             isValidationActive = true;
-            countdownTime = 25;
-            totalSecondsOpen = 0;
-            window.hasMainTabHidden = false; // Reset tracker
+            let countdownTime = globalAdTimerSeconds;
             btn.disabled = true;
 
             let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
-            btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
+            btn.innerText = baseWaitTxt;
 
-            targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
 
             if (platformTimer) clearInterval(platformTimer);
 
             platformTimer = setInterval(() => {
                 countdownTime--;
-                btn.innerText = baseWaitTxt + `(${countdownTime}s)`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
 
-                // Validation 1: Tab closed early
-                if (targetWindow && targetWindow.closed) {
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if (document.hidden) { 
                     clearInterval(platformTimer);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
                     resetQuizSubmitButton();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     return;
                 }
 
-                // Validation 2: Invalid app switching
-                if (!document.hidden && window.hasMainTabHidden) {
-                    if (totalSecondsOpen < 24) {
-                        clearInterval(platformTimer);
-                        resetQuizSubmitButton();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
-
                 if (countdownTime <= 0) {
                     clearInterval(platformTimer);
-                    btn.innerText = "SAVING...";
-
-                    consecutiveCorrectAnswersCount++;
-                    
-                    // Dynamic Reward Calculation based on difficulty
-                    let currentPayoutCoins = 10;
-                    if (consecutiveCorrectAnswersCount >= 3 && consecutiveCorrectAnswersCount < 6) currentPayoutCoins = 15;
-                    else if (consecutiveCorrectAnswersCount >= 6 && consecutiveCorrectAnswersCount < 10) currentPayoutCoins = 20;
-                    else if (consecutiveCorrectAnswersCount >= 10) currentPayoutCoins = 30; // Extreme level reward
-                    
-                    evaluateQuizRewardViaNodeServer(currentPayoutCoins);
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
         // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
-        async function evaluateQuizRewardViaNodeServer(rewardAmount) {
-            try {
-                // Call API to add points and Sync Daily Task 't8'
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: rewardAmount, 
-                        action: "math_quiz_solve",
-                        syncTask: "t8" // Tells backend to complete task 't8'
-                    })
-                });
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+
+            consecutiveCorrectAnswersCount++;
+            
+            // Dynamic Reward Calculation based on difficulty
+            if (consecutiveCorrectAnswersCount < 3) currentPayoutCoins = 10;
+            else if (consecutiveCorrectAnswersCount >= 3 && consecutiveCorrectAnswersCount < 6) currentPayoutCoins = 15;
+            else if (consecutiveCorrectAnswersCount >= 6 && consecutiveCorrectAnswersCount < 10) currentPayoutCoins = 20;
+            else if (consecutiveCorrectAnswersCount >= 10 && consecutiveCorrectAnswersCount < 15) currentPayoutCoins = 30;
+            else if (consecutiveCorrectAnswersCount >= 15) currentPayoutCoins = 50; 
+            
+            evaluateQuizRewardViaFirebase(currentPayoutCoins);
+        }
+
+        function evaluateQuizRewardViaFirebase(rewardAmount) {
+            
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + rewardAmount;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
-                    
-                    resetQuizSubmitButton();
-                    executeUpdateStreakVisualInterface();
-                    generateHardMathQuestion();
-                    showCustomAlert("err_success", true);
-                }
-            } catch (err) {
+                // 2. Mark Daily Task 't10' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t10")) {
+                        tasks.push("t10");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                resetQuizSubmitButton();
+                executeUpdateStreakVisualInterface();
+                generateHardMathQuestion();
+                showCustomAlert("err_success", true);
+                
+            }).catch(() => {
                 resetQuizSubmitButton();
                 alert("Task Verified but couldn't sync with server. Try again.");
-            }
+            });
         }
 
         function executeUpdateStreakVisualInterface() {
             let level = 1;
-            let multiplier = "1X REWARD";
+            let multiplier = "10 COINS";
             let badgeColor = "var(--accent-gold)";
             let textColor = "#000";
+            let borderColor = "var(--accent-gold)";
+            let ribbonBg = "rgba(251, 191, 36, 0.1)";
 
-            if (consecutiveCorrectAnswersCount >= 3 && consecutiveCorrectAnswersCount < 6) { level = 2; multiplier = "1.5X REWARD"; }
-            else if (consecutiveCorrectAnswersCount >= 6 && consecutiveCorrectAnswersCount < 10) { level = 3; multiplier = "2X REWARD"; badgeColor = "var(--accent-green)"; textColor = "#fff"; }
-            else if (consecutiveCorrectAnswersCount >= 10) { level = "MAX"; multiplier = "3X REWARD (EXTREME)"; badgeColor = "var(--accent-pink)"; textColor = "#fff"; }
+            if (consecutiveCorrectAnswersCount >= 3 && consecutiveCorrectAnswersCount < 6) { 
+                level = 2; multiplier = "15 COINS"; badgeColor = "#f97316"; borderColor = "#f97316"; ribbonBg = "rgba(249, 115, 22, 0.1)";
+            }
+            else if (consecutiveCorrectAnswersCount >= 6 && consecutiveCorrectAnswersCount < 10) { 
+                level = 3; multiplier = "20 COINS"; badgeColor = "var(--accent-green)"; textColor = "#fff"; borderColor = "var(--accent-green)"; ribbonBg = "rgba(16, 185, 129, 0.1)";
+            }
+            else if (consecutiveCorrectAnswersCount >= 10 && consecutiveCorrectAnswersCount < 15) { 
+                level = 4; multiplier = "30 COINS"; badgeColor = "var(--primary-blue)"; textColor = "#fff"; borderColor = "var(--primary-blue)"; ribbonBg = "rgba(59, 130, 246, 0.1)";
+            }
+            else if (consecutiveCorrectAnswersCount >= 15) { 
+                level = "MAX"; multiplier = "50 COINS (EXTREME)"; badgeColor = "var(--accent-pink)"; textColor = "#fff"; borderColor = "var(--accent-pink)"; ribbonBg = "rgba(244, 63, 94, 0.1)";
+            }
 
             document.getElementById("quizStreakCountDisplay").innerHTML = `<i class="fa-solid fa-fire"></i> LEVEL: ${level}`;
             
@@ -415,6 +495,11 @@
             badge.innerText = multiplier;
             badge.style.background = badgeColor;
             badge.style.color = textColor;
+            
+            const ribbon = document.getElementById("streakRibbonBox");
+            ribbon.style.borderColor = borderColor;
+            ribbon.style.background = ribbonBg;
+            ribbon.style.color = badgeColor;
         }
 
         function resetQuizSubmitButton() {

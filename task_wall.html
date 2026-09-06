@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -30,22 +35,27 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
 
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--primary-blue); font-weight: bold; cursor: pointer; }
+
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         .main-container { width: 92%; max-width: 440px; margin: 15px auto; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; }
 
-        /* Profile Balance Ribbon */
+        /* PLAY STORE SAFE: Only show Coins */
         .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--primary-blue); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); backdrop-filter: blur(10px); }
         .balance-card span { font-size: 18px; font-weight: 900; }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 20px; font-weight: 900; }
 
         /* 📢 MULTI-SLOT INCOME ADS SYSTEM */
         .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(59, 130, 246, 0.4); box-sizing: border-box; margin: 5px 0; }
 
-        /* 🔥 Premium Task Cards */
+        /* 🔥 Premium Dynamic Task Cards */
         .task-card-node { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 22px 18px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; transition: 0.2s; box-shadow: 0 8px 25px rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: relative; overflow: hidden; }
         .task-card-node::before { content: ''; position: absolute; left: 0; top: 0; width: 5px; height: 100%; background: var(--primary-blue); }
-        .task-card-node.completed { opacity: 0.7; filter: grayscale(0.5); }
+        .task-card-node.completed { opacity: 0.6; filter: grayscale(0.8); }
         .task-card-node.completed::before { background: var(--accent-green); }
         
         .task-meta { text-align: left; display: flex; flex-direction: column; gap: 6px; max-width: 65%; }
@@ -58,14 +68,6 @@
         .action-task-btn:active:not(:disabled) { transform: scale(0.95); }
         .action-task-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
-        /* 🔒 SYSTEM VALIDATION REALTIME PROGRESS POPUP SCREEN */
-        .validation-lock-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
-        .progress-circle-txt { font-size: 55px; font-weight: 900; color: var(--accent-gold); margin: 25px 0; text-shadow: 0 0 20px rgba(250, 204, 21, 0.5); }
-        .overlay-title { font-size: 20px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; }
-        .overlay-desc { color: var(--text-sub); font-size: 13.5px; max-width: 320px; margin-top: 10px; line-height: 1.5; font-weight: 600; }
-        .warning-txt { color: var(--accent-pink); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; animation: pulse 1.5s infinite alternate; }
-        @keyframes pulse { 0% { opacity: 0.6; } 100% { opacity: 1; text-shadow: 0 0 10px rgba(244, 63, 94, 0.5); } }
-
         /* Custom Alert Popups */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 3000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
@@ -74,6 +76,13 @@
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 2999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -84,105 +93,90 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
-    <!-- 🔒 SYSTEM VALIDATION OVERLAY -->
-    <div class="validation-lock-overlay" id="globalVerificationEngineGate">
-        <div style="font-size: 65px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🛡️</div>
-        <div class="overlay-title" data-i18n="sw_verifying">Task Verification Active</div>
-        <p class="overlay-desc" data-i18n="sw_stay_msg">Please remain on the sponsor page. Tracking protocols are active to ensure you receive your reward.</p>
-        <div class="progress-circle-txt" id="liveVerificationTimerDisplay">20s</div>
-        <p class="warning-txt" data-i18n="sw_warning">Do not switch apps or close the window</p>
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Task Verification</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 20s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="sw_title">Smart Task Wall</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
-    <div class="main-container">
+    <!-- DYNAMIC MASTER CONTAINER -->
+    <div class="main-container" id="dynamicTasksContainer">
         
+        <!-- PLAY STORE SAFE: Only show Coins -->
         <div class="balance-card">
             <span data-i18n="sw_wallet">Wallet Balance</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
 
-        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
-
-        <div class="task-card-node" id="task_wrapper_0">
-            <div class="task-meta">
-                <span class="task-title"><i class="fa-solid fa-play" style="color: var(--accent-pink);"></i> <span data-i18n="sw_t1_title">Premium Video Ad 01</span></span>
-                <span class="task-desc" data-i18n="sw_t1_desc">Watch the sponsor video completely and remain active for 20 seconds.</span>
-                <div><span class="task-reward-badge">+30 COINS</span></div>
-            </div>
-            <button class="action-task-btn" id="task_trigger_btn_0" onclick="executeTriggerSmartTask(0, 30, 'task1_link')"><span data-i18n="sw_btn_start">START</span> ⚡</button>
-        </div>
-
-        <div class="task-card-node" id="task_wrapper_1">
-            <div class="task-meta">
-                <span class="task-title"><i class="fa-solid fa-globe" style="color: var(--accent-cyan);"></i> <span data-i18n="sw_t2_title">Sponsored Web Offer 02</span></span>
-                <span class="task-desc" data-i18n="sw_t2_desc">Explore the partner web portal page completely to receive credits.</span>
-                <div><span class="task-reward-badge">+25 COINS</span></div>
-            </div>
-            <button class="action-task-btn" id="task_trigger_btn_1" onclick="executeTriggerSmartTask(1, 25, 'task2_link')"><span data-i18n="sw_btn_start">START</span> ⚡</button>
-        </div>
-
-        <div class="ad-banner-slot" id="adminBannerSlot2"></div>
-
-        <div class="task-card-node" id="task_wrapper_2">
-            <div class="task-meta">
-                <span class="task-title"><i class="fa-solid fa-bell" style="color: var(--accent-gold);"></i> <span data-i18n="sw_t3_title">Notification Task 03</span></span>
-                <span class="task-desc" data-i18n="sw_t3_desc">Open the community distribution network hub and stay active.</span>
-                <div><span class="task-reward-badge">+40 COINS</span></div>
-            </div>
-            <button class="action-task-btn" id="task_trigger_btn_2" onclick="executeTriggerSmartTask(2, 40, 'task3_link')"><span data-i18n="sw_btn_start">START</span> ⚡</button>
-        </div>
-
-        <div class="ad-banner-slot" id="adminBannerSlot3"></div>
+        <!-- System will auto-generate Banners and Tasks Here -->
+        <p style="text-align: center; color: var(--text-sub);"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading Smart Tasks...</p>
 
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+      const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 20; // Default time
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH PLAY STORE SAFE RULES
         const langData = {
             "en": { 
                 "sw_title": "Smart Task Wall", "sw_wallet": "Wallet Balance", 
-                "sw_t1_title": "Premium Video Ad 01", "sw_t1_desc": "Watch the sponsor video completely and remain active for 20 seconds.", 
-                "sw_t2_title": "Sponsored Web Offer 02", "sw_t2_desc": "Explore the partner web portal page completely to receive credits.", 
-                "sw_t3_title": "Notification Task 03", "sw_t3_desc": "Open the community distribution network hub and stay active.", 
                 "sw_btn_start": "START", "sw_btn_done": "DONE",
-                "sw_verifying": "Task Verification Active", "sw_stay_msg": "Please remain on the sponsor page. Tracking protocols are active to ensure you receive your reward.", "sw_warning": "Do not switch apps or close the window",
-                "err_early": "❌ Verification Incomplete! You closed the sponsor page before the required time.", "err_invalid": "❌ Tracking Interrupted! Please avoid switching tabs to ensure successful verification.", "err_success": "🎉 Task Verified! Coins successfully deposited to your profile."
+                "err_early": "❌ Verification Incomplete! You closed the sponsor page before the required time.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please avoid switching tabs.", "err_success": "🎉 Task Verified! Coins successfully deposited to your profile."
             },
             "hi": { 
                 "sw_title": "स्मार्ट टास्क वॉल", "sw_wallet": "वॉलेट बैलेंस", 
-                "sw_t1_title": "प्रीमियम वीडियो विज्ञापन 01", "sw_t1_desc": "प्रायोजक वीडियो को पूरा देखें और 20 सेकंड तक सक्रिय रहें।", 
-                "sw_t2_title": "प्रायोजित वेब ऑफर 02", "sw_t2_desc": "क्रेडिट प्राप्त करने के लिए पार्टनर वेब पोर्टल का पूरी तरह से अन्वेषण करें।", 
-                "sw_t3_title": "नोटिफिकेशन टास्क 03", "sw_t3_desc": "कम्युनिटी डिस्ट्रीब्यूशन नेटवर्क हब खोलें और सक्रिय रहें।", 
                 "sw_btn_start": "शुरू करें", "sw_btn_done": "पूरा हुआ",
-                "sw_verifying": "सत्यापन प्रगति पर है", "sw_stay_msg": "कृपया प्रायोजक पृष्ठ पर बने रहें। यह सुनिश्चित करने के लिए कि आपको अपना इनाम मिले, ट्रैकिंग प्रोटोकॉल सक्रिय हैं।", "sw_warning": "ऐप्स न बदलें या विंडो बंद न करें",
-                "err_early": "❌ सत्यापन अधूरा! आपने आवश्यक समय से पहले स्पॉन्सर पेज बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! सफल सत्यापन के लिए कृपया टैब बदलने से बचें।", "err_success": "🎉 टास्क सत्यापित! कॉइन्स आपके खाते में सफलतापूर्वक जमा हो गए हैं।"
+                "err_early": "❌ सत्यापन अधूरा! आपने आवश्यक समय से पहले स्पॉन्सर पेज बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! ऐप बंद करना मना है। सफल सत्यापन के लिए कृपया टैब न बदलें।", "err_success": "🎉 टास्क सत्यापित! कॉइन्स आपके खाते में सफलतापूर्वक जमा हो गए हैं।"
             },
-            "bn": { "sw_title": "স্মার্ট টাস্ক ওয়াল", "sw_wallet": "ওয়ালেট ব্যালেন্স", "sw_btn_start": "শুরু", "sw_btn_done": "সম্পন্ন", "sw_verifying": "যাচাই চলছে", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! ট্যাব পরিবর্তন করবেন না।", "err_success": "🎉 টাস্ক ভেরিফাইড! কয়েন জমা হয়েছে।" },
-            "te": { "sw_title": "స్మార్ట్ టాస్క్ వాల్", "sw_btn_start": "ప్రారంభించండి", "sw_btn_done": "పూర్తయింది", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి." },
-            "mr": { "sw_title": "स्मार्ट टास्क वॉल", "sw_btn_start": "सुरू करा", "sw_btn_done": "पूर्ण", "err_success": "🎉 सत्यापित! कॉइन्स जमा झाले." },
-            "ta": { "sw_title": "ஸ்மார்ட் டாஸ்க்", "sw_btn_start": "தொடங்கு", "sw_btn_done": "முடிந்தது", "err_success": "🎉 வெற்றி! நாணயங்கள் சேர்க்கப்பட்டன." },
-            "ur": { "sw_title": "اسمارٹ ٹاسک وال", "sw_btn_start": "شروع کریں", "sw_btn_done": "مکمل", "err_success": "🎉 تصدیق ہو گئی! کوئنز شامل ہو گئے۔" },
-            "gu": { "sw_title": "સ્માર્ટ ટાસ્ક", "sw_btn_start": "શરૂ કરો", "sw_btn_done": "પૂર્ણ", "err_success": "🎉 સફળતા! સિક્કા ઉમેરાયા." },
-            "es": { "sw_title": "Muro de Tareas", "sw_btn_start": "INICIAR", "sw_btn_done": "HECHO", "err_success": "🎉 ¡Verificado! Monedas añadidas." },
-            "fr": { "sw_title": "Mur de Tâches", "sw_btn_start": "DÉMARRER", "sw_btn_done": "TERMINÉ", "err_success": "🎉 Vérifié ! Pièces ajoutées." },
-            "ar": { "sw_title": "حائط المهام", "sw_btn_start": "ابدأ", "sw_btn_done": "تم", "err_success": "🎉 تم التحقق! أضيفت العملات." },
-            "pt": { "sw_title": "Mural de Tarefas", "sw_btn_start": "INICIAR", "sw_btn_done": "FEITO", "err_success": "🎉 Verificado! Moedas adicionadas." },
-            "ru": { "sw_title": "Стена Заданий", "sw_btn_start": "НАЧАТЬ", "sw_btn_done": "ГОТОВО", "err_success": "🎉 Проверено! Монеты добавлены." }
+            "bn": { "sw_title": "স্মার্ট টাস্ক ওয়াল", "sw_wallet": "ওয়ালেট ব্যালেন্স", "sw_btn_start": "শুরু", "sw_btn_done": "সম্পন্ন", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ মিনিমাইজ করবেন না।", "err_success": "🎉 টাস্ক ভেরিফাইড! কয়েন জমা হয়েছে।" },
+            "te": { "sw_title": "స్మార్ట్ టాస్క్ వాల్", "sw_wallet": "బ్యాలెన్స్", "sw_btn_start": "ప్రారంభించండి", "sw_btn_done": "పూర్తయింది", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి." },
+            "mr": { "sw_title": "स्मार्ट टास्क वॉल", "sw_wallet": "बॅलन्स", "sw_btn_start": "सुरू करा", "sw_btn_done": "पूर्ण", "err_success": "🎉 सत्यापित! कॉइन्स जमा झाले." },
+            "ta": { "sw_title": "ஸ்மார்ட் டாஸ்க்", "sw_wallet": "இருப்பு", "sw_btn_start": "தொடங்கு", "sw_btn_done": "முடிந்தது", "err_success": "🎉 வெற்றி! நாணயங்கள் சேர்க்கப்பட்டன." },
+            "ur": { "sw_title": "اسمارٹ ٹاسک وال", "sw_wallet": "بیلنس", "sw_btn_start": "شروع کریں", "sw_btn_done": "مکمل", "err_success": "🎉 تصدیق ہو گئی! کوئنز شامل ہو گئے۔" },
+            "gu": { "sw_title": "સ્માર્ટ ટાસ્ક", "sw_wallet": "બેલેન્સ", "sw_btn_start": "શરૂ કરો", "sw_btn_done": "પૂર્ણ", "err_success": "🎉 સફળતા! સિક્કા ઉમેરાયા." },
+            "es": { "sw_title": "Muro de Tareas", "sw_wallet": "Saldo", "sw_btn_start": "INICIAR", "sw_btn_done": "HECHO", "err_success": "🎉 ¡Verificado! Monedas añadidas." },
+            "fr": { "sw_title": "Mur de Tâches", "sw_wallet": "Solde", "sw_btn_start": "DÉMARRER", "sw_btn_done": "TERMINÉ", "err_success": "🎉 Vérifié ! Pièces ajoutées." },
+            "ar": { "sw_title": "حائط المهام", "sw_wallet": "الرصيد", "sw_btn_start": "ابدأ", "sw_btn_done": "تم", "err_success": "🎉 تم التحقق! أضيفت العملات." },
+            "pt": { "sw_title": "Mural de Tarefas", "sw_wallet": "Saldo", "sw_btn_start": "INICIAR", "sw_btn_done": "FEITO", "err_success": "🎉 Verificado! Moedas adicionadas." },
+            "ru": { "sw_title": "Стена Заданий", "sw_wallet": "Баланс", "sw_btn_start": "НАЧАТЬ", "sw_btn_done": "ГОТОВО", "err_success": "🎉 Проверено! Монеты добавлены." }
         };
 
         function changeLanguage(langCode) {
@@ -200,71 +194,216 @@
                 }
             });
             document.getElementById("appLanguage").value = langCode;
-        }
-
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-
-        // 🔥 DYNAMIC LINKS MAPPING (Fetched from Admin)
-        let smartTaskAdminLinks = {
-            task1_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            task2_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            task3_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
-        };
-
-        let liveTickerCountdownValueInt = 20;
-        let totalActiveFocusSecondsInt = 0;
-        let runningTaskEngineInterval = null;
-        let targetTaskExternalWindowHandle = null;
-
-        let activeProcessingTaskIdInt = null;
-        let activeProcessingTaskCoinsRewardValueInt = 0;
-        let isValidationActive = false;
-
-        document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
-            let savedLang = localStorage.getItem("selectedLang") || "en";
-            changeLanguage(savedLang);
-
-            executeCheckLocalTaskCompletionFlags();
-            fetchDataFromAdminServer();
-        });
-
-        // 📡 FETCH USER DATA AND ADMIN BANNERS/LINKS
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                }
-
-                // 2. Fetch Admin Banners and Smartlinks
-                const confRes = await fetch(`${API_BASE_URL}/app-config/smart-tasks`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.settings.banners) {
-                        if(confData.settings.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.settings.banners[0];
-                        if(confData.settings.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.settings.banners[1];
-                        if(confData.settings.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.settings.banners[2];
-                    }
-                    if (confData.settings.taskLinks) {
-                        if(confData.settings.taskLinks.task1) smartTaskAdminLinks.task1_link = confData.settings.taskLinks.task1;
-                        if(confData.settings.taskLinks.task2) smartTaskAdminLinks.task2_link = confData.settings.taskLinks.task2;
-                        if(confData.settings.taskLinks.task3) smartTaskAdminLinks.task3_link = confData.settings.taskLinks.task3;
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
+            
+            // Re-render tasks to apply new language to buttons
+            if (globalAdminDataConfig) {
+                executeDynamicEngineRenderer(globalAdminDataConfig);
             }
         }
 
-        // 🔥 ADDED SYSTEM TAB TRACKER 
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
+        const uid = localStorage.getItem("userId");
+
+        // Engine State Variables
+        let liveTickerCountdownValueInt = 20;
+        let totalActiveFocusSecondsInt = 0;
+        let runningTaskEngineInterval = null;
+        let activeProcessingTaskIdInt = null;
+        let activeProcessingTaskCoinsRewardValueInt = 0;
+        let isValidationActive = false;
+        
+        let globalAdminDataConfig = null; // Store config for re-rendering on lang change
+        let defaultSmartlinkGlobal = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+
+        // Pre-defined UI Presets for Auto-Generating Task Cards Beautifully
+        const taskUIPresets = [
+            { icon: "fa-play", color: "var(--accent-pink)" },
+            { icon: "fa-globe", color: "var(--accent-cyan)" },
+            { icon: "fa-bell", color: "var(--accent-gold)" },
+            { icon: "fa-rocket", color: "var(--accent-green)" },
+            { icon: "fa-bolt", color: "var(--accent-purple)" },
+            { icon: "fa-gamepad", color: "#f97316" },
+            { icon: "fa-gift", color: "#ec4899" }
+        ];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!uid) { window.location.replace("index.html"); return; }
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations & Build Wall Dynamically
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            if (adminData.globalSmartlink) {
+                                defaultSmartlinkGlobal = adminData.globalSmartlink;
+                            }
+                            
+                            globalAdminDataConfig = adminData.smart_tasks_configs || null;
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME
+                            if (globalAdminDataConfig && globalAdminDataConfig.ad_timer) {
+                                globalAdTimerSeconds = parseInt(globalAdminDataConfig.ad_timer);
+                            }
+
+                            executeDynamicEngineRenderer(globalAdminDataConfig);
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+        });
+
+        // 🔥 DYNAMIC WALL BUILDER ENGINE
+        function executeDynamicEngineRenderer(adminConfig) {
+            const container = document.getElementById("dynamicTasksContainer");
+            
+            // Save the balance card before clearing
+            const balanceHTML = `
+                <div class="balance-card">
+                    <span data-i18n="sw_wallet">${langData[localStorage.getItem("selectedLang") || "en"]["sw_wallet"] || "Wallet Balance"}</span>
+                    <span class="coin-txt"><span id="liveUserCoins">${document.getElementById("liveUserCoins").innerText}</span> 🪙</span>
+                </div>
+            `;
+            
+            container.innerHTML = balanceHTML;
+
+            let today = new Date().toISOString().slice(0, 10);
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let doneTxt = langData[currentLang]["sw_btn_done"] || "DONE";
+            let startTxt = langData[currentLang]["sw_btn_start"] || "START";
+
+            let validTasksFound = false;
+
+            // Loop 1 to 20 to find all configured tasks and banners
+            for (let i = 1; i <= 20; i++) {
+                
+                // 1. Inject Banner if exists for this slot (slot1 before task1, slot2 before task2 etc)
+                if (adminConfig && adminConfig[`slot${i}_code`]) {
+                    let bannerDiv = document.createElement("div");
+                    bannerDiv.className = "ad-banner-slot";
+                    bannerDiv.style.display = "flex";
+                    setAdHTML(bannerDiv, adminConfig[`slot${i}_code`]);
+                    container.appendChild(bannerDiv);
+                }
+
+                // 2. Inject Task if exists
+                if (adminConfig && adminConfig[`t${i}_title`] && adminConfig[`t${i}_link`]) {
+                    validTasksFound = true;
+                    
+                    let title = adminDataConfigEscape(adminConfig[`t${i}_title`]);
+                    let desc = adminDataConfigEscape(adminConfig[`t${i}_desc`] || "Complete this task to earn rewards.");
+                    let reward = parseInt(adminConfig[`t${i}_reward`]) || 10;
+                    let link = adminDataConfigEscape(adminConfig[`t${i}_link`]);
+                    
+                    let design = taskUIPresets[(i-1) % taskUIPresets.length];
+                    let isCompleted = localStorage.getItem(`smart_task_date_${i}_${uid}`) === today;
+                    
+                    let cardClass = isCompleted ? "task-card-node completed" : "task-card-node";
+                    
+                    let btnHtml = isCompleted 
+                        ? `<button class="action-task-btn" disabled style="background:#334155;">${doneTxt} ✅</button>`
+                        : `<button class="action-task-btn" id="task_trigger_btn_${i}" onclick="executeTriggerSmartTask(${i}, ${reward}, '${link}')"><span>${startTxt}</span> ⚡</button>`;
+
+                    let taskHtml = `
+                        <div class="task-meta">
+                            <span class="task-title"><i class="fa-solid ${design.icon}" style="color: ${design.color};"></i> <span>${title}</span></span>
+                            <span class="task-desc">${desc}</span>
+                            <div><span class="task-reward-badge">+${reward} COINS</span></div>
+                        </div>
+                        ${btnHtml}
+                    `;
+                    
+                    let taskNode = document.createElement("div");
+                    taskNode.className = cardClass;
+                    taskNode.id = `task_wrapper_${i}`;
+                    taskNode.innerHTML = taskHtml;
+                    
+                    container.appendChild(taskNode);
+                }
+            }
+
+            // Fallback Defaults if Admin panel is empty
+            if (!validTasksFound && !adminConfig) {
+                // Hardcoded Defaults
+                let defaultTasks = [
+                    { id: 1, title: "Premium Video Ad 01", desc: "Watch the sponsor video completely and remain active.", reward: 30 },
+                    { id: 2, title: "Sponsored Web Offer 02", desc: "Explore the partner web portal page completely to receive credits.", reward: 25 },
+                    { id: 3, title: "Notification Task 03", desc: "Open the community distribution network hub and stay active.", reward: 40 }
+                ];
+
+                defaultTasks.forEach((t, i) => {
+                    let design = taskUIPresets[i % taskUIPresets.length];
+                    let isCompleted = localStorage.getItem(`smart_task_date_${t.id}_${uid}`) === today;
+                    let cardClass = isCompleted ? "task-card-node completed" : "task-card-node";
+                    
+                    let btnHtml = isCompleted 
+                        ? `<button class="action-task-btn" disabled style="background:#334155;">${doneTxt} ✅</button>`
+                        : `<button class="action-task-btn" id="task_trigger_btn_${t.id}" onclick="executeTriggerSmartTask(${t.id}, ${t.reward}, '${defaultSmartlinkGlobal}')"><span>${startTxt}</span> ⚡</button>`;
+
+                    let taskNode = document.createElement("div");
+                    taskNode.className = cardClass;
+                    taskNode.id = `task_wrapper_${t.id}`;
+                    taskNode.innerHTML = `
+                        <div class="task-meta">
+                            <span class="task-title"><i class="fa-solid ${design.icon}" style="color: ${design.color};"></i> <span>${t.title}</span></span>
+                            <span class="task-desc">${t.desc}</span>
+                            <div><span class="task-reward-badge">+${t.reward} COINS</span></div>
+                        </div>
+                        ${btnHtml}
+                    `;
+                    container.appendChild(taskNode);
+                });
+            }
+        }
+
+        // Helper to prevent script injection via admin inputs
+        function adminDataConfigEscape(str) {
+            if(!str) return "";
+            return str.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+
+        // 🔥 ADDED TAB TRACKER 
         window.hasMainTabHidden = false;
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) { window.hasMainTabHidden = true; }
@@ -275,14 +414,12 @@
             let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
 
             const alertBox = document.getElementById("customAlertBox");
-            const overlay = document.getElementById("alertOverlay");
+            if(isSuccess) alertBox.classList.add("success-border");
+            else alertBox.classList.remove("success-border");
+
             document.getElementById("alertMessage").innerText = msgStr + appendText;
-            
-            if(isSuccess) { alertBox.classList.add("success-border"); } 
-            else { alertBox.classList.remove("success-border"); }
-            
+            document.getElementById("alertOverlay").style.display = "block";
             alertBox.style.display = "block";
-            overlay.style.display = "block";
         }
 
         function closeCustomAlert() {
@@ -290,27 +427,8 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        function executeCheckLocalTaskCompletionFlags() {
-            let today = new Date().toISOString().slice(0, 10);
-            let currentLang = localStorage.getItem("selectedLang") || "en";
-            let doneTxt = langData[currentLang]["sw_btn_done"] || "DONE";
-
-            for(let i = 0; i < 3; i++) {
-                if(localStorage.getItem(`smart_task_date_${i}_${uid}`) === today) {
-                    const btn = document.getElementById(`task_trigger_btn_${i}`);
-                    const wrapper = document.getElementById(`task_wrapper_${i}`);
-                    if(btn && wrapper) {
-                        btn.disabled = true;
-                        btn.innerHTML = `${doneTxt} ✅`;
-                        btn.style.background = "#334155";
-                        wrapper.classList.add("completed");
-                    }
-                }
-            }
-        }
-
-        // 🔒 SMART TASK INTERLOCK MODULE (20 SECONDS VALIDATION)
-        function executeTriggerSmartTask(taskIdInt, rewardCoinsValueInt, adminLinkKey) {
+        // 🔒 SMART TASK INTERLOCK MODULE (WITH IN-APP VIEWER)
+        function executeTriggerSmartTask(taskIdInt, rewardCoinsValueInt, targetUrlStr) {
             let today = new Date().toISOString().slice(0, 10);
             if(localStorage.getItem(`smart_task_date_${taskIdInt}_${uid}`) === today) return;
             if(isValidationActive) return;
@@ -319,81 +437,84 @@
             activeProcessingTaskIdInt = taskIdInt;
             activeProcessingTaskCoinsRewardValueInt = rewardCoinsValueInt;
 
-            liveTickerCountdownValueInt = 20;
+            liveTickerCountdownValueInt = globalAdTimerSeconds;
             totalActiveFocusSecondsInt = 0;
             window.hasMainTabHidden = false; // Reset Tracker
 
-            document.getElementById("globalVerificationEngineGate").style.display = "flex";
-            document.getElementById("liveVerificationTimerDisplay").innerText = `${liveTickerCountdownValueInt}s`;
-
-            let targetUrl = smartTaskAdminLinks[adminLinkKey];
-            targetTaskExternalWindowHandle = window.open(targetUrl, '_blank', 'noopener,noreferrer');
+            // IN-APP VIEWER DISPLAY
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${liveTickerCountdownValueInt}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = targetUrlStr;
 
             runningTaskEngineInterval = setInterval(() => {
-                // Check 1: Premature closure validation filter
-                if(targetTaskExternalWindowHandle && targetTaskExternalWindowHandle.closed) {
+                liveTickerCountdownValueInt--;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${liveTickerCountdownValueInt}s`;
+
+                // Check: Background tab minimizing validation monitor
+                if(document.hidden) {
                     clearInterval(runningTaskEngineInterval);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
                     executeRollbackTaskWallHUD();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     return;
                 }
 
-                // Check 2: Background tab minimizing validation monitor
-                if(!document.hidden && window.hasMainTabHidden) {
-                    if(totalActiveFocusSecondsInt < 19) {
-                        clearInterval(runningTaskEngineInterval);
-                        executeRollbackTaskWallHUD();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalActiveFocusSecondsInt++;
-                liveTickerCountdownValueInt--;
-                document.getElementById("liveVerificationTimerDisplay").innerText = `${liveTickerCountdownValueInt}s`;
-
                 if(liveTickerCountdownValueInt <= 0) {
                     clearInterval(runningTaskEngineInterval);
-                    executeCreditVerifiedTaskCoins();
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
-        // 💰 DATA REWARD PIPELINE (NODE API & DAILY TASK SYNC 't13')
-        async function executeCreditVerifiedTaskCoins() {
-            try {
-                // Call API to add Points and Sync Daily Task 't13'
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: activeProcessingTaskCoinsRewardValueInt, 
-                        action: `smart_task_${activeProcessingTaskIdInt}`,
-                        syncTask: "t13" // Completes Daily Task 't13'
-                    })
-                });
+        // 💰 DATA REWARD PIPELINE (PURE FIREBASE API & DAILY TASK SYNC 't13')
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            executeCreditVerifiedTaskCoinsViaFirebase();
+        }
+
+        function executeCreditVerifiedTaskCoinsViaFirebase() {
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + activeProcessingTaskCoinsRewardValueInt;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    document.getElementById("liveUserBalance").innerText = "₹" + data.newBalance.toFixed(2);
-                    
-                    let today = new Date().toISOString().slice(0, 10);
-                    localStorage.setItem(`smart_task_date_${activeProcessingTaskIdInt}_${uid}`, today);
-                    
-                    showCustomAlert("err_success", ` (+${activeProcessingTaskCoinsRewardValueInt} 🪙)`, true);
-                    executeCheckLocalTaskCompletionFlags();
+                // 2. Mark Daily Task 't13' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t13")) {
+                        tasks.push("t13");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                // Lock the task locally for today
+                let today = new Date().toISOString().slice(0, 10);
+                localStorage.setItem(`smart_task_date_${activeProcessingTaskIdInt}_${uid}`, today);
+                
+                showCustomAlert("err_success", ` (+${activeProcessingTaskCoinsRewardValueInt} 🪙)`, true);
+                
+                // Refresh the UI to show it as completed
+                if (globalAdminDataConfig) {
+                    executeDynamicEngineRenderer(globalAdminDataConfig);
+                } else {
+                    window.location.reload(); // Fallback reload
                 }
-            } catch (err) {
+                
+            }).catch(() => {
                 alert("Task Verified but couldn't sync with server. Try again.");
-            } finally {
+            }).finally(() => {
                 executeRollbackTaskWallHUD();
-            }
+            });
         }
 
         function executeRollbackTaskWallHUD() {
-            document.getElementById("globalVerificationEngineGate").style.display = "none";
             isValidationActive = false;
         }
     </script>

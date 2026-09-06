@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -30,9 +35,19 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
 
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
+
         .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
+
+        /* PLAY STORE SAFE: Only show Coins */
+        .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-pink); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.2); backdrop-filter: blur(10px); margin-bottom: 5px; }
+        .balance-card span { font-size: 18px; font-weight: 900; }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
         /* Banner Ads Slots */
         .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(239, 68, 68, 0.4); box-sizing: border-box; }
@@ -45,7 +60,7 @@
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; /* Prevents user pausing directly, forced watch */ }
 
         /* Timer Analytics Ticker Widget */
-        .watch-timer-box { background: linear-gradient(135deg, var(--accent-pink), #b91c1c); padding: 12px 20px; border-radius: 50px; font-weight: 900; font-size: 14.5px; margin: 20px auto 15px auto; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); border: 1px solid #f87171; letter-spacing: 0.5px; transition: 0.3s; }
+        .watch-timer-box { background: linear-gradient(135deg, var(--accent-pink), #b91c1c); padding: 12px 20px; border-radius: 50px; font-weight: 900; font-size: 14.5px; margin: 20px auto 15px auto; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); border: 1px solid #f87171; letter-spacing: 0.5px; transition: 0.3s; color: #fff; }
         .timer-paused { background: linear-gradient(135deg, #f59e0b, #b45309) !important; border-color: #fcd34d !important; box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4) !important; }
 
         .video-meta-info { text-align: left; margin-top: 5px; padding: 0 5px; }
@@ -65,9 +80,9 @@
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
-        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
         .custom-alert button:active { transform: scale(0.95); }
-        .custom-alert.success-border button { background: var(--accent-green); }
+        .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
 
         #playerOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: pointer; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.6); }
@@ -86,17 +101,27 @@
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="vt_title">Micro-Video Tasks</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="main-container">
         
+        <!-- PLAY STORE SAFE: Only show Coins -->
+        <div class="balance-card">
+            <span data-i18n="vt_wallet_lbl">Wallet Balance</span>
+            <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
+        </div>
+
         <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
@@ -118,7 +143,7 @@
             </div>
 
             <button class="start-video-btn" id="startVideoBtn" onclick="startVideoPlayback()"><i class="fa-solid fa-play"></i> <span data-i18n="vt_btn_start">Start Playing</span></button>
-            <button class="claim-video-btn" id="claimVideoRewardBtn" onclick="executeClaimVideoRewardCoins()"><i class="fa-solid fa-gift"></i> <span data-i18n="vt_btn_claim">Claim Reward</span> 🪙</button>
+            <button class="claim-video-btn" id="claimVideoRewardBtn" onclick="executeClaimVideoRewardCoinsViaFirebase()"><i class="fa-solid fa-gift"></i> <span id="claimTextDisplay" data-i18n="vt_btn_claim">Claim Reward</span> 🪙</button>
         </div>
 
         <!-- 📢 ADMIN CONNECTED AD SLOT 2 -->
@@ -131,16 +156,28 @@
 
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE RULES
         const langData = {
-            "en": { "vt_title": "Micro-Video Tasks", "vt_timer": "Required Watch Time:", "vt_h4": "Watch & Earn Reward", "vt_desc": "Stay focused on this video player. The timer will automatically pause if you switch tabs, minimize the app, or attempt to skip the video.", "vt_btn_start": "Start Playing", "vt_btn_claim": "Claim Reward", "vt_security": "Verification protocols are strictly monitoring this stream. Skipping or using split-screen mode will invalidate the session.", "err_pause": "⚠️ Verification Paused! Return to the video.", "err_success": "🎉 Success! Points credited safely to your wallet.", "wait_txt": "Processing... " },
-            "hi": { "vt_title": "वीडियो टास्क", "vt_timer": "आवश्यक समय:", "vt_h4": "देखें और रिवॉर्ड पाएं", "vt_desc": "इस वीडियो प्लेयर पर ध्यान दें। यदि आप टैब बदलते हैं, ऐप को मिनीमाइज़ करते हैं या वीडियो को स्किप करने का प्रयास करते हैं, तो टाइमर अपने आप रुक जाएगा।", "vt_btn_start": "वीडियो शुरू करें", "vt_btn_claim": "रिवॉर्ड प्राप्त करें", "vt_security": "सत्यापन प्रोटोकॉल इस स्ट्रीम की निगरानी कर रहे हैं। स्किप करने या स्प्लिट-स्क्रीन का उपयोग करने से सत्र अमान्य हो जाएगा।", "err_pause": "⚠️ सत्यापन रुका! वीडियो पर वापस आएं।", "err_success": "🎉 सफलता! पॉइंट्स आपके वॉलेट में सुरक्षित रूप से जमा हो गए।", "wait_txt": "प्रोसेसिंग... " },
-            "bn": { "vt_title": "ভিডিও টাস্ক", "vt_timer": "প্রয়োজনীয় সময়:", "vt_btn_start": "শুরু করুন", "vt_btn_claim": "রিওয়ার্ড নিন", "err_pause": "⚠️ যাচাই বন্ধ! ভিডিওতে ফিরুন।", "err_success": "🎉 সফল! পয়েন্ট যোগ হয়েছে।" },
+            "en": { "vt_title": "Micro-Video Tasks", "vt_wallet_lbl": "Wallet Balance", "vt_timer": "Required Watch Time:", "vt_h4": "Watch & Earn Reward", "vt_desc": "Stay focused on this video player. The timer will automatically pause if you switch tabs, minimize the app, or attempt to skip the video.", "vt_btn_start": "Start Playing", "vt_btn_claim": "Claim Reward", "vt_security": "Verification protocols are strictly monitoring this stream. Skipping or using split-screen mode will invalidate the session.", "err_pause": "⚠️ Verification Paused! Return to the video.", "err_success": "🎉 Success! Points credited safely to your wallet.", "wait_txt": "Processing... " },
+            "hi": { "vt_title": "वीडियो टास्क", "vt_wallet_lbl": "वॉलेट बैलेंस", "vt_timer": "आवश्यक समय:", "vt_h4": "देखें और रिवॉर्ड पाएं", "vt_desc": "इस वीडियो प्लेयर पर ध्यान दें। यदि आप टैब बदलते हैं, ऐप को मिनीमाइज़ करते हैं या वीडियो को स्किप करने का प्रयास करते हैं, तो टाइमर अपने आप रुक जाएगा।", "vt_btn_start": "वीडियो शुरू करें", "vt_btn_claim": "रिवॉर्ड प्राप्त करें", "vt_security": "सत्यापन प्रोटोकॉल इस स्ट्रीम की निगरानी कर रहे हैं। स्किप करने या स्प्लिट-स्क्रीन का उपयोग करने से सत्र अमान्य हो जाएगा।", "err_pause": "⚠️ सत्यापन रुका! वीडियो पर वापस आएं।", "err_success": "🎉 सफलता! पॉइंट्स आपके वॉलेट में सुरक्षित रूप से जमा हो गए।", "wait_txt": "प्रोसेसिंग... " },
+            "bn": { "vt_title": "ভিডিও টাস্ক", "vt_wallet_lbl": "ওয়ালেট ব্যালেন্স", "vt_timer": "প্রয়োজনীয় সময়:", "vt_btn_start": "শুরু করুন", "vt_btn_claim": "রিওয়ার্ড নিন", "err_pause": "⚠️ যাচাই বন্ধ! ভিডিওতে ফিরুন।", "err_success": "🎉 সফল! পয়েন্ট যোগ হয়েছে।" },
             "te": { "vt_title": "వీడియో టాస్క్స్", "vt_timer": "సమయం:", "vt_btn_start": "ప్రారంభించండి", "vt_btn_claim": "రివార్డ్ పొందండి", "err_pause": "⚠️ ఆపివేయబడింది! వీడియోకు తిరిగి రండి.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి." },
             "mr": { "vt_title": "व्हिडिओ टास्क", "vt_btn_start": "सुरू करा", "vt_btn_claim": "रिवॉर्ड मिळवा", "err_pause": "⚠️ थांबले! व्हिडिओवर परत या.", "err_success": "🎉 यशस्वी! पॉइंट्स जोडले गेले." },
             "ta": { "vt_title": "வீடியோ பணிகள்", "vt_btn_start": "தொடங்கு", "vt_btn_claim": "வெகுமதி பெறு", "err_pause": "⚠️ சரிபார்ப்பு இடைநிறுத்தப்பட்டது!", "err_success": "🎉 வெற்றி! புள்ளிகள் சேர்க்கப்பட்டன." },
@@ -163,69 +200,114 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
 
-        let videoTimeLeftInt = 60; // 60 seconds strict task loop rule
+        const uid = localStorage.getItem("userId");
+        
+        let videoTimeLeftInt = 60; 
         let isWindowInFocusState = true;
         let videoTimerInterval = null;
-        let activeAdminVideoId = "dQw4w9WgXcQ"; // Default Fallback
+        
+        // Default Admin Settings Fallbacks
+        let activeAdminVideoId = "dQw4w9WgXcQ"; 
         let activeRewardCoinsInt = 40;
         let isTaskCompleted = false;
-
-        let player; // YouTube Player Object
+        let player; 
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
-            
-            // Load YouTube Iframe API
-            var tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync (Matches ho.html)
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners & Video Settings)
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // Inject Banners
+                            if (adminData.video_tasks_settings) {
+                                let vSettings = adminData.video_tasks_settings;
+                                
+                                if(vSettings.slot1_code) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), vSettings.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                                if(vSettings.slot2_code) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), vSettings.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+
+                                // Target Video Configs
+                                if (vSettings.videoId) activeAdminVideoId = vSettings.videoId;
+                                if (vSettings.videoDuration) videoTimeLeftInt = parseInt(vSettings.videoDuration);
+                                if (vSettings.videoReward) activeRewardCoinsInt = parseInt(vSettings.videoReward);
+                                
+                                document.getElementById("videoCountdownTxt").innerText = videoTimeLeftInt;
+
+                                // Load YouTube Iframe API only after fetching admin data
+                                var tag = document.createElement('script');
+                                tag.src = "https://www.youtube.com/iframe_api";
+                                var firstScriptTag = document.getElementsByTagName('script')[0];
+                                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                            } else {
+                                // Global Fallback
+                                if(adminData.banner_ads && adminData.banner_ads.slot1) { setAdHTML(document.getElementById("adminBannerSlot1"), adminData.banner_ads.slot1.code); }
+                                
+                                var tag = document.createElement('script');
+                                tag.src = "https://www.youtube.com/iframe_api";
+                                var firstScriptTag = document.getElementsByTagName('script')[0];
+                                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                            }
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
         // Called automatically when YouTube API loads
         function onYouTubeIframeAPIReady() {
-            // Player initialization waits for API data
+            player = new YT.Player('youtubePlayer', {
+                height: '100%',
+                width: '100%',
+                videoId: activeAdminVideoId,
+                playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'disablekb': 1, 'modestbranding': 1 },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
         }
 
-        // 📡 FETCH ADMIN VIDEO CONFIG (NODE API)
-        async function fetchDataFromAdminServer() {
-            try {
-                const confRes = await fetch(`${API_BASE_URL}/app-config/video-tasks`);
-                const confData = await confRes.json();
-                
-                if (confData.success && confData.settings) {
-                    if (confData.settings.banners) {
-                        if(confData.settings.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.settings.banners[0];
-                        if(confData.settings.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.settings.banners[1];
-                    }
-
-                    if (confData.settings.videoId) activeAdminVideoId = confData.settings.videoId;
-                    if (confData.settings.videoDuration) videoTimeLeftInt = parseInt(confData.settings.videoDuration);
-                    if (confData.settings.videoReward) activeRewardCoinsInt = parseInt(confData.settings.videoReward);
-                    
-                    document.getElementById("videoCountdownTxt").innerText = videoTimeLeftInt;
-
-                    // Initialize Player with Admin ID
-                    player = new YT.Player('youtubePlayer', {
-                        height: '100%',
-                        width: '100%',
-                        videoId: activeAdminVideoId,
-                        playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'disablekb': 1, 'modestbranding': 1 },
-                        events: {
-                            'onStateChange': onPlayerStateChange
-                        }
-                    });
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
         function showCustomAlert(msgKey, isSuccess = false) {
@@ -247,7 +329,6 @@
         }
 
         // 🛡️ ADVANCED VALIDATION ENGINE: Play Store Anti-Cheat Logic
-        // Triggers pause if user changes tab or minimizes app
         document.addEventListener("visibilitychange", () => {
             isWindowInFocusState = !document.hidden;
             const timerBox = document.getElementById("videoTimerBox");
@@ -255,7 +336,7 @@
             
             if (!isTaskCompleted) {
                 if (!isWindowInFocusState) {
-                    // Pause Video and Timer safely
+                    // Pause Video and Timer safely if user switches tabs
                     if(player && typeof player.pauseVideo === 'function') player.pauseVideo();
                     timerBox.classList.add("timer-paused");
                     timerBox.innerHTML = `<span><i class="fa-solid fa-triangle-exclamation"></i> ${langData[currentLang]["err_pause"]}</span>`;
@@ -279,9 +360,6 @@
                 startVideoWatchVerificationEngine();
             } else if (event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.ENDED) {
                 clearInterval(videoTimerInterval);
-                if(!isWindowInFocusState && !isTaskCompleted) {
-                    // Handled by visibilitychange
-                }
             }
         }
 
@@ -316,6 +394,8 @@
                         let claimBtn = document.getElementById("claimVideoRewardBtn");
                         let currentLang = localStorage.getItem("selectedLang") || "en";
                         let claimTxt = langData[currentLang]["vt_btn_claim"] || "Claim Reward";
+                        document.getElementById("claimTextDisplay").innerText = claimTxt;
+                        
                         claimBtn.innerHTML = `<i class="fa-solid fa-gift"></i> <span>${claimTxt}</span> (${activeRewardCoinsInt}🪙)`;
                         claimBtn.style.display = "block";
                     }
@@ -323,36 +403,36 @@
             }, 1000);
         }
 
-        // 💰 LEDGER SYNC ROUTER (NODE API & DAILY TASK SYNC t15)
-        async function executeClaimVideoRewardCoins() {
+        // 💰 LEDGER SYNC ROUTER (PURE FIREBASE API & DAILY TASK SYNC t15)
+        function executeClaimVideoRewardCoinsViaFirebase() {
             const btn = document.getElementById("claimVideoRewardBtn");
             btn.disabled = true;
             btn.innerText = "PROCESSING...";
 
-            try {
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: activeRewardCoinsInt, 
-                        action: "micro_video_task",
-                        syncTask: "t15" // Completes Daily Task 't15'
-                    })
-                });
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + activeRewardCoinsInt;
+            }).then(() => {
                 
-                const data = await res.json();
-                if (data.success) {
-                    showCustomAlert("err_success", true);
-                    setTimeout(() => {
-                        window.location.href = "ho.html"; // Redirect back securely
-                    }, 2000);
-                }
-            } catch (err) {
+                // 2. Mark Daily Task 't15' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t15")) {
+                        tasks.push("t15");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                showCustomAlert("err_success", true);
+                setTimeout(() => {
+                    window.location.href = "ho.html"; // Redirect back securely
+                }, 2000);
+                
+            }).catch(() => {
                 alert("Task Verified but couldn't sync with server. Try again.");
                 btn.disabled = false;
                 btn.innerText = "CLAIM REWARD";
-            }
+            });
         }
     </script>
 </body>

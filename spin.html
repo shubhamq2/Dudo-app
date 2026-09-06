@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -22,40 +27,57 @@
             --text-sub: #94a3b8;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); padding-bottom: 40px; overflow-x: hidden; }
+        /* 🔥 FIX 1: स्क्रीन को हिलने और साइड से खाली होने से रोकने के लिए */
+        html, body {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.1) 0%, transparent 60%); display: flex; flex-direction: column; align-items: center; color: var(--text-main); padding-bottom: 40px; }
         
         /* Premium Sync Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-gold); backdrop-filter: blur(10px); }
         .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-gold); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(251, 191, 36, 0.15); transition: 0.2s; border: 1px solid rgba(251, 191, 36, 0.3); }
         .back-btn:active { transform: scale(0.9); }
-        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); flex-grow: 1; text-align: center; letter-spacing: 0.5px; }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-gold); font-weight: bold; cursor: pointer; }
 
-        /* Balance Info Ribbon */
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-pink); }
+
+        /* PLAY STORE SAFE: Balance Info Ribbon (Only Coins Viewable) */
         .info-bar { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(69, 26, 3, 0.9), rgba(120, 53, 15, 0.9)); padding: 18px 20px; border-radius: 16px; margin-top: 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; border: 1px solid #b45309; box-shadow: 0 8px 25px rgba(251, 191, 36, 0.2); backdrop-filter: blur(10px); }
         .info-bar p { margin: 0 0 6px 0; font-size: 13.5px; color: #fde68a; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .info-bar h3 { margin: 0; font-size: 24px; color: #fff; font-weight: 900; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
 
         /* 📢 ADMIN CONNECTED AD BANNER */
-        .ad-banner { width: 92%; max-width: 440px; min-height: 52px; background: rgba(255,255,255,0.03); margin: 20px 0; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 1px dashed rgba(251, 191, 36, 0.4); overflow: hidden; box-sizing: border-box; }
+        .ad-banner { width: 92%; max-width: 440px; min-height: 52px; background: rgba(255,255,255,0.03); margin: 15px 0; border-radius: 12px; display: none; justify-content: center; align-items: center; border: 1px dashed rgba(251, 191, 36, 0.4); overflow: hidden; box-sizing: border-box; }
 
         /* 🔥 UPGRADED: Spin Wheel Container & Glowing Ring */
-        .wheel-container { position: relative; width: 310px; height: 310px; margin: 30px 0 40px 0; display: flex; justify-content: center; align-items: center; }
-        .wheel-outer-ring { position: absolute; width: 335px; height: 335px; border-radius: 50%; border: 5px dashed var(--accent-orange); animation: spinRing 20s linear infinite; opacity: 0.6; box-shadow: 0 0 25px rgba(249, 115, 22, 0.3); }
-        @keyframes spinRing { 100% { transform: rotate(360deg); } }
+        .wheel-container { position: relative; width: 310px; height: 310px; margin: 30px 0 40px 0; display: flex; justify-content: center; align-items: center; perspective: 1000px; /* Hardware Acceleration */ }
+        
+        .wheel-outer-ring { position: absolute; width: 335px; height: 335px; border-radius: 50%; border: 5px dashed var(--accent-orange); animation: spinRing 20s linear infinite; opacity: 0.6; box-shadow: 0 0 25px rgba(249, 115, 22, 0.3); backface-visibility: hidden; transform-origin: center center; }
+        
+        /* 🔥 FIX 2: translateZ(0) से WebView में ग्राफ़िक्स नहीं कांपेगा */
+        @keyframes spinRing { 100% { transform: rotate(360deg) translateZ(0); } }
         
         /* The Pointer */
-        .wheel-pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid var(--accent-pink); z-index: 10; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); }
+        .wheel-pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%) translateZ(0); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid var(--accent-pink); z-index: 10; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); backface-visibility: hidden; }
 
         /* The Wheel itself */
-        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 10px solid var(--accent-gold); box-sizing: border-box; box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), inset 0 0 30px rgba(0,0,0,0.9); overflow: hidden; position: relative; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); background: conic-gradient( var(--accent-orange) 0deg 45deg, #1e293b 45deg 90deg, var(--accent-orange) 90deg 135deg, #1e293b 135deg 180deg, var(--accent-orange) 180deg 225deg, #1e293b 225deg 270deg, var(--accent-orange) 270deg 315deg, #1e293b 315deg 360deg ); z-index: 5; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 10px solid var(--accent-gold); box-sizing: border-box; box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), inset 0 0 30px rgba(0,0,0,0.9); overflow: hidden; position: relative; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); background: conic-gradient( var(--accent-orange) 0deg 45deg, #1e293b 45deg 90deg, var(--accent-orange) 90deg 135deg, #1e293b 135deg 180deg, var(--accent-orange) 180deg 225deg, #1e293b 225deg 270deg, var(--accent-orange) 270deg 315deg, #1e293b 315deg 360deg ); z-index: 5; backface-visibility: hidden; transform: translateZ(0); /* Anti-shake Trick */ transform-origin: center center; }
         
         /* Wheel Center Dot */
         .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: radial-gradient(circle, #ffffff, #e2e8f0); border-radius: 50%; border: 6px solid var(--accent-gold); box-shadow: 0 0 20px rgba(0,0,0,0.9); z-index: 10; }
 
         /* Numbers Visibility */
-        .slice { position: absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: 50% 100%; display: flex; justify-content: center; padding-top: 20px; box-sizing: border-box; font-size: 32px; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 6px rgba(0,0,0,0.9); z-index: 5; }
+        .slice { position: absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: 50% 100%; display: flex; justify-content: center; padding-top: 20px; box-sizing: border-box; font-size: 32px; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 6px rgba(0,0,0,0.9); z-index: 5; backface-visibility: hidden; }
         
         .slice-1 { transform: rotate(22.5deg); }
         .slice-2 { transform: rotate(67.5deg); }
@@ -90,6 +112,13 @@
 
         /* Notice Board Security Safe Box */
         .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-gold); background: rgba(251, 191, 36, 0.05); border-radius: 16px; padding: 15px 18px; margin-top: 25px; box-sizing: border-box; font-size: 12.5px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; font-weight: 600; }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -100,34 +129,45 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Reward System</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="spin_title">Spin & Win</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option><option value="mr">MR</option>
-            <option value="te">TE</option><option value="ta">TA</option><option value="ur">UR</option><option value="gu">GU</option>
-        </select>
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option><option value="mr">MR</option>
+                <option value="te">TE</option><option value="ta">TA</option><option value="ur">UR</option><option value="gu">GU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
+    <!-- PLAY STORE SAFE: Only show Coins -->
     <div class="info-bar">
-        <div>
-            <p data-i18n="wallet_bal">Wallet Balance</p>
-            <h3 id="wallBal"><i class="fa-solid fa-spinner fa-spin" style="font-size: 18px;"></i></h3>
-        </div>
-        <div style="text-align: right;">
+        <div style="flex-grow: 1; text-align: center;">
             <p data-i18n="total_coins">Total Coins</p>
             <h3 id="wallCoins"><i class="fa-solid fa-spinner fa-spin" style="font-size: 18px;"></i></h3>
         </div>
     </div>
 
-    <!-- 📢 ADMIN CONNECTED AD BANNER SLOT -->
+    <!-- 📢 ADMIN CONNECTED AD BANNER SLOT 1 -->
     <div class="ad-banner" id="adminBannerSlot1"></div>
 
     <div class="wheel-container">
         <div class="wheel-outer-ring"></div>
         <div class="wheel-pointer"></div>
         <div class="wheel" id="spinWheel">
-            <!-- Values hardcoded for visual UI. Backend decides the actual win -->
             <div class="slice slice-1">0</div>
             <div class="slice slice-2">5</div>
             <div class="slice slice-3">1</div>
@@ -142,26 +182,44 @@
     <div class="controls">
         <div class="spins-left"><span data-i18n="spins_left">Spins Left Today:</span> <span id="spinCountText" style="color:#fff;"><i class="fa-solid fa-circle-notch fa-spin"></i></span></div>
         
-        <button class="action-btn btn-spin" id="spinBtn" onclick="executeSpinRequest()"><i class="fa-solid fa-dharmachakra"></i> <span data-i18n="btn_spin">SPIN NOW</span></button>
+        <button class="action-btn btn-spin" id="spinBtn" onclick="executeSecureSpinRequest()"><i class="fa-solid fa-dharmachakra"></i> <span data-i18n="btn_spin">SPIN NOW</span></button>
         <button class="action-btn btn-ad" id="adBtn" onclick="watchAdForSpin()"><i class="fa-solid fa-play"></i> <span data-i18n="btn_watch_ad">WATCH AD FOR 1 SPIN</span></button>
     </div>
 
+    <!-- 📢 ADMIN CONNECTED AD BANNER SLOT 2 -->
+    <div class="ad-banner" id="adminBannerSlot2"></div>
+
     <div class="security-box">
         <span style="font-size: 18px;">🛡️</span>
-        <span data-i18n="sec_msg">Verification protocols are active. Do not switch tabs or close the application during the ad view to ensure you receive your extra spin.</span>
+        <span data-i18n="sec_msg">Verification protocols are active. Do not minimize the app during the ad view to ensure you receive your extra spin.</span>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 25; // Default time
 
         // 🌐 FULL MULTILINGUAL SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "spin_title": "Spin & Win", "wallet_bal": "Wallet Balance", "total_coins": "Total Coins", "spins_left": "Spins Left Today:", "btn_spin": "SPIN NOW", "btn_watch_ad": "WATCH AD FOR 1 SPIN", "err_early": "❌ Verification Incomplete! You closed the sponsor tab early.", "err_invalid": "❌ Tracking Interrupted! Please stay on the ad page for 25s.", "spin_added": "🎉 1 Extra Spin Added successfully!", "won_msg": "🎉 Congratulations! You won ", "lost_msg": "😢 Oops! Better luck next time.", "sec_msg": "Verification protocols are active. Do not switch tabs or close the application during the ad view to ensure you receive your extra spin." },
-            "hi": { "spin_title": "स्पिन और विन", "wallet_bal": "वॉलेट बैलेंस", "total_coins": "कुल सिक्के", "spins_left": "आज बचे हुए स्पिन:", "btn_spin": "अभी घुमाएं", "btn_watch_ad": "1 स्पिन के लिए विज्ञापन देखें", "err_early": "❌ सत्यापन अधूरा! आपने स्पॉन्सर टैब को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया 25 सेकंड तक एड पेज पर बने रहें।", "spin_added": "🎉 1 अतिरिक्त स्पिन सफलतापूर्वक जुड़ गया!", "won_msg": "🎉 बधाई हो! आपने जीते हैं ", "lost_msg": "😢 ऊप्स! अगली बार बेहतर किस्मत।", "sec_msg": "सत्यापन प्रक्रिया सक्रिय है। अतिरिक्त स्पिन प्राप्त करने के लिए विज्ञापन देखते समय ऐप या टैब न बदलें।" },
-            "bn": { "spin_title": "স্পিন এবং জয়", "wallet_bal": "ওয়ালেট ব্যালেন্স", "total_coins": "মোট কয়েন", "spins_left": "বাকি স্পিন:", "btn_spin": "এখন ঘুরান", "btn_watch_ad": "অ্যাড দেখুন (১ স্পিন)", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি স্পনসর ট্যাব আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! 25s পেজেই থাকুন।", "spin_added": "🎉 ১টি স্পিন যোগ হয়েছে!", "won_msg": "🎉 আপনি জিতেছেন ", "lost_msg": "😢 পরের বার আরও ভালো ভাগ্য।", "sec_msg": "ট্যাব পরিবর্তন করলে স্পিন বাতিল হবে।" },
-            "mr": { "spin_title": "स्पिन आणि जिंका", "wallet_bal": "वॉलेट शिल्लक", "total_coins": "एकूण नाणी", "spins_left": "उर्वरित स्पिन:", "btn_spin": "आता फिरवा", "btn_watch_ad": "१ स्पिनसाठी जाहिरात पहा", "err_early": "❌ अपूर्ण! आपण टॅब लवकर बंद केला.", "err_invalid": "❌ ट्रॅकिंग थांबले! 25 सेकंद जाहिरात पृष्ठावर रहा.", "spin_added": "🎉 1 स्पिन जोडले!", "won_msg": "🎉 तुम्ही जिंकलात ", "lost_msg": "😢 पुढच्या वेळी चांगले नशीब.", "sec_msg": "जाहिरात पाहताना टॅब बदलू नका." },
+            "en": { "spin_title": "Spin & Win", "total_coins": "Total Coins", "spins_left": "Spins Left Today:", "btn_spin": "SPIN NOW", "btn_watch_ad": "WATCH AD FOR 1 SPIN", "err_early": "❌ Verification Incomplete! You closed the sponsor page early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "spin_added": "🎉 1 Extra Spin Added successfully!", "won_msg": "🎉 Congratulations! You won ", "lost_msg": "😢 Oops! Better luck next time.", "sec_msg": "Verification protocols are active. Do not minimize the app during the ad view to ensure you receive your extra spin." },
+            "hi": { "spin_title": "स्पिन और विन", "total_coins": "कुल सिक्के", "spins_left": "आज बचे हुए स्पिन:", "btn_spin": "अभी घुमाएं", "btn_watch_ad": "1 स्पिन के लिए विज्ञापन देखें", "err_early": "❌ सत्यापन अधूरा! आपने स्पॉन्सर पेज को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें।", "spin_added": "🎉 1 अतिरिक्त स्पिन सफलतापूर्वक जुड़ गया!", "won_msg": "🎉 बधाई हो! आपने जीते हैं ", "lost_msg": "😢 ऊप्स! अगली बार बेहतर किस्मत।", "sec_msg": "सत्यापन प्रक्रिया सक्रिय है। अतिरिक्त स्पिन प्राप्त करने के लिए विज्ञापन देखते समय ऐप बंद न करें।" },
+            "bn": { "spin_title": "স্পিন এবং জয়", "total_coins": "মোট কয়েন", "spins_left": "বাকি স্পিন:", "btn_spin": "এখন ঘুরান", "btn_watch_ad": "অ্যাড দেখুন (১ স্পিন)", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি স্পনসর পেজ আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ বন্ধ করবেন না।", "spin_added": "🎉 ১টি স্পিন যোগ হয়েছে!", "won_msg": "🎉 আপনি জিতেছেন ", "lost_msg": "😢 পরের বার আরও ভালো ভাগ্য।", "sec_msg": "অ্যাপ বন্ধ করলে স্পিন বাতিল হবে।" },
+            "mr": { "spin_title": "स्पिन आणि जिंका", "total_coins": "एकूण नाणी", "spins_left": "उर्वरित स्पिन:", "btn_spin": "आता फिरवा", "btn_watch_ad": "१ स्पिनसाठी जाहिरात पहा", "err_early": "❌ अपूर्ण! आपण जाहिरात लवकर बंद केली.", "err_invalid": "❌ ट्रॅकिंग थांबले! ॲप मिनिमाईज करू नका.", "spin_added": "🎉 1 स्पिन जोडले!", "won_msg": "🎉 तुम्ही जिंकलात ", "lost_msg": "😢 पुढच्या वेळी चांगले नशीब.", "sec_msg": "जाहिरात पाहताना ॲप बंद करू नका." },
             "te": { "spin_title": "స్పిన్ & విన్", "btn_spin": "స్పిన్ చేయండి", "err_success": "🎉 గెలిచారు: ", "lost_msg": "😢 మళ్లీ ప్రయత్నించండి." },
             "ta": { "spin_title": "சுழற்றி வெல்லுங்கள்", "btn_spin": "சுழற்று", "err_success": "🎉 வென்றீர்கள்: ", "lost_msg": "😢 மீண்டும் முயற்சிக்கவும்." },
             "ur": { "spin_title": "اسپن اور جیتیں", "btn_spin": "اسپن کریں", "err_success": "🎉 آپ نے جیتا: ", "lost_msg": "😢 اگلی بار کے لئے گڈ لک۔" },
@@ -178,9 +236,13 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
 
+        const uid = localStorage.getItem("userId");
         let currentRotation = 0;
         let isSpinning = false;
         let spinsLeft = 0;
@@ -199,61 +261,109 @@
         ];
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("wallCoins").innerText = (data.coins || 0) + " 🪙";
+                            
+                            // Client reads spins from DB
+                            let today = new Date().toLocaleDateString();
+                            if(data.lastSpinDate !== today) {
+                                spinsLeft = 2; // Default daily free spins
+                                updateSpinsToFirebase(2, today);
+                            } else {
+                                spinsLeft = data.spinsLeftToday !== undefined ? data.spinsLeftToday : 0;
+                            }
+                            updateButtonsUI();
+                            
+                            // Smart Avatar Sync
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Time & Links from spin_win_configs node)
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            if (adminData.spin_win_configs) {
+                                const swConfig = adminData.spin_win_configs;
+                                
+                                // 🔥 GET ADMIN CONTROLLED TIME
+                                if (swConfig.ad_timer) { globalAdTimerSeconds = parseInt(swConfig.ad_timer); }
+                                
+                                // Load Banners
+                                if (swConfig.slot1_code) {
+                                    document.getElementById("adminBannerSlot1").style.display = "flex";
+                                    setAdHTML(document.getElementById("adminBannerSlot1"), swConfig.slot1_code);
+                                } else {
+                                    document.getElementById("adminBannerSlot1").style.display = "none";
+                                }
+                                
+                                if (swConfig.slot2_code) {
+                                    document.getElementById("adminBannerSlot2").style.display = "flex";
+                                    setAdHTML(document.getElementById("adminBannerSlot2"), swConfig.slot2_code);
+                                } else {
+                                    document.getElementById("adminBannerSlot2").style.display = "none";
+                                }
+
+                                // Load Post Spin / Watch Ad Link
+                                if (swConfig.task_ad_link) {
+                                    activeAdminSmartlinkUrl = swConfig.task_ad_link;
+                                } else if (adminData.globalSmartlink) {
+                                    activeAdminSmartlinkUrl = adminData.globalSmartlink;
+                                }
+
+                            } else {
+                                // Global Fallbacks
+                                if (adminData.banner_ads && adminData.banner_ads.slot1 && adminData.banner_ads.slot1.active) {
+                                    document.getElementById("adminBannerSlot1").style.display = "flex";
+                                    setAdHTML(document.getElementById("adminBannerSlot1"), adminData.banner_ads.slot1.code);
+                                }
+                                if (adminData.globalSmartlink) {
+                                    activeAdminSmartlinkUrl = adminData.globalSmartlink;
+                                }
+                            }
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH USER DATA AND ADMIN CONFIGS (NODE API)
-        async function fetchDataFromAdminServer() {
-            try {
-                // Fetch User Details & Spin Counts
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = (userData.user.coins || 0) + " 🪙";
-                    document.getElementById("wallBal").innerText = "₹" + (userData.user.balance || 0).toFixed(2);
-                    
-                    // Client reads spins from DB
-                    let today = new Date().toLocaleDateString();
-                    if(userData.user.lastSpinDate !== today) {
-                        spinsLeft = 2; // Default daily spins
-                        updateSpinsToBackend(2, today);
-                    } else {
-                        spinsLeft = userData.user.spinsLeftToday !== undefined ? userData.user.spinsLeftToday : 0;
-                    }
-                    updateButtonsUI();
-                }
-
-                // Fetch Admin Banners and Smartlink
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.banners && confData.banners[0]) {
-                        document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                    }
-                    if (confData.globalSmartlink) {
-                        activeAdminSmartlinkUrl = confData.globalSmartlink;
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
-        async function updateSpinsToBackend(spins, dateStr) {
-            try {
-                await fetch(`${API_BASE_URL}/user/update-spins`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid, spinsLeft: spins, date: dateStr })
-                });
-            } catch(e) {}
+        function updateSpinsToFirebase(spins, dateStr) {
+            db.ref(`users/${uid}`).update({
+                spinsLeftToday: spins,
+                lastSpinDate: dateStr
+            });
         }
 
         function updateButtonsUI() {
@@ -291,69 +401,87 @@
             if (document.hidden) { window.hasMainTabHidden = true; }
         });
 
-        // 🎰 SECURE SPIN LOGIC (Talks to Node API)
-        async function executeSpinRequest() {
+        // 🎰 SECURE SPIN LOGIC (Pure Firebase)
+        function executeSecureSpinRequest() {
             if(isSpinning || spinsLeft <= 0) return;
             isSpinning = true;
             
             document.getElementById("spinBtn").disabled = true;
 
-            try {
-                // Call API to get randomized reward (Backend decides the win)
-                const res = await fetch(`${API_BASE_URL}/spin/play`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ userId: uid })
-                });
+            // 1. Calculate random reward based on probabilities
+            const probabilities = [
+                { val: 0, chance: 30 }, // 30% chance
+                { val: 1, chance: 20 },
+                { val: 2, chance: 20 },
+                { val: 3, chance: 15 },
+                { val: 5, chance: 10 },
+                { val: 10, chance: 4 },
+                { val: 20, chance: 1 }  // 1% chance
+            ];
+            
+            let rand = Math.random() * 100;
+            let wonCoins = 0;
+            let cumulative = 0;
+            for(let p of probabilities) {
+                cumulative += p.chance;
+                if(rand < cumulative) { wonCoins = p.val; break; }
+            }
 
-                const data = await res.json();
-                
-                if(data.success) {
+            // 2. Perform Transaction
+            db.ref(`users/${uid}/coins`).transaction((currentCoins) => {
+                return (currentCoins || 0) + wonCoins;
+            }).then((result) => {
+                if(result.committed) {
+                    
+                    // Deduct Spin & Add Daily Task 't4'
                     spinsLeft--;
-                    updateButtonsUI();
+                    let today = new Date().toLocaleDateString();
+                    updateSpinsToFirebase(spinsLeft, today);
+                    
+                    db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                        let tasks = snap.val() || [];
+                        if (!tasks.includes("t4")) {
+                            tasks.push("t4");
+                            db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                        }
+                    });
 
-                    let wonCoins = data.reward;
+                    // 3. UI Wheel Animation Logic
                     let targetSliceIndex = prizesMap.findIndex(p => p.label === wonCoins);
                     if(targetSliceIndex === -1) targetSliceIndex = 0; // Fallback
 
                     let extraSpins = 5 * 360; 
-                    // Calculate exact angle to stop pointer (Pointer is at top)
                     let stopAngle = 360 - prizesMap[targetSliceIndex].angle; 
                     
                     currentRotation += extraSpins + stopAngle;
                     
                     let wheel = document.getElementById("spinWheel");
-                    wheel.style.transform = `rotate(${currentRotation}deg)`;
+                    // 🔥 FIX 3: JavaScript में भी translateZ(0) जोड़ दिया ताकि स्पिन होते समय ग्राफिक्स ना फटे
+                    wheel.style.transform = `rotate(${currentRotation}deg) translateZ(0)`;
 
                     setTimeout(() => {
                         isSpinning = false;
                         document.getElementById("spinBtn").disabled = false;
-                        
-                        // Update UI balances
-                        document.getElementById("liveUserCoins").innerText = data.newCoins + " 🪙";
-                        document.getElementById("wallBal").innerText = "₹" + data.newBalance.toFixed(2);
+                        updateButtonsUI();
                         
                         if(wonCoins > 0) {
                             showCustomAlert("won_msg", `${wonCoins} Coins!`, true);
                         } else {
                             showCustomAlert("lost_msg");
                         }
-
                     }, 4100);
 
                 } else {
-                    isSpinning = false;
-                    document.getElementById("spinBtn").disabled = false;
-                    alert("Sync Error. Please try again.");
+                    throw new Error("Transaction failed");
                 }
-            } catch(e) {
+            }).catch((err) => {
                 isSpinning = false;
                 document.getElementById("spinBtn").disabled = false;
-                alert("Server connection failed.");
-            }
+                alert("Server connection failed. Try again.");
+            });
         }
 
-        // 📺 SECURE AD VERIFICATION (25s)
+        // 📺 SECURE AD VERIFICATION WITH IN-APP VIEWER
         let platformTimer = null;
         let countdownTime = 25;
         let targetWindow = null;
@@ -363,51 +491,58 @@
             const btn = document.getElementById("adBtn");
             btn.disabled = true;
 
-            countdownTime = 25;
+            countdownTime = globalAdTimerSeconds;
             totalSecondsOpen = 0;
             window.hasMainTabHidden = false; // Tracker reset
             
             btn.innerText = `Verifying... (${countdownTime}s)`;
 
-            targetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
 
             platformTimer = setInterval(() => {
-                // Check 1: User instantly closes window
-                if(targetWindow && targetWindow.closed) {
-                    clearInterval(platformTimer);
-                    resetAdBtn();
-                    showCustomAlert("err_early");
-                    return;
-                }
-
-                // Check 2: Invalid tab switching
-                if(!document.hidden && window.hasMainTabHidden) {
-                    if(totalSecondsOpen < 24) {
-                        clearInterval(platformTimer);
-                        resetAdBtn();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
                 countdownTime--;
                 btn.innerText = `Verifying... (${countdownTime}s)`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if(document.hidden) {
+                    clearInterval(platformTimer);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
+                    resetAdBtn();
+                    showCustomAlert("err_invalid");
+                    return;
+                }
 
                 if(countdownTime <= 0) {
                     clearInterval(platformTimer);
                     btn.innerText = "SAVING...";
-
-                    // Add +1 Spin and Save to Server
-                    spinsLeft++;
-                    let today = new Date().toLocaleDateString();
-                    updateSpinsToBackend(spinsLeft, today).then(() => {
-                        updateButtonsUI();
-                        resetAdBtn();
-                        showCustomAlert("spin_added", "", true);
-                    });
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
+        }
+
+        // 💰 REWARD SYNC API
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+
+            // Add +1 Spin and Save to Server
+            spinsLeft++;
+            let today = new Date().toLocaleDateString();
+            updateSpinsToFirebase(spinsLeft, today);
+            
+            updateButtonsUI();
+            resetAdBtn();
+            showCustomAlert("spin_added", "", true);
         }
 
         function resetAdBtn() {

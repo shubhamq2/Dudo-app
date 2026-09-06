@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -17,6 +22,7 @@
             --accent-green: #10b981;
             --accent-gold: #facc15;
             --accent-pink: #f43f5e;
+            --accent-purple: #a855f7;
             --accent-orange: #f59e0b;
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
@@ -30,94 +36,123 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
 
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-orange); font-weight: bold; cursor: pointer; }
+
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-orange)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Profile Balance Ribbon */
+        /* PLAY STORE SAFE: Only show Coins */
         .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-orange); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2); backdrop-filter: blur(10px); margin-bottom: 5px; }
-        .balance-card span { font-size: 18px; font-weight: 900; }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+        .balance-card span { font-size: 14px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
+        .coin-txt { color: var(--accent-gold) !important; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 18px !important; }
 
         /* 📢 AD SLOTS */
         .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(245, 158, 11, 0.4); box-sizing: border-box; margin: 5px 0; }
 
         /* Terminal Controller Card */
         .task-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .bolt-icon { font-size: 70px; color: var(--accent-gold); margin-bottom: 15px; animation: pulseGlow 2s infinite alternate; filter: drop-shadow(0 0 20px rgba(250, 204, 21, 0.5)); display: inline-block; }
+        @keyframes pulseGlow { 0% { transform: scale(0.95); } 100% { transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(250, 204, 21, 0.8)); } }
+        
         .task-card h3 { margin: 0 0 10px 0; font-size: 22px; color: var(--accent-orange); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
         .task-card p { margin: 0 0 25px 0; font-size: 13.5px; color: var(--text-sub); font-weight: 600; line-height: 1.5; }
 
+        /* Rules Box */
+        .rules-info-box { background: rgba(245, 158, 11, 0.08); border: 1px dashed var(--accent-orange); border-radius: 16px; padding: 18px 15px; text-align: left; margin-bottom: 25px; display: flex; align-items: flex-start; gap: 12px; }
+        .rules-info-icon { font-size: 24px; }
+        .rules-info-text h4 { margin: 0 0 6px 0; color: var(--accent-orange); font-size: 15px; text-transform: uppercase; font-weight: 900; }
+        .rules-info-text p { margin: 0; font-size: 12.5px; color: #cbd5e1; line-height: 1.5; font-weight: 500; }
+
         /* Custom Action Launch Button Layout */
         .launch-loop-btn { width: 100%; background: linear-gradient(135deg, var(--accent-orange), #b45309); color: #000; border: none; padding: 18px; border-radius: 50px; font-size: 15px; font-weight: 900; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4); cursor: pointer; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px; outline: none; }
-        .launch-loop-btn:active { transform: scale(0.96); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+        .launch-loop-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+        .launch-loop-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
-        /* Dynamic Verification Sub-Box Panel */
-        .verification-node-panel { display: none; background: rgba(0,0,0,0.6); border-radius: 20px; padding: 30px 20px; border: 2px dashed var(--accent-pink); margin-top: 15px; text-align: center; box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.2); animation: pulseBorder 1.5s infinite alternate; }
-        @keyframes pulseBorder { 100% { box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.4); border-color: #f87171; } }
-        
-        .verification-node-panel h4 { margin: 0 0 8px 0; font-size: 15px; color: var(--accent-pink); font-weight: 900; text-transform: uppercase; }
-        .task-timer-clock { font-size: 42px; font-weight: 900; color: var(--accent-gold); margin: 15px 0; text-shadow: 0 0 15px rgba(250, 204, 21, 0.5); letter-spacing: 2px; }
-        .verification-node-panel p { font-size: 12.5px; color: var(--text-sub); margin: 0; font-weight: 600; line-height: 1.5; }
+        /* Security Safe Box */
+        .security-box { border: 1px dashed var(--accent-green); background: rgba(16, 185, 129, 0.05); border-radius: 16px; padding: 15px 18px; font-size: 12.5px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-top: 5px; font-weight: 600; }
 
-        .claim-payout-btn { width: 100%; background: linear-gradient(135deg, var(--accent-green), #059669); color: #fff; border: none; padding: 18px; border-radius: 16px; font-size: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); text-transform: uppercase; margin-top: 20px; display: none; transition: 0.2s; letter-spacing: 1px; }
-        .claim-payout-btn:active { transform: scale(0.96); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
-
-        .security-box { border: 1px dashed var(--accent-orange); background: rgba(245, 158, 11, 0.05); border-radius: 16px; padding: 15px 18px; font-size: 12.5px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; font-weight: 600; margin-top: 5px; }
-
-        /* Custom Modern Alert Modal Popup style */
+        /* Custom Modern Alert Popup */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
-        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 30px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-orange); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
 
     <div class="overlay" id="alertOverlay"></div>
     <div class="custom-alert" id="customAlertBox">
-        <p id="alertMessage">Message</p>
+        <p id="alertMessage">Success Message</p>
         <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Web Task</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 15s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="wt_title">Web Tasks</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
     <div class="main-container">
 
+        <!-- PLAY STORE SAFE: Only show Coins -->
         <div class="balance-card">
-            <span data-i18n="wt_wallet">Wallet Balance</span>
+            <span data-i18n="wallet_bal">🌐 Web Tasks</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
-        
+
         <!-- 📢 ADMIN CONNECTED TOP BANNERS -->
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="task-card">
-            <h3 data-i18n="wt_h3">Premium Web Offers</h3>
-            <p data-i18n="wt_p">Open the web stream engine below, navigate through the landing description, and clear the validation to claim high-yield tokens.</p>
-
-            <button class="launch-loop-btn" id="startTaskBtn" onclick="executeStartTaskSequence()"><i class="fa-solid fa-globe"></i> <span data-i18n="wt_btn_start">Open Web Stream</span></button>
-
-            <!-- Dynamic Verification Mask Panel -->
-            <div class="verification-node-panel" id="taskVerificationBox">
-                <h4 id="statusLabelTxt" data-i18n="wt_track"><i class="fa-solid fa-circle-notch fa-spin"></i> Tracking Web Stream...</h4>
-                <div class="task-timer-clock" id="taskCountdownClock">30s</div>
-                <p id="statusSubDesc" data-i18n="wt_desc">Complete the target interaction on the external landing page. Keep this app window active.</p>
-                
-                <button class="claim-payout-btn" id="claimTaskRewardBtn" onclick="executeCreditTaskTokens()"><i class="fa-solid fa-gift"></i> <span data-i18n="wt_btn_claim">Claim Reward Coins</span></button>
+            <div class="bolt-icon"><i class="fa-solid fa-bolt"></i></div>
+            <h3 data-i18n="ce_subtitle">Sponsor Visit</h3>
+            <p data-i18n="ce_desc">Click the button below, visit our sponsor website for the required time, and earn rewards instantly!</p>
+            
+            <div class="rules-info-box">
+                <div class="rules-info-icon">🎯</div>
+                <div class="rules-info-text">
+                    <h4 data-i18n="ce_rules_title">How to Earn?</h4>
+                    <p data-i18n="ce_rules_desc">Tap the button and stay fully active on the opened page. Do not minimize the app. Points will be credited securely upon your return.</p>
+                </div>
             </div>
+
+            <button class="launch-loop-btn" id="startTaskBtn" onclick="executeClickTask()"><i class="fa-solid fa-earth-americas"></i> <span data-i18n="ce_btn">VISIT & EARN</span></button>
         </div>
 
         <!-- 📢 ADMIN CONNECTED BOTTOM BANNERS -->
@@ -131,26 +166,42 @@
 
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & COINS 🔥
+        let globalAdTimerSeconds = 15; // Default time
+        let taskRewardCoinsValue = 5; // Default reward
+
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH PLAY STORE SAFE RULES
         const langData = {
-            "en": { "wt_title": "Web Tasks", "wt_wallet": "Wallet Balance", "wt_h3": "Premium Web Offers", "wt_p": "Open the web stream engine below, navigate through the landing description, and clear the validation to claim high-yield tokens.", "wt_btn_start": "Open Web Stream", "wt_track": "Tracking Web Stream...", "wt_desc": "Complete the target interaction on the external landing page. Keep this app window active.", "wt_btn_claim": "Claim Reward Coins", "wt_security": "System validation protocols are monitoring this active tab process. Invalid app switching or split interface modes will pause tracking instantly.", "err_early": "❌ Validation Failed! You closed the verification landing stream early.", "err_invalid": "❌ System Alert! Keep the landing browser active for 30 seconds.", "err_success": "🎉 Validation Success! Coins successfully credited to your wallet.", "msg_success": "WEB INTERACTION VERIFIED!" },
-            "hi": { "wt_title": "वेब टास्क", "wt_wallet": "वॉलेट बैलेंस", "wt_h3": "प्रीमियम वेब ऑफ़र", "wt_p": "नीचे दिए गए वेब स्ट्रीम इंजन को खोलें, लैंडिंग पेज को देखें, और टोकन प्राप्त करने के लिए सत्यापन पूरा करें।", "wt_btn_start": "वेब स्ट्रीम खोलें", "wt_track": "वेब स्ट्रीम ट्रैक कर रहा है...", "wt_desc": "बाहरी लैंडिंग पृष्ठ पर लक्ष्य इंटरैक्शन पूरा करें। इस ऐप विंडो को सक्रिय रखें।", "wt_btn_claim": "रिवॉर्ड कॉइन्स क्लेम करें", "wt_security": "सिस्टम सत्यापन प्रोटोकॉल इस सक्रिय टैब की निगरानी कर रहे हैं। अमान्य ऐप स्विचिंग या स्प्लिट मोड तुरंत ट्रैकिंग को रोक देगा।", "err_early": "❌ सत्यापन विफल! आपने लैंडिंग स्ट्रीम को जल्दी बंद कर दिया।", "err_invalid": "❌ सिस्टम अलर्ट! 30 सेकंड तक ब्राउज़र सक्रिय रखें।", "err_success": "🎉 सत्यापन सफल! कॉइन्स आपके वॉलेट में जमा कर दिए गए हैं।", "msg_success": "वेब इंटरैक्शन सत्यापित!" },
-            "bn": { "wt_title": "ওয়েব টাস্ক", "wt_btn_start": "ওয়েব খুলুন", "wt_track": "ট্র্যাকিং হচ্ছে...", "wt_btn_claim": "রিওয়ার্ড নিন", "err_early": "❌ অসম্পূর্ণ! পেজটি আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! ৩০ সেকেন্ড থাকুন।", "err_success": "🎉 সফল! কয়েন যোগ করা হয়েছে।", "msg_success": "যাচাই সফল!" },
-            "te": { "wt_title": "వెబ్ టాస్క్స్", "wt_btn_start": "ప్రారంభించండి", "wt_track": "ట్రాక్ చేస్తోంది...", "wt_btn_claim": "రివార్డ్ పొందండి", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి.", "msg_success": "ధృవీకరించబడింది!" },
-            "mr": { "wt_title": "वेब टास्क", "wt_btn_start": "सुरू करा", "wt_track": "ट्रॅकिंग सुरू आहे...", "wt_btn_claim": "रिवॉर्ड मिळवा", "err_success": "🎉 यशस्वी! कॉइन्स जमा झाले.", "msg_success": "सत्यापित झाले!" },
-            "ta": { "wt_title": "வலைப் பணிகள்", "wt_btn_start": "தொடங்கு", "wt_track": "கண்காணிக்கிறது...", "wt_btn_claim": "வெகுமதி பெறு", "err_success": "🎉 வெற்றி! நாணயங்கள் சேர்க்கப்பட்டன.", "msg_success": "சரிபார்க்கப்பட்டது!" },
-            "ur": { "wt_title": "ویب ٹاسک", "wt_btn_start": "شروع کریں", "wt_track": "ٹریکنگ ہو رہی ہے...", "wt_btn_claim": "انعام حاصل کریں", "err_success": "🎉 تصدیق ہو گئی! کوئنز شامل ہو گئے۔", "msg_success": "تصدیق ہو گئی!" },
-            "gu": { "wt_title": "વેબ ટાસ્ક", "wt_btn_start": "શરૂ કરો", "wt_track": "ટ્રેકિંગ ચાલુ છે...", "wt_btn_claim": "ઇનામ મેળવો", "err_success": "🎉 સફળતા! સિક્કા ઉમેરાયા.", "msg_success": "ચકાસાયેલ!" },
-            "es": { "wt_title": "Tareas Web", "wt_btn_start": "Abrir Web", "wt_track": "Rastreando...", "wt_btn_claim": "Reclamar", "err_success": "🎉 ¡Verificado! Monedas añadidas.", "msg_success": "¡INTERACCIÓN VERIFICADA!" },
-            "fr": { "wt_title": "Tâches Web", "wt_btn_start": "Ouvrir le Web", "wt_track": "Suivi en cours...", "wt_btn_claim": "Réclamer", "err_success": "🎉 Vérifié ! Pièces ajoutées.", "msg_success": "INTERACTION VÉRIFIÉE !" },
-            "ar": { "wt_title": "مهام الويب", "wt_btn_start": "افتح الويب", "wt_track": "جاري التتبع...", "wt_btn_claim": "استرداد المكافأة", "err_success": "🎉 تم التحقق! أضيفت العملات.", "msg_success": "تم التحقق من التفاعل!" },
-            "pt": { "wt_title": "Tarefas Web", "wt_btn_start": "Abrir Web", "wt_track": "Rastreando...", "wt_btn_claim": "Resgatar", "err_success": "🎉 Verificado! Moedas adicionadas.", "msg_success": "INTERAÇÃO VERIFICADA!" },
-            "ru": { "wt_title": "Веб-задания", "wt_btn_start": "ОТКРЫТЬ", "wt_track": "Отслеживание...", "wt_btn_claim": "ПОЛУЧИТЬ", "err_success": "🎉 Проверено! Монеты добавлены.", "msg_success": "ПРОВЕРЕНО!" }
+            "en": { "wt_title": "Web Tasks", "wallet_bal": "🌐 Web Tasks", "ce_subtitle": "Sponsor Visit", "ce_desc": "Visit our sponsor website for the required time and earn rewards instantly!", "ce_rules_title": "How to Earn?", "ce_rules_desc": "Tap the button and stay fully active on the opened page. Do not minimize the app. Points will be credited securely.", "ce_btn": "Open Web Stream", "wt_security": "System validation protocols are monitoring this active tab process. Invalid app switching or split interface modes will pause tracking instantly.", "err_invalid": "❌ System Alert! App minimized. Keep the landing browser active.", "err_success": "🎉 Validation Success! Coins successfully credited to your wallet.", "wait_txt": "Verifying... " },
+            "hi": { "wt_title": "वेब टास्क", "wallet_bal": "🌐 वेब टास्क", "ce_subtitle": "स्पॉन्सर विजिट", "ce_desc": "आवश्यक समय के लिए हमारे स्पॉन्सर की वेबसाइट देखें और तुरंत रिवॉर्ड्स कमाएं!", "ce_rules_title": "कैसे कमाएं?", "ce_rules_desc": "बटन पर टैप करें और खोले गए पृष्ठ पर सक्रिय रहें। ऐप को मिनीमाइज न करें। आपकी वापसी पर पॉइंट्स सुरक्षित रूप से जोड़ दिए जाएंगे।", "ce_btn": "वेब स्ट्रीम खोलें", "wt_security": "सिस्टम सत्यापन प्रोटोकॉल इस सक्रिय टैब की निगरानी कर रहे हैं। अमान्य ऐप स्विचिंग या स्प्लिट मोड तुरंत ट्रैकिंग को रोक देगा।", "err_invalid": "❌ सिस्टम अलर्ट! ऐप मिनीमाइज करना मना है। कृपया सक्रिय रहें।", "err_success": "🎉 सत्यापन सफल! कॉइन्स आपके वॉलेट में जमा कर दिए गए हैं।", "wait_txt": "सत्यापन... " },
+            "bn": { "wt_title": "ওয়েব টাস্ক", "wallet_bal": "ওয়েব টাস্ক", "ce_btn": "ওয়েব খুলুন", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ মিনিমাইজ করবেন না।", "err_success": "🎉 সফল! পয়েন্ট যোগ হয়েছে।", "wait_txt": "যাচাই... " },
+            "te": { "wt_title": "వెబ్ టాస్క్స్", "ce_btn": "ప్రారంభించండి", "err_invalid": "❌ దయచేసి యాప్ మినిమైజ్ చేయకండి.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి.", "wait_txt": "ధృవీకరిస్తోంది... " },
+            "mr": { "wt_title": "वेब टास्क", "ce_btn": "सुरू करा", "err_invalid": "❌ ॲप मिनिमाईज करू नका.", "err_success": "🎉 यशस्वी! कॉइन्स जमा झाले.", "wait_txt": "तपासत आहे... " },
+            "ta": { "wt_title": "வலைப் பணிகள்", "ce_btn": "தொடங்கு", "err_invalid": "❌ பயன்பாட்டை சுருக்க வேண்டாம்.", "err_success": "🎉 வெற்றி! நாணயங்கள் சேர்க்கப்பட்டன.", "wait_txt": "சரிபார்க்கிறது... " },
+            "ur": { "wt_title": "ویب ٹاسک", "ce_btn": "شروع کریں", "err_invalid": "❌ ایپ کو منیمائز نہ کریں۔", "err_success": "🎉 تصدیق ہو گئی! کوئنز شامل ہو گئے۔", "wait_txt": "تصدیق ہو رہی ہے... " },
+            "gu": { "wt_title": "વેબ ટાસ્ક", "ce_btn": "શરૂ કરો", "err_invalid": "❌ એપ મિનિમાઇઝ ન કરો.", "err_success": "🎉 સફળતા! સિક્કા ઉમેરાયા.", "wait_txt": "ચકાસણી... " },
+            "es": { "wt_title": "Tareas Web", "ce_btn": "Abrir Web", "err_invalid": "❌ No minimices la app.", "err_success": "🎉 ¡Verificado! Monedas añadidas.", "wait_txt": "Verificando... " },
+            "fr": { "wt_title": "Tâches Web", "ce_btn": "Ouvrir le Web", "err_invalid": "❌ Ne minimisez pas l'appli.", "err_success": "🎉 Vérifié ! Pièces ajoutées.", "wait_txt": "Vérification... " },
+            "ar": { "wt_title": "مهام الويب", "ce_btn": "افتح الويب", "err_invalid": "❌ لا تغلق التطبيق.", "err_success": "🎉 تم التحقق! أضيفت العملات.", "wait_txt": "التحقق... " },
+            "pt": { "wt_title": "Tarefas Web", "ce_btn": "Abrir Web", "err_invalid": "❌ Não minimize o app.", "err_success": "🎉 Verificado! Moedas adicionadas.", "wait_txt": "Verificando... " },
+            "ru": { "wt_title": "Веб-задания", "ce_btn": "ОТКРЫТЬ", "err_invalid": "❌ Не сворачивайте приложение.", "err_success": "🎉 Проверено! Монеты добавлены.", "wait_txt": "Проверка... " }
         };
 
         function changeLanguage(langCode) {
@@ -158,85 +209,116 @@
             const transObj = langData[langCode] || langData["en"];
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) {
-                    if (elem.tagName === "H4" && elem.id === "statusLabelTxt" && !elem.innerText.includes("VERIFIED")) {
-                        elem.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${transObj[key]}`;
-                    } else if (elem.tagName === "BUTTON" && elem.id === "startTaskBtn") {
-                        elem.innerHTML = `<i class="fa-solid fa-globe"></i> <span>${transObj[key]}</span>`;
-                    } else if (elem.tagName === "BUTTON" && elem.id === "claimTaskRewardBtn") {
-                        elem.innerHTML = `<i class="fa-solid fa-gift"></i> <span>${transObj[key]}</span>`;
+                if(transObj[key]) { 
+                    if(elem.tagName === "BUTTON" && elem.id === "startTaskBtn") {
+                        if(!elem.disabled) elem.innerHTML = `<i class="fa-solid fa-globe"></i> <span>${transObj[key]}</span>`;
                     } else {
-                        elem.innerText = transObj[key];
+                        elem.innerText = transObj[key]; 
                     }
                 }
             });
             document.getElementById("appLanguage").value = langCode;
         }
 
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-
-        let taskCountdownInt = 30; // 30s strict traffic validation
-        let totalSecondsActiveInt = 0;
-        let taskTimerInterval = null;
-        let externalTargetWindow = null;
-        let isValidationActive = false;
-
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
-        const taskRewardCoinsValue = 50; // Higher reward for double validation loop
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Smart Avatar Sync
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Link, Time & Reward)
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // Load Configs from our new node
+                            if (adminData.web_tasks_configs) {
+                                let c = adminData.web_tasks_configs;
+                                
+                                // 🔥 GET ADMIN CONTROLLED TIME & REWARD
+                                if (c.ad_timer) { globalAdTimerSeconds = parseInt(c.ad_timer); }
+                                if (c.task_reward) { taskRewardCoinsValue = parseInt(c.task_reward); }
+
+                                if(c.slot1_code) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), c.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                                if(c.slot2_code) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), c.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                                if(c.slot3_code) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), c.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                                
+                                if (c.task_ad_link) activeAdminSmartlinkUrl = c.task_ad_link;
+                            } 
+                            // Global Fallback
+                            else if (adminData.globalSmartlink) {
+                                activeAdminSmartlinkUrl = adminData.globalSmartlink;
+                            }
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH USER DATA AND ADMIN BANNERS/LINKS
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                }
-
-                // 2. Fetch Admin Banners and Smartlinks
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
-                    }
-                    if (confData.globalSmartlink) {
-                        activeAdminSmartlinkUrl = confData.globalSmartlink;
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configuration.");
-            }
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
-        function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
+        let taskTimer = null;
+        let countdownTime = 15;
+        let isValidationActive = false;
+
+        // 🔥 ADDED TAB TRACKER 
+        window.hasMainTabHidden = false;
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) { window.hasMainTabHidden = true; }
+        });
+
+        function showCustomAlert(msgKey, isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
             let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
 
             const alertBox = document.getElementById("customAlertBox");
-            const overlay = document.getElementById("alertOverlay");
-            document.getElementById("alertMessage").innerText = msgStr + appendText;
-            
-            if(isSuccess) { alertBox.classList.add("success-border"); } 
-            else { alertBox.classList.remove("success-border"); }
-            
+            if(isSuccess) alertBox.classList.add("success-border");
+            else alertBox.classList.remove("success-border");
+
+            document.getElementById("alertMessage").innerText = msgStr;
+            document.getElementById("alertOverlay").style.display = "block";
             alertBox.style.display = "block";
-            overlay.style.display = "block";
         }
 
         function closeCustomAlert() {
@@ -244,112 +326,92 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🔥 ADDED SYSTEM TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { window.hasMainTabHidden = true; }
-        });
-
-        // 🔒 SMART TASK INTERLOCK MODULE (30 SECONDS VALIDATION)
-        function executeStartTaskSequence() {
+        // 🚀 PLAY STORE SAFE VALIDATION LOGIC (WITH IN-APP VIEWER)
+        function executeClickTask() {
             if(isValidationActive) return;
             isValidationActive = true;
 
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let verifyTxt = langData[currentLang]["wt_track"] || "Tracking Web Stream...";
+            let verifyTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
 
-            taskCountdownInt = 30;
-            totalSecondsActiveInt = 0;
-            window.hasMainTabHidden = false; // Reset Tracker
+            const btn = document.getElementById("startTaskBtn");
+            countdownTime = globalAdTimerSeconds;
+            window.hasMainTabHidden = false; // Reset tracker
 
-            document.getElementById("startTaskBtn").style.display = "none";
-            document.getElementById("taskVerificationBox").style.display = "block";
-            document.getElementById("taskCountdownClock").style.display = "block";
-            document.getElementById("claimTaskRewardBtn").style.display = "none";
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${verifyTxt}(${countdownTime}s)</span>`;
+
+            // IN-APP VIEWER DISPLAY
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
             
-            document.getElementById("statusLabelTxt").innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${verifyTxt}`;
-            document.getElementById("statusLabelTxt").style.color = "var(--accent-pink)";
-            document.getElementById("taskVerificationBox").style.borderColor = "var(--accent-pink)";
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
 
-            externalTargetWindow = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            taskTimer = setInterval(() => {
+                countdownTime--;
+                btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${verifyTxt}(${countdownTime}s)</span>`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
 
-            taskTimerInterval = setInterval(() => {
-                // Check 1: Tab closed early guard
-                if(externalTargetWindow && externalTargetWindow.closed) {
-                    clearInterval(taskTimerInterval);
-                    resetTaskDashboard();
-                    showCustomAlert("err_early");
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if (document.hidden) { 
+                    clearInterval(taskTimer);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
+                    resetTaskButton();
+                    showCustomAlert("err_invalid");
                     return;
                 }
 
-                // Check 2: App Switching Protection Check
-                if(!document.hidden && window.hasMainTabHidden) {
-                    if(totalSecondsActiveInt < 29) {
-                        clearInterval(taskTimerInterval);
-                        resetTaskDashboard();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsActiveInt++;
-                taskCountdownInt--;
-                document.getElementById("taskCountdownClock").innerText = `${taskCountdownInt}s`;
-
-                if(taskCountdownInt <= 0) {
-                    clearInterval(taskTimerInterval);
-                    
-                    let successTxt = langData[currentLang]["msg_success"] || "WEB INTERACTION VERIFIED!";
-                    document.getElementById("taskCountdownClock").style.display = "none";
-                    document.getElementById("statusLabelTxt").innerHTML = `<i class="fa-solid fa-circle-check"></i> ${successTxt}`;
-                    document.getElementById("statusLabelTxt").style.color = "var(--accent-green)";
-                    document.getElementById("taskVerificationBox").style.borderColor = "var(--accent-green)";
-                    document.getElementById("claimTaskRewardBtn").style.display = "block";
+                if (countdownTime <= 0) {
+                    clearInterval(taskTimer);
+                    btn.innerText = "PROCESSING...";
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
-        // 💰 DATA REWARD PIPELINE (NODE API & DAILY TASK SYNC 't16')
-        async function executeCreditTaskTokens() {
-            const btn = document.getElementById("claimTaskRewardBtn");
-            btn.disabled = true;
-            btn.innerText = "SAVING...";
-
-            try {
-                // Call API to add 50 Points and Sync Daily Task 't16' (for example)
-                const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        pointsToAdd: taskRewardCoinsValue, 
-                        action: "web_stream_task",
-                        syncTask: "t16" // Completes Daily Task 't16'
-                    })
-                });
-                
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById("liveUserCoins").innerText = data.newCoins;
-                    showCustomAlert("err_success", true);
-                }
-            } catch (err) {
-                alert("Task Verified but couldn't sync with server. Try again.");
-            } finally {
-                resetTaskDashboard();
-            }
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t12) via PURE FIREBASE
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            executeRewardSyncWithFirebase();
         }
 
-        function resetTaskDashboard() {
-            document.getElementById("startTaskBtn").style.display = "block";
-            document.getElementById("taskVerificationBox").style.display = "none";
-            
-            const btn = document.getElementById("claimTaskRewardBtn");
-            let currentLang = localStorage.getItem("selectedLang") || "en";
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-gift"></i> <span>${langData[currentLang]["wt_btn_claim"] || "Claim Reward Coins"}</span>`;
-            
+        function executeRewardSyncWithFirebase() {
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + taskRewardCoinsValue;
+            }).then(() => {
+                
+                // 2. Mark Daily Task 't12' as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes("t12")) {
+                        tasks.push("t12");
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                showCustomAlert("err_success", true);
+                
+            }).catch(() => {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            }).finally(() => {
+                resetTaskButton();
+            });
+        }
+
+        function resetTaskButton() {
             isValidationActive = false;
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            const btn = document.getElementById("startTaskBtn");
+            btn.disabled = false;
+            btn.style.background = "linear-gradient(135deg, var(--accent-orange), #b45309)";
+            btn.innerHTML = `<i class="fa-solid fa-earth-americas"></i> <span>${langData[currentLang]["ce_btn"] || "VISIT & EARN"}</span>`;
         }
     </script>
 </body>

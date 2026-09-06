@@ -3,18 +3,18 @@ const dailyTasksList = [
   { id: "t1", text: "Watch Media Clip 1", coins: 10 },
   { id: "t2", text: "Watch Media Clip 2", coins: 10 },
   { id: "t3", text: "Explore Premium Web Offer", coins: 15 },
-  { id: "t4", text: "Play Daily Spin 3 Times", coins: 12 },
-  { id: "t5", text: "Complete 1 Math Quiz", coins: 20 },
-  { id: "t6", text: "Claim Hourly Vault Key", coins: 15 },
+  { id: "t4", text: "Play Daily Spin", coins: 12 },
+  { id: "t5", text: "Lucky Scratch Card", coins: 20 },
+  { id: "t6", text: "Premium Partner Offerwall", coins: 15 },
   { id: "t8", text: "Math Quiz Master", coins: 10 },
   { id: "t9", text: "Solve Captcha Task", coins: 5 },
-  { id: "t10", text: "Secure Server Validation", coins: 30 },
-  { id: "t11", text: "Play Daily Spin", coins: 10 },
-  { id: "t12", text: "Instant Coins Task", coins: 5 },
-  { id: "t13", text: "Complete Surveys", coins: 50 },
-  { id: "t14", text: "Complete TimeWall Task", coins: 20 },
-  { id: "t15", text: "Play Square Dash Arcade", coins: 20 },
-  { id: "t16", text: "Premium Web Stream", coins: 50 }
+  { id: "t10", text: "Secure Cloud Validation", coins: 30 },
+  { id: "t11", text: "Read Articles", coins: 10 },
+  { id: "t12", text: "Sponsor Web Visit", coins: 5 },
+  { id: "t13", text: "Smart Premium Task", coins: 50 },
+  { id: "t14", text: "Video Zone Stream", coins: 20 },
+  { id: "t15", text: "Micro Video Play", coins: 20 },
+  { id: "t16", text: "30s Web Stream", coins: 50 }
 ];
 
 // 🔄 Show/Hide Tasks Button Logic (Multi-Language Safe)
@@ -29,7 +29,7 @@ function toggleDailyTasksChecklistDisplay() {
   let showTxt = "Show Tasks";
   let hideTxt = "Hide Tasks";
   
-  // Connecting to global langData if available in your files
+  // Connecting to global langData if available in your HTML files
   if (typeof langData !== 'undefined' && langData[savedLang]) {
     showTxt = langData[savedLang]["show_tasks_btn"] || showTxt;
     hideTxt = langData[savedLang]["hide_tasks_btn"] || hideTxt;
@@ -59,7 +59,7 @@ function executeRealtimeChecklistEvaluation(completedTaskIdsArray) {
   container.innerHTML = "";
   let doneCount = 0;
   
-  // UI Create karna
+  // UI Creation Loop
   dailyTasksList.forEach(task => {
     const isDone = completedTaskIdsArray.includes(task.id);
     if (isDone) doneCount++;
@@ -75,23 +75,23 @@ function executeRealtimeChecklistEvaluation(completedTaskIdsArray) {
     taskBox.innerHTML = `
             <div class="task-info" style="display: flex; align-items: center; gap: 10px;">
                 ${iconHtml}
-                <span class="task-text" style="color: ${isDone ? '#94a3b8' : '#334155'}; text-decoration: ${isDone ? 'line-through' : 'none'}; font-weight: 700;">${task.text}</span>
+                <span class="task-text" style="color: ${isDone ? '#94a3b8' : '#334155'}; text-decoration: ${isDone ? 'line-through' : 'none'}; font-weight: 700; font-size: 13.5px;">${task.text}</span>
             </div>
-            <div class="task-reward" style="background: rgba(250, 204, 21, 0.1); color: #f59e0b; padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 11px;">+${task.coins} 🪙</div>
+            <div class="task-reward" style="background: rgba(250, 204, 21, 0.1); color: #f59e0b; padding: 3px 8px; border-radius: 6px; font-weight: 900; font-size: 11px;">+${task.coins} 🪙</div>
         `;
     container.appendChild(taskBox);
   });
   
-  // Count Update Karna
+  // Count Update Tracking
   if (document.getElementById("doneCount")) document.getElementById("doneCount").innerText = doneCount;
   if (document.getElementById("dailyProgressCount")) document.getElementById("dailyProgressCount").innerText = `${doneCount} / ${dailyTasksList.length} Tasks`;
   
-  // Bar Fill Animation
+  // Bar Fill Animation Progress
   let percentage = (doneCount / dailyTasksList.length) * 100;
   if (document.getElementById("taskProgressFill")) document.getElementById("taskProgressFill").style.width = percentage + "%";
   if (document.getElementById("dailyProgressBarFill")) document.getElementById("dailyProgressBarFill").style.width = percentage + "%";
   
-  // Milestones Update & Unlock logic
+  // Milestones Nodes Update & Unlock logic
   let m1 = document.getElementById("mNode1");
   let m2 = document.getElementById("mNode2");
   let m3 = document.getElementById("mNode3");
@@ -107,11 +107,11 @@ function executeRealtimeChecklistEvaluation(completedTaskIdsArray) {
   } else if (doneCount >= 2 && doneCount < 5) {
     if (m1) m1.classList.add("achieved");
     hintText = `Awesome! ${5 - doneCount} more tasks for +30🪙 Extra!`;
-    executeAutoClaimMilestone(1, 10); // Automatically trigger backend API claim for Node 1
+    executeAutoClaimMilestone(1, 10); // Automatically trigger Firebase claim for Node 1
   } else if (doneCount >= 5 && doneCount < 8) {
     if (m1) m1.classList.add("achieved");
     if (m2) m2.classList.add("achieved");
-    hintText = `💥 Just ${dailyTasksList.length - doneCount} tasks left for MEGA BONUS!`;
+    hintText = `💥 Just ${8 - doneCount} tasks left for MEGA BONUS!`;
     executeAutoClaimMilestone(2, 30); // Claim Node 2
   } else if (doneCount >= 8) {
     if (m1) m1.classList.add("achieved");
@@ -126,42 +126,48 @@ function executeRealtimeChecklistEvaluation(completedTaskIdsArray) {
   }
 }
 
-// 💰 NEW: SECURE NODE.JS API CALL FOR MILESTONE REWARDS
-async function executeAutoClaimMilestone(milestoneTier, rewardAmount) {
+// 💰 NEW: SECURE PURE FIREBASE TRANSACTION FOR MILESTONE REWARDS
+function executeAutoClaimMilestone(milestoneTier, rewardAmount) {
   const uid = localStorage.getItem("userId");
-  const token = localStorage.getItem("userToken");
+  if (!uid) return;
   
-  // LocalStorage validation to prevent spam API calls
+  // Ensure Firebase db instance is available
+  if (typeof firebase === 'undefined' || !firebase.database) return;
+  const db = firebase.database();
+  
+  // LocalStorage validation to prevent spam database transaction calls
   let today = new Date().toISOString().slice(0, 10);
   let milestoneKey = `milestone_${milestoneTier}_claimed_${today}_${uid}`;
   
-  if (localStorage.getItem(milestoneKey) === "true") return; // Already claimed today
+  if (localStorage.getItem(milestoneKey) === "true") return; // Already claimed today locally
   
-  try {
-    const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-    const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+  // Check securely on Firebase if already claimed today
+  db.ref(`users/${uid}/daily_milestones_claimed/${today}`).once('value', (snapshot) => {
+    let claimedTiers = snapshot.val() || [];
     
-    const res = await fetch(`${API_BASE_URL}/user/update-balance`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({
-        userId: uid,
-        pointsToAdd: rewardAmount,
-        action: `daily_milestone_tier_${milestoneTier}`
-      })
-    });
-    
-    const data = await res.json();
-    if (data.success) {
-      localStorage.setItem(milestoneKey, "true"); // Lock locally
+    // If the tier is NOT found in the database for today
+    if (!claimedTiers.includes(milestoneTier)) {
       
-      // Optionally update UI top balance dynamically if elements exist
-      if (document.getElementById("liveUserCoins")) {
-        document.getElementById("liveUserCoins").innerText = data.newCoins;
-      }
-      console.log(`Milestone Tier ${milestoneTier} Unlocked: +${rewardAmount} Coins securely credited!`);
+      // 1. Give Coins securely via Transaction
+      db.ref(`users/${uid}/coins`).transaction((current) => {
+        return (current || 0) + rewardAmount;
+      }).then((result) => {
+        if (result.committed) {
+          // 2. Mark this Tier as Claimed in the Database
+          claimedTiers.push(milestoneTier);
+          return db.ref(`users/${uid}/daily_milestones_claimed/${today}`).set(claimedTiers);
+        }
+      }).then(() => {
+        // 3. Mark locally to prevent further checks
+        localStorage.setItem(milestoneKey, "true");
+        console.log(`Milestone Tier ${milestoneTier} Unlocked: +${rewardAmount} Coins securely credited!`);
+      }).catch((error) => {
+        console.log("Milestone sync delayed. Retrying next refresh.");
+      });
+      
+    } else {
+      // If DB says it's claimed but local storage didn't know, update local storage
+      localStorage.setItem(milestoneKey, "true");
     }
-  } catch (err) {
-    console.log("Milestone sync delayed. Retrying next refresh.");
-  }
+  });
 }

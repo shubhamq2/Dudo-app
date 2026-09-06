@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-color: #f8fafc;
@@ -51,21 +56,25 @@
         .my-tickets-container { margin-bottom: 30px; text-align: left; display: none; }
         .my-tickets-container h4 { font-size: 16.5px; color: var(--text-main); font-weight: 900; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .user-ticket-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.2s; }
+        .tkt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 8px; }
+        .tkt-id { font-family: monospace; color: var(--primary-blue); font-weight: 900; font-size: 12px; }
+        .tkt-status { font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; }
+        .status-pending { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+        .status-resolved { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .tkt-subj { font-size: 14px; font-weight: 900; color: var(--text-main); margin-bottom: 6px; }
+        .tkt-msg { font-size: 12px; color: var(--text-sub); line-height: 1.5; font-weight: 600; }
         .admin-reply-box { background: #f0fdf4; border-left: 4px solid #10b981; padding: 12px 15px; margin-top: 15px; border-radius: 0 12px 12px 0; font-size: 13.5px; color: #064e3b; line-height: 1.5; font-weight: 600; }
+        .admin-reply-box strong { display: block; color: #10b981; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; }
 
         /* SUPPORT CHANNELS CARDS */
-        .support-card { background: var(--card-bg); border-radius: 18px; padding: 20px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); text-decoration: none; color: inherit; text-align: left; box-shadow: 0 6px 20px rgba(0,0,0,0.03); transition: 0.2s; }
-        .support-card:active { transform: scale(0.97); }
+        .social-contact-grid { display: flex; gap: 10px; }
+        .social-btn { flex: 1; padding: 16px 10px; border-radius: 16px; font-size: 13.5px; font-weight: 900; text-align: center; cursor: pointer; text-decoration: none; color: #fff; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: 0 6px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        .social-btn:active { transform: scale(0.95); }
+        .social-btn i { font-size: 24px; }
         
-        .card-left { display: flex; align-items: center; gap: 15px; }
-        .icon-circle { width: 50px; height: 50px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: inset 0 0 10px rgba(255,255,255,0.5); }
-        .icon-whatsapp { background: #dcfce7; color: #15803d; }
-        .icon-telegram { background: #e0f2fe; color: #0369a1; }
-        
-        .card-details h4 { margin: 0; font-size: 16px; color: var(--text-main); font-weight: 800; }
-        .card-details p { margin: 4px 0 0 0; font-size: 13px; color: var(--text-sub); font-weight: 600; }
-        .arrow-right { color: #cbd5e1; font-weight: bold; font-size: 18px; transition: 0.2s; }
-        .support-card:hover .arrow-right { transform: translateX(5px); color: var(--text-main); }
+        .btn-whatsapp { background: linear-gradient(135deg, #10b981, #047857); }
+        .btn-telegram { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
+        .btn-email { background: linear-gradient(135deg, #f43f5e, #be123c); } 
 
         /* FAQ SECTION LOOK */
         .faq-title { font-size: 20px; color: var(--text-main); font-weight: 900; text-align: left; margin: 35px 0 20px 0; letter-spacing: 0.5px; }
@@ -84,7 +93,26 @@
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: #10b981; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 999; backdrop-filter: blur(4px); }
+        .loading-text { text-align: center; color: var(--text-sub); font-weight: bold; padding: 20px; font-size: 13px; }
     </style>
+
+    <!-- ⚡⚡ ANTI-FLICKER SCRIPT FOR INDEPENDENT SUPPORT TOGGLE ⚡⚡ -->
+    <script>
+        let cssRules = "";
+        let cToggles = localStorage.getItem("d_toggles");
+        if(cToggles) {
+            let toggles = JSON.parse(cToggles);
+            // Hide WA and TG if mod_support_links is false
+            if(toggles.mod_support_links === false) {
+                cssRules += "#btnWhatsapp, #btnTelegram { display: none !important; } ";
+            }
+        }
+        if(cssRules !== "") {
+            let style = document.createElement('style');
+            style.innerHTML = cssRules;
+            document.head.appendChild(style);
+        }
+    </script>
 </head>
 <body>
 
@@ -128,36 +156,26 @@
             <button class="ticket-submit-btn" id="btnSubmitTicket" onclick="executeSubmitUserHelpTicket()" data-i18n="ticket_btn">Submit Ticket</button>
         </div>
 
-        <!-- 🔥 MY TICKETS LIST DISPLAY -->
+        <!-- 🔥 MY TICKETS LIST DISPLAY (Synced with Admin 'user_support_tickets') -->
         <div class="my-tickets-container" id="myTicketsSection">
             <h4><i class="fa-solid fa-clipboard-list"></i> My Recent Tickets</h4>
             <div id="myTicketsList">
-                <!-- Data will be loaded from Node API here -->
+                <div class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Loading your tickets...</div>
             </div>
         </div>
 
-        <!-- 📢 ADMIN CONNECTED SOCIAL LINKS -->
-        <a href="#" id="linkWhatsapp" class="support-card" target="_blank" style="display: none;">
-            <div class="card-left">
-                <div class="icon-circle icon-whatsapp"><i class="fa-brands fa-whatsapp"></i></div>
-                <div class="card-details">
-                    <h4 data-i18n="wa_title">WhatsApp Chat</h4>
-                    <p data-i18n="wa_desc">Instant reply (10 AM - 6 PM)</p>
-                </div>
-            </div>
-            <div class="arrow-right"><i class="fa-solid fa-chevron-right"></i></div>
-        </a>
-
-        <a href="#" id="linkTelegram" class="support-card" target="_blank" style="display: none;">
-            <div class="card-left">
-                <div class="icon-circle icon-telegram"><i class="fa-brands fa-telegram"></i></div>
-                <div class="card-details">
-                    <h4 data-i18n="tg_title">Telegram Support</h4>
-                    <p data-i18n="tg_desc">Resolution within 2 hours</p>
-                </div>
-            </div>
-            <div class="arrow-right"><i class="fa-solid fa-chevron-right"></i></div>
-        </a>
+        <!-- 📢 ADMIN CONNECTED SOCIAL LINKS (Hide/Show Controlled independently) -->
+        <div class="social-contact-grid">
+            <a href="#" target="_blank" class="social-btn btn-whatsapp" id="btnWhatsapp" style="display: none;">
+                <i class="fa-brands fa-whatsapp"></i> <span data-i18n="wa_title">WhatsApp</span>
+            </a>
+            <a href="#" target="_blank" class="social-btn btn-telegram" id="btnTelegram" style="display: none;">
+                <i class="fa-brands fa-telegram"></i> <span data-i18n="tg_title">Telegram</span>
+            </a>
+            <a href="#" class="social-btn btn-email" id="btnEmail">
+                <i class="fa-solid fa-envelope"></i> Email Us
+            </a>
+        </div>
 
         <div class="faq-title" data-i18n="faq_header">Frequently Asked Questions</div>
         
@@ -185,16 +203,27 @@
 
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT (100% Play Store Compliant Terms)
+        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
             "en": {
                 "btn_back": "Back", "support_title": "Help Center", "how_help": "How can we help you?", "hero_desc": "Our support team is available 24/7 to solve your problems.",
-                "wa_title": "WhatsApp Chat", "wa_desc": "Instant reply (10 AM - 6 PM)", "tg_title": "Telegram Support", "tg_desc": "Resolution within 2 hours",
+                "wa_title": "WhatsApp", "tg_title": "Telegram",
                 "faq_header": "Frequently Asked Questions",
                 "q1": "1. How long does it take to receive my reward?", "a1": "After submitting a redeem request, your reward is processed within 2 to 24 hours.",
                 "q2": "2. Why is my task verification pending?", "a2": "For security reasons, some tasks are manually verified to ensure fair play. This can take a few minutes.",
@@ -205,7 +234,7 @@
             },
             "hi": {
                 "btn_back": "पीछे", "support_title": "सहायता केंद्र", "how_help": "हम आपकी क्या मदद कर सकते हैं?", "hero_desc": "हमारी सहायता टीम आपकी समस्याओं को हल करने के लिए 24/7 उपलब्ध है।",
-                "wa_title": "WhatsApp चैट", "wa_desc": "तुरंत रिप्लाई (सुबह 10 - शाम 6)", "tg_title": "Telegram सपोर्ट", "tg_desc": "2 घंटे के भीतर समाधान",
+                "wa_title": "WhatsApp", "tg_title": "Telegram",
                 "faq_header": "अक्सर पूछे जाने वाले प्रश्न (FAQ)",
                 "q1": "1. रिवॉर्ड आने में कितना समय लगता है?", "a1": "रिडीम रिक्वेस्ट लगाने के बाद 2 से 24 घंटे के भीतर आपका रिवॉर्ड प्रोसेस कर दिया जाता है।",
                 "q2": "2. मेरा टास्क वेरिफिकेशन पेंडिंग क्यों है?", "a2": "सुरक्षा कारणों से कुछ टास्क की मैन्युअल जांच की जाती है। इसमें कुछ मिनट का समय लग सकता है।",
@@ -214,36 +243,17 @@
                 "ticket_box_title": "सपोर्ट को संदेश भेजें", "ticket_btn": "टिकट सबमिट करें",
                 "err_empty": "❌ कृपया विषय और संदेश दोनों दर्ज करें।", "err_success": "✅ सपोर्ट टिकट सफलतापूर्वक सबमिट हो गया!"
             },
-            "bn": {
-                "btn_back": "পেছনে", "support_title": "সহায়তা কেন্দ্র", "how_help": "আমরা কীভাবে সাহায্য করতে পারি?", "hero_desc": "আমাদের টিম আপনার সমস্যা সমাধানের জন্য ২৪/৭ উপলব্ধ রয়েছে।",
-                "wa_title": "WhatsApp চ্যাট", "wa_desc": "তাত্ক্ষণিক উত্তর (সকাল ১০ - সন্ধ্যা ৬ টা)", "tg_title": "Telegram সাপোর্ট", "tg_desc": "২ ঘণ্টার মধ্যে সমাধান",
-                "faq_header": "সচরাচর জিজ্ঞাস্য প্রশ্নাবলী",
-                "q1": "১. রিওয়ার্ড আসতে কত সময় লাগে?", "a1": "রিডিম রিকোয়েস্ট করার পর ২ থেকে ২৪ ঘণ্টার মধ্যে আপনার রিওয়ার্ড প্রসেস করা হয়।",
-                "q2": "২. আমার টাস্ক ভেরিফিকেশন পেন্ডিং কেন?", "a2": "নিরাপত্তার কারণে কিছু টাস্ক ম্যানুয়ালি যাচাই করা হয়। এতে কিছু সময় লাগতে পারে।",
-                "q3": "৩. রেফারেল বোনাস কীভাবে পাব?", "a3": "আপনার বন্ধু আপনার কোড দিয়ে অ্যাকাউন্ট খুললে এবং ৫ দিন সক্রিয় থাকলে আপনি পুরো পয়েন্ট পাবেন।",
-                "q4": "৪. আমার রিডিম রিকোয়েস্ট কেন বাতিল হলো?", "a4": "ভুল ID/Email দিলে বা অবৈধভাবে টাস্ক করলে রিকোয়েস্ট বাতিল করা হয়।",
-                "ticket_box_title": "সাপোর্ট ডেস্কে মেসেজ পাঠান", "ticket_btn": "টিকিট জমা দিন"
-            },
-            "te": {
-                "btn_back": "వెనుకకు", "support_title": "సహాయ కేంద్రం", "how_help": "మేము మీకు ఎలా సహాయం చేయగలం?", "hero_desc": "మీ సమస్యలను పరిష్కరించడానికి మా సహాయ బృందం 24/7 అందుబాటులో ఉంది.",
-                "wa_title": "WhatsApp చాట్", "wa_desc": "తక్షణ ప్రతిస్పందన (10 AM - 6 PM)", "tg_title": "Telegram మద్దతు", "tg_desc": "2 గంటల లోపు పరిష్కారం",
-                "faq_header": "తరచుగా అడిగే ప్రశ్నలు",
-                "q1": "1. రివార్డ్ రావడానికి ఎంత సమయం పడుతుంది?", "a1": "రిడీమ్ అభ్యర్థన సమర్పించిన తర్వాత 2 నుండి 24 గంటల లోపు మీ రివార్డ్ పంపబడుతుంది.",
-                "q2": "2. నా టాస్క్ వెరిఫికేషన్ ఎందుకు పెండింగ్‌లో ఉంది?", "a2": "భద్రతా కారణాల వల్ల కొన్ని టాస్క్‌లను మాన్యువల్‌గా తనిఖీ చేస్తారు. దీనికి కొద్ది సమయం పట్టవచ్చు.",
-                "q3": "3. రిఫరల్ బోనస్ ఎలా వస్తుంది?", "a3": "మీ స్నేహితుడు మీ కోడ్‌తో ఖాతాను సృష్టించి 5 రోజులు యాక్టివ్‌గా ఉంటే, మీకు పూర్తి పాయింట్లు వస్తాయి.",
-                "q4": "4. నా రిడీమ్ అభ్యర్థన ఎందుకు తిరస్కరించబడింది?", "a4": "తప్పు ID/Email ఇచ్చినా లేదా టాస్క్‌లలో మోసం చేసినా అభ్యర్థన తిరస్కరించబడుతుంది.",
-                "ticket_box_title": "సపోర్ట్‌కి మెసేజ్ పంపండి", "ticket_btn": "టికెట్ సమర్పించండి"
-            },
-            // Fallback templates to save code limits. All gambling terms removed!
-            "mr": { "support_title": "मदत केंद्र", "ticket_btn": "सबमिट करा", "faq_header": "सतत विचारले जाणारे प्रश्न", "err_success": "✅ यशस्वीरित्या सबमिट केले!" },
-            "ta": { "support_title": "உதவி மையம்", "ticket_btn": "சமர்ப்பிக்கவும்", "faq_header": "அடிக்கடி கேட்கப்படும் கேள்விகள்", "err_success": "✅ வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!" },
-            "ur": { "support_title": "امدادی مرکز", "ticket_btn": "جمع کریں", "faq_header": "عام طور پر پوچھے گئے سوالات", "err_success": "✅ کامیابی سے جمع کر دیا گیا!" },
-            "gu": { "support_title": "સહાયતા કેન્દ્ર", "ticket_btn": "સબમિટ કરો", "faq_header": "વારંવાર પૂછાતા પ્રશ્નો", "err_success": "✅ સફળતાપૂર્વક સબમિટ કર્યું!" },
-            "es": { "support_title": "Centro de Ayuda", "ticket_btn": "Enviar", "faq_header": "Preguntas Frecuentes", "err_success": "✅ ¡Enviado con éxito!" },
-            "fr": { "support_title": "Centre d'Aide", "ticket_btn": "Soumettre", "faq_header": "Foire Aux Questions", "err_success": "✅ Soumis avec succès !" },
-            "ar": { "support_title": "مركز الدعم", "ticket_btn": "إرسال", "faq_header": "الأسئلة الشائعة", "err_success": "✅ تم الإرسال بنجاح!" },
-            "pt": { "support_title": "Centro de Ajuda", "ticket_btn": "Enviar", "faq_header": "Perguntas Frequentes", "err_success": "✅ Enviado com sucesso!" },
-            "ru": { "support_title": "Служба поддержки", "ticket_btn": "Отправить", "faq_header": "Часто задаваемые вопросы", "err_success": "✅ Успешно отправлено!" }
+            "bn": { "support_title": "সহায়তা কেন্দ্র", "ticket_btn": "জমা দিন", "err_success": "✅ সফলভাবে জমা দেওয়া হয়েছে!" },
+            "te": { "support_title": "సహాయ కేంద్రం", "ticket_btn": "సమర్పించండి", "err_success": "✅ విజయవంతమైంది!" },
+            "mr": { "support_title": "मदत केंद्र", "ticket_btn": "सबमिट करा", "err_success": "✅ यशस्वीरित्या सबमिट केले!" },
+            "ta": { "support_title": "உதவி மையம்", "ticket_btn": "சமர்ப்பிக்கவும்", "err_success": "✅ வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!" },
+            "ur": { "support_title": "امدادی مرکز", "ticket_btn": "جمع کریں", "err_success": "✅ کامیابی سے جمع کر دیا گیا!" },
+            "gu": { "support_title": "સહાયતા કેન્દ્ર", "ticket_btn": "સબમિટ કરો", "err_success": "✅ સફળતાપૂર્વક સબમિટ કર્યું!" },
+            "es": { "support_title": "Centro de Ayuda", "ticket_btn": "Enviar", "err_success": "✅ ¡Enviado con éxito!" },
+            "fr": { "support_title": "Centre d'Aide", "ticket_btn": "Soumettre", "err_success": "✅ Soumis avec succès !" },
+            "ar": { "support_title": "مركز الدعم", "ticket_btn": "إرسال", "err_success": "✅ تم الإرسال بنجاح!" },
+            "pt": { "support_title": "Centro de Ajuda", "ticket_btn": "Enviar", "err_success": "✅ Enviado com sucesso!" },
+            "ru": { "support_title": "Служба поддержки", "ticket_btn": "Отправить", "err_success": "✅ Успешно отправлено!" }
         };
 
         function changeLanguage(langCode) {
@@ -254,6 +264,8 @@
                 if(transObj[key]) {
                     if (elem.tagName === "H4" && elem.id !== "") {
                         elem.innerHTML = `<i class="fa-solid fa-ticket"></i> ${transObj[key]}`;
+                    } else if(elem.tagName === "SPAN") {
+                        elem.innerText = transObj[key];
                     } else {
                         elem.innerText = transObj[key];
                     }
@@ -263,130 +275,176 @@
         }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-        const userName = localStorage.getItem("userName") || "Player";
+        let userNameGlobal = "App User";
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchAdminSupportConfigs();
-            fetchUserSupportTickets();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Get User Name
+                    db.ref('users/' + uid).once('value', (snap) => {
+                        if(snap.exists() && snap.val().name) {
+                            userNameGlobal = snap.val().name;
+                        }
+                    });
+
+                    // 2. Sync External Support Links & Custom Toggle from Admin Panel
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const config = snap.val();
+                            
+                            // Check Independent Toggle: mod_support_links
+                            let isSupportLinksActive = true; 
+                            if(config.module_toggles) {
+                                // Save to local storage for fast loading (anti-flicker)
+                                localStorage.setItem("d_toggles", JSON.stringify(config.module_toggles));
+                                if (config.module_toggles.mod_support_links !== undefined) {
+                                    isSupportLinksActive = (config.module_toggles.mod_support_links === true || config.module_toggles.mod_support_links === "true");
+                                }
+                            }
+
+                            const btnWa = document.getElementById("btnWhatsapp");
+                            const btnTg = document.getElementById("btnTelegram");
+                            const btnEm = document.getElementById("btnEmail");
+
+                            // Social Links Setup
+                            if (config.social_settings) {
+                                let social = config.social_settings;
+                                
+                                // Email (Always Safe to show)
+                                if (social.support_email && social.support_email.trim() !== "") {
+                                    btnEm.href = `mailto:${social.support_email}`;
+                                } else {
+                                    btnEm.href = `mailto:support@dudoapp.com`;
+                                }
+
+                                // WhatsApp & Telegram (Show ONLY if Toggle is ON and Link exists)
+                                if (isSupportLinksActive && social.supportLinks) {
+                                    if (social.supportLinks.whatsapp && social.supportLinks.whatsapp.trim() !== "") {
+                                        btnWa.href = social.supportLinks.whatsapp;
+                                        btnWa.style.display = "flex";
+                                    } else {
+                                        btnWa.style.display = "none";
+                                    }
+
+                                    if (social.supportLinks.telegram && social.supportLinks.telegram.trim() !== "") {
+                                        btnTg.href = social.supportLinks.telegram;
+                                        btnTg.style.display = "flex";
+                                    } else {
+                                        btnTg.style.display = "none";
+                                    }
+                                } else {
+                                    // Toggle is OFF, force hide
+                                    btnWa.style.display = "none";
+                                    btnTg.style.display = "none";
+                                }
+                            }
+                        }
+                    });
+
+                    // 3. Fetch User's Ticket History (Syncs with Admin Panel's 'user_support_tickets')
+                    fetchUserTicketsHistory();
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH ADMIN CONTACT LINKS (NODE API)
-        async function fetchAdminSupportConfigs() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/app-config/social-settings`);
-                const data = await res.json();
-                
-                if (data.success && data.settings && data.settings.supportLinks) {
-                    let links = data.settings.supportLinks;
-                    
-                    if (links.whatsapp) {
-                        let waNode = document.getElementById("linkWhatsapp");
-                        waNode.href = links.whatsapp;
-                        waNode.style.display = "flex";
-                    }
-                    if (links.telegram) {
-                        let tgNode = document.getElementById("linkTelegram");
-                        tgNode.href = links.telegram;
-                        tgNode.style.display = "flex";
-                    }
-                }
-            } catch (err) {
-                console.log("Using cached configurations.");
-            }
-        }
-
-        // 🎫 FETCH USER'S TICKETS & ADMIN REPLIES
-        async function fetchUserSupportTickets() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/support/my-tickets/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                
-                const listDiv = document.getElementById("myTicketsList");
-                const sectionDiv = document.getElementById("myTicketsSection");
-                listDiv.innerHTML = "";
-
-                if (data.success && data.tickets && data.tickets.length > 0) {
-                    sectionDiv.style.display = "block";
-                    
-                    data.tickets.forEach(t => {
-                        let statusColor = t.status === 'Resolved' ? '#10b981' : '#f59e0b';
-                        let replyHtml = t.adminReply ? `<div class="admin-reply-box"><b><i class="fa-solid fa-headset"></i> Admin Reply:</b><br>${t.adminReply}</div>` : '';
-                        
-                        listDiv.innerHTML += `
-                            <div class="user-ticket-card">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                                    <span style="font-size:11px; color:var(--text-sub); font-weight:800;">${new Date(t.timestamp).toLocaleString()}</span>
-                                    <span style="font-size:11.5px; font-weight:900; color:${statusColor}; text-transform:uppercase;">${t.status}</span>
-                                </div>
-                                <div style="font-size:15px; font-weight:900; color:var(--text-main); margin-bottom:5px;">${t.subject}</div>
-                                <div style="font-size:13.5px; color:var(--text-sub); margin-bottom:8px; line-height: 1.5; font-weight: 600;">${t.message}</div>
-                                ${replyHtml}
-                            </div>
-                        `;
-                    });
-                } else {
-                    sectionDiv.style.display = "none";
-                }
-            } catch (err) {
-                console.log("Could not load support tickets.");
-            }
-        }
-
-        // 🚀 SUBMIT NEW TICKET TO NODE.JS API
-        async function executeSubmitUserHelpTicket() {
+        // 🚀 TICKET SUBMISSION ENGINE (100% SYNCED WITH ADMIN PANEL)
+        function executeSubmitUserHelpTicket() {
             const subject = document.getElementById("ticketSubject").value.trim();
             const message = document.getElementById("ticketMessage").value.trim();
+            let currentLang = localStorage.getItem("selectedLang") || "en";
 
-            if(!subject || !message) {
-                showCustomAlert("err_empty");
-                return;
-            }
+            if (!subject || !message) { showCustomAlert("err_empty"); return; }
 
             const btn = document.getElementById("btnSubmitTicket");
             btn.disabled = true;
             btn.innerText = "SUBMITTING...";
 
-            try {
-                const res = await fetch(`${API_BASE_URL}/support/create-ticket`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({
-                        userId: uid,
-                        userName: userName,
-                        subject: subject,
-                        message: message
-                    })
-                });
+            const ticketId = "TKT-" + Math.floor(Math.random() * 900000 + 100000);
+            
+            // Format Matches Admin Panel exactly
+            const ticketData = {
+                userId: uid,
+                userName: userNameGlobal,
+                subject: subject,
+                message: message,
+                status: "Pending", // Admin panel looks for 'Pending'
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
 
-                const data = await res.json();
-                
-                if (data.success) {
-                    showCustomAlert("err_success", "", true);
-                    document.getElementById("ticketSubject").value = "";
-                    document.getElementById("ticketMessage").value = "";
-                    fetchUserSupportTickets(); // Refresh list automatically
-                } else {
-                    alert("Failed to submit ticket. Server error.");
-                }
-            } catch (err) {
-                alert("Network connection error. Try again later.");
-            } finally {
-                let currentLang = localStorage.getItem("selectedLang") || "en";
+            // Write to EXACT database node that Admin Panel reads from
+            db.ref(`user_support_tickets/${ticketId}`).set(ticketData).then(() => {
+                showCustomAlert("err_success", "", true);
+                document.getElementById("ticketSubject").value = "";
+                document.getElementById("ticketMessage").value = "";
+            }).catch(err => {
+                alert("⚠️ Error: " + err.message);
+            }).finally(() => {
                 btn.disabled = false;
                 btn.innerText = langData[currentLang]["ticket_btn"] || "Submit Ticket";
-            }
+            });
+        }
+
+        // 📜 TICKET HISTORY RENDERER
+        function fetchUserTicketsHistory() {
+            db.ref('user_support_tickets').orderByChild('userId').equalTo(uid).on('value', (snap) => {
+                const list = document.getElementById("myTicketsList");
+                const sectionDiv = document.getElementById("myTicketsSection");
+                list.innerHTML = "";
+
+                if (!snap.exists()) {
+                    sectionDiv.style.display = "none";
+                    return;
+                }
+
+                sectionDiv.style.display = "block";
+                let ticketsArray = [];
+                snap.forEach(child => {
+                    ticketsArray.push({ id: child.key, ...child.val() });
+                });
+
+                // Sort latest first
+                ticketsArray.sort((a, b) => b.timestamp - a.timestamp);
+
+                ticketsArray.forEach(t => {
+                    let dateStr = new Date(t.timestamp).toLocaleDateString();
+                    
+                    let statusClass = t.status === "Resolved" ? "status-resolved" : "status-pending";
+                    let statusText = t.status === "Resolved" ? "✅ RESOLVED" : "⏳ PENDING";
+
+                    let adminReplyHtml = "";
+                    if (t.status === "Resolved" && t.adminReply) {
+                        adminReplyHtml = `
+                        <div class="admin-reply-box">
+                            <strong><i class="fa-solid fa-headset"></i> Admin Reply:</strong>
+                            <p>${t.adminReply}</p>
+                        </div>`;
+                    }
+
+                    list.innerHTML += `
+                        <div class="user-ticket-card">
+                            <div class="tkt-header">
+                                <span class="tkt-id">#${t.id} <span style="color:var(--text-sub); margin-left:5px;">${dateStr}</span></span>
+                                <span class="tkt-status ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="tkt-subj">${t.subject}</div>
+                            <div class="tkt-msg">${t.message}</div>
+                            ${adminReplyHtml}
+                        </div>
+                    `;
+                });
+            });
         }
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
+            let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey];
 
             const alertBox = document.getElementById("customAlertBox");
             const overlay = document.getElementById("alertOverlay");

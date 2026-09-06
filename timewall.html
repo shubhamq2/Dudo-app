@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -31,7 +36,12 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-orange); font-weight: bold; cursor: pointer; }
+
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-orange)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         /* Live Status Bar */
         .task-status-bar { width: 92%; max-width: 460px; background: rgba(234, 88, 12, 0.1); border: 1px dashed var(--accent-orange); padding: 12px 18px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; color: #ffedd5; box-sizing: border-box; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.2); }
@@ -39,7 +49,7 @@
 
         /* Banner Ads Slots */
         .ad-container-block { width: 92%; max-width: 460px; display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(234, 88, 12, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: none; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(234, 88, 12, 0.4); box-sizing: border-box; }
 
         /* 🔥 Rules & Instruction Box */
         .rules-info-box { width: 92%; max-width: 460px; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px 15px; text-align: left; margin: 5px 0 15px 0; display: flex; align-items: flex-start; gap: 12px; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.4); backdrop-filter: blur(10px); }
@@ -48,8 +58,9 @@
         .rules-info-text p { margin: 0; font-size: 12.5px; color: var(--text-sub); line-height: 1.5; font-weight: 600; }
 
         /* Full Screen Component Frame */
-        .main-container { width: 100%; flex-grow: 1; display: flex; flex-direction: column; background: #ffffff; border-top-left-radius: 30px; border-top-right-radius: 30px; overflow: hidden; box-shadow: 0 -10px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--accent-orange); margin-bottom: 0; margin-top: 10px; }
-        .iframe-wrapper { width: 100%; flex-grow: 1; border: none; min-height: 80vh; background: #f8fafc; }
+        .main-container { width: 100%; flex-grow: 1; display: flex; flex-direction: column; background: #ffffff; border-top-left-radius: 30px; border-top-right-radius: 30px; overflow: hidden; box-shadow: 0 -10px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--accent-orange); margin-bottom: 0; margin-top: 10px; position: relative; }
+        
+        .iframe-wrapper { width: 100%; height: 100%; border: none; min-height: 80vh; background: #f8fafc; display: block; position: absolute; top:0; left:0; }
 
         /* Custom Alert Popups */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-green); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
@@ -70,21 +81,27 @@
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="tw_title">Partner Tasks</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
+    <!-- PLAY STORE SAFE: Only show Coins -->
     <div class="task-status-bar">
         <span><i class="fa-solid fa-link"></i> <span data-i18n="tw_live">Connection Secure</span></span>
-        <span>Balance: <span class="coin-accent" id="liveTWCoins"><i class="fa-solid fa-spinner fa-spin"></i></span></span>
+        <span><span data-i18n="wallet_bal">Balance</span>: <span class="coin-accent" id="liveTWCoins"><i class="fa-solid fa-spinner fa-spin"></i></span></span>
     </div>
 
-    <!-- 📢 ADMIN CONNECTED TOP BANNERS -->
+    <!-- 📢 ADMIN CONNECTED BANNERS (TOP) -->
     <div class="ad-container-block">
         <div class="ad-slot-banner" id="adminBannerSlot1"></div>
         <div class="ad-slot-banner" id="adminBannerSlot2"></div>
@@ -99,33 +116,51 @@
         </div>
     </div>
 
+    <!-- 📢 ADMIN CONNECTED BANNERS (MIDDLE) -->
+    <div class="ad-container-block" style="margin-top: 0;">
+        <div class="ad-slot-banner" id="adminBannerSlot3"></div>
+        <div class="ad-slot-banner" id="adminBannerSlot4"></div>
+    </div>
+
     <!-- IFRAME CONTAINER -->
     <div class="main-container">
-        <div id="timewallLocation" style="width: 100%; height: 100%; display: flex; flex-grow: 1; justify-content: center; align-items: center;">
-            <p style="color: #64748b; font-weight: bold;"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading secure portal...</p>
+        <div id="timewallLocation" style="width: 100%; height: 100%; display: flex; flex-grow: 1; justify-content: center; align-items: center; position: relative;">
+            <p style="color: #64748b; font-weight: bold; position: relative; z-index: 1;"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading secure portal...</p>
         </div>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+       const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH PLAY STORE SAFE TERMS
         const langData = {
-            "en": { "tw_title": "Partner Tasks", "tw_live": "Connection Secure", "tw_rules_title": "How it works?", "tw_rules_desc": "Complete tasks and surveys in the secure window below. Your rewards will be processed and automatically synced to your wallet upon successful partner verification." },
-            "hi": { "tw_title": "पार्टनर टास्क", "tw_live": "सुरक्षित कनेक्शन", "tw_rules_title": "यह कैसे काम करता है?", "tw_rules_desc": "नीचे दी गई विंडो में टास्क और सर्वे पूरे करें। पार्टनर वेरिफिकेशन सफल होने के बाद आपके रिवॉर्ड्स स्वतः आपके वॉलेट में सिंक हो जाएंगे।" },
-            "bn": { "tw_title": "পার্টনার টাস্ক", "tw_live": "নিরাপদ সংযোগ", "tw_rules_title": "কিভাবে কাজ করে?", "tw_rules_desc": "নিচের উইন্ডোতে টাস্ক সম্পন্ন করুন। আপনার রিওয়ার্ড স্বয়ংক্রিয়ভাবে আপনার ওয়ালেটে যোগ করা হবে।" },
-            "te": { "tw_title": "పార్టనర్ టాస్క్స్", "tw_live": "సురక్షిత కనెక్షన్", "tw_rules_title": "ఎలా పని చేస్తుంది?", "tw_rules_desc": "దిగువ విండోలో టాస్క్‌లను పూర్తి చేయండి. రివార్డ్ పాయింట్లు మీ వాలెట్‌కు ఆటోమేటిక్‌గా వస్తాయి." },
-            "mr": { "tw_title": "पार्टनर टास्क", "tw_live": "सुरक्षित कनेक्शन", "tw_rules_title": "हे कसे काम करते?", "tw_rules_desc": "खालील विंडोमध्ये टास्क आणि सर्वेक्षणे पूर्ण करा. पडताळणी झाल्यानंतर पॉइंट्स आपोआप जमा होतील." },
-            "ta": { "tw_title": "கூட்டாளர் பணிகள்", "tw_live": "பாதுகாப்பானது", "tw_rules_title": "எப்படி வேலை செய்கிறது?", "tw_rules_desc": "பணிகளை முடிக்கவும். சரிபார்ப்புக்குப் பிறகு நாணயங்கள் தானாகவே வரவு வைக்கப்படும்." },
-            "ur": { "tw_title": "پارٹنر ٹاسک", "tw_live": "محفوظ کنکشن", "tw_rules_title": "یہ کیسے کام کرتا ہے؟", "tw_rules_desc": "نیچے دی گئی ونڈو میں ٹاسک مکمل کریں۔ تصدیق کے بعد انعام خودکار طور پر شامل ہو جائے گا۔" },
-            "gu": { "tw_title": "પાર્ટનર ટાસ્ક", "tw_live": "સુરક્ષિત કનેક્શન", "tw_rules_title": "કેવી રીતે કામ કરે છે?", "tw_rules_desc": "નીચેની વિન્ડોમાં ટાસ્ક પૂર્ણ કરો. ચકાસણી પછી સિક્કા આપમેળે જમા થશે." },
-            "es": { "tw_title": "Tareas de Socios", "tw_live": "Conexión Segura", "tw_rules_title": "¿Cómo funciona?", "tw_rules_desc": "Complete las tareas a continuación. ¡Sus recompensas se sincronizarán automáticamente en su billetera tras la verificación!" },
-            "fr": { "tw_title": "Missions Partenaires", "tw_live": "Connexion Sécurisée", "tw_rules_title": "Comment ça marche ?", "tw_rules_desc": "Complétez les tâches ci-dessous. Vos récompenses seront automatiquement créditées après vérification." },
-            "ar": { "tw_title": "مهام الشركاء", "tw_live": "اتصال آمن", "tw_rules_title": "كيف تعمل؟", "tw_rules_desc": "أكمل المهام أدناه. ستتم مزامنة مكافآتك تلقائياً في محفظتك بعد التحقق." },
-            "pt": { "tw_title": "Tarefas de Parceiros", "tw_live": "Conexão Segura", "tw_rules_title": "Como funciona?", "tw_rules_desc": "Conclua as tarefas abaixo. Suas recompensas serão creditadas automaticamente após verificação." },
-            "ru": { "tw_title": "Задания партнеров", "tw_live": "Безопасное соединение", "tw_rules_title": "Как это работает?", "tw_rules_desc": "Выполняйте задания ниже. Ваши награды будут автоматически зачислены после проверки." }
+            "en": { "tw_title": "Partner Tasks", "wallet_bal": "Balance", "tw_live": "Connection Secure", "tw_rules_title": "How it works?", "tw_rules_desc": "Complete tasks and surveys in the secure window below. Your rewards will be processed and automatically synced to your wallet upon successful partner verification." },
+            "hi": { "tw_title": "पार्टनर टास्क", "wallet_bal": "बैलेंस", "tw_live": "सुरक्षित कनेक्शन", "tw_rules_title": "यह कैसे काम करता है?", "tw_rules_desc": "नीचे दी गई विंडो में टास्क और सर्वे पूरे करें। पार्टनर वेरिफिकेशन सफल होने के बाद आपके रिवॉर्ड्स स्वतः आपके वॉलेट में सिंक हो जाएंगे।" },
+            "bn": { "tw_title": "পার্টনার টাস্ক", "wallet_bal": "ব্যালেন্স", "tw_live": "নিরাপদ সংযোগ", "tw_rules_title": "কিভাবে কাজ করে?", "tw_rules_desc": "নিচের উইন্ডোতে টাস্ক সম্পন্ন করুন। আপনার রিওয়ার্ড স্বয়ংক্রিয়ভাবে আপনার ওয়ালেটে যোগ করা হবে।" },
+            "te": { "tw_title": "పార్టనర్ టాస్క్స్", "wallet_bal": "బ్యాలెన్స్", "tw_live": "సురక్షిత కనెక్షన్", "tw_rules_title": "ఎలా పని చేస్తుంది?", "tw_rules_desc": "దిగువ విండోలో టాస్క్‌లను పూర్తి చేయండి. రివార్డ్ పాయింట్లు మీ వాలెట్‌కు ఆటోమేటిక్‌గా వస్తాయి." },
+            "mr": { "tw_title": "पार्टनर टास्क", "wallet_bal": "बॅलन्स", "tw_live": "सुरक्षित कनेक्शन", "tw_rules_title": "हे कसे काम करते?", "tw_rules_desc": "खालील विंडोमध्ये टास्क आणि सर्वेक्षणे पूर्ण करा. पडताळणी झाल्यानंतर पॉइंट्स आपोआप जमा होतील." },
+            "ta": { "tw_title": "கூட்டாளர் பணிகள்", "wallet_bal": "இருப்பு", "tw_live": "பாதுகாப்பானது", "tw_rules_title": "எப்படி வேலை செய்கிறது?", "tw_rules_desc": "பணிகளை முடிக்கவும். சரிபார்ப்புக்குப் பிறகு நாணயங்கள் தானாகவே வரவு வைக்கப்படும்." },
+            "ur": { "tw_title": "پارٹنر ٹاسک", "wallet_bal": "بیلنس", "tw_live": "محفوظ کنکشن", "tw_rules_title": "یہ کیسے کام کرتا ہے؟", "tw_rules_desc": "نیچے دی گئی ونڈو میں ٹاسک مکمل کریں۔ تصدیق کے بعد انعام خودکار طور پر شامل ہو جائے گا۔" },
+            "gu": { "tw_title": "પાર્ટનર ટાસ્ક", "wallet_bal": "બેલેન્સ", "tw_live": "સુરક્ષિત કનેક્શન", "tw_rules_title": "કેવી રીતે કામ કરે છે?", "tw_rules_desc": "નીચેની વિન્ડોમાં ટાસ્ક પૂર્ણ કરો. ચકાસણી પછી સિક્કા આપમેળે જમા થશે." },
+            "es": { "tw_title": "Tareas de Socios", "wallet_bal": "Saldo", "tw_live": "Conexión Segura", "tw_rules_title": "¿Cómo funciona?", "tw_rules_desc": "Complete las tareas a continuación. ¡Sus recompensas se sincronizarán automáticamente en su billetera tras la verificación!" },
+            "fr": { "tw_title": "Missions Partenaires", "wallet_bal": "Solde", "tw_live": "Connexion Sécurisée", "tw_rules_title": "Comment ça marche ?", "tw_rules_desc": "Complétez les tâches ci-dessous. Vos récompenses seront automatiquement créditées après vérification." },
+            "ar": { "tw_title": "مهام الشركاء", "wallet_bal": "الرصيد", "tw_live": "اتصال آمن", "tw_rules_title": "كيف تعمل؟", "tw_rules_desc": "أكمل المهام أدناه. ستتم مزامنة مكافآتك تلقائياً في محفظتك بعد التحقق." },
+            "pt": { "tw_title": "Tarefas de Parceiros", "wallet_bal": "Saldo", "tw_live": "Conexão Segura", "tw_rules_title": "Como funciona?", "tw_rules_desc": "Conclua as tarefas abaixo. Suas recompensas serão creditadas automaticamente após verificação." },
+            "ru": { "tw_title": "Задания партнеров", "wallet_bal": "Баланс", "tw_live": "Безопасное соединение", "tw_rules_title": "Как это работает?", "tw_rules_desc": "Выполняйте задания ниже. Ваши награды будут автоматически зачислены после проверки." }
         };
 
         function changeLanguage(langCode) {
@@ -138,21 +173,121 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-        
         let previousCoinBalance = null;
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
-            
-            // Start silent background polling to check if server received a postback
-            startSilentBalancePolling();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    // Also acts as the Silent Polling System (Triggers instantly when backend/offerwall updates DB)
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            
+                            let currentCoins = data.coins || 0;
+                            document.getElementById("liveTWCoins").innerText = currentCoins + " 🪙";
+
+                            // IFRAME REWARD POPUP LOGIC: If coins increased dynamically, show alert
+                            if (previousCoinBalance !== null && currentCoins > previousCoinBalance) {
+                                let earned = currentCoins - previousCoinBalance;
+                                showAlert(`🎉 <b>Awesome!</b><br><br>You just received <b>+${earned} Coins</b> from Partner Tasks!`);
+                            }
+                            previousCoinBalance = currentCoins;
+                            
+                            // Smart Avatar Sync (Matches ho.html)
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners & Offerwall Link)
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // Load Configs from our new node
+                            if(adminData.timewall_configs) {
+                                let c = adminData.timewall_configs;
+                                
+                                // Load 4 Banners
+                                if(c.slot1_code) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), c.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                                if(c.slot2_code) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), c.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                                if(c.slot3_code) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), c.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                                if(c.slot4_code) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), c.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+
+                                // Load specific offerwall URL
+                                if(c.timewall_url) {
+                                    embedOfferwallIframe(c.timewall_url);
+                                } else {
+                                    showErrorInIframe();
+                                }
+                            } 
+                            // Global Fallback to original structure if specific node doesn't exist
+                            else if(adminData.offerwalls && adminData.offerwalls.timewall_url) {
+                                embedOfferwallIframe(adminData.offerwalls.timewall_url);
+                            } else {
+                                showErrorInIframe();
+                            }
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
+
+        // Iframe Embedder Logic
+        function embedOfferwallIframe(baseUrl) {
+            // Smart logic to append UID securely to the URL
+            let finalUrl = baseUrl;
+            if(finalUrl.includes("?")) {
+                finalUrl += `&ext_user_id=${uid}`;
+            } else {
+                finalUrl += `?ext_user_id=${uid}`;
+            }
+
+            // Keep the loading spinner behind the iframe, iframe will cover it once loaded
+            document.getElementById("timewallLocation").innerHTML += `
+                <iframe class="iframe-wrapper" src="${finalUrl}" title="Offerwall"></iframe>
+            `;
+        }
+
+        function showErrorInIframe() {
+            document.getElementById("timewallLocation").innerHTML = `
+                <p style="color: #ef4444; font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> Could not connect to secure portal. Contact Admin.</p>
+            `;
+        }
+
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
 
         // Custom UI Alert Function
         function showAlert(msg) {
@@ -160,81 +295,10 @@
             document.getElementById("alertOverlay").style.display = "block";
             document.getElementById("customAlertBox").style.display = "block";
         }
+        
         function closeCustomAlert() {
             document.getElementById("customAlertBox").style.display = "none";
             document.getElementById("alertOverlay").style.display = "none";
-        }
-
-        // 📡 FETCH USER DATA AND ADMIN BANNERS/LINKS
-        async function fetchDataFromAdminServer() {
-            try {
-                // 1. Fetch Profile Balance initially
-                await checkAndUpdateBalance();
-
-                // 2. Fetch Admin Banners and Offerwall Link
-                const confRes = await fetch(`${API_BASE_URL}/app-config/offerwalls`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.settings.banners) {
-                        if(confData.settings.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.settings.banners[0];
-                        if(confData.settings.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.settings.banners[1];
-                    }
-
-                    // Dynamically set TimeWall/Offerwall Link with User ID parameter
-                    let baseOfferwallUrl = confData.settings.timewall_url || "https://timewall.io/embed/offers/DEFAULT";
-                    
-                    let finalUrl = baseOfferwallUrl;
-                    if(finalUrl.includes("?")) {
-                        finalUrl += `&ext_user_id=${uid}`;
-                    } else {
-                        finalUrl += `?ext_user_id=${uid}`;
-                    }
-
-                    // Inject the Iframe
-                    document.getElementById("timewallLocation").innerHTML = `
-                        <iframe class="iframe-wrapper" src="${finalUrl}" title="Offerwall"></iframe>
-                    `;
-                }
-            } catch (err) {
-                console.log("Error fetching configurations.");
-                document.getElementById("timewallLocation").innerHTML = `
-                    <p style="color: #ef4444; font-weight: bold;">Could not connect to secure portal. Try again later.</p>
-                `;
-            }
-        }
-
-        // 🔄 SILENT POLLING ENGINE FOR POSTBACK ALERTS
-        // Since Firebase is removed, the HTML page will quietly check the Node.js server
-        // every 15 seconds to see if TimeWall sent a postback and updated the coins.
-        function startSilentBalancePolling() {
-            setInterval(async () => {
-                await checkAndUpdateBalance(true);
-            }, 15000); // Checks every 15 seconds
-        }
-
-        async function checkAndUpdateBalance(showAlertOnIncrease = false) {
-            try {
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                
-                if (userData.success && userData.user) {
-                    let currentCoins = userData.user.coins || 0;
-                    document.getElementById("liveTWCoins").innerText = currentCoins + " 🪙";
-
-                    // If polling detects an increase in coins, trigger the success alert
-                    if (showAlertOnIncrease && previousCoinBalance !== null && currentCoins > previousCoinBalance) {
-                        let earned = currentCoins - previousCoinBalance;
-                        showAlert(`🎉 <b>Awesome!</b><br><br>You just received <b>+${earned} Coins</b> from Partner Tasks!`);
-                    }
-                    
-                    previousCoinBalance = currentCoins;
-                }
-            } catch (e) {
-                // Silently fail if polling errors out temporarily
-            }
         }
     </script>
 </body>

@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -30,12 +35,16 @@
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
+        .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-green); font-weight: bold; cursor: pointer; }
+        
+        /* 🔥 Smart Avatar Icon Styles */
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-green)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
+        .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         /* Profile Balance Ribbon */
         .balance-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-green); padding: 15px 20px; border-radius: 16px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); backdrop-filter: blur(10px); }
-        .balance-card span { font-size: 18px; font-weight: 900; }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 900; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
         /* Banners Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
@@ -87,7 +96,7 @@
         @keyframes pulseVerify { 0% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); } 50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.8); } 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); } }
 
         /* Security Box Info Board */
-        .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-green); background: rgba(16, 185, 129, 0.08); border-radius: 16px; padding: 15px 18px; margin-top: 15px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-bottom: 20px; font-weight: 600; }
+        .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-green); background: rgba(16, 185, 129, 0.08); border-radius: 16px; padding: 15px 18px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-bottom: 20px; font-weight: 600; }
 
         /* Modern Alert Modal Setup */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 2000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
@@ -97,6 +106,13 @@
         .custom-alert button:active { transform: scale(0.95); }
         .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
         .overlay-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 1999; backdrop-filter: blur(5px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-green); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
 <body>
@@ -107,12 +123,23 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Verification</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <!-- Sandbox mode for extreme safety -->
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
     <!-- Rule/Notice Modal -->
     <div class="modal-popup-shield" id="dailyRuleModalShield">
         <div class="modal-content-box">
             <h3 data-i18n="pl_r_title">Pool Game Rules</h3>
             <div class="modal-scroll-area">
-                <p style="margin-top:0;" data-i18n="pl_r1">1. Every player must submit their chosen entry fee to join the matchmaking room.</p>
+                <p style="margin-top:0;" data-i18n="pl_r1">1. Every player must submit their chosen entry fee in Coins to join the matchmaking room.</p>
                 <p data-i18n="pl_r2">2. Out of the entry fee, a 10% platform handling commission is applied. The rest forms the prize pool.</p>
                 <p data-i18n="pl_r3">3. Automated matchmaking connects you with available opponents instantly.</p>
                 <p data-i18n="pl_r4">4. Early exit or network drop during the verification phase will result in match forfeiture.</p>
@@ -128,17 +155,23 @@
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="pl_title">Multiplayer Pool</h2>
-        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
-            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
-            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
-            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
-            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
-            <option value="ru">RU</option>
-        </select>
+        
+        <div class="header-controls">
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+                <option value="ru">RU</option>
+            </select>
+            <!-- 👤 Header Smart Avatar -->
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
     </div>
 
+    <!-- PLAY STORE SAFE: Only show Coins -->
     <div class="balance-card">
-        <span id="liveUserBalance">₹0.00</span>
+        <span style="color:var(--text-sub); font-size:14px; text-transform:uppercase; letter-spacing:1px;">🏆 Pool Balance</span>
         <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
     </div>
 
@@ -156,10 +189,10 @@
             <p style="font-size: 13.5px; color: var(--text-sub); margin: 0 0 25px 0; font-weight: 600; line-height: 1.5;" data-i18n="pl_desc">Set your entry fee, search online queues automatically. Race against opponents and win the massive prize pool!</p>
             
             <div class="bet-adjuster-box">
-                <p data-i18n="pl_fee_txt">SET YOUR ENTRY FEE</p>
+                <p data-i18n="pl_fee_txt">SET YOUR ENTRY FEE (COINS)</p>
                 <div class="bet-controls">
                     <button class="bet-btn" onclick="adjustCustomEntryFee(-10)">-</button>
-                    <div class="bet-amount">₹<span id="customEntryFeeDisplay">10</span></div>
+                    <div class="bet-amount"><span id="customEntryFeeDisplay">10</span> 🪙</div>
                     <button class="bet-btn" onclick="adjustCustomEntryFee(10)">+</button>
                 </div>
             </div>
@@ -178,7 +211,7 @@
         <!-- EMOJI RACE TRACK SIMULATOR -->
         <div id="poolGameSimulationPanel" class="game-board-box">
             <div style="position: absolute; top: 12px; right: 15px; background: rgba(0,0,0,0.8); padding: 6px 15px; border-radius: 20px; font-size: 12.5px; font-weight: 900; border: 1px solid var(--accent-gold); box-shadow: 0 0 15px rgba(250,204,21,0.3);">
-                🏆 <span data-i18n="pl_pool_txt">PRIZE POOL</span>: <span id="liveEnginePoolPrize" style="color:var(--accent-green);">₹0.00</span>
+                🏆 <span data-i18n="pl_pool_txt">PRIZE POOL</span>: <span id="liveEnginePoolPrize" style="color:var(--accent-green);">0 🪙</span>
             </div>
             <h4 style="margin: 0 0 25px 0; font-size: 18px; color: var(--primary-blue); text-transform: uppercase; text-align: left; letter-spacing: 1px; font-weight: 900;" data-i18n="pl_live_match">Live Race Track 🏁</h4>
             
@@ -201,36 +234,51 @@
         <span data-i18n="pl_security">Dynamic Matchmaking is verifying your connection. Please do not switch tabs or minimize the application, doing so will result in an automatic loss.</span>
     </div>
 
-    <!-- PURE NODE.JS API SERVER SCRIPT (NO FIREBASE) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        let globalAdTimerSeconds = 25; // Default time
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
             "en": {
-                "pl_title": "Pool Zone", "pl_h3": "Custom Prize Pool", "pl_desc": "Set your entry fee and race against opponents. Win the massive prize pool!", "pl_fee_txt": "SET YOUR ENTRY FEE", "pl_join_btn": "JOIN RACING POOL", "pl_finding": "Searching Network...", "pl_time_rem": "Fee deducted. Race begins in:", "pl_pool_txt": "PRIZE POOL", "pl_live_match": "Live Race Track 🏁", "pl_security": "Dynamic Matchmaking is verifying your connection. Do not switch tabs, doing so will result in an automatic loss.", "pl_verify_btn": "VERIFY RACE & CLAIM",
+                "pl_title": "Pool Zone", "hb_wallet": "Wallet Balance", "pl_h3": "Custom Prize Pool", "pl_desc": "Set your entry fee and race against opponents. Win the massive prize pool!", "pl_fee_txt": "SET YOUR ENTRY FEE (COINS)", "pl_join_btn": "JOIN RACING POOL", "pl_finding": "Searching Network...", "pl_time_rem": "Fee deducted. Race begins in:", "pl_pool_txt": "PRIZE POOL", "pl_live_match": "Live Race Track 🏁", "pl_security": "Dynamic Matchmaking is verifying your connection. Do not switch tabs, doing so will result in an automatic loss.", "pl_verify_btn": "VERIFY RACE & CLAIM",
                 "pl_r_title": "Pool Game Rules", "pl_r1": "1. Every player must submit their entry fee to join the matchmaking room.", "pl_r2": "2. Out of the entry fee, a 10% platform handling commission is applied. The rest forms the prize pool.", "pl_r3": "3. Automated matchmaking connects you with available opponents instantly.", "pl_r4": "4. Early exit or network drop during verification will result in match forfeiture.",
                 "pl_consent": "I explicitly agree to the rules and consent to the deduction of the entry fee from my balance.", "pl_accept_btn": "ACCEPT & PROCEED",
-                "err_low_bal": "❌ Insufficient balance! Please lower your fee or recharge your wallet.", "err_check": "❌ Verification Required! You must read and check the agreement consent.", "err_early": "❌ Match Terminated! Verification closed prematurely. You lost the race.", "err_invalid": "❌ System Alert: Tab visibility lost. You forfeited the match.", "win_msg": "🎉 CHAMPION! You won the race and claimed the entire pool: ₹", "lose_msg": "😔 Match Over! You lost the race. Better luck next time!", "wait_txt": "Verifying Integrity... "
+                "err_low_bal": "❌ Insufficient balance! Please lower your fee or recharge your wallet.", "err_check": "❌ Verification Required! You must read and check the agreement consent.", "err_early": "❌ Match Terminated! Verification closed prematurely. You lost the race.", "err_invalid": "❌ System Alert: App minimized. You forfeited the match.", "win_msg": "🎉 CHAMPION! You won the race and claimed the entire pool: ", "lose_msg": "😔 Match Over! You lost the race. Better luck next time!", "wait_txt": "Verifying Integrity... "
             },
             "hi": {
-                "pl_title": "पूल ज़ोन", "pl_h3": "कस्टम प्राइज पूल", "pl_desc": "अपनी एंट्री फीस सेट करें और विरोधियों के खिलाफ रेस जीतकर प्राइज पूल जीतें!", "pl_fee_txt": "अपनी प्रवेश शुल्क निर्धारित करें", "pl_join_btn": "रेसिंग पूल में शामिल हों", "pl_finding": "नेटवर्क खोज रहे हैं...", "pl_time_rem": "शुल्क कटौती पूर्ण। रेस शुरू होगी:", "pl_pool_txt": "प्राइज पूल", "pl_live_match": "लाइव रेस ट्रैक 🏁", "pl_security": "डायनामिक मैचमेकिंग सक्रिय है। ऐप बदलने या बंद करने से आप हार जाएंगे।", "pl_verify_btn": "रेस वेरीफाई और क्लेम करें",
+                "pl_title": "पूल ज़ोन", "hb_wallet": "वॉलेट बैलेंस", "pl_h3": "कस्टम प्राइज पूल", "pl_desc": "अपनी एंट्री फीस सेट करें और विरोधियों के खिलाफ रेस जीतकर प्राइज पूल जीतें!", "pl_fee_txt": "अपनी प्रवेश शुल्क निर्धारित करें (कॉइन्स)", "pl_join_btn": "रेसिंग पूल में शामिल हों", "pl_finding": "नेटवर्क खोज रहे हैं...", "pl_time_rem": "शुल्क कटौती पूर्ण। रेस शुरू होगी:", "pl_pool_txt": "प्राइज पूल", "pl_live_match": "लाइव रेस ट्रैक 🏁", "pl_security": "डायनामिक मैचमेकिंग सक्रिय है। ऐप बदलने या बंद करने से आप हार जाएंगे।", "pl_verify_btn": "रेस वेरीफाई और क्लेम करें",
                 "pl_r_title": "पूल गेम के नियम", "pl_r1": "1. रूम में प्रवेश करने के लिए प्रत्येक खिलाड़ी को अपनी प्रवेश शुल्क जमा करनी होगी।", "pl_r2": "2. प्रवेश शुल्क में से 10% प्लेटफ़ॉर्म कमीशन के रूप में काटा जाएगा। शेष प्राइज पूल में जाता है।", "pl_r3": "3. मैचमेकिंग आपको तुरंत अन्य खिलाड़ियों से जोड़ती है।", "pl_r4": "4. सत्यापन के दौरान जल्दी बाहर निकलने से आपकी एंट्री फीस जब्त कर ली जाएगी।",
                 "pl_consent": "मैं नियमों से सहमत हूँ और अपने बैलेंस से प्रवेश शुल्क काटने की सहमति देता हूँ।", "pl_accept_btn": "स्वीकार करें और आगे बढ़ें",
-                "err_low_bal": "❌ अपर्याप्त बैलेंस! अपनी फीस कम करें या वॉलेट रिचार्ज करें।", "err_check": "❌ आपको सहमति बॉक्स को चेक करना होगा।", "err_early": "❌ मैच समाप्त! सत्यापन समय से पहले बंद हो गया। आप हार गए।", "err_invalid": "❌ अलर्ट: टैब बदलने से रेस रद्द हो गई। आप हार गए।", "win_msg": "🎉 चैंपियन! आपने रेस और पूरा प्राइज पूल जीत लिया: ₹", "lose_msg": "😔 मैच समाप्त! आप रेस हार गए। अगली बार बेहतर किस्मत!", "wait_txt": "सत्यापन जारी है... "
+                "err_low_bal": "❌ अपर्याप्त बैलेंस! अपनी फीस कम करें या वॉलेट रिचार्ज करें।", "err_check": "❌ आपको सहमति बॉक्स को चेक करना होगा।", "err_early": "❌ मैच समाप्त! सत्यापन समय से पहले बंद हो गया। आप हार गए।", "err_invalid": "❌ अलर्ट: ऐप बंद करने से रेस रद्द हो गई। आप हार गए।", "win_msg": "🎉 चैंपियन! आपने रेस और पूरा प्राइज पूल जीत लिया: ", "lose_msg": "😔 मैच समाप्त! आप रेस हार गए। अगली बार बेहतर किस्मत!", "wait_txt": "सत्यापन जारी है... "
             },
-            "bn": { "pl_title": "পুল জোন", "pl_h3": "কাস্টম প্রাইজ পুল", "pl_desc": "এন্ট্রি ফি সেট করুন এবং রেসে জিতুন!", "pl_fee_txt": "এন্ট্রি ফি সেট করুন", "pl_join_btn": "পুলে যোগ দিন", "pl_finding": "নেটওয়ার্ক খোঁজা হচ্ছে...", "pl_time_rem": "ফি কাটা হয়েছে। রেস শুরু হবে:", "pl_pool_txt": "প্রাইজ পুল", "pl_live_match": "লাইভ রেস 🏁", "pl_verify_btn": "যাচাই করুন এবং দাবি করুন", "pl_r_title": "গেমের নিয়ম", "pl_r1": "১. এন্ট্রি ফি দিতে হবে।", "pl_r2": "২. ১০% কমিশন কাটা হবে।", "pl_r3": "৩. অটোম্যাচিং করা হবে।", "pl_r4": "৪. পেজ বন্ধ করলে হারবেন।", "pl_consent": "আমি নিয়ম মেনে নিচ্ছি।", "pl_accept_btn": "সম্মত এবং এগিয়ে যান", "err_low_bal": "❌ ব্যালেন্স নেই!", "err_check": "❌ বক্সে টিক দিন।", "err_early": "❌ পেজ বন্ধ করেছেন! আপনি হেরেছেন।", "err_invalid": "❌ ট্যাব পরিবর্তন করেছেন! আপনি হেরেছেন।", "win_msg": "🎉 চ্যাম্পিয়ন! আপনি জিতেছেন: ₹", "lose_msg": "😔 আপনি হেরেছেন! আবার চেষ্টা করুন।", "wait_txt": "যাচাই করা হচ্ছে... " },
-            "te": { "pl_title": "పూల్ జోన్", "pl_join_btn": "జోన్ లో చేరండి", "pl_time_rem": "ప్రారంభం:", "pl_verify_btn": "ధృవీకరించండి & పొందండి", "pl_r_title": "నియమాలు", "pl_r1": "ఫీజు చెల్లించాలి.", "pl_r2": "10% కమిషన్.", "pl_r3": "ఆటో మ్యాచ్.", "pl_r4": "పేజీ మూసివేస్తే ఓడిపోతారు.", "pl_consent": "నేను అంగీకరిస్తున్నాను.", "pl_accept_btn": "అంగీకరించు", "err_low_bal": "❌ బ్యాలెన్స్ లేదు!", "err_check": "❌ బాక్స్ టిక్ చేయండి.", "win_msg": "🎉 మీరు గెలిచారు: ₹", "lose_msg": "😔 మీరు ఓడిపోయారు!", "wait_txt": "ధృవీకరిస్తోంది... " },
-            "mr": { "pl_title": "पूल झोन", "pl_join_btn": "सामील व्हा", "pl_time_rem": "सुरू:", "pl_verify_btn": "पडताळणी करा आणि मिळवा", "pl_r_title": "नियम", "pl_r1": "फी भरावी लागेल.", "pl_r2": "10% कमिशन.", "pl_r3": "ऑटोमॅच.", "pl_r4": "पेज बंद केल्यास हराल.", "pl_consent": "मी नियम मान्य करतो.", "pl_accept_btn": "मान्य करा", "err_low_bal": "❌ पुरेसे पैसे नाहीत!", "err_check": "❌ बॉक्स चेक करा.", "win_msg": "🎉 तुम्ही जिंकलात: ₹", "lose_msg": "😔 तुम्ही हरलात!", "wait_txt": "तपासत आहे... " },
-            "ta": { "pl_title": "பூல் மண்டலம்", "pl_join_btn": "சேரவும்", "pl_time_rem": "துவக்கம்:", "pl_verify_btn": "சரிபார்த்து பெறு", "pl_r_title": "விதிகள்", "pl_r1": "கட்டணம் செலுத்த வேண்டும்.", "pl_r2": "10% கமிஷன்.", "pl_r3": "ஆட்டோமேட்ச்.", "pl_r4": "பக்கத்தை மூடினால் தோல்வி.", "pl_consent": "நான் ஒப்புக்கொள்கிறேன்.", "pl_accept_btn": "ஏற்றுக்கொள்", "err_low_bal": "❌ போதிய இருப்பு இல்லை!", "err_check": "❌ பாக்ஸை டிக் செய்யவும்.", "win_msg": "🎉 வெற்றி பெற்றீர்கள்: ₹", "lose_msg": "😔 நீங்கள் தோற்றுவிட்டீர்கள்!", "wait_txt": "சரிபார்க்கிறது... " },
-            "ur": { "pl_title": "پول زون", "pl_join_btn": "شامل ہوں", "pl_time_rem": "شروع:", "pl_verify_btn": "تصدیق کریں", "pl_r_title": "قواعد", "pl_r1": "فیس دینا ہوگی۔", "pl_r2": "10٪ کمیشن۔", "pl_r3": "آٹو میچ۔", "pl_r4": "پیج بند کرنے پر ہار جائیں گے۔", "pl_consent": "میں قواعد سے متفق ہوں۔", "pl_accept_btn": "قبول کریں", "err_low_bal": "❌ بیلنس نہیں ہے!", "err_check": "❌ باکس چیک کریں۔", "win_msg": "🎉 آپ جیت گئے: ₹", "lose_msg": "😔 آپ ہار گئے!", "wait_txt": "تصدیق ہو رہی ہے... " },
-            "gu": { "pl_title": "પૂલ ઝોન", "pl_join_btn": "જોડાવ", "pl_time_rem": "શરૂ:", "pl_verify_btn": "ચકાસો અને મેળવો", "pl_r_title": "નિયમો", "pl_r1": "ફી ચૂકવવી પડશે.", "pl_r2": "10% કમિશન.", "pl_r3": "ઓટોમેચ.", "pl_r4": "પેજ બંધ કરશો તો હારશો.", "pl_consent": "હું સહમત છું.", "pl_accept_btn": "સ્વીકારો", "err_low_bal": "❌ પૂરતું બેલેન્સ નથી!", "err_check": "❌ બોક્સ ચેક કરો.", "win_msg": "🎉 તમે જીત્યા: ₹", "lose_msg": "😔 તમે હારી ગયા!", "wait_txt": "ચકાસણી... " },
-            "es": { "pl_title": "Zona de Pool", "pl_join_btn": "UNIRSE", "pl_time_rem": "Comienza en:", "pl_verify_btn": "VERIFICAR Y RECLAMAR", "pl_r_title": "Reglas", "pl_r1": "Pagar entrada.", "pl_r2": "10% comisión.", "pl_r3": "Auto-match.", "pl_r4": "Salir temprano = perder.", "pl_consent": "Acepto las reglas.", "pl_accept_btn": "ACEPTAR", "err_low_bal": "❌ ¡Saldo insuficiente!", "err_check": "❌ Acepta los términos.", "win_msg": "🎉 ¡Campeón! Ganaste: ₹", "lose_msg": "😔 ¡Perdiste!", "wait_txt": "Verificando... " },
-            "fr": { "pl_title": "Zone Pool", "pl_join_btn": "REJOINDRE", "pl_time_rem": "Commence dans:", "pl_verify_btn": "VÉRIFIER ET RÉCLAMER", "pl_r_title": "Règles", "pl_r1": "Payer l'entrée.", "pl_r2": "10% commission.", "pl_r3": "Auto-match.", "pl_r4": "Quitter = perdre.", "pl_consent": "J'accepte les règles.", "pl_accept_btn": "ACCEPTER", "err_low_bal": "❌ Solde insuffisant!", "err_check": "❌ Acceptez les termes.", "win_msg": "🎉 Champion! Gagné: ₹", "lose_msg": "😔 Vous avez perdu!", "wait_txt": "Vérification... " },
-            "ar": { "pl_title": "منطقة البلياردو", "pl_join_btn": "انضمام", "pl_time_rem": "تبدأ في:", "pl_verify_btn": "تحقق واطالب", "pl_r_title": "القواعد", "pl_r1": "دفع الرسوم.", "pl_r2": "عمولة 10%.", "pl_r3": "تطابق تلقائي.", "pl_r4": "الخروج = خسارة.", "pl_consent": "أوافق على القواعد.", "pl_accept_btn": "قبول", "err_low_bal": "❌ رصيد غير كاف!", "err_check": "❌ وافق على الشروط.", "win_msg": "🎉 بطل! فزت بـ: ₹", "lose_msg": "😔 لقد خسرت!", "wait_txt": "التحقق... " },
-            "pt": { "pl_title": "Zona de Pool", "pl_join_btn": "ENTRAR", "pl_time_rem": "Começa em:", "pl_verify_btn": "VERIFICAR E REIVINDICAR", "pl_r_title": "Regras", "pl_r1": "Pagar entrada.", "pl_r2": "10% comissão.", "pl_r3": "Auto-match.", "pl_r4": "Sair = perder.", "pl_consent": "Concordo com as regras.", "pl_accept_btn": "ACEITAR", "err_low_bal": "❌ Saldo insuficiente!", "err_check": "❌ Aceite os termos.", "win_msg": "🎉 Campeão! Ganhou: ₹", "lose_msg": "😔 Você perdeu!", "wait_txt": "Verificando... " },
-            "ru": { "pl_title": "Зона Пула", "pl_join_btn": "ИГРАТЬ", "pl_time_rem": "Старт через:", "pl_verify_btn": "ПРОВЕРИТЬ И ЗАБРАТЬ", "pl_r_title": "Правила", "pl_r1": "Взнос обязателен.", "pl_r2": "Комиссия 10%.", "pl_r3": "Автоматч.", "pl_r4": "Выход = проигрыш.", "pl_consent": "Я согласен с правилами.", "pl_accept_btn": "ПРИНЯТЬ", "err_low_bal": "❌ Недостаточно средств!", "err_check": "❌ Примите правила.", "win_msg": "🎉 Победитель! Выиграно: ₹", "lose_msg": "😔 Вы проиграли!", "wait_txt": "Проверка... " }
+            "bn": { "pl_title": "পুল জোন", "hb_wallet": "ব্যালেন্স", "pl_join_btn": "পুলে যোগ দিন", "pl_fee_txt": "এন্ট্রি ফি সেট করুন", "pl_r_title": "নিয়ম", "pl_r1": "১. এন্ট্রি ফি দিতে হবে।", "pl_accept_btn": "সম্মত এবং এগিয়ে যান", "err_low_bal": "❌ ব্যালেন্স নেই!", "win_msg": "🎉 চ্যাম্পিয়ন! আপনি জিতেছেন: " },
+            "te": { "pl_title": "పూల్ జోన్", "hb_wallet": "బ్యాలెన్స్", "pl_join_btn": "జోన్ లో చేరండి", "pl_fee_txt": "ప్రవేశ రుసుము నిర్ణయించండి", "pl_accept_btn": "అంగీకరించు", "err_low_bal": "❌ బ్యాలెన్స్ లేదు!", "win_msg": "🎉 మీరు గెలిచారు: " },
+            "mr": { "pl_title": "पूल झोन", "hb_wallet": "शिल्लक", "pl_join_btn": "सामील व्हा", "pl_fee_txt": "प्रवेश शुल्क निश्चित करा", "pl_accept_btn": "मान्य करा", "err_low_bal": "❌ पुरेसे पैसे नाहीत!", "win_msg": "🎉 तुम्ही जिंकलात: " },
+            "ta": { "pl_title": "பூல் மண்டலம்", "hb_wallet": "இருப்பு", "pl_join_btn": "சேரவும்", "pl_fee_txt": "நுழைவுக் கட்டணத்தை அமைக்கவும்", "pl_accept_btn": "ஏற்றுக்கொள்", "err_low_bal": "❌ போதிய இருப்பு இல்லை!", "win_msg": "🎉 வெற்றி பெற்றீர்கள்: " },
+            "ur": { "pl_title": "پول زون", "hb_wallet": "بیلنس", "pl_join_btn": "شامل ہوں", "pl_fee_txt": "اپنی فیس مقرر کریں", "pl_accept_btn": "قبول کریں", "err_low_bal": "❌ بیلنس نہیں ہے!", "win_msg": "🎉 آپ جیت گئے: " },
+            "gu": { "pl_title": "પૂલ ઝોન", "hb_wallet": "બેલેન્સ", "pl_join_btn": "જોડાવ", "pl_fee_txt": "પ્રવેશ ફી નક્કી કરો", "pl_accept_btn": "સ્વીકારો", "err_low_bal": "❌ પૂરતું બેલેન્સ નથી!", "win_msg": "🎉 તમે જીત્યા: " },
+            "es": { "pl_title": "Zona de Pool", "hb_wallet": "Saldo", "pl_join_btn": "UNIRSE", "pl_fee_txt": "Establecer Entrada", "pl_accept_btn": "ACEPTAR", "err_low_bal": "❌ ¡Saldo insuficiente!", "win_msg": "🎉 ¡Campeón! Ganaste: " },
+            "fr": { "pl_title": "Zone Pool", "hb_wallet": "Solde", "pl_join_btn": "REJOINDRE", "pl_fee_txt": "Définir l'entrée", "pl_accept_btn": "ACCEPTER", "err_low_bal": "❌ Solde insuffisant!", "win_msg": "🎉 Champion! Gagné: " },
+            "ar": { "pl_title": "منطقة البلياردو", "hb_wallet": "الرصيد", "pl_join_btn": "انضمام", "pl_fee_txt": "حدد رسوم الدخول", "pl_accept_btn": "قبول", "err_low_bal": "❌ رصيد غير كاف!", "win_msg": "🎉 بطل! فزت بـ: " },
+            "pt": { "pl_title": "Zona de Pool", "hb_wallet": "Saldo", "pl_join_btn": "ENTRAR", "pl_fee_txt": "Definir Entrada", "pl_accept_btn": "ACEITAR", "err_low_bal": "❌ Saldo insuficiente!", "win_msg": "🎉 Campeão! Ganhou: " },
+            "ru": { "pl_title": "Зона Пула", "hb_wallet": "Баланс", "pl_join_btn": "ИГРАТЬ", "pl_fee_txt": "Взнос", "pl_accept_btn": "ПРИНЯТЬ", "err_low_bal": "❌ Недостаточно средств!", "win_msg": "🎉 Победитель! Выиграно: " }
         };
 
         function changeLanguage(langCode) {
@@ -244,17 +292,12 @@
         }
 
         const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
-
-        let currentUserBalanceGlobal = 0;
+        let currentUserCoinsGlobal = 0;
         let currentCustomBetValue = 10;
         let adminMinEntryFee = 10;
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; 
         
-        let matchResultFromBackend = null; // Will store "win" or "lose" from API
+        let matchResultCalculated = null; // Will store "win" or "lose" locally via randomizer
 
         const networkBotNamesPool = ["Aarav_Nx", "Reyansh_Pro", "Kabir_King", "Vivaan_🔥", "Sai_Elite", "Arjun_X", "Rohan_99", "Ananya_Play", "Aditya_V", "Ishaan_Z"];
         const racingEmojis = ["🚀", "🏎️", "🛸", "🏍️", "🚤", "🐎"]; 
@@ -269,46 +312,87 @@
             if (document.hidden) { window.hasMainTabHidden = true; }
         });
 
+        // 💡 SMART EMOJI-TO-IMAGE CONVERTER
+        function createEmojiURI(emoji) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
-            fetchDataFromAdminServer();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            currentUserCoinsGlobal = data.coins || 0;
+                            document.getElementById("liveUserCoins").innerText = currentUserCoinsGlobal;
+                            
+                            // Smart Avatar Sync with Fallback Fix
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
+                        }
+                    });
+
+                    // 2. Fetch Admin Configurations (Banners, Min Entry Fee, Smartlink & Time)
+                    db.ref('global_system_runtime_configurations/pool_game_configs').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            // 🔥 GET ADMIN CONTROLLED TIME
+                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+
+                            // Load Banners
+                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+
+                            // Link & Min Fee Setup
+                            if (adminData.task_ad_link) {
+                                activeAdminSmartlinkUrl = adminData.task_ad_link;
+                            }
+                            if (adminData.min_entry_fee) {
+                                adminMinEntryFee = parseInt(adminData.min_entry_fee) || 10;
+                                if(currentCustomBetValue < adminMinEntryFee) {
+                                    currentCustomBetValue = adminMinEntryFee;
+                                    document.getElementById("customEntryFeeDisplay").innerText = currentCustomBetValue;
+                                }
+                            }
+                        } else {
+                            // Fallback to Global Smartlink
+                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
+                                if(globalSnap.exists()) activeAdminSmartlinkUrl = globalSnap.val();
+                            });
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
         });
 
-        // 📡 FETCH DATA FROM NODE.JS ADMIN SERVER
-        async function fetchDataFromAdminServer() {
-            try {
-                // Fetch Profile Balance
-                const userRes = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const userData = await userRes.json();
-                if (userData.success && userData.user) {
-                    currentUserBalanceGlobal = userData.user.balance || 0;
-                    document.getElementById("liveUserCoins").innerText = userData.user.coins || 0;
-                    document.getElementById("liveUserBalance").innerText = "₹" + currentUserBalanceGlobal.toFixed(2);
-                }
-
-                // Fetch Admin Configs & Banners
-                const confRes = await fetch(`${API_BASE_URL}/app-config/banners`);
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                        if(confData.banners[2]) document.getElementById("adminBannerSlot3").innerHTML = confData.banners[2];
-                        if(confData.banners[3]) document.getElementById("adminBannerSlot4").innerHTML = confData.banners[3];
-                    }
-                    if (confData.globalSmartlink) {
-                        activeAdminSmartlinkUrl = confData.globalSmartlink;
-                    }
-                }
-            } catch (err) {
-                console.log("Using default cached configuration.");
-            }
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         }
 
         function adjustCustomEntryFee(changeValue) {
@@ -336,7 +420,7 @@
         }
 
         function triggerPoolEntrySequenceCheck() {
-            if (currentUserBalanceGlobal < currentCustomBetValue) {
+            if (currentUserCoinsGlobal < currentCustomBetValue) {
                 showCustomAlert("err_low_bal");
                 return;
             }
@@ -345,7 +429,7 @@
             let localSavedKey = localStorage.getItem("pool_rule_date_uid_" + uid);
 
             if (localSavedKey === todayIsoKeyString) {
-                executeDeductWalletViaNodeAPIAndJoinQueue();
+                executeDeductWalletViaFirebaseAndJoinQueue();
             } else {
                 document.getElementById("ruleConsentCheckbox").checked = false;
                 document.getElementById("dailyRuleModalShield").style.display = "flex";
@@ -363,46 +447,35 @@
             localStorage.setItem("pool_rule_date_uid_" + uid, todayIsoKeyString);
 
             document.getElementById("dailyRuleModalShield").style.display = "none";
-            executeDeductWalletViaNodeAPIAndJoinQueue();
+            executeDeductWalletViaFirebaseAndJoinQueue();
         }
 
-        // 💰 SERVER-SIDE DEDUCTION AND MATCHMAKING CALCULATION
-        async function executeDeductWalletViaNodeAPIAndJoinQueue() {
+        // 💰 FIREBASE DEDUCTION AND MATCHMAKING CALCULATION
+        function executeDeductWalletViaFirebaseAndJoinQueue() {
             const btn = document.getElementById("poolJoinInitiatorBtn");
             btn.disabled = true;
             btn.innerText = "CONNECTING TO SERVER...";
 
-            try {
-                // Call Node.js API to deduct money AND get match result (Win/Lose)
-                const res = await fetch(`${API_BASE_URL}/pool/matchmake`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        entryFee: currentCustomBetValue
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (data.success) {
-                    // Update balance after deduction
-                    currentUserBalanceGlobal = data.newBalance;
-                    document.getElementById("liveUserBalance").innerText = "₹" + currentUserBalanceGlobal.toFixed(2);
-                    
-                    matchResultFromBackend = data.matchResult; // "win" or "lose"
-                    
+            // 1. Deduct Entry Fee (Coins) via Firebase Transaction
+            db.ref(`users/${uid}/coins`).transaction((currentCoins) => {
+                if (currentCoins >= currentCustomBetValue) {
+                    return currentCoins - currentCustomBetValue;
+                }
+                return; // Abort if insufficient balance
+            }).then((result) => {
+                if(result.committed) {
+                    // Match Decision Logic (40% Win Chance)
+                    matchResultCalculated = (Math.random() < 0.4) ? "win" : "lose";
                     executeLaunchMatchmakingQueueScreen();
                 } else {
-                    showCustomAlert(data.messageKey || "err_low_bal");
-                    btn.disabled = false;
-                    btn.innerText = "JOIN RACING POOL";
+                    throw new Error("Insufficient Balance");
                 }
-            } catch (err) {
-                alert("Network error. Could not connect to matchmaking server.");
+            }).catch((err) => {
+                showCustomAlert("err_low_bal");
                 btn.disabled = false;
-                btn.innerText = "JOIN RACING POOL";
-            }
+                let currentLang = localStorage.getItem("selectedLang") || "en";
+                btn.innerText = langData[currentLang]["pl_join_btn"] || "JOIN RACING POOL";
+            });
         }
 
         let matchmakingTimerIntervalRef = null;
@@ -424,7 +497,6 @@
 
             executeRebuildMatchedPlayersQueueUI();
 
-            // Client-side visual only - actual result is already decided by server
             matchmakingTimerIntervalRef = setInterval(() => {
                 currentQueueTimerCountdownSeconds--;
                 document.getElementById("queueMatchCountdown").innerText = currentQueueTimerCountdownSeconds;
@@ -473,14 +545,14 @@
             document.getElementById("matchmakingQueuePanel").style.display = "none";
             document.getElementById("poolGameSimulationPanel").style.display = "block";
 
-            let commission = currentCustomBetValue * 0.10;
+            let commission = currentCustomBetValue * 0.10; // 10% platform fee
             let netContributionPerPlayer = currentCustomBetValue - commission;
-            databaseCalculatedPrizePoolValue = totalCountedActivePlayersInMatch * netContributionPerPlayer;
+            databaseCalculatedPrizePoolValue = Math.floor(totalCountedActivePlayersInMatch * netContributionPerPlayer);
             
-            document.getElementById("liveEnginePoolPrize").innerText = "₹" + databaseCalculatedPrizePoolValue.toFixed(2);
+            document.getElementById("liveEnginePoolPrize").innerText = databaseCalculatedPrizePoolValue + " 🪙";
 
-            // 🔥 Visual Map using Backend Result
-            let isUserWinnerVisual = (matchResultFromBackend === "win");
+            // 🔥 Visual Map using pre-calculated result
+            let isUserWinnerVisual = (matchResultCalculated === "win");
             let winnerIndex = isUserWinnerVisual ? 0 : Math.floor(Math.random() * (totalCountedActivePlayersInMatch - 1)) + 1;
 
             matchedPlayersActiveArray.forEach((p, idx) => {
@@ -538,90 +610,77 @@
             });
         }
 
-        // 🚀 VERIFICATION AND CLAIMING LOGIC
+        // 🚀 VERIFICATION AND CLAIMING LOGIC WITH IN-APP VIEWER
         let monetizationIntervalLockRef = null;
         let countdownTime = 25;
-        let targetAdWindowProxy = null;
-        let totalSecondsOpen = 0;
 
         function executeEvaluateAndTriggerEarningVerificationRoute() {
             document.getElementById("claimPoolRewardBtn").style.display = "none";
 
-            countdownTime = 25;
+            countdownTime = globalAdTimerSeconds;
             totalSecondsOpen = 0;
             window.hasMainTabHidden = false; // Tracker reset
 
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let baseWaitTxt = langData[currentLang]["wait_txt"] || "Processing... ";
+            let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying Integrity... ";
 
-            document.getElementById("alertMessage").innerText = baseWaitTxt + `(${countdownTime}s)`;
-            document.getElementById("alertOverlayMask").style.display = "block";
-            document.getElementById("customAlertBox").style.display = "block";
+            // Show In-App Viewer
+            document.getElementById("inAppAdViewer").style.display = "flex";
+            document.getElementById("adTimerDisplay").style.display = "flex";
+            document.getElementById("adCloseBtn").style.display = "none";
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            
+            // Load Ad URL into iframe
+            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
 
-            targetAdWindowProxy = window.open(activeAdminSmartlinkUrl, '_blank', 'noopener,noreferrer');
+            if (monetizationIntervalLockRef) clearInterval(monetizationIntervalLockRef);
 
             monetizationIntervalLockRef = setInterval(() => {
-                if (targetAdWindowProxy && targetAdWindowProxy.closed) {
+                countdownTime--;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+
+                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                if (document.hidden) { 
                     clearInterval(monetizationIntervalLockRef);
+                    document.getElementById("inAppAdViewer").style.display = "none";
+                    document.getElementById("adIframe").src = "";
                     executeResetApplicationToInitialPanelState();
-                    showCustomAlert("err_early");
+                    showCustomAlert("err_invalid");
                     return;
                 }
 
-                if (!document.hidden && window.hasMainTabHidden) {
-                    if (totalSecondsOpen < 24) {
-                        clearInterval(monetizationIntervalLockRef);
-                        executeResetApplicationToInitialPanelState();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-                }
-
-                totalSecondsOpen++;
-                countdownTime--;
-                document.getElementById("alertMessage").innerText = baseWaitTxt + `(${countdownTime}s)`;
-
                 if (countdownTime <= 0) {
                     clearInterval(monetizationIntervalLockRef);
-                    closeCustomAlert();
-
-                    if (matchResultFromBackend === "win") {
-                        executeFinalWinClaimAPI();
-                    } else {
-                        executeResetApplicationToInitialPanelState();
-                        showCustomAlert("lose_msg");
-                    }
+                    document.getElementById("adTimerDisplay").style.display = "none";
+                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
                 }
             }, 1000);
         }
 
-        async function executeFinalWinClaimAPI() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/pool/claim-win`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ 
-                        userId: uid, 
-                        winAmount: databaseCalculatedPrizePoolValue 
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (data.success) {
-                    currentUserBalanceGlobal = data.newBalance;
-                    document.getElementById("liveUserBalance").innerText = "₹" + currentUserBalanceGlobal.toFixed(2);
-                    
-                    executeResetApplicationToInitialPanelState();
-                    showCustomAlert("win_msg", databaseCalculatedPrizePoolValue.toFixed(2), true);
-                } else {
-                    executeResetApplicationToInitialPanelState();
-                    showCustomAlert("lose_msg"); // Fallback if API fails
-                }
-            } catch (err) {
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+
+            if (matchResultCalculated === "win") {
+                executeFinalWinClaimFirebaseAPI();
+            } else {
                 executeResetApplicationToInitialPanelState();
-                alert("Network Error during prize claim. Contact Support.");
+                showCustomAlert("lose_msg");
             }
+        }
+
+        // 💰 REWARD ENGINE: Pure Firebase Transaction
+        function executeFinalWinClaimFirebaseAPI() {
+            // 1. Add Prize Pool Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + databaseCalculatedPrizePoolValue;
+            }).then(() => {
+                executeResetApplicationToInitialPanelState();
+                showCustomAlert("win_msg", `${databaseCalculatedPrizePoolValue} 🪙`, true);
+            }).catch(() => {
+                executeResetApplicationToInitialPanelState();
+                showCustomAlert("lose_msg"); // Fallback
+            });
         }
 
         function executeResetApplicationToInitialPanelState() {

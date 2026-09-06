@@ -9,340 +9,299 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- 🔥 Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
-            --bg-dark: #0b0f19;
-            --card-bg: rgba(22, 30, 49, 0.75);
-            --primary-blue: #3b82f6;
-            --accent-cyan: #06b6d4;
-            --accent-green: #10b981;
-            --accent-gold: #f59e0b;
-            --accent-pink: #ef4444;
-            --accent-purple: #a855f7;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --border-glow: rgba(59, 130, 246, 0.18);
+            --bg-dark: #0b0f19; --card-bg: rgba(22, 30, 49, 0.75); --primary-blue: #3b82f6; 
+            --accent-cyan: #06b6d4; --accent-green: #10b981; --accent-gold: #f59e0b; 
+            --accent-pink: #ef4444; --accent-purple: #a855f7; --text-main: #f8fafc; 
+            --text-sub: #94a3b8; --border-glow: rgba(59, 130, 246, 0.18);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-        body {
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding-bottom: 120px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-        }
+        body { background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12) 0%, transparent 40%), radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.1) 0%, transparent 40%); color: var(--text-main); min-height: 100vh; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
 
         /* 👑 Header Bar */
-        .header {
-            width: 100%;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 18px;
-            box-sizing: border-box;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .header h2 { margin: 0; color: var(--accent-green); font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
-        .header-controls { display: flex; gap: 10px; align-items: center; }
-
+        .header { width: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .header h2 { margin: 0; color: #fff; font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
+        .header h2 span { color: var(--accent-cyan); }
+        .header-controls { display: flex; gap: 12px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); outline: none; font-size: 11px; background: #1e293b; color: #fff; font-weight: bold; cursor: pointer; }
-
-        /* Notification Bell */
-        .notif-bell { position: relative; width: 36px; height: 36px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+        .notif-bell { position: relative; width: 38px; height: 38px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
         .notif-bell:active { transform: scale(0.9); }
-        .notif-badge { position: absolute; top: -3px; right: -3px; background: var(--accent-pink); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--bg-dark); }
+        .notif-badge { position: absolute; top: -2px; right: -2px; background: var(--accent-pink); color: white; font-size: 10px; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--bg-dark); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+        .header-profile-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; cursor: pointer; background: #1e293b; text-decoration: none; }
+        .header-profile-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
-        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
-
-        /* 💳 Balance Card */
-        .wallet-card { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e293b 100%); color: white; width: 90%; max-width: 420px; padding: 22px; border-radius: 24px; margin-top: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); box-sizing: border-box; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.15); }
-        .wallet-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 60%); pointer-events: none; }
-        .wallet-card p { margin: 0; font-size: 13px; opacity: 0.85; font-weight: 600; }
-        .wallet-card h1 { margin: 8px 0; font-size: 38px; font-weight: 900; letter-spacing: -1px; }
-        .coins-display { font-size: 13px; background: rgba(255,255,255,0.15); padding: 6px 18px; border-radius: 20px; display: inline-block; margin-bottom: 15px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
-        
-        .wallet-buttons-row { display: flex; justify-content: center; gap: 12px; }
-        .ledger-btn { background: linear-gradient(135deg, var(--accent-green), #059669); color: white; border: none; padding: 12px 22px; border-radius: 25px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.3); transition: 0.2s; flex: 1; max-width: 160px; }
+        /* 💳 Smart User Card */
+        .smart-user-card { width: 90%; max-width: 420px; background: linear-gradient(145deg, rgba(30,27,75,0.95) 0%, rgba(15,23,42,0.95) 100%); border-radius: 20px; padding: 18px; margin-top: 18px; border: 1px solid rgba(139, 92, 246, 0.4); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; backdrop-filter: blur(10px); gap: 10px; overflow: hidden; }
+        .card-left-info { display: flex; align-items: center; gap: 12px; width: 65%; }
+        .card-profile-img { width: 50px; height: 50px; min-width: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; background: #1e293b; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+        .card-profile-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .user-text-details { display: flex; flex-direction: column; gap: 4px; width: calc(100% - 62px); overflow: hidden; }
+        .user-name { font-size: 16px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: capitalize; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+        .user-uid { font-size: 10.5px; color: #94a3b8; font-family: monospace; font-weight: bold; background: rgba(0, 0, 0, 0.3); padding: 3px 8px; border-radius: 6px; display: inline-block; border: 1px dashed rgba(255,255,255,0.1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box; }
+        .card-right-wallet { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; max-width: 35%; }
+        .coins-display { font-size: 18px; font-weight: 900; color: var(--accent-gold); display: flex; align-items: center; gap: 5px; text-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+        .ledger-btn { background: linear-gradient(135deg, var(--accent-green), #059669); color: white; border: none; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.4); transition: 0.2s; text-transform: uppercase; white-space: nowrap; }
         .ledger-btn:active { transform: scale(0.95); }
 
         /* 🟢 Marquee Live Ticker */
-        .reward-ticker-wrapper { width: 90%; max-width: 420px; background: var(--card-bg); border: 1px solid var(--border-glow); border-radius: 14px; margin-top: 18px; margin-bottom: 8px; padding: 8px 12px; overflow: hidden; box-sizing: border-box; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(10px); }
-        .ticker-badge-live { background: var(--accent-green); color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; animation: flashBadge 1s infinite alternate; }
-        @keyframes flashBadge { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+        .reward-ticker-wrapper { width: 90%; max-width: 420px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glow); border-radius: 12px; margin-top: 15px; margin-bottom: 5px; padding: 8px 12px; overflow: hidden; box-sizing: border-box; display: flex; align-items: center; gap: 10px; }
+        .ticker-badge-live { background: var(--accent-pink); color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; animation: flashBadge 1s infinite alternate; }
+        @keyframes flashBadge { 0% { opacity: 0.6; } 100% { opacity: 1; } }
         .marquee-container-box { overflow: hidden; white-space: nowrap; width: 100%; }
-        #livePayoutStream { display: inline-block; padding-left: 100%; font-size: 12.5px; font-weight: 600; color: var(--text-sub); position: relative; white-space: nowrap; }
+        #livePayoutStream { display: inline-block; padding-left: 100%; font-size: 12px; font-weight: 600; color: var(--text-sub); white-space: nowrap; animation: smoothMarqueeLoop 20s linear infinite; }
         #livePayoutStream span { margin-right: 35px; color: var(--accent-green); }
         @keyframes smoothMarqueeLoop { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        /* 🎯 Daily Tasks Progress Bar Card */
-        .task-progress-card { width: 90%; max-width: 420px; background: var(--card-bg); border-radius: 20px; padding: 20px; box-sizing: border-box; border: 1px solid var(--border-glow); margin: 18px auto 10px auto; backdrop-filter: blur(10px); }
-        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .progress-title { font-size: 13.5px; font-weight: bold; color: #fff; }
-        .next-reward-hint { font-size: 11.5px; color: var(--accent-gold); font-weight: bold; }
-        .progress-track { position: relative; background: rgba(0,0,0,0.4); height: 12px; border-radius: 6px; margin: 25px 0 15px 0; border: 1px solid rgba(255,255,255,0.05); }
-        .progress-fill { background: linear-gradient(90deg, var(--primary-blue), var(--accent-green)); height: 100%; width: 0%; border-radius: 6px; transition: width 0.5s ease-in-out; }
-        .milestone { position: absolute; top: -5px; width: 22px; height: 22px; background: #1e293b; border: 2px solid var(--text-sub); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: var(--text-sub); transform: translateX(-50%); z-index: 2; }
-        .milestone.achieved { border-color: var(--accent-green); background: var(--accent-green); color: #fff; }
-        .milestone-tag { position: absolute; top: -23px; font-size: 9.5px; font-weight: 800; color: var(--accent-gold); white-space: nowrap; transform: translateX(-50%); }
+        /* 🧩 SMART FLEX GRID */
+        .smart-flex-grid { display: flex; flex-wrap: wrap; gap: 12px; width: 90%; max-width: 420px; margin-top: 15px; }
+        .zone-card { flex: 1 1 calc(50% - 12px); min-width: 130px; background: var(--card-bg); padding: 18px 12px; border-radius: 18px; text-align: center; text-decoration: none; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; border: 1px solid var(--border-glow); position: relative; backdrop-filter: blur(10px); min-height: 110px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .zone-card:active { transform: scale(0.95); background: rgba(30, 41, 59, 0.9); }
+        .full-width-card { flex: 1 1 100%; min-height: 90px; flex-direction: row; gap: 15px; }
+        .zone-icon { font-size: 30px; margin-bottom: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+        .full-width-card .zone-icon { margin-bottom: 0; font-size: 36px; }
+        .zone-card h3 { margin: 0 0 4px 0; font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .zone-card p { margin: 0; font-size: 10px; color: var(--text-sub); font-weight: 600; }
+        .zone-badge { position: absolute; top: -6px; right: -6px; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 20px; color: #fff; text-transform: uppercase; box-shadow: 0 2px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); }
+        .badge-hot { background: linear-gradient(135deg, #ef4444, #991b1b); }
+        .badge-new { background: linear-gradient(135deg, #10b981, #047857); }
+        .badge-pro { background: linear-gradient(135deg, #f59e0b, #b45309); }
 
-        .checklist-container { margin-top: 10px; max-height: 0px; overflow-y: auto; overflow-x: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .checklist-container.expanded { max-height: 260px; }
-        .task-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 11px 14px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .task-info { display: flex; align-items: center; gap: 10px; }
-        .task-checkbox { width: 17px; height: 17px; accent-color: var(--accent-green); pointer-events: none; }
-        .task-text { font-size: 12.5px; color: #e2e8f0; }
-        .task-reward { font-size: 11.5px; font-weight: bold; color: var(--accent-green); }
-        .task-item.completed .task-text { text-decoration: line-through; color: var(--text-sub); }
-
-        .toggle-tasks-btn { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: var(--primary-blue); padding: 10px; font-size: 12.5px; font-weight: 800; cursor: pointer; margin-top: 12px; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; }
-
-        /* 🎁 Surprise Box */
-        .surprise-box-card { width: 90%; max-width: 420px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25)); border-radius: 20px; padding: 20px; margin: 18px 0; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(168, 85, 247, 0.4); backdrop-filter: blur(10px); box-sizing: border-box; text-align: center; }
-        .surprise-badge { background: var(--accent-gold); color: #713f12; font-size: 10.5px; font-weight: 900; padding: 4px 12px; border-radius: 20px; margin-bottom: 10px; text-transform: uppercase; }
-        .surprise-content { width: 100%; margin-bottom: 12px; }
-        .surprise-content .winner-label { font-size: 14.5px; color: #fff; font-weight: bold; }
-        .surprise-content .ticket-label { font-size: 11.5px; color: #e2e8f0; font-family: monospace; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; display: inline-block; margin-top: 6px; }
-        .play-surprise-btn { background: #ffffff; color: #6366f1; border: none; padding: 12px 25px; border-radius: 50px; font-size: 14px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.2s; }
-        .play-surprise-btn:active { transform: scale(0.96); }
-
-        /* 📢 Banner Ad Containers */
-        .ad-banner { width: 90%; max-width: 420px; min-height: 54px; margin: 16px 0; border-radius: 14px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.18); backdrop-filter: blur(8px); z-index: 10; }
+        /* 📢 Admin Banner Ads */
+        .ad-banner { width: 90%; max-width: 420px; min-height: 54px; margin: 15px 0; border-radius: 14px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.3); backdrop-filter: blur(8px); z-index: 10; color: var(--text-sub); font-size: 11px; font-weight: bold; }
 
         /* Section Titles */
-        .section-title { width: 90%; max-width: 420px; margin: 20px 0 12px 0; font-size: 15px; color: var(--text-main); font-weight: 800; text-align: left; }
+        .section-title { width: 90%; max-width: 420px; margin: 25px 0 5px 0; font-size: 15px; color: #fff; font-weight: 900; text-align: left; text-transform: uppercase; letter-spacing: 0.5px; border-left: 4px solid var(--accent-cyan); padding-left: 10px; }
 
-        /* Grids & Cards */
-        .grid-container { width: 90%; max-width: 420px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px; }
-        
-        .zone-card {
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 18px;
-            text-align: center;
-            text-decoration: none;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            border: 1px solid var(--border-glow);
-            position: relative;
-            backdrop-filter: blur(10px);
-            min-height: 115px;
-        }
-        .zone-card:active { transform: scale(0.95); background: rgba(30, 41, 59, 0.9); }
-        .zone-icon { font-size: 30px; margin-bottom: 8px; }
-        .zone-card h3 { margin: 0 0 4px 0; font-size: 13.5px; font-weight: 800; }
-        .zone-card p { margin: 0; font-size: 10.5px; color: var(--text-sub); }
-        
-        .zone-badge { position: absolute; top: 8px; right: 8px; font-size: 8.5px; font-weight: 900; padding: 3px 7px; border-radius: 20px; color: #fff; text-transform: uppercase; }
-        .badge-hot { background: var(--accent-pink); }
-        .badge-new { background: var(--accent-green); }
-
-        .full-card { width: 90%; max-width: 420px; background: var(--card-bg); padding: 16px; border-radius: 18px; text-decoration: none; color: #fff; display: flex; align-items: center; justify-content: center; gap: 15px; margin: 12px 0; border: 1px solid rgba(245, 158, 11, 0.3); box-sizing: border-box; backdrop-filter: blur(10px); }
-        .full-card:active { transform: scale(0.98); }
-        .full-card .zone-icon { margin-bottom: 0; font-size: 34px; }
-        .full-card h3 { margin: 0; font-size: 16px; color: var(--accent-gold); font-weight: 800; }
-
-        .mini-task-grid { width: 90%; max-width: 420px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .mini-box { background: var(--card-bg); padding: 15px 10px; border-radius: 16px; border: 1px solid var(--border-glow); text-align: center; cursor: pointer; backdrop-filter: blur(10px); }
-        .mini-box:active { transform: scale(0.95); }
-        .mini-icon { font-size: 24px; margin-bottom: 4px; }
-        .mini-title { font-size: 12.5px; font-weight: 800; color: #fff; margin: 0; }
-        .mini-reward { font-size: 10.5px; color: var(--accent-green); font-weight: 700; margin-top: 2px; }
+        /* 🎯 Daily Tasks Progress Card */
+        .task-progress-card { width: 100%; background: linear-gradient(135deg, rgba(22, 30, 49, 0.95), rgba(15, 23, 42, 0.95)); border-radius: 20px; padding: 20px; box-sizing: border-box; border: 1px solid var(--border-glow); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-title { font-size: 14px; font-weight: 900; color: #fff; }
+        .progress-track { position: relative; background: rgba(0,0,0,0.5); height: 12px; border-radius: 8px; margin: 25px 0 15px 0; border: 1px solid rgba(255,255,255,0.1); }
+        .progress-fill { background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan), var(--accent-green)); height: 100%; width: 0%; border-radius: 8px; transition: width 0.5s ease-in-out; }
+        .milestone { position: absolute; top: -6px; width: 24px; height: 24px; background: #1e293b; border: 2px solid var(--text-sub); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--text-sub); transform: translateX(-50%); z-index: 2; transition: 0.3s; }
+        .milestone.achieved { border-color: var(--accent-green); background: var(--accent-green); color: #fff; box-shadow: 0 0 15px rgba(16,185,129,0.6); }
+        .milestone-tag { position: absolute; top: -24px; font-size: 10px; font-weight: 900; color: var(--accent-gold); white-space: nowrap; transform: translateX(-50%); }
+        .checklist-container { margin-top: 10px; max-height: 0px; overflow-y: auto; overflow-x: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .checklist-container.expanded { max-height: 300px; margin-top: 15px; }
+        .task-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px 14px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .task-info { display: flex; align-items: center; gap: 10px; }
+        .task-checkbox { width: 18px; height: 18px; accent-color: var(--accent-green); pointer-events: none; }
+        .task-text { font-size: 12.5px; color: #e2e8f0; font-weight: 700; }
+        .task-reward { font-size: 11.5px; font-weight: 900; color: var(--accent-green); background: rgba(16,185,129,0.15); padding: 3px 8px; border-radius: 8px; }
+        .task-item.completed .task-text { text-decoration: line-through; color: var(--text-sub); }
+        .toggle-tasks-btn { width: 100%; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; color: var(--primary-blue); padding: 12px; font-size: 12px; font-weight: 900; cursor: pointer; margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; transition: 0.2s; }
 
         /* 🏆 Winners Podium */
-        .winners-podium-container { width: 90%; max-width: 420px; background: var(--card-bg); border-radius: 18px; padding: 18px; box-sizing: border-box; border: 1px solid rgba(168, 85, 247, 0.3); margin: 15px 0; backdrop-filter: blur(10px); }
-        .podium-title { font-size: 16px; color: #fff; font-weight: 800; text-align: left; margin: 0 0 12px 0; }
-        .winner-rank-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); font-size: 13px; font-weight: bold; }
+        .winners-podium-container { width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border-radius: 20px; padding: 20px; box-sizing: border-box; border: 1px solid rgba(168, 85, 247, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .podium-title { font-size: 16px; color: #fff; font-weight: 900; text-align: left; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
+        .winner-rank-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 13.5px; font-weight: bold; }
         .winner-rank-row:last-child { border-bottom: none; }
-        .rank-user-info { display: flex; align-items: center; gap: 10px; color: #e2e8f0; }
-        .winner-prize-tag { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); font-size: 11.5px; font-weight: 800; padding: 4px 10px; border-radius: 12px; }
+        .rank-user-info { display: flex; align-items: center; gap: 12px; color: #e2e8f0; }
+        .winner-prize-tag { background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05)); color: var(--accent-green); font-size: 12px; font-weight: 900; padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3); }
 
-        /* 📱 5-BUTTON FLOATING BOTTOM NAVIGATION BAR (ADMIN DYNAMIC) */
-        .bottom-nav {
-            position: fixed;
-            bottom: 14px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 24px);
-            max-width: 460px;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 30px;
-            padding: 8px 10px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            backdrop-filter: blur(25px);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.6);
-            z-index: 999;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            color: var(--text-sub);
-            text-decoration: none;
-            font-size: 9.5px;
-            font-weight: 800;
-            padding: 6px;
-            border-radius: 16px;
-            transition: 0.2s;
-            flex: 1;
-            text-align: center;
-            cursor: pointer;
-        }
-        .nav-item i { font-size: 17px; }
-        .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.2); }
+        /* 📱 Bottom Navigation Bar */
+        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: calc(100% - 30px); max-width: 460px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px; padding: 8px 12px; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(25px); box-shadow: 0 15px 40px rgba(0,0,0,0.7); z-index: 999; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-sub); text-decoration: none; font-size: 10px; font-weight: 800; padding: 8px; border-radius: 20px; transition: 0.3s; flex: 1; text-align: center; cursor: pointer; }
+        .nav-item i { font-size: 18px; margin-bottom: 2px; }
+        .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(6, 182, 212, 0.2); }
 
-        /* Overlays & Modals */
-        .system-restrict-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; color: #fff; backdrop-filter: blur(10px); background: rgba(15, 23, 42, 0.95); }
-        .urgent-task-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px); }
-        .urgent-card { background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 2px solid var(--accent-pink); border-radius: 20px; width: 100%; max-width: 340px; padding: 25px 20px; text-align: center; }
-        .urgent-btn { background: var(--accent-gold); color: #713f12; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; width: 100%; margin-top: 15px; }
+        .premium-footer { margin-top: 25px; text-align: center; padding-bottom: 20px; font-size: 11px; color: var(--text-sub); }
+        .safe-disclaimer { font-size: 9.5px; color: #475569; text-align: center; margin-top: 10px; padding: 0 20px; line-height: 1.5; font-weight: 600; }
 
-        .notif-center-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1001; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
-        .notif-center-card { background: #1e293b; border-radius: 20px; width: 100%; max-width: 400px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; max-height: 80vh; }
-        .notif-item { background: rgba(0,0,0,0.25); border-left: 4px solid var(--primary-blue); padding: 12px; border-radius: 8px; position: relative; margin-bottom: 8px; }
-
-        #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
-        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; border: 2px solid var(--accent-pink); padding: 20px; border-radius: 15px; z-index: 2000; width: 80%; max-width: 340px; text-align: center; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1999; }
+        /* ==============================================================
+           MODALS & ALERTS 
+           ============================================================== */
+        .system-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(15px); background: rgba(6, 9, 19, 0.85); text-align: center; }
         
-        .premium-footer { margin-top: 25px; text-align: center; padding-bottom: 10px; font-size: 12px; color: var(--text-sub); }
+        .offline-card { background: #1e293b; border: 2px solid var(--accent-pink); border-radius: 25px; padding: 30px 20px; width: 100%; max-width: 340px; box-shadow: 0 0 30px rgba(239, 68, 68, 0.3); }
+        .offline-btn { background: linear-gradient(135deg, var(--accent-pink), #991b1b); color: #fff; border: none; padding: 14px 30px; border-radius: 50px; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; width: 100%; margin-top: 20px; }
+
+        .urgent-card { background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 2px solid var(--accent-pink); border-radius: 25px; width: 100%; max-width: 350px; padding: 30px 20px; box-shadow: 0 0 40px rgba(239, 68, 68, 0.5); }
+        .urgent-btn { background: linear-gradient(135deg, var(--accent-gold), #b45309); color: #fff; border: none; padding: 14px 25px; border-radius: 50px; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; width: 100%; margin-top: 20px; }
+        
+        .mega-winner-card { background: linear-gradient(135deg, #0f172a, #1e1b4b); border: 2px solid var(--accent-gold); border-radius: 25px; width: 100%; max-width: 350px; padding: 35px 20px; text-align: center; box-shadow: 0 0 50px rgba(245, 158, 11, 0.5); }
+        @keyframes bounceGlow { 0% { transform: translateY(0); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)); } 50% { transform: translateY(-15px); filter: drop-shadow(0 0 30px rgba(245, 158, 11, 1)); } 100% { transform: translateY(0); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)); } }
+
+        /* Notification Modal */
+        .notif-center-card { background: #0f172a; border-radius: 25px; width: 100%; max-width: 400px; padding: 25px 20px; border: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; max-height: 80vh; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .notif-item { background: rgba(0,0,0,0.3); border-left: 4px solid var(--primary-blue); padding: 14px; border-radius: 10px; margin-bottom: 10px; text-align: left; border-right: 1px solid rgba(255,255,255,0.05); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
+
+    <!-- ⚡⚡ ANTI-FLICKER SCRIPT FIX: PREVENTS BUTTON BLINKING 100% ⚡⚡ -->
+    <script>
+        try {
+            let cToggles = localStorage.getItem("d_toggles");
+            if(cToggles) {
+                let toggles = JSON.parse(cToggles);
+                let style = document.createElement('style');
+                let cssRules = "";
+                for(let key in toggles) {
+                    // String aur Boolean dono check kiya gaya hai taaki flash na ho
+                    if(toggles[key] === false || toggles[key] === "false" || toggles[key] === 0) {
+                        cssRules += "#" + key + " { display: none !important; } ";
+                    }
+                }
+                if(cssRules !== "") {
+                    style.innerHTML = cssRules;
+                    document.documentElement.appendChild(style); // Append very early
+                }
+            }
+        } catch(e) {}
+    </script>
 </head>
 <body>
 
-    <!-- 🌐 OFFLINE SCREEN -->
-    <div id="globalOfflineWarningOverlay">
-        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
-        <h2 style="color: var(--accent-pink); font-size: 20px; font-weight: 900; text-transform: uppercase;">No Internet Connection</h2>
-        <p style="color: var(--text-sub); font-size: 13px; margin: 10px 0 20px 0;">Please enable Mobile Data or Wi-Fi to continue.</p>
-        <button onclick="window.location.reload()" style="background: var(--accent-pink); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;">Retry Connection</button>
-    </div>
-
-    <!-- 🚨 ADMIN RESTRICT OVERLAY -->
-    <div class="system-restrict-overlay" id="interceptorMaintenanceScreenOverlay">
-        <div style="font-size:60px; margin-bottom:15px;">🛠️</div>
-        <h3 style="font-weight:900; margin-bottom:6px; font-size: 22px;">Under Maintenance</h3>
-        <p style="font-size:14px; color:var(--text-sub);">App is under temporary updates synchronization.<br>We will be back live shortly.</p>
-    </div>
-
-    <div class="overlay" id="alertOverlay"></div>
-    <div class="custom-alert" id="customAlertBox">
-        <p id="alertMessage" style="color:#e2e8f0; font-size:14px; margin-bottom:15px;">Message</p>
-        <button onclick="closeCustomAlert()" style="background:var(--accent-green); border:none; color:white; padding:8px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">OK</button>
-    </div>
-
-    <!-- 🔥 URGENT TASK MODAL -->
-    <div class="urgent-task-modal" id="urgentTaskModalOverlay">
-        <div class="urgent-card">
-            <div style="font-size: 50px; margin-bottom: 10px;">🚨</div>
-            <h3 id="urgentTaskTitle" style="color:#fca5a5; font-size:20px; font-weight:900;">High Paying Offer!</h3>
-            <p id="urgentTaskDesc" style="color:#fecaca; font-size:13px; margin: 8px 0 20px 0;">Complete this new urgent offer to earn extra points!</p>
-            <button class="urgent-btn" id="urgentTaskBtn">GO TO OFFER NOW</button>
-            <button onclick="closeUrgentTask()" style="background:transparent; border:none; color:#fca5a5; margin-top:15px; font-size:12px; cursor:pointer; text-decoration:underline;">Skip for now</button>
+    <!-- 🌐 1. OFFLINE SCREEN -->
+    <div class="system-modal-overlay" id="globalOfflineWarningOverlay">
+        <div class="offline-card">
+            <div style="font-size:60px; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(239,68,68,0.5));">📡❌</div>
+            <h2 style="color: var(--accent-pink); font-size: 22px; font-weight: 900; text-transform: uppercase;">No Internet</h2>
+            <p style="color: var(--text-sub); font-size: 13.5px; margin: 10px 0 20px 0; font-weight:600;">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+            <button class="offline-btn" onclick="window.location.reload()">Retry Connection</button>
         </div>
     </div>
 
-    <!-- 🔔 NOTIFICATION MODAL -->
-    <div class="notif-center-modal" id="notificationCenterModal">
+    <!-- 🚨 2. ADMIN RESTRICT OVERLAY -->
+    <div class="system-modal-overlay" id="interceptorMaintenanceScreenOverlay">
+        <div class="offline-card" style="border-color: var(--accent-cyan); box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);">
+            <div style="font-size:60px; margin-bottom:15px;">🛠️</div>
+            <h3 style="font-weight:900; margin-bottom:10px; font-size: 24px; color:var(--accent-cyan); text-transform:uppercase;">Maintenance</h3>
+            <p style="font-size:14px; color:var(--text-sub); font-weight:600; line-height:1.5;">App is undergoing system updates.<br>We will be back live shortly.</p>
+        </div>
+    </div>
+
+    <!-- 🔥 3. ADMIN URGENT TASK POPUP -->
+    <div class="system-modal-overlay" id="urgentTaskModalOverlay">
+        <div class="urgent-card">
+            <div style="font-size: 55px; margin-bottom: 10px;">🚨</div>
+            <h3 id="urgentTaskTitle" style="color:#fca5a5; font-size:22px; font-weight:900; text-transform:uppercase;">Priority Alert!</h3>
+            <p id="urgentTaskDesc" style="color:#fecaca; font-size:14px; margin: 12px 0 20px 0; font-weight:600;">Read the admin instruction here.</p>
+            <button class="urgent-btn" id="urgentTaskBtn">PROCEED NOW</button>
+            <button id="btnSkipUrgentTask" style="background:transparent; border:none; color:#fca5a5; margin-top:15px; font-size:12px; cursor:pointer; text-decoration:underline; font-weight:bold;">Skip for now</button>
+        </div>
+    </div>
+
+    <!-- 🏆 4. MEGA WINNER CELEBRATION MODAL -->
+    <div class="system-modal-overlay" id="megaWinnerModalOverlay">
+        <div class="mega-winner-card">
+            <div style="font-size: 75px; margin-bottom: 15px; animation: bounceGlow 2s infinite;">🏆</div>
+            <h2 style="color:var(--accent-gold); font-size:26px; font-weight:900; text-transform:uppercase; margin-bottom: 10px; text-shadow: 0 0 15px rgba(245,158,11,0.5);">Congratulations!</h2>
+            <h3 id="megaWinnerTitle" style="color:#fff; font-size:18px; margin-bottom: 12px; font-weight:800;">Mega Drop Winner</h3>
+            <p id="megaWinnerDesc" style="color:var(--text-sub); font-size:14px; margin-bottom: 25px; font-weight:600; line-height:1.4;">You have been chosen as the lucky winner! Your reward has been added.</p>
+            <div id="megaWinnerPrize" style="font-size: 32px; color: var(--accent-green); font-weight: 900; margin-bottom: 25px; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: 15px; border: 1px dashed var(--accent-green);">+5000 🪙</div>
+            <button onclick="document.getElementById('megaWinnerModalOverlay').style.display='none'" style="background: linear-gradient(135deg, var(--accent-gold), #b45309); color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 900; font-size: 15px; cursor: pointer; text-transform: uppercase; width: 100%;">CLAIM REWARD</button>
+        </div>
+    </div>
+
+    <!-- 🔔 5. ADMIN NOTIFICATION CENTER MODAL -->
+    <div class="system-modal-overlay" id="notificationCenterModal">
         <div class="notif-center-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:15px;">
-                <h3 style="margin:0; color:var(--accent-green); font-size:18px; font-weight:900;">🔔 Notifications</h3>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <button onclick="clearAllNotifications()" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:5px 12px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">Clear All</button>
-                    <button onclick="closeNotificationCenter()" style="background:#f1f5f9; border:none; width:30px; height:30px; border-radius:50%; font-size:15px; font-weight:bold; color:#64748b; cursor:pointer;">✕</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:15px;">
+                <h3 style="margin:0; color:var(--accent-cyan); font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-bell"></i> Alerts</h3>
+                
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <button onclick="document.getElementById('notifListContainer').innerHTML='<div style=\'text-align:center; color:var(--text-sub); margin-top:30px; font-weight:bold;\'>Cleared...</div>'" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">Clear All</button>
+                    <button onclick="document.getElementById('notificationCenterModal').style.display='none'" style="background:rgba(255,255,255,0.1); border:none; width:32px; height:32px; border-radius:50%; font-size:14px; font-weight:bold; color:#fff; cursor:pointer; transition:0.2s;">✕</button>
                 </div>
             </div>
-            <div id="notifListContainer" style="overflow-y:auto; flex-grow:1; display:flex; flex-direction:column; gap:10px;">
-                <div style="text-align:center; color:var(--text-sub); font-size:13px; margin-top:20px;">Loading updates...</div>
+            <div id="notifListContainer" style="overflow-y:auto; flex-grow:1; display:flex; flex-direction:column; padding-right:5px;">
+                <div style="text-align:center; color:var(--text-sub); font-size:13.5px; margin-top:30px; font-weight:600;">No new updates...</div>
             </div>
         </div>
     </div>
 
     <!-- 👑 Header Bar -->
     <div class="header">
-        <h2 class="notranslate">Dudo</h2>
+        <h2 class="notranslate">Du<span>do</span></h2>
         <div class="header-controls">
+            <!-- FULL 13 LANGUAGES -->
             <select class="custom-lang-select notranslate" id="appLanguage" onchange="changeLanguage(this.value)">
-                <option value="en">English</option><option value="hi">हिंदी (HI)</option><option value="bn">বাংলা (BN)</option>
-                <option value="te">తెలుగు (TE)</option><option value="mr">मराठी (MR)</option><option value="ta">தமிழ் (TA)</option>
-                <option value="ur">اردو (UR)</option><option value="gu">ગુજરાતી (GU)</option><option value="es">Español (ES)</option>
-                <option value="fr">Français (FR)</option><option value="ar">عربي (AR)</option><option value="pt">Português (PT)</option><option value="ru">Русский (RU)</option>
+                <option value="en">English (EN)</option><option value="hi">हिंदी (HI)</option>
+                <option value="bn">বাংলা (BN)</option><option value="te">తెలుగు (TE)</option>
+                <option value="mr">मराठी (MR)</option><option value="ta">தமிழ் (TA)</option>
+                <option value="ur">اردو (UR)</option><option value="gu">ગુજરાતી (GU)</option>
+                <option value="es">Español (ES)</option><option value="fr">Français (FR)</option>
+                <option value="ar">عربي (AR)</option><option value="pt">Português (PT)</option>
+                <option value="ru">Русский (RU)</option>
             </select>
-            <div class="notif-bell" onclick="openNotificationCenter()">
-                🔔<span class="notif-badge" id="notifUnreadBadge" style="display:none;">0</span>
+            
+            <div class="notif-bell" onclick="document.getElementById('notificationCenterModal').style.display='flex'">
+                <i class="fa-solid fa-bell"></i>
+                <span class="notif-badge" id="mainNotifBadge" style="display:none;">0</span>
             </div>
-            <a href="profile.html" class="profile-icon notranslate" id="homeProfileIcon">👤</a>
+            
+            <a href="profile.html" class="header-profile-icon notranslate" id="headerProfileIcon">👤</a>
         </div>
     </div>
 
-    <!-- 💳 Balance Card -->
-    <div class="wallet-card">
-        <p data-i18n="total_balance">My Balance</p>
-        <h1 class="notranslate" id="liveBalance">₹ 0.00</h1>
-        <div class="coins-display"><span class="notranslate">🪙</span> <span id="liveCoins" class="notranslate">0</span> <span data-i18n="coins">Points</span></div>
-        <div class="wallet-buttons-row">
-            <button class="ledger-btn" id="mod_my_points" onclick="window.location.href='my_points.html'" data-i18n="withdraw_btn">My Ledger</button>
-            <button class="ledger-btn" id="mod_add_points" onclick="window.location.href='add_points.html'" style="display:none; background:#ffffff; color:#4CAF50;">+ Add Points</button>
+    <!-- 💳 Premium User Profile & Wallet Card -->
+    <div class="smart-user-card">
+        <div class="card-left-info">
+            <div class="card-profile-img" id="cardProfileIcon">👤</div>
+            <div class="user-text-details">
+                <span class="user-name" id="cardUserName">Loading...</span>
+                <span class="user-uid" id="cardUserUID">UID: N/A</span>
+            </div>
+        </div>
+        <div class="card-right-wallet">
+            <div class="coins-display">🪙 <span id="liveCoins" class="notranslate">0</span></div>
+            <button class="ledger-btn" id="mod_my_point1" onclick="window.location.href='my_point1.html'" data-i18n="withdraw_btn">My Reward</button>
         </div>
     </div>
 
-    <!-- 🟢 Marquee Ticker -->
+    <!-- ⚡⚡ INSTANT USER DATA CACHE ⚡⚡ -->
+    <script>
+        let cCoins = localStorage.getItem("d_coins");
+        let cName = localStorage.getItem("d_name");
+        let cUid = localStorage.getItem("d_uid");
+        let cImg = localStorage.getItem("d_img");
+        if(cCoins) document.getElementById("liveCoins").innerText = cCoins;
+        if(cName) document.getElementById("cardUserName").innerText = cName;
+        if(cUid) document.getElementById("cardUserUID").innerText = "UID: " + cUid;
+        if(cImg) {
+            document.getElementById("cardProfileIcon").innerHTML = `<img src="${cImg}">`;
+            document.getElementById("headerProfileIcon").innerHTML = `<img src="${cImg}">`;
+        }
+    </script>
+
+    <!-- 🟢 Admin Marquee Ticker -->
     <div class="reward-ticker-wrapper">
         <div class="ticker-badge-live">LIVE</div>
         <div class="marquee-container-box">
-            <div id="livePayoutStream"><span>• Rakesh redeemed ₹50 success</span><span>• Neha redeemed ₹200 success</span></div>
+            <div id="livePayoutStream">
+                <span>• Fetching Live Feed...</span>
+            </div>
         </div>
     </div>
 
-    <!-- 🎯 Daily Tasks Progress Card -->
-    <div class="task-progress-card">
-        <div class="progress-header">
-            <div class="progress-title">Daily Activities Done: <span id="doneCount">0</span>/8</div>
-            <div class="next-reward-hint" id="rewardHint">Complete tasks to unlock bonus!</div>
-        </div>
-        <div class="progress-track">
-            <div class="progress-fill" id="taskProgressFill"></div>
-            <div class="milestone" style="left: 25%;" id="mNode1"><div class="milestone-tag">+10🪙</div>2</div>
-            <div class="milestone" style="left: 62.5%;" id="mNode2"><div class="milestone-tag">+30🪙</div>5</div>
-            <div class="milestone" style="left: 100%;" id="mNode3"><div class="milestone-tag">+100🪙 🔥</div>8</div>
-        </div>
-        <div class="checklist-container" id="dailyChecklistHTML"></div>
-        <button class="toggle-tasks-btn" id="btnToggleDailyChecklistMenu" onclick="toggleDailyTasksChecklistDisplay()">
-            <span id="lblToggleTasksText" data-i18n="show_tasks_btn">Show Tasks</span> <span>▼</span>
-        </button>
+    <!-- ==============================================
+         EXACT LAYOUT FROM DRAWINGS (100% Modulated)
+         ============================================== -->
+
+    <!-- IMAGE 3 (1000005067.jpg) Layout -->
+    <div class="smart-flex-grid">
+        <a href="daily.html" class="zone-card" id="mod_daily">
+            <div class="zone-icon">🎁</div><h3 style="color:var(--accent-green);">Daily Check-in</h3><p>Earn Points</p>
+        </a>
+        <a href="tasks.html" class="zone-card" id="mod_video_zone">
+            <div class="zone-icon">📺</div><h3 style="color:var(--primary-blue);">Video Offers</h3><p>Watch & earn</p>
+        </a>
+        
+        <a href="spin.html" class="zone-card full-width-card" id="mod_spin" style="border-color: var(--accent-purple);">
+            <div class="zone-icon">🎡</div>
+            <div style="text-align: left;"><h3 style="color: var(--accent-purple);">Lucky Spin</h3><p>Spin the wheel daily to win</p></div>
+        </a>
     </div>
 
-    <!-- 🎁 Surprise Box -->
-    <div class="surprise-box-card" id="mod_surprise_box">
-        <div class="surprise-badge">🎁 SURPRISE REWARD</div>
-        <div class="surprise-content">
-            <div class="winner-label">Last Winner: <span id="lwWinnerNameDisplay">Loading...</span></div>
-            <div class="ticket-label" id="lwWinnerTicketDisplay">Pass: #N/A</div>
-        </div>
-        <button class="play-surprise-btn" onclick="window.location.href='surprise.html'">Open Surprise Box ➔</button>
-    </div>
-
-    <!-- 📢 Banner Ad Slot 1 -->
+    <!-- 📢 Banner Ad Slot 1 (Default visible as placeholder) -->
     <div class="ad-banner" id="bannerSlot1">
         <script type="text/javascript">
             atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -350,56 +309,28 @@
         <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
     </div>
 
-    <!-- Section 1 -->
-    <div class="section-title" data-i18n="earning_zones">Reward Zones</div>
-
-    <div class="grid-container">
-        <a href="daily.html" class="zone-card" id="mod_daily">
-            <div class="zone-icon">🎁</div>
-            <h3 style="color:var(--accent-green);" data-i18n="daily_checkin">Daily Check-in</h3>
-            <p data-i18n="daily_desc">Earn Points everyday</p>
+    <div class="smart-flex-grid">
+        <a href="app.html" class="zone-card" id="mod_app_testing" style="border-color: rgba(233, 30, 99, 0.4);">
+            <div class="zone-icon">📱</div><h3 style="color:#e91e63;">App Discovery</h3><p>Test & Earn</p>
         </a>
-        <a href="tasks.html" class="zone-card" id="mod_tasks">
-            <div class="zone-icon">📺</div>
-            <h3 style="color:var(--primary-blue);" data-i18n="watch_ads">Video Offers</h3>
-            <p data-i18n="watch_desc">Watch clips & earn</p>
+        <a href="social.html" class="zone-card" id="mod_social_tasks" style="border-color: rgba(0, 150, 136, 0.4);">
+            <div class="zone-icon">💬</div><h3 style="color:#009688;">Social Tasks</h3><p>Follow & Share</p>
         </a>
     </div>
 
-    <!-- 📢 Banner Ad Slot 2 -->
     <div class="ad-banner" id="bannerSlot2">
         <ins style="width:320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
     </div>
 
-    <!-- Section 2 -->
-    <div class="grid-container">
-        <a href="app.html" class="zone-card" id="mod_apptesting">
-            <div class="zone-icon">📱</div>
-            <h3 style="color:#e91e63;" data-i18n="app_testing">App Experience</h3>
-            <p data-i18n="app_desc">Premium Rewards</p>
+    <div class="smart-flex-grid">
+        <a href="offer2.html" class="zone-card" id="mod_offerwalls" style="border-color: rgba(168, 85, 247, 0.4);">
+            <div class="zone-icon">🤝</div><h3 style="color: var(--accent-purple);">Partner Tasks</h3><p>Surveys</p>
         </a>
-        <a href="social.html" class="zone-card" id="mod_social">
-            <div class="zone-icon">💬</div>
-            <h3 style="color:#009688;" data-i18n="social_tasks">Social Tasks</h3>
-            <p data-i18n="social_desc">Watch & Comment</p>
+        <a href="premium.html" class="zone-card" id="mod_secure_cloud" style="border-color: rgba(245, 158, 11, 0.4);">
+            <div class="zone-icon">🚀</div><h3 style="color: var(--accent-gold);">Premium Ads</h3><p>High Payouts</p>
         </a>
     </div>
 
-    <!-- Section 3 -->
-    <div class="grid-container">
-        <a href="offer2.html" class="zone-card" id="mod_patner_offer" style="border-color: rgba(168, 85, 247, 0.3);">
-            <div class="zone-icon">🔥</div>
-            <h3 style="color: var(--accent-purple);">Monlix Offers</h3>
-            <p>Premium Games & Surveys</p>
-        </a>
-        <a href="premium.html" class="zone-card" id="mod_premium_ads" style="border-color: rgba(245, 158, 11, 0.3);">
-            <div class="zone-icon">🚀</div>
-            <h3 style="color: var(--accent-gold);">premium Tasks</h3>
-            <p>Smartlink & Video Offers</p>
-        </a>
-    </div>
-
-    <!-- 📢 Banner Ad Slot 3 -->
     <div class="ad-banner" id="bannerSlot3">
         <script type="text/javascript">
             atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -407,71 +338,31 @@
         <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
     </div>
 
-    <!-- Section 4 -->
-    <div class="grid-container">
-        <a href="adgem.html" class="zone-card" id="mod_adgem">
-            <div class="zone-icon">🎮</div>
-            <h3 style="color: var(--primary-blue);">AdGem Games</h3>
-            <p>High Payout Offerwall</p>
+    <div class="smart-flex-grid">
+        <a href="video_tasks.html" class="zone-card" id="mod_smart_tasks" style="border-color: rgba(6, 182, 212, 0.4);">
+            <div class="zone-icon">🎯</div><h3 style="color: var(--accent-cyan);">Premium Task Zone</h3><p>Smart Validate</p>
         </a>
-        <a href="greeting.html" class="zone-card" id="mod_greeting" style="border-color: rgba(245, 158, 11, 0.4);">
-            <div class="zone-icon">🎉</div>
-            <h3 style="color: var(--accent-gold);">Festive Wishes</h3>
-            <p>Share with friends & Earn</p>
+        <a href="special_missions.html" class="zone-card" id="mod_patner_offer" style="border-color: rgba(16, 185, 129, 0.4);">
+            <div class="zone-icon">🔥</div><h3 style="color: var(--accent-green);">Partner Offers</h3><p>Explore more</p>
         </a>
     </div>
 
-    <!-- Section 5 -->
-    <div class="grid-container">
+    <!-- IMAGE 2 (1000005066.jpg) Layout -->
+    <div class="smart-flex-grid">
+        <a href="adgem.html" class="zone-card" id="mod_adgem">
+            <div class="zone-icon">🎮</div><h3 style="color: var(--primary-blue);">AdGem Games</h3><p>Play & earn</p>
+        </a>
+        <a href="greeting.html" class="zone-card" id="mod_greeting">
+            <div class="zone-icon">🎉</div><h3 style="color: var(--accent-gold);">Festive Wishes</h3><p>Share happiness</p>
+        </a>
         <a href="offers.html" class="zone-card" id="mod_mega_offers">
-            <div class="zone-icon">🔥</div>
-            <h3 style="color:var(--accent-pink);" data-i18n="mega_offers">Premium Offers</h3>
-            <p data-i18n="mega_desc">CPA Offers</p>
+            <div class="zone-icon">💎</div><h3 style="color:var(--accent-pink);">Premium Offers</h3><p>Exclusive deals</p>
         </a>
         <a href="bonus.html" class="zone-card" id="mod_extra_bonus">
-            <div class="zone-icon">🚀</div>
-            <h3 style="color:var(--accent-purple);" data-i18n="extra_bonus">Extra Bonus</h3>
-            <p data-i18n="extra_desc">Games & Promo</p>
+            <div class="zone-icon">🎁</div><h3 style="color:var(--accent-purple);">Extra Bonus</h3><p>Claim today</p>
         </a>
     </div>
 
-    <!-- Section 6: Micro Tasks -->
-    <div class="section-title" style="color: var(--accent-cyan);">Micro Activities</div>
-
-    <div class="grid-container">
-        <a href="article.html" class="zone-card" id="mod_article">
-            <div class="zone-badge badge-hot">AdSense</div>
-            <div class="zone-icon">📰</div>
-            <h3 style="color: var(--accent-cyan);">Read Articles</h3>
-            <p>Read & Explore</p>
-        </a>
-        <a href="1v1.html" class="zone-card" id="mod_1v1">
-            <div class="zone-icon">⚔️</div>
-            <h3 style="color: var(--accent-gold);">Point Battle</h3>
-            <p>Play matches to win</p>
-        </a>
-    </div>
-
-    <div class="grid-container">
-        <a href="hourly_reward.html" class="zone-card" id="mod_hourly_reward">
-            <div class="zone-badge badge-new">Hourly</div>
-            <div class="zone-icon">🔑</div>
-            <h3 style="color: var(--accent-pink);">Hourly reward</h3>
-            <p>Claim free bonus keys</p>
-        </a>
-        <a href="special_missions.html" class="zone-card" id="mod_special_missions" style="display:none;">
-            <div class="zone-icon">🔓</div>
-            <h3 style="color: var(--accent-pink);">Special Mission</h3>
-            <p>Hidden bonus tasks</p>
-        </a>
-        <a href="web_explorer.html" class="zone-card" id="mod_web_explorer" style="display:none;">
-            <div class="zone-icon">🌐</div>
-            <h3 style="color: var(--text-sub);">Web Explorer</h3>
-            <p>Browse and earn</p>
-        </a>
-    </div>
-
-    <!-- 📢 Banner Ad Slot 4 -->
     <div class="ad-banner" id="bannerSlot4">
         <script type="text/javascript">
             atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -479,380 +370,568 @@
         <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
     </div>
 
-    <a href="spin.html" class="full-card" id="mod_spin">
-        <div class="zone-icon">🎡</div>
-        <div>
-            <h3 data-i18n="spin_win">Spin & Win</h3>
-            <p style="margin:0; font-size:11px; color:var(--text-sub);" data-i18n="spin_desc">Spin & win daily</p>
-        </div>
-    </a>
-
-    <div class="section-title" data-i18n="quick_tasks">Quick Tasks</div>
-
-    <div class="mini-task-grid">
-        <div class="mini-box" id="mod_cpx" onclick="window.location.href='cpx.html'">
-            <div class="mini-icon">📊</div>
-            <p class="mini-title" data-i18n="cpx_survey">CPX Surveys</p>
-            <p class="mini-reward" data-i18n="up_to_50">Up to 50 🪙</p>
-        </div>
-        <div class="mini-box" id="mod_top_rewards" onclick="window.location.href='top_rewards.html'">
-            <div class="mini-icon">⚡</div>
-            <p class="mini-title" data-i18n="clickearn">Instant Points</p>
-            <p class="mini-reward" data-i18n="instant_coin">Instant 5 🪙</p>
-        </div>
+    <div class="smart-flex-grid">
+        <a href="article.html" class="zone-card" id="mod_read_articles">
+            <div class="zone-icon">📰</div><h3 style="color: var(--accent-cyan);">Read Articles</h3><p>Knowledge pays</p>
+        </a>
+        <a href="hourly_reward.html" class="zone-card" id="mod_hourly">
+            <div class="zone-icon">🔑</div><h3 style="color: var(--accent-pink);">Hourly Reward</h3><p>Free bonus keys</p>
+        </a>
     </div>
 
-    <div class="mini-task-grid">
-        <div class="mini-box" id="mod_timewall" onclick="window.location.href='timewall.html'">
-            <div class="mini-icon">⏱️</div>
-            <p class="mini-title" data-i18n="time_wall">Timewall Clicks</p>
-            <p class="mini-reward" data-i18n="easy_tasks">Easy Tasks</p>
-        </div>
-        <div class="mini-box" id="mod_bitlabs" onclick="window.location.href='bitlabs.html'">
-            <div class="mini-icon">🧬</div>
-            <p class="mini-title" data-i18n="bitlabs">Bitlabs Offer</p>
-            <p class="mini-reward" data-i18n="high_pay">High Paying</p>
-        </div>
-    </div>
-
-    <!-- 📢 Banner Ad Slot 5 -->
     <div class="ad-banner" id="bannerSlot5">
         <ins style="width:320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
     </div>
 
-    <div class="section-title" style="color: var(--accent-pink);">Dudo Games Zone</div>
+    <div class="smart-flex-grid">
+        <a href="mystery_gift_box.html" class="zone-card" id="mod_surprise_box">
+            <div class="zone-icon">📦</div><h3 style="color: var(--accent-gold);">Surprise Rewards</h3><p>Open box</p>
+        </a>
+        
+        <!-- 🔥 FIX 2: WEEKLY DROP ID FIXED -->
+        <a href="surprise.html" class="zone-card" id="mod_mega_drop">
+            <div class="zone-icon">🏆</div><h3 style="color: var(--primary-blue);">Weekly Drop</h3><p>Mega coins</p>
+        </a>
+        
+        <a href="web_explorer.html" class="zone-card" id="mod_web_tasks">
+            <div class="zone-icon">🌐</div><h3 style="color: var(--text-sub);">Web Tasks</h3><p>Browse internet</p>
+        </a>
+        <a href="tap_rewards.html" class="zone-card" id="mod_scratch">
+            <div class="zone-icon">🧩</div><h3 style="color: var(--accent-green);">Smart Task Wall</h3><p>Scratch & Win</p>
+        </a>
+    </div>
 
-    <div class="grid-container">
-        <a href="game.html" class="zone-card" id="mod_square_dash">
-            <div class="zone-icon">🎯</div>
-            <h3 style="color: var(--accent-pink);">Square Dash</h3>
-            <p>Play game & earn points</p>
+    <div class="ad-banner" id="bannerSlot6">
+        <script type="text/javascript">
+            atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+    </div>
+
+    <div class="smart-flex-grid">
+        <a href="special_missions.html" class="zone-card" id="mod_premium_web_task">
+            <div class="zone-icon">🌟</div><h3 style="color: var(--accent-gold);">Premium Web Task</h3><p>High yielding</p>
+        </a>
+        <a href="task_wall.html" class="zone-card" id="mod_app_offers">
+            <div class="zone-icon">📲</div><h3 style="color: var(--accent-pink);">App Offers</h3><p>smart task</p>
+        </a>
+    </div>
+
+    <!-- 🎯 Daily Tasks Progress Card -->
+    <div class="smart-flex-grid" id="mod_daily_progress">
+        <div class="task-progress-card">
+            <div class="progress-header">
+                <div class="progress-title">Daily Activities Done <span id="doneCount">0</span>/15</div>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="taskProgressFill"></div>
+                <div class="milestone" style="left: 25%;" id="mNode1"><div class="milestone-tag">+10🪙</div>2</div>
+                <div class="milestone" style="left: 62.5%;" id="mNode2"><div class="milestone-tag">+30🪙</div>5</div>
+                <div class="milestone" style="left: 100%;" id="mNode3"><div class="milestone-tag">+100🪙</div>8</div>
+            </div>
+            <div class="checklist-container" id="dailyChecklistHTML"></div>
+            <button class="toggle-tasks-btn" id="btnToggleDailyChecklistMenu" onclick="toggleDailyTasksChecklistDisplay()">Show Tasks List ▼</button>
+        </div>
+    </div>
+
+    <div class="ad-banner" id="bannerSlot7">
+        <ins style="width:320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
+    </div>
+
+    <!-- IMAGE 1 (1000005068.jpg) Layout -->
+    <div class="section-title">⚡ Quick Tasks</div>
+    <div class="smart-flex-grid">
+        <a href="cpx.html" class="zone-card" id="mod_cpx">
+            <div class="zone-icon">📊</div><h3 style="color: #fff;">CPX Surveys</h3><p style="color: var(--accent-green);">Up to 50 🪙</p>
+        </a>
+        <a href="milestones.html" class="zone-card" id="mod_tap_rewards">
+            <div class="zone-icon">⚡</div><h3 style="color: #fff;">Instant Point</h3><p style="color: var(--accent-green);">Instant 5 🪙</p>
+        </a>
+        <a href="timewall.html" class="zone-card" id="mod_timewall">
+            <div class="zone-icon">⏱️</div><h3 style="color: #fff;">Time Wall</h3><p style="color: var(--accent-green);">Easy Tasks</p>
+        </a>
+        <a href="tasks.html" class="zone-card" id="mod_mini_tasks">
+            <div class="zone-icon">📋</div><h3 style="color: #fff;">Tasks</h3><p style="color: var(--accent-green);">High Paying</p>
+        </a>
+    </div>
+
+    <div class="ad-banner" id="bannerSlot8">
+        <script type="text/javascript">
+            atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
+    </div>
+
+    <div class="section-title">🎮 Game Zone</div>
+    <div class="smart-flex-grid">
+        <a href="1v1.html" class="zone-card" id="mod_1v1">
+            <div class="zone-icon">⚔️</div><h3 style="color: var(--accent-gold);">Point Battle</h3><p>Clash to win</p>
+        </a>
+        <a href="1v1_ga.html" class="zone-card" id="mod_rps">
+            <div class="zone-icon">✊🖐️✌️</div><h3 style="color: var(--accent-cyan);">Rock Paper Scissor</h3><p>Classic game</p>
+        </a>
+        <a href="game.html" class="zone-card" id="mod_arcade">
+            <div class="zone-icon">🎯</div><h3 style="color: var(--accent-pink);">Square Dash</h3><p>Play & earn</p>
         </a>
         <a href="pool.html" class="zone-card" id="mod_pool">
-            <div class="zone-badge" style="background:var(--accent-green);">POOL</div>
-            <div class="zone-icon">🎱</div>
-            <h3 style="color: var(--accent-green);">4-Player Pool</h3>
-            <p>Play pool & earn rewards</p>
+            <div class="zone-icon">🎱</div><h3 style="color: var(--accent-green);">4-Player Pool</h3><p>Multiplayer</p>
+        </a>
+        <a href="esports_zone.html" class="zone-card full-width-card" id="mod_esports" style="border-color: var(--accent-purple);">
+            <div class="zone-icon">🪖</div>
+            <div style="text-align: left;"><h3 style="color: var(--accent-purple);">Esports Zone</h3><p>Join Arena Matches & Tournaments</p></div>
+        </a>
+    </div>
+
+    <!-- 🏆 BIG LEADERBOARD BUTTON & WINNER PODIUM -->
+    <div class="smart-flex-grid">
+        <a href="leaderboard.html" class="zone-card full-width-card" id="mod_leaderboard_btn" style="border-color: var(--accent-gold); background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0,0,0,0.5));">
+            <div class="zone-icon">🏆</div>
+            <div style="text-align: left;">
+                <h3 style="color: var(--accent-gold); font-size: 18px; text-transform:uppercase;">Leaderboard</h3>
+                <p>Check Top Players Global Ranking</p>
+            </div>
         </a>
     </div>
 
     <!-- Winners Podium -->
     <div class="winners-podium-container" id="anchor_retention">
-        <h3 class="podium-title" id="lblWinnerSectionHeadline">Winners</h3>
+        <h3 class="podium-title">Winners</h3>
         <div style="display:flex; flex-direction:column;">
-            <div class="winner-rank-row">
-                <div class="rank-user-info"><span>🥇</span> <div><b>1st:</b> <span id="lblWinnerRank1Name">Shubham Singh</span></div></div>
-                <div class="winner-prize-tag" id="lblWinnerRank1Prize">+10,000 Points</div>
-            </div>
-            <div class="winner-rank-row">
-                <div class="rank-user-info"><span>🥈</span> <div><b>2nd:</b> <span id="lblWinnerRank2Name">Aman Verma</span></div></div>
-                <div class="winner-prize-tag" id="lblWinnerRank2Prize">+5,000 Points</div>
-            </div>
-            <div class="winner-rank-row">
-                <div class="rank-user-info"><span>🥉</span> <div><b>3rd:</b> <span id="lblWinnerRank3Name">Rahul Kumar</span></div></div>
-                <div class="winner-prize-tag" id="lblWinnerRank3Prize">+2,500 Points</div>
-            </div>
+            <div class="winner-rank-row"><div class="rank-user-info"><span>🥇</span> <div><b>1st:</b> <span id="lblWinnerRank1Name">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank1Prize">--</div></div>
+            <div class="winner-rank-row"><div class="rank-user-info"><span>🥈</span> <div><b>2nd:</b> <span id="lblWinnerRank2Name">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank2Prize">--</div></div>
+            <div class="winner-rank-row"><div class="rank-user-info"><span>🥉</span> <div><b>3rd:</b> <span id="lblWinnerRank3Name">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank3Prize">--</div></div>
         </div>
     </div>
+    
+
+    <!-- 🔥 ADMIN DYNAMIC CARDS CONTAINER -->
+    <div id="dynamicAdminCardsContainer" class="smart-flex-grid" style="display: none;"></div>
 
     <div class="premium-footer notranslate">
-        <p>Powered by <span style="color:var(--accent-green); font-weight:900;">Shubham</span> || <span style="color:var(--primary-blue); font-weight:900;">tvtune</span></p>
+        <p>Powered by <span style="color:var(--accent-green); font-weight:900;">Shubham</span> || <span style="color:var(--primary-blue); font-weight:900;">Postpriya</span></p>
+        <div class="safe-disclaimer">Disclaimer: This is a Reward-based App. Users collect virtual coins by completing tasks/playing games and can redeem them for digital game currency. This app does not offer real money gambling.</div>
     </div>
 
-    <!-- 📱 5-BUTTON FLOATING BOTTOM NAVIGATION BAR (ADMIN CONTROLLED) -->
+    <!-- 📱 5-BUTTON FLOATING BOTTOM NAVIGATION BAR -->
     <div class="bottom-nav" id="bottomNavContainer">
+        <!-- Default Fallback -->
         <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
         <a href="tasks.html" class="nav-item"><i class="fa-solid fa-fire"></i><span>Offerwall</span></a>
         <a href="daily.html" class="nav-item"><i class="fa-solid fa-gift"></i><span>Daily</span></a>
         <a href="leaderboard.html" class="nav-item"><i class="fa-solid fa-trophy"></i><span>Leaders</span></a>
-        <a href="my_points.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span>Vault</span></a>
+        <a href="my_point1.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span>Vault</span></a>
     </div>
+    <!-- 🚨 PRIORITY URGENT TASK POPUP (ADMIN CONTROLLED) -->
+    <div class="overlay" id="urgentTaskOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; backdrop-filter:blur(8px); justify-content:center; align-items:center;">
+        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border:2px solid #ef4444; border-radius:20px; padding:30px 20px; width:85%; max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(239, 68, 68, 0.4); animation: popIn 0.5s ease;">
+            <div style="font-size:50px; margin-bottom:10px; color:#ef4444; filter: drop-shadow(0 4px 10px rgba(239,68,68,0.5));">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h2 id="urgentTaskTitle" style="color:#ef4444; margin:0 0 10px 0; font-weight:900; text-transform:uppercase;">IMPORTANT NOTICE</h2>
+            <p id="urgentTaskDesc" style="color:#e2e8f0; font-size:14px; font-weight:600; margin:0 0 20px 0; line-height:1.5;">Please read this urgent message.</p>
+            
+            <button id="urgentTaskBtn" style="background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; border:none; padding:14px 25px; border-radius:12px; font-weight:900; font-size:14px; cursor:pointer; width:100%; box-shadow:0 6px 15px rgba(239, 68, 68, 0.4); text-transform:uppercase; transition:0.2s;">TAKE ACTION</button>
+            
+            <button id="urgentTaskCloseBtn" style="background:transparent; color:#94a3b8; border:none; margin-top:15px; font-size:12px; font-weight:bold; cursor:pointer; text-decoration:underline;">Close & Continue</button>
+        </div>
+    </div>
+    <style>@keyframes popIn { from {transform: scale(0.7); opacity: 0;} to {transform: scale(1); opacity: 1;} }</style>
+<!-- 🏆 HOME SCREEN WINNER POPUP -->
+    <div class="overlay" id="homeWinnerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; backdrop-filter:blur(5px); justify-content:center; align-items:center;">
+        <div style="background:linear-gradient(135deg, #1e1b4b, #4c1d95); border:2px solid #facc15; border-radius:20px; padding:30px 20px; width:85%; max-width:340px; text-align:center; box-shadow:0 10px 40px rgba(250,204,21,0.4); animation: popIn 0.5s ease;">
+            <div style="font-size:55px; margin-bottom:10px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🎉👑🥳</div>
+            <h2 style="color:#facc15; margin:0 0 10px 0; font-weight:900; text-transform:uppercase;">CONGRATULATIONS!</h2>
+            <p style="color:#e9d5ff; font-size:14px; font-weight:600; margin:0 0 15px 0;" id="homeWinnerText">You won the Drop!</p>
+            <div style="background:rgba(0,0,0,0.3); border:1px dashed #facc15; padding:15px; border-radius:12px; font-size:28px; font-weight:900; color:#10b981; margin-bottom:20px; text-shadow:0 0 10px rgba(16,185,129,0.4);" id="homeWinnerPrize">+0 COINS</div>
+            <button style="background:linear-gradient(135deg, #facc15, #d97706); color:#000; border:none; padding:14px 25px; border-radius:50px; font-weight:900; font-size:14px; cursor:pointer; width:100%; box-shadow:0 6px 15px rgba(250,204,21,0.4);" onclick="closeHomeWinnerPopup()">CLAIM REWARD 🪙</button>
+        </div>
+    </div>
+    <style>@keyframes popIn { from{transform:scale(0.7); opacity:0;} to{transform:scale(1); opacity:1;} }</style>
 
-    <!-- 🟢 SCRIPT ENGINE (PURE NODE.JS API & RENDER SERVER BACKEND) -->
     <script>
-    const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-    const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // Check for Wins on Home Screen Load
+        document.addEventListener("DOMContentLoaded", () => {
+            const userId = localStorage.getItem("userId");
+            if(!userId) return;
 
-    function checkUserNetworkStatusConnection() {
-        const overlayNode = document.getElementById("globalOfflineWarningOverlay");
-        if (!navigator.onLine) { if (overlayNode) overlayNode.style.display = "flex"; } 
-        else { if (overlayNode) overlayNode.style.display = "none"; }
-    }
+            let currentWinType = "";
+            let currentWinAmt = 0;
 
-    window.addEventListener('online', checkUserNetworkStatusConnection);
-    window.addEventListener('offline', checkUserNetworkStatusConnection);
+            window.closeHomeWinnerPopup = function() {
+                localStorage.setItem(`ack_win_${currentWinType}_${currentWinAmt}`, "true");
+                document.getElementById("homeWinnerOverlay").style.display = "none";
+            };
 
-    const langData = {
-        "en": {
-            "total_balance": "My Balance", "coins": "Points", "withdraw_btn": "My Rewards", "earning_zones": "Reward Zones",
-            "daily_checkin": "Daily Check-in", "daily_desc": "Earn Points everyday", "watch_ads": "Video Offers", "watch_desc": "Watch clips & earn",
-            "app_testing": "App Experience", "app_desc": "Premium Rewards", "social_tasks": "Social Tasks", "social_desc": "Watch & Comment",
-            "mega_offers": "Premium Offers", "mega_desc": "CPA Offers", "extra_bonus": "Extra Bonus", "extra_desc": "Games & Promo",
-            "spin_win": "Spin & Win", "spin_desc": "Spin wheel daily", "quick_tasks": "Quick Tasks",
-            "cpx_survey": "CPX Surveys", "up_to_50": "Up to 50 🪙", "click_earn": "Instant Points", "instant_coin": "Instant 5 🪙",
-            "time_wall": "Timewall Clicks", "easy_tasks": "Easy Tasks", "bitlabs": "Bitlabs Offer", "high_pay": "High Paying",
-            "show_tasks_btn": "Show Tasks", "hide_tasks_btn": "Hide Tasks"
-        },
-        "hi": {
-            "total_balance": "मेरा बैलेंस", "coins": "पॉइंट्स", "withdraw_btn": "मेरे रिवॉर्ड", "earning_zones": "रिवॉर्ड तरीके",
-            "daily_checkin": "दैनिक चेक-इन", "daily_desc": "रोजाना पॉइंट्स जमा करें", "watch_ads": "वीडियो ऑफर्स", "watch_desc": "वीडियो देखें और जमा करें",
-            "app_testing": "ऐप एक्सपीरियंस", "app_desc": "प्रीमियम रिवॉर्ड", "social_tasks": "सोशल टास्क", "social_desc": "देखें और शेयर करें",
-            "mega_offers": "प्रीमियम ऑफर्स", "mega_desc": "ऐप इंस्टॉल ऑफर्स", "extra_bonus": "अतिरिक्त बोनस", "extra_desc": "गेम और प्रोमो",
-            "spin_win": "स्पिन और विन", "spin_desc": "रोजाना घुमाएं", "quick_tasks": "क्विक टास्क",
-            "cpx_survey": "CPX सर्वे", "up_to_50": "50 🪙 तक", "click_earn": "इंस्टेंट पॉइंट्स", "instant_coin": "तुरंत 5 🪙",
-            "time_wall": "Timewall टास्क", "easy_tasks": "आसान टास्क", "bitlabs": "Bitlabs ऑफर", "high_pay": "ज्यादा कमाई",
-            "show_tasks_btn": "टास्क दिखाएं", "hide_tasks_btn": "टास्क छुपाएं"
-        },
-         "bn": {
-            "total_balance": "মোট ব্যালেন্স", "coins": "কয়েন", "withdraw_btn": "আমার রিওয়ার্ড", "earning_zones": "উপার্জন অঞ্চল",
-            "daily_checkin": "দৈনিক চেক-ইন", "daily_desc": "প্রতিদিন কয়েন উপার্জন করুন", "watch_ads": "ভিডিও জোন", "watch_desc": "ভিডিও দেখে আয় করুন",
-            "app_testing": "অ্যাপ টেস্টিং", "app_desc": "প্রিমিয়াম রিওয়ার্ড", "social_tasks": "সোশ্যাল টাস্ক", "social_desc": "দেখুন এবং মন্তব্য করুন",
-            "mega_offers": "প্রিমিয়াম অফার", "mega_desc": "অ্যাপ ইনস্টল অফার", "extra_bonus": "অতিরিক্ত বোনাস", "extra_desc": "গেমস এবং প্রোমো",
-            "spin_win": "স্পিন এবং জয়", "spin_desc": "প্রতিদিন স্পিন করুন", "quick_tasks": "দ্রুত টাস্ক",
-            "cpx_survey": "CPX সার্ভে", "up_to_50": "50 🪙 পর্যন্ত", "click_earn": "ইনস্ট্যান্ট কয়েন", "instant_coin": "তাত্ক্ষণিক 5 🪙",
-            "time_wall": "Timewall ক্লিক", "easy_tasks": "সহজ কাজ", "bitlabs": "Bitlabs অফার", "high_pay": "বেশি আয়",
-            "show_tasks_btn": "টাস্ক দেখান", "hide_tasks_btn": "টাস্ক লুকান"
-        },
-        "te": {
-            "total_balance": "మొత్తం బ్యాలెన్స్", "coins": "నాణేలు", "withdraw_btn": "నా రివార్డ్స్", "earning_zones": "సంపాదన మార్గాలు",
-            "daily_checkin": "రోజువారీ చెక్-ఇన్", "daily_desc": "ప్రతిరోజూ నాణేలు సంపాదించండి", "watch_ads": "వీడియో జోన్", "watch_desc": "చూడండి & సంపాదించండి",
-            "app_testing": "యాప్ టెస్టింగ్", "app_desc": "ప్రీమియం రివార్డ్స్", "social_tasks": "సామాజిక పనులు", "social_desc": "చూడండి & వ్యాఖ్యానించండి",
-            "mega_offers": "ప్రీమియం ఆఫర్‌లు", "mega_desc": "CPA ఆఫర్‌లు", "extra_bonus": "అదనపు బోనస్", "extra_desc": "గేమ్స్ & ప్రోమో",
-            "spin_win": "స్పిన్ & విన్", "spin_desc": "రోజూ ఆడండి", "quick_tasks": "శీఘ్ర పనులు",
-            "cpx_survey": "CPX సర్వేలు", "up_to_50": "50 🪙 వరకు", "click_earn": "ఇన్‌స్టంట్ కాయిన్స్", "instant_coin": "తక్షణం 5 🪙",
-            "time_wall": "Timewall పనులు", "easy_tasks": "సులువు పనులు", "bitlabs": "Bitlabs ఆఫర్", "high_pay": "అధిక చెల్లింపు",
-            "show_tasks_btn": "టాస్క్‌లు చూపించు", "hide_tasks_btn": "టాస్క్‌లు దాచు"
-        },
-        "mr": {
-            "total_balance": "एकूण शिल्लक", "coins": "नाणी", "withdraw_btn": "माझे रिवॉर्ड्स", "earning_zones": "कमाईचे मार्ग",
-            "daily_checkin": "दैनिक चेक-इन", "daily_desc": "दररोज नाणी मिळवा", "watch_ads": "व्हिडिओ झोन", "watch_desc": "व्हिडिओ पाहून कमवा",
-            "app_testing": "अॅप टेस्टिंग", "app_desc": "प्रीमियम रिवॉर्ड", "social_tasks": "सोशल टास्क", "social_desc": "पहा आणि टिप्पणी करा",
-            "mega_offers": "प्रीमियम ऑफर्स", "mega_desc": "अॅप इन्स्टॉल करा", "extra_bonus": "अतिरिक्त बोनस", "extra_desc": "गेम्स आणि प्रोमो",
-            "spin_win": "स्पिन आणि जिंका", "spin_desc": "दररोज स्पिन करा", "quick_tasks": "क्विक टास्क",
-            "cpx_survey": "CPX सर्वेक्षण", "up_to_50": "50 🪙 पर्यंत", "click_earn": "इन्स्टंट कॉइन्स", "instant_coin": "त्वरित 5 🪙",
-            "time_wall": "Timewall टास्क", "easy_tasks": "सोपी कामे", "bitlabs": "Bitlabs ऑफर", "high_pay": "जास्त कमाई",
-            "show_tasks_btn": "टास्क दाखवा", "hide_tasks_btn": "टास्क लपवा"
-        },
-        "ta": {
-            "total_balance": "மொத்த இருப்பு", "coins": "நாணயங்கள்", "withdraw_btn": "என் வெகுமதிகள்", "earning_zones": "வருமான வழிகள்",
-            "daily_checkin": "தினசரி செக்-இன்", "daily_desc": "தினமும் நாணயங்களை பெறுங்கள்", "watch_ads": "வீடியோ மண்டலம்", "watch_desc": "பார்த்து சம்பாதிக்கவும்",
-            "app_testing": "பயன்பாடு சோதனை", "app_desc": "பிரீமியம் வெகுமதி", "social_tasks": "சமூக பணிகள்", "social_desc": "பார்த்து கருத்து தெரிவிக்கவும்",
-            "mega_offers": "பிரீமியம் சலுகைகள்", "mega_desc": "CPA சலுகைகள்", "extra_bonus": "கூடுதல் போனஸ்", "extra_desc": "விளையாட்டுகள் & ப்ரோமோ",
-            "spin_win": "ஸ்பின் & வின்", "spin_desc": "தினமும் விளையாடுங்கள்", "quick_tasks": "விரைவான பணிகள்",
-            "cpx_survey": "CPX ஆய்வுகள்", "up_to_50": "50 🪙 வரை", "click_earn": "உடனடி நாணயங்கள்", "instant_coin": "உடனடி 5 🪙",
-            "time_wall": "Timewall பணிகள்", "easy_tasks": "எளிய பணிகள்", "bitlabs": "Bitlabs சலுகை", "high_pay": "அதிக வருமானம்",
-            "show_tasks_btn": "பணிகளைக் காட்டு", "hide_tasks_btn": "பணிகளை மறை"
-        },
-        "ur": {
-            "total_balance": "کل بیلنس", "coins": "سکے", "withdraw_btn": "میرے انعامات", "earning_zones": "کمائی کے زونز",
-            "daily_checkin": "روزانہ چیک ان", "daily_desc": "روزانہ سکے کمائیں", "watch_ads": "ویڈیو زون", "watch_desc": "دیکھیں اور کمائیں",
-            "app_testing": "ایپ ٹیسٹنگ", "app_desc": "پریمیم انعامات", "social_tasks": "سوشل ٹاسک", "social_desc": "دیکھیں اور تبصرہ کریں",
-            "mega_offers": "پریمیم آفرز", "mega_desc": "CPA آفرز", "extra_bonus": "اضافی بونس", "extra_desc": "گیمز اور پرومو",
-            "spin_win": "اسپن اور جیتیں", "spin_desc": "روزانہ اسپن کریں", "quick_tasks": "فوری ٹاسک",
-            "cpx_survey": "CPX سروے", "up_to_50": "50 🪙 تک", "click_earn": "فوری کوئنز", "instant_coin": "فوری 5 🪙",
-            "time_wall": "Timewall ٹاسک", "easy_tasks": "آسان ٹاسک", "bitlabs": "Bitlabs آفر", "high_pay": "زیادہ کمائی",
-            "show_tasks_btn": "ٹاسک دکھائیں", "hide_tasks_btn": "ٹاسک چھپائیں"
-        },
-        "gu": {
-            "total_balance": "કુલ બેલેન્સ", "coins": "સિક્કા", "withdraw_btn": "મારા ઇનામો", "earning_zones": "કમાણીના ઝોન",
-            "daily_checkin": "દૈનિક ચેક-ઇન", "daily_desc": "દરરોજ સિક્કા કમાઓ", "watch_ads": "વિડિઓ ઝોન", "watch_desc": "જુઓ અને કમાઓ",
-            "app_testing": "એપ્લિકેશન ટેસ્ટિંગ", "app_desc": "પ્રીમિયમ ઇનામો", "social_tasks": "સામાજિક કાર્યો", "social_desc": "જુઓ અને ટિપ્પણી કરો",
-            "mega_offers": "પ્રીમિયમ ઓફર્સ", "mega_desc": "CPA ઓફર્સ", "extra_bonus": "વધારાનું બોનસ", "extra_desc": "રમતો અને પ્રોમો",
-            "spin_win": "સ્પિન અને જીતો", "spin_desc": "દરરોજ રમો", "quick_tasks": "ઝડપી કાર્યો",
-            "cpx_survey": "CPX સર્વે", "up_to_50": "50 🪙 સુધી", "click_earn": "તરત સિક્કા", "instant_coin": "તરત 5 🪙",
-            "time_wall": "Timewall કાર્યો", "easy_tasks": "સરળ કાર્યો", "bitlabs": "Bitlabs ઓફર", "high_pay": "વધુ ચૂકવણી",
-            "show_tasks_btn": "કાર્યો બતાવો", "hide_tasks_btn": "કાર્યો છુપાવો"
-        },
-        "es": {
-            "total_balance": "Saldo Total", "coins": "Monedas", "withdraw_btn": "Mis Recompensas", "earning_zones": "Zonas de Ganancia",
-            "daily_checkin": "Registro Diario", "daily_desc": "Gana monedas a diario", "watch_ads": "Zona de Video", "watch_desc": "Mira y gana",
-            "app_testing": "Probar Apps", "app_desc": "Recompensas Premium", "social_tasks": "Tareas Sociales", "social_desc": "Mira y comenta",
-            "mega_offers": "Ofertas Premium", "mega_desc": "Ofertas CPA", "extra_bonus": "Bono Extra", "extra_desc": "Juegos y Promos",
-            "spin_win": "Gira y Gana", "spin_desc": "Gira a diario", "quick_tasks": "Tareas Rápidas",
-            "cpx_survey": "Encuestas CPX", "up_to_50": "Hasta 50 🪙", "click_earn": "Monedas al Instante", "instant_coin": "5 🪙 al instante",
-            "time_wall": "Tareas Timewall", "easy_tasks": "Tareas Fáciles", "bitlabs": "Oferta Bitlabs", "high_pay": "Buen Pago",
-            "show_tasks_btn": "Mostrar Tareas", "hide_tasks_btn": "Ocultar Tareas"
-        },
-        "fr": {
-            "total_balance": "Solde Total", "coins": "Pièces", "withdraw_btn": "Mes Récompenses", "earning_zones": "Zones de Gain",
-            "daily_checkin": "Check-in Quotidien", "daily_desc": "Gagnez chaque jour", "watch_ads": "Zone Vidéo", "watch_desc": "Regardez et gagnez",
-            "app_testing": "Test d'App", "app_desc": "Récompense Premium", "social_tasks": "Tâches Sociales", "social_desc": "Regardez et commentez",
-            "mega_offers": "Offres Premium", "mega_desc": "Offres CPA", "extra_bonus": "Bonus Extra", "extra_desc": "Jeux & Promos",
-            "spin_win": "Tournez & Gagnez", "spin_desc": "Tournez chaque jour", "quick_tasks": "Tâches Rapides",
-            "cpx_survey": "Sondages CPX", "up_to_50": "Jusqu'à 50 🪙", "click_earn": "Pièces Instantanées", "instant_coin": "5 🪙 instantanés",
-            "time_wall": "Tâches Timewall", "easy_tasks": "Tâches Faciles", "bitlabs": "Offre Bitlabs", "high_pay": "Haut Paiement",
-            "show_tasks_btn": "Afficher les tâches", "hide_tasks_btn": "Masquer les tâches"
-        },
-        "ar": {
-            "total_balance": "إجمالي الرصيد", "coins": "معادلات", "withdraw_btn": "مكافآتي", "earning_zones": "مناطق الكسب",
-            "daily_checkin": "تسجيل يومي", "daily_desc": "اكسب كل يوم", "watch_ads": "منطقة الفيديو", "watch_desc": "شاهد واربح",
-            "app_testing": "اختبار التطبيقات", "app_desc": "مكافآت مميزة", "social_tasks": "مهام اجتماعية", "social_desc": "شاهد وعلق",
-            "mega_offers": "عروض مميزة", "mega_desc": "عروض CPA", "extra_bonus": "مكافأة إضافية", "extra_desc": "ألعاب وعروض",
-            "spin_win": "دور واربح", "spin_desc": "العب يومياً", "quick_tasks": "مهام سريعة",
-            "cpx_survey": "استطلاعات CPX", "up_to_50": "حتى 50 🪙", "click_earn": "عملات فورية", "instant_coin": "5 🪙 فوراً",
-            "time_wall": "مهام Timewall", "easy_tasks": "مهام سهلة", "bitlabs": "عروض Bitlabs", "high_pay": "عالي الدفع",
-            "show_tasks_btn": "إظهار المهام", "hide_tasks_btn": "إخفاء المهام"
-        },
-        "pt": {
-            "total_balance": "Saldo Total", "coins": "Moedas", "withdraw_btn": "Minhas Recompensas", "earning_zones": "Zonas de Ganho",
-            "daily_checkin": "Check-in Diário", "daily_desc": "Ganhe todos os dias", "watch_ads": "Zona de Vídeo", "watch_desc": "Assista e ganhe",
-            "app_testing": "Testar Apps", "app_desc": "Recompensas Premium", "social_tasks": "Tarefas Sociais", "social_desc": "Assista e comente",
-            "mega_offers": "Ofertas Premium", "mega_desc": "Ofertas CPA", "extra_bonus": "Bônus Extra", "extra_desc": "Jogos e Promos",
-            "spin_win": "Gire e Ganhe", "spin_desc": "Gire diariamente", "quick_tasks": "Tarefas Rápidas",
-            "cpx_survey": "Pesquisas CPX", "up_to_50": "Até 50 🪙", "click_earn": "Moedas Instantâneas", "instant_coin": "5 🪙 na hora",
-            "time_wall": "Tarefas Timewall", "easy_tasks": "Tarefas fáceis", "bitlabs": "Oferta Bitlabs", "high_pay": "Bom Pagamento",
-            "show_tasks_btn": "Mostrar Tarefas", "hide_tasks_btn": "Ocultar Tarefas"
-        },
-        "ru": {
-            "total_balance": "Общий баланс", "coins": "Монеты", "withdraw_btn": "Мои Награды", "earning_zones": "Зоны заработка",
-            "daily_checkin": "Ежедневная отметка", "daily_desc": "Монеты каждый день", "watch_ads": "Видео Зона", "watch_desc": "Смотри и зарабатывай",
-            "app_testing": "Тест приложений", "app_desc": "Премиум Награды", "social_tasks": "Соц. задания", "social_desc": "Смотри и комментируй",
-            "mega_offers": "Премиум предложения", "mega_desc": "CPA предложения", "extra_bonus": "Экстра бонус", "extra_desc": "Игры и акции",
-            "spin_win": "Крути и выигрывай", "spin_desc": "Крути каждый день", "quick_tasks": "Быстрые задания",
-            "cpx_survey": "Опросы CPX", "up_to_50": "До 50 🪙", "click_earn": "Мгновенные монеты", "instant_coin": "Сразу 5 🪙",
-            "time_wall": "Задания Timewall", "easy_tasks": "Легкие задания", "bitlabs": "Оффер Bitlabs", "high_pay": "Высокая оплата",
-            "show_tasks_btn": "Показать задания", "hide_tasks_btn": "Скрыть задания"
-        }
-    };
-
-    function changeLanguage(langCode) {
-        localStorage.setItem("selectedLang", langCode);
-        const transObj = langData[langCode] || langData["en"];
-        document.querySelectorAll('[data-i18n]').forEach(elem => {
-            const key = elem.getAttribute("data-i18n");
-            if(transObj[key]) elem.innerText = transObj[key];
-        });
-        document.getElementById("appLanguage").value = langCode;
-    }
-
-    const dailyTasksList = [
-        { id: "t1", text: "Watch Video Ad 1", coins: 10 },
-        { id: "t2", text: "Watch Video Ad 2", coins: 10 },
-        { id: "t3", text: "Click Premium Banner Ad", coins: 15 },
-        { id: "t4", text: "Spin the Lucky Wheel 3 Times", coins: 12 },
-        { id: "t5", text: "Complete 1 Math Quiz", coins: 20 },
-        { id: "t6", text: "Claim Hourly Vault Key", coins: 15 },
-        { id: "t11", text: "Play Daily Spin", coins: 10 },
-        { id: "t15", text: "Play Square Dash Arcade", coins: 20 }
-    ];
-
-    function toggleDailyTasksChecklistDisplay() {
-        const container = document.getElementById("dailyChecklistHTML");
-        const toggleBtn = document.getElementById("btnToggleDailyChecklistMenu");
-        const toggleText = document.getElementById("lblToggleTasksText");
-        let savedLang = localStorage.getItem("selectedLang") || "en";
-        const transObj = langData[savedLang] || langData["en"];
-
-        if (!container || !toggleBtn || !toggleText) return;
-
-        if (container.classList.contains("expanded")) {
-            container.classList.remove("expanded");
-            toggleBtn.classList.remove("active");
-            toggleText.innerText = transObj["show_tasks_btn"] || "Show Tasks";
-        } else {
-            container.classList.add("expanded");
-            toggleBtn.classList.add("active");
-            toggleText.innerText = transObj["hide_tasks_btn"] || "Hide Tasks";
-        }
-    }
-
-    async function loadUserProfileAPI() {
-        const userId = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-
-        if (!userId || !token) {
-            window.location.href = "index.html";
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/user/${userId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-
-            if (data.success && data.user) {
-                document.getElementById("liveBalance").innerText = "₹ " + (data.user.balance || 0).toFixed(2);
-                document.getElementById("liveCoins").innerText = data.user.coins || 0;
-
-                if (data.user.profile_pic) {
-                    document.getElementById("homeProfileIcon").innerHTML = `<img src="${data.user.profile_pic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                }
-
-                executeRealtimeChecklistEvaluation(data.user, data.user.completed_daily_tasks || []);
-            }
-        } catch (err) {
-            console.log("Offline mode or cache fallback");
-        }
-    }
-
-    async function loadAdminDynamicNavButtons() {
-        try {
-            const res = await fetch(`${API_BASE_URL}/app-config/nav-buttons`);
-            const data = await res.json();
-
-            if (data.success && data.navButtons && data.navButtons.length === 5) {
-                const container = document.getElementById("bottomNavContainer");
-                container.innerHTML = "";
-
-                data.navButtons.forEach((btn, idx) => {
-                    const a = document.createElement("a");
-                    a.className = `nav-item ${idx === 0 ? 'active' : ''}`;
-                    a.onclick = () => window.location.href = btn.targetUrl;
-                    a.innerHTML = `<i class="${btn.iconClass || 'fa-solid fa-star'}"></i><span>${btn.label}</span>`;
-                    container.appendChild(a);
-                });
-            }
-        } catch (e) {
-            console.log("Using default bottom nav");
-        }
-    }
-
-    function executeRealtimeChecklistEvaluation(uData, completedTaskIds) {
-        const container = document.getElementById("dailyChecklistHTML");
-        if (!container) return;
-        container.innerHTML = ""; 
-        let doneCount = 0;
-
-        dailyTasksList.forEach(task => {
-            const isDone = completedTaskIds.includes(task.id);
-            if (isDone) doneCount++;
-            const taskBox = document.createElement("div");
-            taskBox.className = `task-item ${isDone ? 'completed' : ''}`;
-            taskBox.innerHTML = `
-                <div class="task-info">
-                    <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onclick="return false;">
-                    <span class="task-text">${task.text}</span>
-                </div>
-                <div class="task-reward">+${task.coins}🪙</div>
-            `;
-            container.appendChild(taskBox);
-        });
-
-        document.getElementById("doneCount").innerText = doneCount;
-        let percentage = (doneCount / dailyTasksList.length) * 100;
-        document.getElementById("taskProgressFill").style.width = percentage + "%";
+// 🚨 PRIORITY POPUP LISTENER (Connects to Admin Panel)
+firebase.database().ref('global_system_runtime_configurations/urgent_task').on('value', (snap) => {
+    const overlay = document.getElementById("urgentTaskOverlay");
+    if (snap.exists() && overlay) {
+        const data = snap.val();
         
-        document.getElementById("mNode1").classList.remove("achieved");
-        document.getElementById("mNode2").classList.remove("achieved");
-        document.getElementById("mNode3").classList.remove("achieved");
-
-        if (doneCount >= 2) document.getElementById("mNode1").classList.add("achieved");
-        if (doneCount >= 5) document.getElementById("mNode2").classList.add("achieved");
-        if (doneCount >= 8) document.getElementById("mNode3").classList.add("achieved");
+        // Check if Admin has turned it "true"
+        if (data.active === "true") {
+            document.getElementById("urgentTaskTitle").innerText = data.title || "IMPORTANT NOTICE";
+            document.getElementById("urgentTaskDesc").innerText = data.desc || "";
+            
+            const actionBtn = document.getElementById("urgentTaskBtn");
+            
+            // Agar Admin ne koi URL link diya hai toh button show karo
+            if (data.url && data.url.trim() !== "") {
+                actionBtn.style.display = "block";
+                actionBtn.innerText = "GO NOW";
+                actionBtn.onclick = () => window.location.href = data.url;
+            } else {
+                // Agar link nahi diya, toh button hata do
+                actionBtn.style.display = "none";
+            }
+            
+            // Close button functionality
+            document.getElementById("urgentTaskCloseBtn").onclick = () => overlay.style.display = "none";
+            
+            overlay.style.display = "flex";
+        } else {
+            // Agar Admin ne "false" kar diya, toh hata do
+            overlay.style.display = "none";
+        }
     }
+});
 
-    function closeUrgentTask() { document.getElementById("urgentTaskModalOverlay").style.display = "none"; }
-    function closeCustomAlert() { document.getElementById("customAlertBox").style.display = "none"; document.getElementById("alertOverlay").style.display = "none"; }
-    function openNotificationCenter() { document.getElementById("notificationCenterModal").style.display = "flex"; }
-    function closeNotificationCenter() { document.getElementById("notificationCenterModal").style.display = "none"; }
+            // Mini Drop Listener
+            firebase.database().ref('mini_drop').on('value', snap => {
+                if(snap.exists() && snap.val().winner_uid === userId) {
+                    let amt = snap.val().jackpot_amount || 1000;
+                    if(localStorage.getItem(`ack_win_mini_${amt}`) !== "true") {
+                        currentWinType = "mini"; currentWinAmt = amt;
+                        document.getElementById("homeWinnerText").innerText = `You won the MINI DROP!`;
+                        document.getElementById("homeWinnerPrize").innerText = `+${amt} COINS`;
+                        document.getElementById("homeWinnerOverlay").style.display = "flex";
+                    }
+                }
+            });
 
-    document.addEventListener("DOMContentLoaded", () => {
-        checkUserNetworkStatusConnection();
-        changeLanguage(localStorage.getItem("selectedLang") || "en");
-        loadUserProfileAPI();
-        loadAdminDynamicNavButtons();
-    });
+            // Mega Drop Listener
+            firebase.database().ref('weekly_drop').on('value', snap => {
+                if(snap.exists() && snap.val().winner_uid === userId) {
+                    let amt = snap.val().jackpot_amount || 5000;
+                    if(localStorage.getItem(`ack_win_mega_${amt}`) !== "true") {
+                        currentWinType = "mega"; currentWinAmt = amt;
+                        document.getElementById("homeWinnerText").innerText = `You won the MEGA DROP!`;
+                        document.getElementById("homeWinnerPrize").innerText = `+${amt} COINS`;
+                        document.getElementById("homeWinnerOverlay").style.display = "flex";
+                    }
+                }
+            });
+        });
+    </script>
+    <!-- 🟢 FIREBASE REALTIME SCRIPT ENGINE -->
+    <script>
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        function checkUserNetworkStatusConnection() {
+            const overlayNode = document.getElementById("globalOfflineWarningOverlay");
+            if (!navigator.onLine) { if (overlayNode) overlayNode.style.display = "flex"; } 
+            else { if (overlayNode) overlayNode.style.display = "none"; }
+        }
+        window.addEventListener('online', checkUserNetworkStatusConnection);
+        window.addEventListener('offline', checkUserNetworkStatusConnection);
+
+        const langData = {
+            "en": { 
+                "withdraw_btn": "My Reward", "daily_checkin": "Daily Check-in", "daily_desc": "Earn Points", 
+                "watch_ads": "Video Offers", "watch_desc": "Watch & earn", "app_testing": "App Discovery", 
+                "app_desc": "Test & Earn", "social_tasks": "Social Tasks", "social_desc": "Follow & Share", 
+                "spin_win": "Lucky Spin", "spin_desc": "Spin the wheel daily to win" 
+            },
+            "hi": { 
+                "withdraw_btn": "मेरे रिवॉर्ड", "daily_checkin": "दैनिक चेक-इन", "daily_desc": "पॉइंट्स कमाएं", 
+                "watch_ads": "वीडियो ऑफर्स", "watch_desc": "देखें और कमाएं", "app_testing": "ऐप डिस्कवरी", 
+                "app_desc": "टेस्ट करें", "social_tasks": "सोशल टास्क", "social_desc": "फॉलो करें", 
+                "spin_win": "लकी स्पिन", "spin_desc": "रोजाना घुमाएं" 
+            },
+            "bn": { "withdraw_btn": "রিওয়ার্ড", "daily_checkin": "দৈনিক চেক-ইন", "daily_desc": "পয়েন্ট আয়", "watch_ads": "ভিডিও অফার", "watch_desc": "দেখুন ও আয়", "app_testing": "অ্যাপ আবিষ্কার", "app_desc": "টেস্ট করুন", "social_tasks": "সোশ্যাল টাস্ক", "social_desc": "ফলো করুন", "spin_win": "লাকি স্পিন", "spin_desc": "প্রতিদিন ঘোরান" },
+            "te": { "withdraw_btn": "రివార్డులు", "daily_checkin": "రోజువారీ చెక్-ఇన్", "daily_desc": "పాయింట్లు పొందండి", "watch_ads": "వీడియో ఆఫర్‌లు", "watch_desc": "చూడండి & పొందండి", "app_testing": "యాప్ డిస్కవరీ", "app_desc": "పరీక్షించండి", "social_tasks": "సామాజిక పనులు", "social_desc": "ఫాలో అవ్వండి", "spin_win": "లక్కీ స్పిన్", "spin_desc": "రోజూ తిప్పండి" },
+            "mr": { "withdraw_btn": "माझे बक्षिसे", "daily_checkin": "दैनिक चेक-इन", "daily_desc": "पॉइंट्स मिळवा", "watch_ads": "व्हिडिओ ऑफर", "watch_desc": "पहा आणि मिळवा", "app_testing": "अॅप शोधा", "app_desc": "चाचणी करा", "social_tasks": "सोशल टास्क", "social_desc": "फॉलो करा", "spin_win": "लकी स्पिन", "spin_desc": "दररोज फिरवा" },
+            "ta": { "withdraw_btn": "வெகுமதிகள்", "daily_checkin": "தினசரி செக்-இன்", "daily_desc": "புள்ளிகள் பெற", "watch_ads": "வீடியோ சலுகைகள்", "watch_desc": "பாருங்கள்", "app_testing": "ஆப் தேடல்", "app_desc": "சோதனை", "social_tasks": "சமூக பணிகள்", "social_desc": "பகிரவும்", "spin_win": "லக்கி ஸ்பின்", "spin_desc": "சுழற்றுங்கள்" },
+            "ur": { "withdraw_btn": "انعامات", "daily_checkin": "روزانہ چیک ان", "daily_desc": "پوائنٹس حاصل کریں", "watch_ads": "ویڈیو آفرز", "watch_desc": "دیکھیں اور کمائیں", "app_testing": "ایپ دریافت", "app_desc": "ٹیسٹ کریں", "social_tasks": "سوشل ٹاسک", "social_desc": "فالو کریں", "spin_win": "لکی اسپن", "spin_desc": "روزانہ گھمائیں" },
+            "gu": { "withdraw_btn": "ઈનામો", "daily_checkin": "દૈનિક ચેક-ઇન", "daily_desc": "પોઈન્ટ્સ મેળવો", "watch_ads": "વિડિઓ ઓફર્સ", "watch_desc": "જુઓ અને કમાઓ", "app_testing": "એપ ડિસ્કવરી", "app_desc": "ટેસ્ટ કરો", "social_tasks": "સામાજિક કાર્યો", "social_desc": "ફોલો કરો", "spin_win": "લકી સ્પિન", "spin_desc": "દરરોજ ફેરવો" },
+            "es": { "withdraw_btn": "Mi Premio", "daily_checkin": "Check-in Diario", "daily_desc": "Gana Puntos", "watch_ads": "Ofertas Video", "watch_desc": "Mira y gana", "app_testing": "Descubrir Apps", "app_desc": "Prueba y Gana", "social_tasks": "Tareas Sociales", "social_desc": "Sigue y Comparte", "spin_win": "Giro Suerte", "spin_desc": "Gira para ganar" },
+            "fr": { "withdraw_btn": "Récompense", "daily_checkin": "Check-in Quotidien", "daily_desc": "Gagnez Points", "watch_ads": "Offres Vidéo", "watch_desc": "Regardez et Gagnez", "app_testing": "Découvrir Apps", "app_desc": "Testez", "social_tasks": "Tâches Sociales", "social_desc": "Suivez", "spin_win": "Tour de Chance", "spin_desc": "Tournez par jour" },
+            "ar": { "withdraw_btn": "مكافآتي", "daily_checkin": "تسجيل يومي", "daily_desc": "اكسب نقاط", "watch_ads": "عروض فيديو", "watch_desc": "شاهد واربح", "app_testing": "استكشاف التطبيقات", "app_desc": "اختبر", "social_tasks": "مهام اجتماعية", "social_desc": "تابع وشارك", "spin_win": "دوران الحظ", "spin_desc": "دور واربح" },
+            "pt": { "withdraw_btn": "Meu Prêmio", "daily_checkin": "Check-in Diário", "daily_desc": "Ganhe Pontos", "watch_ads": "Ofertas Vídeo", "watch_desc": "Assista e Ganhe", "app_testing": "Descobrir Apps", "app_desc": "Teste e Ganhe", "social_tasks": "Tarefas Sociais", "social_desc": "Siga", "spin_win": "Giro da Sorte", "spin_desc": "Gire para ganhar" },
+            "ru": { "withdraw_btn": "Награды", "daily_checkin": "Ежедневная отметка", "daily_desc": "Очки", "watch_ads": "Видео Офферы", "watch_desc": "Смотри и зарабатывай", "app_testing": "Новые Приложения", "app_desc": "Тестируй", "social_tasks": "Соц. задания", "social_desc": "Смотри", "spin_win": "Колесо удачи", "spin_desc": "Вращай каждый день" }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
+            });
+            if(document.getElementById("appLanguage")) document.getElementById("appLanguage").value = langCode;
+        }
+
+        const dailyTasksList = [
+            { id: "t5", text: "Scratch Card Bonus", coins: 20 }, { id: "t10", text: "Secure Server Validation", coins: 30 },
+            { id: "t11", text: "Play Daily Spin", coins: 10 }, { id: "t12", text: "Instant Coins Visit", coins: 5 },
+            { id: "t13", text: "Complete Smart Task", coins: 25 }, { id: "t14", text: "TimeWall Partner Task", coins: 20 },
+            { id: "t15", text: "Watch Premium Video", coins: 40 }, { id: "t16", text: "Premium Web Stream", coins: 50 }
+        ];
+
+        function toggleDailyTasksChecklistDisplay() {
+            const container = document.getElementById("dailyChecklistHTML");
+            const toggleBtn = document.getElementById("btnToggleDailyChecklistMenu");
+            if (container.classList.contains("expanded")) {
+                container.classList.remove("expanded"); toggleBtn.innerText = "Show Tasks List ▼";
+            } else {
+                container.classList.add("expanded"); toggleBtn.innerText = "Hide Tasks List ▲";
+            }
+        }
+
+        function executeRealtimeChecklistEvaluation(uid, completedTaskIds) {
+            const container = document.getElementById("dailyChecklistHTML");
+            if (!container) return; container.innerHTML = ""; let doneCount = 0;
+
+            dailyTasksList.forEach(task => {
+                const isDone = completedTaskIds.includes(task.id);
+                if (isDone) doneCount++;
+                container.innerHTML += `<div class="task-item ${isDone ? 'completed' : ''}"><div class="task-info"><input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onclick="return false;"><span class="task-text">${task.text}</span></div><div class="task-reward">+${task.coins}🪙</div></div>`;
+            });
+
+            document.getElementById("doneCount").innerText = doneCount;
+            document.getElementById("taskProgressFill").style.width = ((doneCount / 15) * 100) + "%"; 
+        }
+
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkUserNetworkStatusConnection();
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const uid = user.uid;
+                    
+                    // 1. Fetch User Profile
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            
+                            let cCoins = Number(data.coins) || 0;
+                            let cName = data.name || "User";
+                            let cUidStr = uid.substring(0, 10) + "...";
+                            let cImg = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${data.name || uid}&backgroundColor=b6e3f4`;
+                            
+                            document.getElementById("liveCoins").innerText = cCoins;
+                            document.getElementById("cardUserName").innerText = cName;
+                            document.getElementById("cardUserUID").innerText = "UID: " + cUidStr;
+                            document.getElementById("cardProfileIcon").innerHTML = `<img src="${cImg}">`;
+                            document.getElementById("headerProfileIcon").innerHTML = `<img src="${cImg}">`;
+                            
+                            localStorage.setItem("d_coins", cCoins);
+                            localStorage.setItem("d_name", cName);
+                            localStorage.setItem("d_uid", cUidStr);
+                            localStorage.setItem("d_img", cImg);
+
+                            executeRealtimeChecklistEvaluation(uid, data.completed_daily_tasks || []);
+                        }
+                    });
+
+                    // 2. Marquee Feed
+                    db.ref('global_system_runtime_configurations/incentives_popup_array_feed_source').on('value', (snap) => {
+                        if (snap.exists()) {
+                            const arr = snap.val(); let html = "";
+                            arr.forEach(item => { if(item.text) html += `<span>• ${item.text}</span>`; });
+                            document.getElementById("livePayoutStream").innerHTML = html || "<span>• Live earning updates loading...</span>";
+                        }
+                    });
+
+                    // 3. Admin Urgent Task (24 HOUR COOLDOWN)
+                    db.ref('global_system_runtime_configurations/urgent_task').on('value', snap => {
+                        if(snap.exists()) {
+                            let task = snap.val();
+                            if(task.active === "true" || task.active === true) {
+                                let cacheKey = "utask_" + encodeURIComponent(task.title);
+                                let lastSeen = localStorage.getItem(cacheKey);
+                                let now = Date.now();
+                                
+                                if (!lastSeen || (now - parseInt(lastSeen)) > 86400000) {
+                                    document.getElementById("urgentTaskTitle").innerText = task.title;
+                                    document.getElementById("urgentTaskDesc").innerText = task.desc;
+                                    
+                                    document.getElementById("urgentTaskBtn").onclick = () => { 
+                                        localStorage.setItem(cacheKey, now);
+                                        window.location.href = task.url; 
+                                    };
+                                    document.getElementById("btnSkipUrgentTask").onclick = () => {
+                                        localStorage.setItem(cacheKey, now);
+                                        document.getElementById("urgentTaskModalOverlay").style.display = "none";
+                                    };
+
+                                    document.getElementById("urgentTaskModalOverlay").style.display = "flex";
+                                } else {
+                                    document.getElementById("urgentTaskModalOverlay").style.display = "none";
+                                }
+                            } else { document.getElementById("urgentTaskModalOverlay").style.display = "none"; }
+                        }
+                    });
+
+                    // 4. Admin Mega Winner
+                    db.ref('global_system_runtime_configurations/latest_surprise_winner').on('value', snap => {
+                        if(snap.exists()){
+                            let w = snap.val();
+                            if(w.uid === uid && localStorage.getItem('seen_win_'+w.timestamp) !== "true") {
+                                document.getElementById("megaWinnerModalOverlay").style.display = "flex";
+                                localStorage.setItem('seen_win_'+w.timestamp, "true");
+                            }
+                        }
+                    });
+
+                    // 5. Notification Center
+                    db.ref('notification_center').limitToLast(20).on('value', snap => {
+                        const container = document.getElementById("notifListContainer");
+                        const badge = document.getElementById("mainNotifBadge");
+                        container.innerHTML = "";
+                        if(snap.exists()){
+                            let notifs = []; snap.forEach(child => { notifs.push(child.val()); }); notifs.reverse();
+                            badge.innerText = notifs.length; badge.style.display = "flex";
+                            notifs.forEach(n => {
+                                let color = n.type === 'success' ? '#10b981' : (n.type === 'urgent' ? '#ef4444' : '#06b6d4');
+                                container.innerHTML += `<div class="notif-item" style="border-left-color: ${color}">
+                                    <h4 style="margin:0 0 4px 0; color:#fff; font-size:13.5px;">${n.title}</h4>
+                                    <p style="margin:0; color:var(--text-sub); font-size:11.5px;">${n.message}</p>
+                                </div>`;
+                            });
+                        } else { badge.style.display = "none"; container.innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:13.5px; margin-top:30px; font-weight:bold;">No new updates...</div>`; }
+                    });
+
+                    // 6. ✅ UNIVERSAL ADMIN HIDE/SHOW MODULE TOGGLES (Fixed Firebase listener)
+                    db.ref('global_system_runtime_configurations/module_toggles').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const toggles = snap.val();
+                            localStorage.setItem("d_toggles", JSON.stringify(toggles));
+                            
+                            document.querySelectorAll('[id^="mod_"]').forEach(el => {
+                                if (toggles[el.id] !== undefined) {
+                                    let state = toggles[el.id];
+                                    // 🔥 FIX: Check both string and boolean explicitly
+                                    if(state === false || state === "false" || state === 0) {
+                                        el.style.display = 'none'; 
+                                    } else {
+                                        el.style.display = '';
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                    // 7. BANNERS DISPLAY
+                    db.ref('global_system_runtime_configurations/banner_ads').on('value', (snap) => {
+                        const adsData = snap.exists() ? snap.val() : {};
+                        for(let i=1; i<=8; i++) {
+                            let slot = document.getElementById("bannerSlot" + i);
+                            if(slot) {
+                                if(adsData["slot" + i] && adsData["slot" + i].active && adsData["slot" + i].code) {
+                                    slot.style.display = "flex";
+                                    setAdHTML(slot, adsData["slot" + i].code);
+                                } else if(adsData["slot" + i] && adsData["slot" + i].active === false) {
+                                    slot.style.display = "none";
+                                } else {
+                                    // Default show placeholder script if nothing touched in admin
+                                    slot.style.display = "flex";
+                                }
+                            }
+                        }
+                    });
+
+                    // 8. DYNAMIC BOTTOM NAV
+db.ref('global_system_runtime_configurations/bottom_tabs').on('value', (snap) => {
+    const container = document.getElementById("bottomNavContainer");
+    if (snap.exists()) {
+        const t = snap.val();
+        container.innerHTML = `
+                                <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+                                <a href="${t.t2_url || 'tasks.html'}" class="nav-item"><i class="${t.t2_icon || 'fa-solid fa-fire'}"></i><span>${t.t2_name || 'Offerwall'}</span></a>
+                                <a href="${t.t3_url || 'daily.html'}" class="nav-item"><i class="${t.t3_icon || 'fa-solid fa-gift'}"></i><span>${t.t3_name || 'Daily'}</span></a>
+                                <a href="${t.t4_url || 'leaderboard.html'}" class="nav-item"><i class="${t.t4_icon || 'fa-solid fa-trophy'}"></i><span>${t.t4_name || 'Leaders'}</span></a>
+                                <a href="${t.t5_url || 'my_point1.html'}" class="nav-item"><i class="${t.t5_icon || 'fa-solid fa-wallet'}"></i><span>${t.t5_name || 'Vault'}</span></a>
+                            `;
+    } else {
+        // Default Fallback
+        container.innerHTML = `
+                                <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+                                <a href="tasks.html" class="nav-item"><i class="fa-solid fa-fire"></i><span>Offerwall</span></a>
+                                <a href="daily.html" class="nav-item"><i class="fa-solid fa-gift"></i><span>Daily</span></a>
+                                <a href="leaderboard.html" class="nav-item"><i class="fa-solid fa-trophy"></i><span>Leaders</span></a>
+                                <a href="my_point1.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span>Vault</span></a>
+                            `;
+    }
+});
+// 🛑 Admin Maintenance Lock Listener
+db.ref('global_system_runtime_configurations/app_maintenance').on('value', (snap) => {
+    if (snap.exists() && snap.val() === "ON") {
+        document.getElementById("interceptorMaintenanceScreenOverlay").style.display = "flex";
+    } else {
+        document.getElementById("interceptorMaintenanceScreenOverlay").style.display = "none";
+    }
+});
+                    // 9. NEW DYNAMIC CARDS FROM ADMIN
+                    db.ref('global_system_runtime_configurations/custom_cards').on('value', (snap) => {
+                        const container = document.getElementById("dynamicAdminCardsContainer");
+                        if(snap.exists()) {
+                            container.style.display = "flex"; container.innerHTML = ""; const cards = snap.val();
+                            cards.forEach(card => {
+                                let widthStyle = card.isFullWidth ? "flex: 1 1 100%; min-height: 90px; flex-direction: row; gap: 15px;" : "";
+                                let iconStyle = card.isFullWidth ? "margin-bottom: 0; font-size: 32px;" : "";
+                                container.innerHTML += `<a href="${card.url}" class="zone-card" style="${widthStyle} border-color: ${card.color};"><div class="zone-icon" style="${iconStyle}">${card.icon}</div><h3 style="color: ${card.color};">${card.title}</h3><p>${card.desc}</p></a>`;
+                            });
+                        } else { container.style.display = "none"; }
+                    });
+
+                    // 10. 🏆 TOP WINNERS PODIUM (LIVE FROM ADMIN)
+                    db.ref('global_system_runtime_configurations/top_winners_podium').on('value', (snap) => {
+                        if (snap.exists()) {
+                            let podium = snap.val();
+                            
+                            if(podium.rank1) {
+                                document.getElementById("lblWinnerRank1Name").innerText = podium.rank1.name;
+                                document.getElementById("lblWinnerRank1Prize").innerText = podium.rank1.prize;
+                            }
+                            if(podium.rank2) {
+                                document.getElementById("lblWinnerRank2Name").innerText = podium.rank2.name;
+                                document.getElementById("lblWinnerRank2Prize").innerText = podium.rank2.prize;
+                            }
+                            if(podium.rank3) {
+                                document.getElementById("lblWinnerRank3Name").innerText = podium.rank3.name;
+                                document.getElementById("lblWinnerRank3Prize").innerText = podium.rank3.prize;
+                            }
+                        }
+                    });
+
+                } else { window.location.replace("index.html"); }
+            });
+        });
     </script>
 </body>
 </html>

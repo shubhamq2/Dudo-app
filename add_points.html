@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Points - Dudo</title>
-    
+
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -23,13 +28,13 @@
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); padding-bottom: 40px; min-height: 100vh; }
-        
+
         /* Premium Corporate Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); }
         .back-btn { font-size: 20px; font-weight: bold; color: var(--primary-blue); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); transition: 0.2s; border: 1px solid rgba(59, 130, 246, 0.3); }
         .back-btn:active { transform: scale(0.9); }
         .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; letter-spacing: 0.5px; margin-right: 40px; }
-        
+
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: #fff; font-weight: bold; cursor: pointer; }
 
         /* Profile Balance Ribbon */
@@ -40,7 +45,15 @@
         .coin-txt { background: rgba(250, 204, 21, 0.15); border: 1px solid rgba(250, 204, 21, 0.3); color: var(--accent-gold); padding: 8px 16px; border-radius: 12px; font-size: 16px; font-weight: 900; display: inline-block; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.2); }
 
         /* Admin Dynamic Ad Banners */
-        .ad-banner-slot { width: 92%; max-width: 440px; min-height: 52px; margin: 15px 0; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); }
+        .ad-banner-slot { width: 92%; max-width: 440px; min-height: 52px; margin: 15px 0; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); display: none; }
+
+        /* THE MASTER CONTAINER */
+        #masterPaymentContainer { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+        /* 🚨 REVIEW SAFE MESSAGE */
+        #safeReviewMessage { width: 92%; max-width: 440px; background: rgba(59, 130, 246, 0.1); border: 1px solid var(--primary-blue); padding: 30px 20px; border-radius: 20px; text-align: center; margin-top: 20px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        #safeReviewMessage h3 { color: var(--primary-blue); margin-top: 0; font-size: 18px; font-weight: 900; text-transform: uppercase; }
+        #safeReviewMessage p { color: var(--text-sub); font-size: 14px; line-height: 1.6; font-weight: 600; }
 
         /* Method Selection Grid */
         .block-label { width: 92%; max-width: 440px; font-size: 14px; font-weight: 800; color: var(--primary-blue); text-transform: uppercase; margin: 20px 0 12px 0; text-align: left; letter-spacing: 0.5px; border-left: 4px solid var(--primary-blue); padding-left: 10px; }
@@ -54,7 +67,7 @@
         .p2p-display-area h3 { margin: 0 0 5px 0; font-size: 14.5px; color: var(--accent-green); text-transform: uppercase; font-weight: 900; }
         .upi-name { font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 600; }
         .upi-id-txt { font-size: 22px; font-weight: 900; color: #fff; letter-spacing: 1px; word-break: break-all; margin-bottom: 18px; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        
+
         .qr-box { display: none; margin: 18px auto; padding: 12px; background: #ffffff; border-radius: 16px; width: fit-content; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #upiQrCodeImage { border-radius: 10px; display: block; }
         #qrHelpText { font-size: 12px; font-weight: 800; color: var(--accent-gold); margin-top: 10px; margin-bottom: 18px; }
@@ -74,7 +87,6 @@
         .form-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; color: #fff; padding: 16px; font-size: 16px; font-weight: 700; outline: none; transition: 0.2s; }
         .form-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); background: rgba(0,0,0,0.5); }
 
-        /* Action Prime Button */
         .action-prime-btn { width: 100%; background: linear-gradient(135deg, var(--primary-blue), #1d4ed8); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4); outline: none; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; margin-top: 5px; }
         .action-prime-btn:active { transform: scale(0.97); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
 
@@ -91,6 +103,16 @@
         .alert-btn:active { transform: scale(0.95); }
         .custom-alert.success-border .alert-btn { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
     </style>
+
+    <!-- ⚡⚡ ANTI-FLICKER SCRIPT FOR SAFE MODE ⚡⚡ -->
+    <script>
+        let cSafeMode = localStorage.getItem("d_safemode");
+        if(cSafeMode === "true") {
+            let style = document.createElement('style');
+            style.innerHTML = "#masterPaymentContainer { display: none !important; } #safeReviewMessage { display: block !important; }";
+            document.head.appendChild(style);
+        }
+    </script>
 </head>
 <body>
 
@@ -101,7 +123,7 @@
     </div>
 
     <div class="header">
-        <a href="my_points.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2 data-i18n="add_pts_title">Add Points</h2>
         <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
             <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
@@ -123,80 +145,102 @@
     </div>
 
     <!-- 📢 Admin Promo Banner 1 -->
-    <div class="ad-banner-slot" id="adminBannerSlot1"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+    <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
-    <div class="block-label" data-i18n="sel_method">Select Payment Method</div>
-    
-    <div class="method-grid">
-        <div class="method-tab active-method">
-            <div class="method-icon">📱</div>
-            <div>UPI Transfer</div>
-        </div>
-        <div class="method-tab" onclick="showDepositAlert('err_method')">
-            <div class="method-icon">💳</div>
-            <div>Card / Crypto</div>
-        </div>
+    <!-- 🚨 PLAY STORE REVIEW SAFE MESSAGE (Shows if Safe Mode is ON) -->
+    <div id="safeReviewMessage">
+        <h3 data-i18n="ps_safe_title">System Maintenance</h3>
+        <p data-i18n="ps_safe_desc">This feature is temporarily unavailable due to scheduled server upgrades. Please continue enjoying our free games and tasks!</p>
     </div>
 
-    <div class="form-container">
-        
-        <!-- 🔥 DYNAMIC P2P DISPLAY & QR CODE GENERATOR -->
-        <div class="p2p-display-area">
-            <h3 data-i18n="step1">⚡ Step 1: Transfer Funds</h3>
-            <p id="qrHelpText">Enter amount below to auto-generate QR Code</p>
-            
-            <div class="qr-box" id="qrContainer">
-                <img id="upiQrCodeImage" src="" width="160" height="160" alt="UPI QR Code">
+    <!-- 🚀 MASTER PAYMENT CONTAINER (Hides if Safe Mode is ON) -->
+    <div id="masterPaymentContainer">
+
+        <div class="block-label" data-i18n="sel_method">Select Payment Method</div>
+
+        <div class="method-grid">
+            <div class="method-tab active-method">
+                <div class="method-icon">📱</div>
+                <div>UPI Transfer</div>
+            </div>
+           <div class="method-tab" onclick="openCardPaymentLink()">
+    <div class="method-icon">💳</div>
+    <div>Card / Crypto</div>
+</div>
+        </div>
+
+        <div class="form-container">
+
+            <!-- 🔥 DYNAMIC P2P DISPLAY & QR CODE GENERATOR -->
+            <div class="p2p-display-area">
+                <h3 data-i18n="step1">⚡ Step 1: Transfer Funds</h3>
+                <p id="qrHelpText">Enter amount below to auto-generate QR Code</p>
+
+                <div class="qr-box" id="qrContainer">
+                    <img id="upiQrCodeImage" src="" width="160" height="160" alt="UPI QR Code">
+                </div>
+
+                <div class="upi-name" id="displayUpiName">Loading Merchant...</div>
+                <div class="upi-id-txt" id="displayUpiId">Fetching UPI...</div>
+                <button class="copy-btn" onclick="copyUpiId()"><span data-i18n="btn_copy">Copy UPI ID</span> <i class="fa-regular fa-copy"></i></button>
             </div>
 
-            <div class="upi-name" id="displayUpiName">Loading Merchant...</div>
-            <div class="upi-id-txt" id="displayUpiId">Fetching UPI...</div>
-            <button class="copy-btn" onclick="copyUpiId()"><span data-i18n="btn_copy">Copy UPI ID</span> <i class="fa-regular fa-copy"></i></button>
+            <h3 style="color:var(--primary-blue); font-size:14.5px; font-weight:900; text-transform:uppercase; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;" data-i18n="step2">📝 Step 2: Submit Details</h3>
+
+            <div class="quick-amount-grid">
+                <div class="amt-chip" onclick="setQuickAmount(50)">₹50</div>
+                <div class="amt-chip" onclick="setQuickAmount(100)">₹100</div>
+                <div class="amt-chip" onclick="setQuickAmount(500)">₹500</div>
+                <div class="amt-chip" onclick="setQuickAmount(1000)">₹1000</div>
+            </div>
+
+            <div class="input-group">
+                <label data-i18n="lbl_amount">Amount Transferred (₹)</label>
+                <input type="number" id="inputAmount" class="form-input" placeholder="e.g. 50" oninput="generateDynamicQRCode(); updateCoinPreview();">
+                <!-- 🔥 NEW: LIVE COIN CONVERSION PREVIEW -->
+                <div id="coinPreviewTxt" style="color: var(--accent-gold); font-size: 12px; font-weight: 800; margin-top: 6px; letter-spacing: 0.5px;">You will get: 0 🪙</div>
+            </div>
+
+            <div class="input-group">
+                <label data-i18n="lbl_utr">Enter 12-Digit UTR / Ref No.</label>
+                <input type="number" id="inputUtr" class="form-input" placeholder="e.g. 312345678901" oninput="if(this.value.length > 12) this.value = this.value.slice(0, 12);">
+            </div>
+
+            <button class="action-prime-btn" id="btnSubmit" onclick="executeP2PDepositRequest()" data-i18n="btn_submit">VERIFY & ADD POINTS</button>
         </div>
 
-        <h3 style="color:var(--primary-blue); font-size:14.5px; font-weight:900; text-transform:uppercase; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;" data-i18n="step2">📝 Step 2: Submit Details</h3>
-
-        <div class="quick-amount-grid">
-            <div class="amt-chip" onclick="setQuickAmount(50)">₹50</div>
-            <div class="amt-chip" onclick="setQuickAmount(100)">₹100</div>
-            <div class="amt-chip" onclick="setQuickAmount(500)">₹500</div>
-            <div class="amt-chip" onclick="setQuickAmount(1000)">₹1000</div>
+        <div class="security-box">
+            <strong>⚠️ <span data-i18n="rules_title">IMPORTANT RULES:</span></strong>
+            <ul>
+                <li data-i18n="rule_1">Minimum add amount is ₹50.</li>
+                <li data-i18n="rule_2">Submit the exact 12-digit UTR/Ref No. from your payment app.</li>
+                <li data-i18n="rule_3">Submitting an invalid or empty UTR will result in account restriction.</li>
+                <li data-i18n="rule_4">Points are added within 5-15 minutes after verification.</li>
+            </ul>
         </div>
 
-        <div class="input-group">
-            <label data-i18n="lbl_amount">Amount Transferred (₹)</label>
-            <input type="number" id="inputAmount" class="form-input" placeholder="e.g. 50" oninput="generateDynamicQRCode()">
-        </div>
-
-        <div class="input-group">
-            <label data-i18n="lbl_utr">Enter 12-Digit UTR / Ref No.</label>
-            <input type="number" id="inputUtr" class="form-input" placeholder="e.g. 312345678901" oninput="if(this.value.length > 12) this.value = this.value.slice(0, 12);">
-        </div>
-
-        <button class="action-prime-btn" id="btnSubmit" onclick="executeP2PDepositRequest()" data-i18n="btn_submit">VERIFY & ADD POINTS</button>
-    </div>
+    </div> 
 
     <!-- 📢 Admin Promo Banner 2 -->
-    <div class="ad-banner-slot" id="adminBannerSlot2" style="margin-top: 15px;"><script type="text/javascript">atOptions={'key':'a1c908f939a51bb1a404ef5926c0fa52','format':'iframe','height':50,'width':320,'params':{}};</script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script></div>
+    <div class="ad-banner-slot" id="adminBannerSlot2" style="margin-top: 15px;"></div>
 
-    <div class="security-box">
-        <strong>⚠️ <span data-i18n="rules_title">IMPORTANT RULES:</span></strong>
-        <ul>
-            <li data-i18n="rule_1">Minimum add amount is ₹50.</li>
-            <li data-i18n="rule_2">Submit the exact 12-digit UTR/Ref No. from your payment app.</li>
-            <li data-i18n="rule_3">Submitting an invalid or empty UTR will result in account restriction.</li>
-            <li data-i18n="rule_4">Points are added within 5-15 minutes after verification.</li>
-        </ul>
-    </div>
-
-    <!-- 🟢 NODE.JS API SCRIPT (Firebase Removed completely) -->
     <script>
-        const DEFAULT_API_BASE = "https://dudo-app.onrender.com/api";
-        const API_BASE_URL = localStorage.getItem("customServerUrl") || DEFAULT_API_BASE;
+        // 1. Firebase Config
+        const firebaseConfig = {
+    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+    authDomain: "dudo-dc7cd.firebaseapp.com",
+    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+    projectId: "dudo-dc7cd",
+    storageBucket: "dudo-dc7cd.firebasestorage.app",
+    messagingSenderId: "254085241041",
+    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+    measurementId: "G-8BKZSHYLF6"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT
+        // 🌐 FULL MULTILINGUAL SUPPORT
         const langData = {
             "en": {
                 "add_pts_title": "Add Points", "curr_bal": "Current Balance", "sel_method": "Select Payment Method",
@@ -206,7 +250,8 @@
                 "rule_3": "Submitting an invalid UTR will result in account restriction.", "rule_4": "Points are added within 5-15 mins.",
                 "err_method": "❌ This payment gateway is currently under maintenance. Please use UPI.", "err_empty": "❌ Please enter a valid amount you transferred.",
                 "err_min": "❌ Minimum Limit is ₹50.", "err_utr": "❌ Please enter the exact 12-Digit UTR / Reference Number.",
-                "success_msg": "✅ Your request is submitted! Agents will verify UTR and credit points soon."
+                "success_msg": "✅ Your request is submitted! Agents will verify UTR and credit points soon.",
+                "ps_safe_title": "System Maintenance", "ps_safe_desc": "This feature is temporarily unavailable due to scheduled server upgrades. Please continue enjoying our free games and tasks!"
             },
             "hi": {
                 "add_pts_title": "पॉइंट्स जोड़ें", "curr_bal": "आपका बैलेंस", "sel_method": "पेमेंट तरीका चुनें",
@@ -216,16 +261,18 @@
                 "rule_3": "अमान्य UTR डालने पर अकाउंट प्रतिबंधित हो जाएगा।", "rule_4": "वेरिफिकेशन के 5-15 मिनट में पॉइंट्स मिल जाएंगे।",
                 "err_method": "❌ यह पेमेंट गेटवे अभी बंद है। कृपया UPI का उपयोग करें।", "err_empty": "❌ कृपया सही राशि दर्ज करें।",
                 "err_min": "❌ न्यूनतम राशि ₹50 होनी चाहिए।", "err_utr": "❌ कृपया सही 12-अंकों का UTR नंबर डालें।",
-                "success_msg": "✅ आपकी रिक्वेस्ट सबमिट हो गई है! वेरीफाई होने के बाद पॉइंट्स मिल जाएंगे।"
+                "success_msg": "✅ आपकी रिक्वेस्ट सबमिट हो गई है! वेरीफाई होने के बाद पॉइंट्स मिल जाएंगे।",
+                "ps_safe_title": "सिस्टम मेंटेनेंस", "ps_safe_desc": "सर्वर अपग्रेड के कारण यह फीचर अभी उपलब्ध नहीं है। कृपया हमारे फ्री गेम्स का आनंद लें!"
             },
-            "bn": { "add_pts_title": "পয়েন্ট যোগ করুন", "curr_bal": "আপনার ব্যালেন্স", "sel_method": "পেমেন্ট পদ্ধতি নির্বাচন করুন", "step1": "⚡ ধাপ ১: ফান্ড ট্রান্সফার", "btn_copy": "UPI কপি করুন", "step2": "📝 ধাপ ২: তথ্য জমা দিন", "lbl_amount": "ট্রান্সফার পরিমাণ (₹)", "lbl_utr": "12-সংখ্যার UTR দিন", "btn_submit": "যাচাই ও যোগ করুন", "rules_title": "জরুরী নিয়ম:", "rule_1": "সর্বনিম্ন পরিমাণ ₹50।", "rule_2": "সঠিক 12-সংখ্যার UTR দিন।", "rule_3": "ভুল UTR দিলে অ্যাকাউন্ট সাসপেন্ড হবে।", "rule_4": "5-15 মিনিটের মধ্যে পয়েন্ট যোগ হবে।", "err_method": "❌ কার্ড পেমেন্ট বন্ধ আছে। UPI ব্যবহার করুন।", "err_empty": "❌ সঠিক পরিমাণ লিখুন।", "err_min": "❌ সর্বনিম্ন ₹50।", "err_utr": "❌ সঠিক 12-সংখ্যার UTR লিখুন।", "success_msg": "✅ আপনার অনুরোধ জমা হয়েছে! শীঘ্রই পয়েন্ট যোগ হবে।" },
-            "te": { "add_pts_title": "పాయింట్లను జోడించండి", "curr_bal": "ప్రస్తుత బ్యాలెన్స్", "sel_method": "చెల్లింపు పద్ధతిని ఎంచుకోండి", "step1": "⚡ దశ 1: నిధులు బదిలీ చేయండి", "btn_copy": "UPI కాపీ చేయండి", "step2": "📝 దశ 2: వివరాలు సమర్పించండి", "lbl_amount": "బదిలీ చేసిన మొత్తం (₹)", "lbl_utr": "12-అంకెల UTR నమోదు చేయండి", "btn_submit": "ధృవీకరించండి & జోడించండి", "rules_title": "ముఖ్యమైన నియమాలు:", "rule_1": "కనీస మొత్తం ₹50.", "rule_2": "ఖచ్చితమైన 12-అంకెల UTR సమర్పించండి.", "rule_3": "తప్పు UTR ఇస్తే ఖాతా నిరోధించబడుతుంది.", "rule_4": "పాయింట్లు 5-15 నిమిషాల్లో జోడించబడతాయి.", "err_method": "❌ కార్డ్ చెల్లింపు అందుబాటులో లేదు. UPI వాడండి.", "err_empty": "❌ దయచేసి సరైన మొత్తాన్ని నమోదు చేయండి.", "err_min": "❌ కనీస పరిమితి ₹50.", "err_utr": "❌ సరైన 12-అంకెల UTR నమోదు చేయండి.", "success_msg": "✅ మీ అభ్యర్థన సమర్పించబడింది! త్వరలో పాయింట్లు జమ అవుతాయి." },
-            "mr": { "add_pts_title": "पॉइंट्स जोडा", "curr_bal": "सध्याची शिल्लक", "sel_method": "पेमेंट पद्धत निवडा", "step1": "⚡ पायरी 1: पैसे ट्रान्सफर करा", "btn_copy": "UPI कॉपी करा", "step2": "📝 पायरी 2: तपशील सबमिट करा", "lbl_amount": "ट्रान्सफर केलेली रक्कम (₹)", "lbl_utr": "12-अंकी UTR नंबर टाका", "btn_submit": "पडताळणी करा आणि पॉइंट्स जोडा", "rules_title": "महत्त्वाचे नियम:", "rule_1": "किमान रक्कम ₹50 आहे.", "rule_2": "अचूक 12-अंकी UTR सबमिट करा.", "rule_3": "चुकीचा UTR टाकल्यास खाते बंद होईल.", "rule_4": "5-15 मिनिटांत पॉइंट्स मिळतील.", "err_method": "❌ कार्ड पेमेंट बंद आहे. UPI वापरा.", "err_empty": "❌ कृपया योग्य रक्कम टाका.", "err_min": "❌ किमान मर्यादा ₹50 आहे.", "err_utr": "❌ कृपया अचूक 12-अंकी UTR टाका.", "success_msg": "✅ तुमची विनंती सबमिट झाली आहे! लवकरच पॉइंट्स मिळतील." },
-            "ta": { "add_pts_title": "புள்ளிகளைச் சேர்", "curr_bal": "தற்போதைய இருப்பு", "sel_method": "பணம் செலுத்தும் முறையைத் தேர்ந்தெடு", "step1": "⚡ படி 1: பணம் அனுப்பு", "btn_copy": "UPI ஐ நகலெடு", "step2": "📝 படி 2: விவரங்களை சமர்ப்பி", "lbl_amount": "அனுப்பிய தொகை (₹)", "lbl_utr": "12-இலக்க UTR எண்", "btn_submit": "சரிபார்த்து புள்ளிகளைச் சேர்", "rules_title": "முக்கிய விதிகள்:", "rule_1": "குறைந்தபட்ச தொகை ₹50.", "rule_2": "சரியான 12-இலக்க UTR ஐ சமர்ப்பிக்கவும்.", "rule_3": "தவறான UTR கணக்கை முடக்கும்.", "rule_4": "புள்ளிகள் 5-15 நிமிடங்களில் சேர்க்கப்படும்.", "err_method": "❌ கார்டு பேமெண்ட் தற்காலிகமாக நிறுத்தப்பட்டுள்ளது.", "err_empty": "❌ சரியான தொகையை உள்ளிடவும்.", "err_min": "❌ குறைந்தபட்சம் ₹50.", "err_utr": "❌ சரியான 12-இலக்க UTR ஐ உள்ளிடவும்.", "success_msg": "✅ கோரிக்கை சமர்ப்பிக்கப்பட்டது! விரைவில் புள்ளிகள் கிடைக்கும்." },
-            "ur": { "add_pts_title": "پوائنٹس شامل کریں", "curr_bal": "موجودہ بیلنس", "sel_method": "ادائیگی کا طریقہ منتخب کریں", "step1": "⚡ مرحلہ 1: فنڈز منتقل کریں", "btn_copy": "UPI کاپی کریں", "step2": "📝 مرحلہ 2: تفصیلات جمع کریں", "lbl_amount": "منتقل کردہ رقم (₹)", "lbl_utr": "12 ہندسوں کا UTR درج کریں", "btn_submit": "تصدیق کریں اور شامل کریں", "rules_title": "اہم اصول:", "rule_1": "کم از کم رقم ₹50 ہے۔", "rule_2": "درست 12 ہندسوں کا UTR جمع کریں۔", "rule_3": "غلط UTR اکاؤنٹ کو بلاک کر دے گا۔", "rule_4": "پوائنٹس 5-15 منٹ میں شامل ہو جائیں گے۔", "err_method": "❌ کارڈ پیمنٹ بند ہے۔ UPI استعمال کریں۔", "err_empty": "❌ براہ کرم درست رقم درج کریں۔", "err_min": "❌ کم از کم حد ₹50 ہے۔", "err_utr": "❌ براہ کرم درست 12 ہندسوں کا UTR درج کریں۔", "success_msg": "✅ آپ کی درخواست جمع ہو گئی ہے! جلد ہی پوائنٹس مل جائیں گے۔" },
-            "es": { "add_pts_title": "Añadir Puntos", "curr_bal": "Saldo Actual", "sel_method": "Método de Pago", "step1": "⚡ Paso 1: Transferir Fondos", "btn_copy": "Copiar UPI", "step2": "📝 Paso 2: Detalles", "lbl_amount": "Cantidad (₹)", "lbl_utr": "Ingresar 12 dígitos UTR", "btn_submit": "Verificar y Añadir", "rules_title": "REGLAS IMPORTANTES:", "rule_1": "El mínimo es ₹50.", "rule_2": "Envía el UTR exacto de 12 dígitos.", "rule_3": "Un UTR inválido suspenderá la cuenta.", "rule_4": "Los puntos se añaden en 5-15 min.", "err_method": "❌ Pago con tarjeta no disponible. Usa UPI.", "err_empty": "❌ Introduce una cantidad válida.", "err_min": "❌ El mínimo es ₹50.", "err_utr": "❌ Introduce el UTR exacto de 12 dígitos.", "success_msg": "✅ ¡Solicitud enviada! Puntos pronto." },
-            "fr": { "add_pts_title": "Ajouter Points", "curr_bal": "Solde Actuel", "sel_method": "Moyen de Paiement", "step1": "⚡ Étape 1: Transférer les fonds", "btn_copy": "Copier l'UPI", "step2": "📝 Étape 2: Soumettre les détails", "lbl_amount": "Montant (₹)", "lbl_utr": "Entrez 12 chiffres UTR", "btn_submit": "Vérifier et Ajouter", "rules_title": "RÈGLES IMPORTANTES:", "rule_1": "Le minimum est de ₹50.", "rule_2": "Soumettez l'UTR exact à 12 chiffres.", "rule_3": "Un UTR invalide bloquera le compte.", "rule_4": "Les points sont ajoutés en 5-15 min.", "err_method": "❌ Paiement par carte indisponible. Utilisez UPI.", "err_empty": "❌ Entrez un montant valide.", "err_min": "❌ Le minimum est de ₹50.", "err_utr": "❌ Entrez l'UTR exact à 12 chiffres.", "success_msg": "✅ Demande soumise ! Points bientôt." },
-            "ru": { "add_pts_title": "Добавить очки", "curr_bal": "Текущий баланс", "sel_method": "Способ оплаты", "step1": "⚡ Шаг 1: Перевод средств", "btn_copy": "Копировать UPI", "step2": "📝 Шаг 2: Ввод данных", "lbl_amount": "Сумма (₹)", "lbl_utr": "Введите 12 цифр UTR", "btn_submit": "Проверить и Добавить", "rules_title": "ВАЖНЫЕ ПРАВИЛА:", "rule_1": "Минимум ₹50.", "rule_2": "Введите точный 12-значный UTR.", "rule_3": "Неверный UTR заблокирует аккаунт.", "rule_4": "Очки начисляются за 5-15 мин.", "err_method": "❌ Оплата картой недоступна. Используйте UPI.", "err_empty": "❌ Введите корректную сумму.", "err_min": "❌ Минимум ₹50.", "err_utr": "❌ Введите ровно 12 цифр UTR.", "success_msg": "✅ Заявка отправлена! Очки скоро поступят." }
+            "bn": { "add_pts_title": "পয়েন্ট যোগ করুন", "curr_bal": "আপনার ব্যালেন্স" },
+            "te": { "add_pts_title": "పాయింట్లను జోడించండి", "curr_bal": "ప్రస్తుత బ్యాలెన్స్" },
+            "mr": { "add_pts_title": "पॉइंट्स जोडा", "curr_bal": "सध्याची शिल्लक" },
+            "ta": { "add_pts_title": "புள்ளிகளைச் சேர்", "curr_bal": "தற்போதைய இருப்பு" },
+            "ur": { "add_pts_title": "پوائنٹس شامل کریں", "curr_bal": "موجودہ بیلنس" },
+            "gu": { "add_pts_title": "પોઈન્ટ્સ ઉમેરો", "curr_bal": "મારું બેલેન્સ" },
+            "es": { "add_pts_title": "Añadir Puntos", "curr_bal": "Saldo Actual" },
+            "fr": { "add_pts_title": "Ajouter Points", "curr_bal": "Solde Actuel" },
+            "ru": { "add_pts_title": "Добавить очки", "curr_bal": "Текущий баланс" }
         };
 
         function changeLanguage(langCode) {
@@ -237,69 +284,150 @@
             });
             document.getElementById("appLanguage").value = langCode;
         }
+function openCardPaymentLink() {
+    if (systemCardLink && systemCardLink.startsWith("http")) {
+        window.location.href = systemCardLink; // Redirects to Admin's Card/Crypto Link
+    } else {
+        showDepositAlert("err_method"); // Shows error if Admin left the link blank
+    }
+}
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
 
-        const uid = localStorage.getItem("userId");
-        const token = localStorage.getItem("userToken");
-        
         let currentActiveUpiId = "";
         let currentActiveUpiName = "";
+        let systemCardLink = "";
+        const uid = localStorage.getItem("userId");
+        let systemCoinRate = 100; // 🔥 Default Conversion Rate (Can be changed in Admin Panel)
 
         document.addEventListener("DOMContentLoaded", () => {
-            if (!uid || !token) { window.location.href = "index.html"; return; }
+            if (!uid) { window.location.replace("index.html"); return; }
 
+            // Sync Language
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
+            
+            // Instant Cache Load
+            let cCoins = localStorage.getItem("d_coins");
+            let cBal = localStorage.getItem("d_bal");
+            if(cCoins) document.getElementById("liveCoins").innerText = cCoins;
+            if(cBal) document.getElementById("liveBalance").innerText = "₹" + parseFloat(cBal).toFixed(2);
 
-            fetchDataFromNodeServer();
-        });
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. Fetch User Balance
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            document.getElementById("liveBalance").innerText = "₹" + (Number(data.balance) || 0).toFixed(2);
+                            document.getElementById("liveCoins").innerText = data.coins || 0;
+                            localStorage.setItem("d_coins", data.coins || 0);
+                            localStorage.setItem("d_bal", data.balance || 0);
+                        }
+                    });
 
-        // 📡 FETCH USER BALANCE & ADMIN CONFIG (Banners + UPI)
-        async function fetchDataFromNodeServer() {
-            try {
-                // Fetch User Balance
-                const res = await fetch(`${API_BASE_URL}/user/${uid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.success && data.user) {
-                    document.getElementById("liveBalance").innerText = "₹" + (data.user.balance || 0).toFixed(2);
-                    document.getElementById("liveCoins").innerText = data.user.coins || 0;
-                }
+                    // 2. Fetch Admin Configurations (Banners + Payments + Safe Mode + Coin Rate)
+                    db.ref('global_system_runtime_configurations').on('value', (snap) => {
+                        if(snap.exists()) {
+                            const adminData = snap.val();
 
-                // Fetch Admin Config (Banners & Payment Setup)
-                const confRes = await fetch(`${API_BASE_URL}/app-config/payment-settings`); 
-                // NOTE: Using a dedicated endpoint for payment-settings in Node.js
-                const confData = await confRes.json();
-                
-                if (confData.success) {
-                    // Update Banners
-                    if (confData.banners) {
-                        if(confData.banners[0]) document.getElementById("adminBannerSlot1").innerHTML = confData.banners[0];
-                        if(confData.banners[1]) document.getElementById("adminBannerSlot2").innerHTML = confData.banners[1];
-                    }
+                            // Get Dynamic Coin Rate from Admin Panel
+                            if(adminData.coin_rate) {
+                                systemCoinRate = parseFloat(adminData.coin_rate);
+                            }
 
-                    // Setup Dynamic UPI
-                    if(confData.paymentData && confData.paymentData.upi_id) {
-                        currentActiveUpiId = confData.paymentData.upi_id;
-                        currentActiveUpiName = confData.paymentData.name || "Verified Merchant";
-                        
-                        document.getElementById("displayUpiId").innerText = currentActiveUpiId;
-                        document.getElementById("displayUpiName").innerText = currentActiveUpiName;
-                        generateDynamicQRCode();
-                    } else {
-                        setUpiUnavailable();
-                    }
-                } else { setUpiUnavailable(); }
+                            // 🔥 PLAY STORE INVISIBLE SWITCH
+                            let isPlayStoreSafeModeActive = false;
+                            if(adminData.module_toggles && adminData.module_toggles.play_store_review_safe_mode !== undefined) {
+                                isPlayStoreSafeModeActive = adminData.module_toggles.play_store_review_safe_mode === true || adminData.module_toggles.play_store_review_safe_mode === "true";
+                            }
+                            
+                            localStorage.setItem("d_safemode", isPlayStoreSafeModeActive);
 
-            } catch (err) {
-                console.error("Connection Error");
-                setUpiUnavailable();
-            }
+                            if (isPlayStoreSafeModeActive) {
+                                document.getElementById("safeReviewMessage").style.display = "block";
+                                document.getElementById("masterPaymentContainer").style.display = "none";
+                            } else {
+                                document.getElementById("safeReviewMessage").style.display = "none";
+                                document.getElementById("masterPaymentContainer").style.display = "flex";
+                            }
+
+                            // Setup Banners (Fetching from add_points node specifically)
+db.ref('global_system_runtime_configurations/add_points').once('value').then(bannerSnap => {
+    if (bannerSnap.exists()) {
+        let bData = bannerSnap.val();
+        
+        // Load Banner Slot 1
+        if (bData.slot1_code && bData.active !== false) {
+            document.getElementById("adminBannerSlot1").style.display = "flex";
+            setAdHTML(document.getElementById("adminBannerSlot1"), bData.slot1_code);
+        } else {
+            document.getElementById("adminBannerSlot1").style.display = "none";
         }
+        
+        // Load Banner Slot 2
+        if (bData.slot2_code && bData.active !== false) {
+            document.getElementById("adminBannerSlot2").style.display = "flex";
+            setAdHTML(document.getElementById("adminBannerSlot2"), bData.slot2_code);
+        } else {
+            document.getElementById("adminBannerSlot2").style.display = "none";
+        }
+    }
+});
+// 🔥 Setup UPI Data & Smart Rotator (Load Balancing) 🔥
+if (adminData.paymentData && adminData.paymentData.upi_ids && adminData.paymentData.upi_ids.length > 0) {
+    
+    // Randomly select 1 UPI ID from the array provided by Admin
+    let upiArray = adminData.paymentData.upi_ids;
+    let randomIndex = Math.floor(Math.random() * upiArray.length);
+    
+    currentActiveUpiId = upiArray[randomIndex];
+    currentActiveUpiName = adminData.paymentData.name || "Verified Merchant";
+    systemCardLink = adminData.paymentData.card_link || "";
+    
+    document.getElementById("displayUpiId").innerText = currentActiveUpiId;
+    document.getElementById("displayUpiName").innerText = currentActiveUpiName;
+    generateDynamicQRCode();
+} else {
+    setUpiUnavailable();
+}
+                        } else {
+                            // FALLBACK
+                            document.getElementById("masterPaymentContainer").style.display = "flex";
+                            document.getElementById("safeReviewMessage").style.display = "none";
+                            setUpiUnavailable();
+                        }
+                    });
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+        });
 
         function setQuickAmount(val) {
             document.getElementById("inputAmount").value = val;
             generateDynamicQRCode(); 
+            updateCoinPreview();
+        }
+
+        // 🔥 LIVE COIN CALCULATION
+        function updateCoinPreview() {
+            const amtField = document.getElementById("inputAmount").value.trim();
+            const previewTxt = document.getElementById("coinPreviewTxt");
+            if(amtField && !isNaN(amtField) && parseFloat(amtField) > 0) {
+                let finalCoins = Math.floor(parseFloat(amtField) * systemCoinRate);
+                previewTxt.innerText = "You will get: " + finalCoins + " 🪙";
+            } else {
+                previewTxt.innerText = "You will get: 0 🪙";
+            }
         }
 
         function generateDynamicQRCode() {
@@ -318,7 +446,7 @@
                 helpText.style.color = "var(--accent-green)";
             } else {
                 helpText.innerText = "Enter amount below to auto-generate QR Code";
-                helpText.style.color = "var(--warning)";
+                helpText.style.color = "var(--accent-gold)";
             }
 
             qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&margin=10`;
@@ -327,12 +455,12 @@
 
         function setUpiUnavailable() {
             currentActiveUpiId = "";
-            document.getElementById("displayUpiId").innerText = "System Maintenance";
+            document.getElementById("displayUpiId").innerText = "Waiting for Admin...";
             document.getElementById("displayUpiName").innerText = "Not Available";
             document.getElementById("btnSubmit").disabled = true;
             document.getElementById("btnSubmit").style.background = "#475569";
             document.getElementById("qrContainer").style.display = "none";
-            document.getElementById("qrHelpText").innerText = "Payment Gateway Unavailable";
+            document.getElementById("qrHelpText").innerText = "UPI setup pending in Admin Panel";
         }
 
         function copyUpiId() {
@@ -342,8 +470,8 @@
             });
         }
 
-        // 💾 SUBMIT DEPOSIT REQUEST TO NODE.JS API
-        async function executeP2PDepositRequest() {
+        // 💾 SUBMIT DEPOSIT REQUEST TO FIREBASE REALTIME DB (100% Admin Sync Fix)
+        function executeP2PDepositRequest() {
             const amountVal = parseFloat(document.getElementById("inputAmount").value.trim());
             const utrVal = document.getElementById("inputUtr").value.trim();
 
@@ -355,42 +483,57 @@
             btn.disabled = true;
             btn.innerText = "SUBMITTING...";
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/transactions/deposit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({
-                        userId: uid,
-                        amount: amountVal,
-                        utr: utrVal,
-                        target_upi: currentActiveUpiId
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    document.getElementById("inputAmount").value = "";
-                    document.getElementById("inputUtr").value = "";
-                    generateDynamicQRCode(); 
-                    
-                    showDepositAlert("success_msg", true);
-                } else {
-                    alert("❌ Submission Failed: " + (result.message || "Try again later"));
-                }
-            } catch (e) {
-                alert("⚠️ Server connection error.");
-            } finally {
+            // Create a unique transaction ID
+            const txnId = "DEP-" + new Date().getTime();
+            
+            // 🔥 CONVERT ₹ TO COINS using Admin's coin_rate (₹50 = 5000 Coins)
+            const finalCoinsToCredit = Math.floor(amountVal * systemCoinRate);
+
+            // Structure data EXACTLY as Admin Panel (`system_core_99.html`) expects for Deposits
+            const requestData = {
+                uid: uid,                     // Admin panel uses 'uid' not 'userId'
+                amount: finalCoinsToCredit,   // Send the CONVERTED COINS to admin
+                utr: utrVal,
+                target_upi: currentActiveUpiId,
+                status: "pending",            // Lowercase pending
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Push to Firebase 'deposits' node (Admin Panel listens to 'deposits', NOT 'deposit_requests')
+            let pushToAdmin = db.ref('deposits/' + txnId).set(requestData);
+            
+            // Push to User's transaction history so it shows as pending in history.html
+            let pushToHistory = db.ref(`users/${uid}/transactions/${Date.now()}`).set({
+                action: "deposit_upi",
+                amount: finalCoinsToCredit,  // Positive value
+                status: "PENDING",
+                details: `Credit Request (UTR: ${utrVal})`,
+                timestamp: Date.now()
+            });
+
+            Promise.all([pushToAdmin, pushToHistory])
+            .then(() => {
+                document.getElementById("inputAmount").value = "";
+                document.getElementById("inputUtr").value = "";
+                document.getElementById("coinPreviewTxt").innerText = "You will get: 0 🪙";
+                generateDynamicQRCode(); 
+
+                showDepositAlert("success_msg", true);
+            })
+            .catch((error) => {
+                alert("❌ Submission Failed: " + error.message);
+            })
+            .finally(() => {
                 btn.disabled = false;
                 let currentLang = localStorage.getItem("selectedLang") || "en";
                 btn.innerText = langData[currentLang]["btn_submit"] || "VERIFY & ADD POINTS";
-            }
+            });
         }
 
         function showDepositAlert(msgKey, isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
             let msgStr = langData[currentLang][msgKey] || langData["en"][msgKey] || msgKey;
-            
+
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");
             else alertBox.classList.remove("success-border");
