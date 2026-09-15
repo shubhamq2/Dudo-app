@@ -50,7 +50,7 @@
         .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
 
         /* Banner Ads Slots */
-        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(16, 185, 129, 0.4); margin: 5px 0; box-sizing: border-box; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(16, 185, 129, 0.4); margin: 5px 0; box-sizing: border-box; display: none; }
 
         /* 🖥️ Main Controller Terminal Grid */
         .gateway-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
@@ -92,7 +92,7 @@
         .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
         .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-green); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 153, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
@@ -102,6 +102,14 @@
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
         <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,9,19,0.95); z-index:99999999; flex-direction:column; justify-content:center; align-items:center; text-align:center; backdrop-filter:blur(10px);">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
@@ -144,6 +152,8 @@
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="gateway-card">
+            <div id="dailyClaimsCounterBox" style="font-size:11px; font-weight:800; color:var(--text-sub); text-align:right; margin-bottom:10px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; width: fit-content; margin-left: auto; border: 1px solid rgba(255,255,255,0.1);"><span id="todayServerDone">0</span> / <span id="totalServerLimit">15</span> Today</div>
+
             <h3 data-i18n="sb_h3">Premium Link Access</h3>
             <p data-i18n="sb_p">Select any high-speed secure mirror stream below. Complete the validation to claim your distributed cloud tokens.</p>
 
@@ -177,32 +187,41 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & LIMITS 🔥
         let globalAdTimerSeconds = 20; // Default time
+        let globalDailyLimit = 15;     // Default limits
+        
+        let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+        let userTodayClaimsCount = 0;
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "sb_title": "Secure Cloud", "sb_wallet": "Wallet Balance", "sb_h3": "Premium Link Access", "sb_p": "Select any high-speed secure mirror stream below. Complete the validation to claim cloud tokens.", "sb_decrypt": "Verifying Connection...", "sb_stay": "Please stay on the sponsor page to complete the validation. Closing early will cancel your reward.", "sb_claim": "Claim Secure Tokens", "sb_security": "Security protocols are active. Switching applications or tabs during the verification process will pause synchronization and cancel rewards.", "err_early": "❌ Verification Incomplete! You closed the secure window early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay active on the page.", "err_success": "🎉 Verification Success! Points added to your balance.", "msg_success": "🔒 CONNECTION SECURED!" },
-            "hi": { "sb_title": "सिक्योर सर्वर", "sb_wallet": "वॉलेट बैलेंस", "sb_h3": "प्रीमियम लिंक एक्सेस", "sb_p": "नीचे दिए गए किसी भी हाई-स्पीड सर्वर को चुनें। टोकन का दावा करने के लिए विज्ञापन सत्यापन पूरा करें।", "sb_decrypt": "कनेक्शन वेरीफाई हो रहा है...", "sb_stay": "कृपया स्पॉन्सर पेज पर रुकें। जल्दी बंद करने से रिवॉर्ड नहीं मिलेगा।", "sb_claim": "रिवॉर्ड टोकन क्लेम करें", "sb_security": "सिक्योरिटी प्रोटोकॉल सक्रिय है। ऐप बंद करने या स्प्लिट स्क्रीन करने पर रिवॉर्ड कैंसिल हो जाएगा।", "err_early": "❌ सत्यापन अधूरा! आपने विंडो को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और साइट पर बने रहें।", "err_success": "🎉 सफलता! टोकन आपके वॉलेट में सुरक्षित रूप से जुड़ गए हैं।", "msg_success": "🔒 लिंक सफलतापूर्वक वेरीफाई हो गया!" },
-            "bn": { "sb_title": "নিরাপদ সার্ভার", "sb_wallet": "ওয়ালেট ব্যালেন্স" }, "te": { "sb_title": "సురక్షిత సర్వర్" }, 
-            "mr": { "sb_title": "सुरक्षित सर्व्हर" }, "ta": { "sb_title": "பாதுகாப்பான சர்வர்" }, 
-            "ur": { "sb_title": "محفوظ سرور" }, "gu": { "sb_title": "સુરક્ષિત સર્વર" }, 
-            "es": { "sb_title": "Servidor Seguro" }, "fr": { "sb_title": "Serveur Sécurisé" }, 
-            "ar": { "sb_title": "خادم آمن" }, "pt": { "sb_title": "Servidor Seguro" }, 
-            "ru": { "sb_title": "Защищенный сервер" }
+            "en": { "sb_title": "Secure Cloud", "sb_wallet": "Wallet Balance", "sb_h3": "Premium Link Access", "sb_p": "Select any high-speed secure mirror stream below. Complete the validation to claim cloud tokens.", "sb_decrypt": "Verifying Connection...", "sb_stay": "Please stay on the sponsor page to complete the validation. Closing early will cancel your reward.", "sb_claim": "Claim Secure Tokens", "sb_security": "Security protocols are active. Switching applications or tabs during the verification process will pause synchronization and cancel rewards.", "err_early": "❌ Verification Incomplete! You closed the secure window early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay active on the page.", "err_limit": "⏳ Daily Limit Reached! You have completed all secure access tokens for today.", "err_success": "🎉 Verification Success! Points added to your balance.", "msg_success": "🔒 CONNECTION SECURED!", "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection" },
+            "hi": { "sb_title": "सिक्योर सर्वर", "sb_wallet": "वॉलेट बैलेंस", "sb_h3": "प्रीमियम लिंक एक्सेस", "sb_p": "नीचे दिए गए किसी भी हाई-स्पीड सर्वर को चुनें। टोकन का दावा करने के लिए विज्ञापन सत्यापन पूरा करें।", "sb_decrypt": "कनेक्शन वेरीफाई हो रहा है...", "sb_stay": "कृपया स्पॉन्सर पेज पर रुकें। जल्दी बंद करने से रिवॉर्ड नहीं मिलेगा।", "sb_claim": "रिवॉर्ड टोकन क्लेम करें", "sb_security": "सिक्योरिटी प्रोटोकॉल सक्रिय है। ऐप बंद करने या स्प्लिट स्क्रीन करने पर रिवॉर्ड कैंसिल हो जाएगा।", "err_early": "❌ सत्यापन अधूरा! आपने विंडो को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और साइट पर बने रहें।", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज के सभी सिक्योर टोकन पूरे कर लिए हैं।", "err_success": "🎉 सफलता! टोकन आपके वॉलेट में सुरक्षित रूप से जुड़ गए हैं।", "msg_success": "🔒 लिंक सफलतापूर्वक वेरीफाई हो गया!", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें" },
+            "bn": { "sb_title": "নিরাপদ সার্ভার", "sb_wallet": "ওয়ালেট ব্যালেন্স", "err_limit": "⏳ দৈনিক সীমা শেষ!", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে!", "err_success": "🎉 সফলভাবে যোগ হয়েছে!" }, 
+            "te": { "sb_title": "సురక్షిత సర్వర్", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "err_invalid": "❌ దయచేసి పేజీలోనే ఉండండి.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి." }, 
+            "mr": { "sb_title": "सुरक्षित सर्व्हर", "err_limit": "⏳ दैनिक मर्यादा पूर्ण!", "err_invalid": "❌ कृपया पेजवरच थांबा.", "err_success": "🎉 यशस्वी! पॉइंट्स जोडले गेले." }, 
+            "ta": { "sb_title": "பாதுகாப்பான சர்வர்", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "err_invalid": "❌ பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 வெற்றி! புள்ளிகள் சேர்க்கப்பட்டன." }, 
+            "ur": { "sb_title": "محفوظ سرور", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی!", "err_invalid": "❌ براہ کرم پیج پر رہیں۔", "err_success": "🎉 کامیابی! شامل کیے گئے۔" }, 
+            "gu": { "sb_title": "સુરક્ષિત સર્વર", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ!", "err_invalid": "❌ કૃપા કરીને પેજ પર રહો.", "err_success": "🎉 સફળતા! પોઇન્ટ્સ ઉમેરાયા." }, 
+            "es": { "sb_title": "Servidor Seguro", "err_limit": "⏳ ¡Límite Diario Alcanzado!", "err_invalid": "❌ Quédate en la página.", "err_success": "🎉 ¡Éxito! Puntos añadidos." }, 
+            "fr": { "sb_title": "Serveur Sécurisé", "err_limit": "⏳ Limite quotidienne atteinte !", "err_invalid": "❌ Restez sur la page.", "err_success": "🎉 Succès ! Points ajoutés." }, 
+            "ar": { "sb_title": "خادم آمن", "err_limit": "⏳ تم الوصول للحد اليومي!", "err_invalid": "❌ يرجى البقاء في الصفحة.", "err_success": "🎉 نجاح! تمت إضافة النقاط." }, 
+            "pt": { "sb_title": "Servidor Seguro", "err_limit": "⏳ Limite diário atingido!", "err_invalid": "❌ Fique na página.", "err_success": "🎉 Sucesso! Pontos adicionados." }, 
+            "ru": { "sb_title": "Защищенный сервер", "err_limit": "⏳ Дневной лимит исчерпан!", "err_invalid": "❌ Оставайтесь на странице.", "err_success": "🎉 Успех! Очки добавлены." }
         };
 
         function changeLanguage(langCode) {
@@ -246,8 +265,14 @@
             { icon: "fa-microchip", color: "#f97316" }
         ];
 
+        // Network Monitor
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
+            
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
@@ -259,6 +284,14 @@
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
                             
+                            // Load Anti-Ban Click Data
+                            if(data.daily_secure_cloud_claims && data.daily_secure_cloud_claims.date === todayDateString) {
+                                userTodayClaimsCount = data.daily_secure_cloud_claims.count || 0;
+                            } else {
+                                userTodayClaimsCount = 0;
+                            }
+                            document.getElementById("todayServerDone").innerText = userTodayClaimsCount;
+
                             // Smart Avatar Sync
                             let userName = data.name || "Player";
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
@@ -277,16 +310,35 @@
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME (From secure_cloud_configs)
-                            if(adminData.secure_cloud_configs && adminData.secure_cloud_configs.ad_timer) {
-                                globalAdTimerSeconds = parseInt(adminData.secure_cloud_configs.ad_timer);
-                            }
+                            if(adminData.secure_cloud_configs) {
+                                // 🔥 GET ADMIN CONTROLLED SETTINGS
+                                if(adminData.secure_cloud_configs.ad_timer) { globalAdTimerSeconds = parseInt(adminData.secure_cloud_configs.ad_timer); }
+                                if(adminData.secure_cloud_configs.daily_limit) { 
+                                    globalDailyLimit = parseInt(adminData.secure_cloud_configs.daily_limit); 
+                                    document.getElementById("totalServerLimit").innerText = globalDailyLimit;
+                                }
 
-                            // Load Banners
-                            if(adminData.banner_ads) {
-                                if(adminData.banner_ads.slot1 && adminData.banner_ads.slot1.active) setAdHTML(document.getElementById("adminBannerSlot1"), adminData.banner_ads.slot1.code);
-                                if(adminData.banner_ads.slot2 && adminData.banner_ads.slot2.active) setAdHTML(document.getElementById("adminBannerSlot2"), adminData.banner_ads.slot2.code);
-                                if(adminData.banner_ads.slot3 && adminData.banner_ads.slot3.active) setAdHTML(document.getElementById("adminBannerSlot3"), adminData.banner_ads.slot3.code);
+                                // Load Banners
+                                let s1Code = (adminData.secure_cloud_configs.slot1 && adminData.secure_cloud_configs.slot1.code) ? adminData.secure_cloud_configs.slot1.code : adminData.secure_cloud_configs.slot1_code;
+                                let s1Active = (adminData.secure_cloud_configs.slot1 && adminData.secure_cloud_configs.slot1.active !== undefined) ? adminData.secure_cloud_configs.slot1.active : adminData.secure_cloud_configs.active;
+                                if (s1Code && s1Active !== false) {
+                                    document.getElementById("adminBannerSlot1").style.display = "flex";
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                                } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                                
+                                let s2Code = (adminData.secure_cloud_configs.slot2 && adminData.secure_cloud_configs.slot2.code) ? adminData.secure_cloud_configs.slot2.code : adminData.secure_cloud_configs.slot2_code;
+                                let s2Active = (adminData.secure_cloud_configs.slot2 && adminData.secure_cloud_configs.slot2.active !== undefined) ? adminData.secure_cloud_configs.slot2.active : adminData.secure_cloud_configs.active;
+                                if (s2Code && s2Active !== false) {
+                                    document.getElementById("adminBannerSlot2").style.display = "flex";
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                                } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                                
+                                let s3Code = (adminData.secure_cloud_configs.slot3 && adminData.secure_cloud_configs.slot3.code) ? adminData.secure_cloud_configs.slot3.code : adminData.secure_cloud_configs.slot3_code;
+                                let s3Active = (adminData.secure_cloud_configs.slot3 && adminData.secure_cloud_configs.slot3.active !== undefined) ? adminData.secure_cloud_configs.slot3.active : adminData.secure_cloud_configs.active;
+                                if (s3Code && s3Active !== false) {
+                                    document.getElementById("adminBannerSlot3").style.display = "flex";
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                                } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
                             }
 
                             // Global Link Fallback
@@ -347,7 +399,7 @@
 
             // Generate UI Elements safely without breaking design
             serversArray.forEach((srv, index) => {
-                let design = serverDesignPresets[index % serverDesignPresets.length]; // Infinite looping of colors
+                let design = serverDesignPresets[index % serverDesignPresets.length]; 
 
                 let srvNode = document.createElement('div');
                 srvNode.className = "server-btn-node";
@@ -367,7 +419,7 @@
         }
 
         let activeValidationInterval = null;
-        let targetValidationWindow = null;
+        let isValidationActive = false;
 
         // 🔥 ADDED TAB TRACKER 
         window.hasMainTabHidden = false;
@@ -395,6 +447,15 @@
 
         // 🚀 PLAY STORE SAFE VALIDATION LOGIC WITH IN-APP VIEWER
         function executeStartValidationSequence(linkArg, rewardAmt) {
+            // 🔥 ANTI-BAN: Custom Limit Check
+            if(userTodayClaimsCount >= globalDailyLimit) {
+                showCustomAlert("err_limit");
+                return;
+            }
+
+            if(isValidationActive) return;
+            isValidationActive = true;
+
             currentTaskLinkString = linkArg || activeAdminSmartlinkUrl;
             currentTaskRewardCoinsInt = rewardAmt || 30;
 
@@ -419,42 +480,53 @@
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
             
+            // 🔥 Wait for Ad to Load fully before countdown
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Link...`;
+            
+            let iframeNode = document.getElementById("adIframe");
+
+            iframeNode.onload = function() {
+                if(activeValidationInterval) clearInterval(activeValidationInterval);
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                activeValidationInterval = setInterval(() => {
+                    countdownTime--;
+                    document.getElementById("validationCountdownClock").innerText = `${countdownTime}s`;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if(document.hidden) {
+                        clearInterval(activeValidationInterval);
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        resetValidationDashboardLayout();
+                        showCustomAlert("err_invalid");
+                        isValidationActive = false;
+                        return;
+                    }
+
+                    if(countdownTime <= 0) {
+                        clearInterval(activeValidationInterval);
+
+                        let successTxt = langData[currentLang]["msg_success"] || "🔒 CONNECTION SECURED!";
+                        document.getElementById("validationCountdownClock").style.display = "none";
+                        document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-lock"></i> ${successTxt}`;
+                        document.getElementById("maskLabelTxt").style.color = "var(--accent-green)";
+                        document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-green)";
+                        
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                    }
+                }, 1000);
+            };
+
             // Load Ad URL into iframe
-            document.getElementById("adIframe").src = currentTaskLinkString;
-
-            activeValidationInterval = setInterval(() => {
-                countdownTime--;
-                document.getElementById("validationCountdownClock").innerText = `${countdownTime}s`;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if(document.hidden) {
-                    clearInterval(activeValidationInterval);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    resetValidationDashboardLayout();
-                    showCustomAlert("err_invalid");
-                    return;
-                }
-
-                if(countdownTime <= 0) {
-                    clearInterval(activeValidationInterval);
-
-                    let successTxt = langData[currentLang]["msg_success"] || "🔒 CONNECTION SECURED!";
-                    document.getElementById("validationCountdownClock").style.display = "none";
-                    document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-lock"></i> ${successTxt}`;
-                    document.getElementById("maskLabelTxt").style.color = "var(--accent-green)";
-                    document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-green)";
-                    
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+            iframeNode.src = currentTaskLinkString;
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t10) via PURE FIREBASE
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t10) via PURE FIREBASE + HISTORY
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
@@ -475,7 +547,24 @@
                 return (current || 0) + currentTaskRewardCoinsInt;
             }).then(() => {
                 
-                // 2. Mark Daily Task 't10' as Complete
+                // 2. 🔥 ANTI-BAN LOGIC: Register limits
+                db.ref(`users/${uid}/daily_secure_cloud_claims`).set({
+                    date: todayDateString,
+                    count: userTodayClaimsCount + 1
+                });
+
+                // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
+                db.ref(`users/${uid}/history`).push({
+                    title: `Premium Server Token`,
+                    amount: currentTaskRewardCoinsInt,
+                    type: "credit",
+                    txn_type: "premium_ad",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // 4. Mark Daily Task 't10' as Complete
                 db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                     let tasks = snap.val() || [];
                     if (!tasks.includes("t10")) {
@@ -491,6 +580,7 @@
             }).finally(() => {
                 resetValidationDashboardLayout();
                 btn.disabled = false;
+                isValidationActive = false;
             });
         }
 

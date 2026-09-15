@@ -50,7 +50,7 @@
 
         /* Banner Ads Slots */
         .ad-container-block { width: 100%; display: flex; flex-direction: column; gap: 12px; margin: 5px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); box-sizing: border-box; display: none; }
 
         /* Grid Layout Components */
         .section-label { width: 100%; font-size: 14.5px; font-weight: 900; color: var(--accent-purple); text-transform: uppercase; letter-spacing: 0.8px; margin: 15px 0 10px 0; text-align: left; border-left: 4px solid var(--accent-purple); padding-left: 8px; }
@@ -100,6 +100,8 @@
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+        
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -110,10 +112,18 @@
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
+    </div>
+
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
-            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Premium Offer</div>
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Partner Task</div>
             <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
@@ -153,7 +163,7 @@
         
         <!-- PLAY STORE SAFE: Only show Coins -->
         <div class="balance-card">
-            <span style="color:var(--text-sub); font-size:14px; text-transform:uppercase; letter-spacing:1px;">💼 Partner Rewards</span>
+            <span style="color:var(--text-sub); font-size:14px; text-transform:uppercase; letter-spacing:1px;" data-i18n="pt_wallet_lbl">💼 Partner Rewards</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
         
@@ -165,46 +175,46 @@
 
         <div class="section-label" data-i18n="pt_sec1">Mega Offerwalls</div>
         <div class="grid-container">
-            <div class="zone-card" onclick="openTaskInstruction('torox', '💎', 'Torox', 40)">
+            <div class="zone-card" onclick="openTaskInstruction('torox', '💎', 'Torox')">
                 <div class="zone-badge badge-popular" data-i18n="pt_pop">Popular</div>
                 <div class="zone-icon">💎</div>
                 <h3>Torox</h3>
                 <p data-i18n="pt_torox_p">High Reward Apps</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('lootably', '🔥', 'Lootably', 40)">
+            <div class="zone-card" onclick="openTaskInstruction('lootably', '🔥', 'Lootably')">
                 <div class="zone-badge badge-hot" data-i18n="pt_hot">Hot</div>
                 <div class="zone-icon">🔥</div>
                 <h3>Lootably</h3>
                 <p data-i18n="pt_loot_p">Videos & Tasks</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('ayet', '🕹️', 'Ayet Studios', 35)">
+            <div class="zone-card" onclick="openTaskInstruction('ayet', '🕹️', 'Ayet Studios')">
                 <div class="zone-icon">🕹️</div>
                 <h3>Ayet Studios</h3>
                 <p data-i18n="pt_ayet_p">Play Games & Earn</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('timewall', '⚡', 'Timewall', 30)">
+            <div class="zone-card" onclick="openTaskInstruction('timewall', '⚡', 'Timewall')">
                 <div class="zone-badge badge-easy" data-i18n="pt_easy">Easy</div>
                 <div class="zone-icon">⚡</div>
                 <h3>Timewall</h3>
                 <p data-i18n="pt_time_p">Micro Tasks (Clicks)</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('adgate', '🎯', 'AdGate Media', 35)">
+            <div class="zone-card" onclick="openTaskInstruction('adgate', '🎯', 'AdGate Media')">
                 <div class="zone-icon">🎯</div>
                 <h3>AdGate Media</h3>
                 <p data-i18n="pt_adgate_p">Premium Offers</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('monlix', '🚀', 'Monlix', 45)">
+            <div class="zone-card" onclick="openTaskInstruction('monlix', '🚀', 'Monlix')">
                 <div class="zone-badge badge-new" data-i18n="pt_new">New</div>
                 <div class="zone-icon">🚀</div>
                 <h3>Monlix</h3>
                 <p data-i18n="pt_monlix_p">Multi-Reward Tasks</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('hangmyads', '📱', 'Hang My Ads', 30)">
+            <div class="zone-card" onclick="openTaskInstruction('hangmyads', '📱', 'Hang My Ads')">
                 <div class="zone-icon">📱</div>
                 <h3>Hang My Ads</h3>
                 <p data-i18n="pt_hang_p">App Installs</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('pubscale', '👑', 'Pubscale', 30)">
+            <div class="zone-card" onclick="openTaskInstruction('pubscale', '👑', 'Pubscale')">
                 <div class="zone-icon">👑</div>
                 <h3>Pubscale</h3>
                 <p data-i18n="pt_pub_p">Top Brand Tasks</p>
@@ -213,24 +223,24 @@
 
         <div class="section-label" data-i18n="pt_sec2">Premium Surveys</div>
         <div class="grid-container">
-            <div class="zone-card" onclick="openTaskInstruction('cpx', '📊', 'CPX Research', 50)">
+            <div class="zone-card" onclick="openTaskInstruction('cpx', '📊', 'CPX Research')">
                 <div class="zone-badge badge-high" data-i18n="pt_high">High Reward</div>
                 <div class="zone-icon">📊</div>
                 <h3>CPX Research</h3>
                 <p data-i18n="pt_cpx_p">High Reward Surveys</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('bitlabs', '📋', 'Bitlabs Surveys', 50)">
+            <div class="zone-card" onclick="openTaskInstruction('bitlabs', '📋', 'Bitlabs Surveys')">
                 <div class="zone-badge badge-auto" data-i18n="pt_auto">Auto-Pay</div>
                 <div class="zone-icon">📋</div>
                 <h3>Bitlabs Surveys</h3>
                 <p data-i18n="pt_bit_p">Instant Coin Credit</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('inbrain', '🧠', 'Inbrain Surveys', 25)">
+            <div class="zone-card" onclick="openTaskInstruction('inbrain', '🧠', 'Inbrain Surveys')">
                 <div class="zone-icon">🧠</div>
                 <h3>Inbrain Surveys</h3>
                 <p data-i18n="pt_inbrain_p">Short & Fast Surveys</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('theorem', '📈', 'Theoremreach', 25)">
+            <div class="zone-card" onclick="openTaskInstruction('theorem', '📈', 'Theoremreach')">
                 <div class="zone-icon">📈</div>
                 <h3>Theoremreach</h3>
                 <p data-i18n="pt_theorem_p">Earn even if you fail</p>
@@ -239,12 +249,12 @@
 
         <div class="section-label" data-i18n="pt_sec3">More Reward Walls</div>
         <div class="grid-container">
-            <div class="zone-card" onclick="openTaskInstruction('notik', '📝', 'Notik Me', 20)">
+            <div class="zone-card" onclick="openTaskInstruction('notik', '📝', 'Notik Me')">
                 <div class="zone-icon">📝</div>
                 <h3>Notik Me</h3>
                 <p data-i18n="pt_notik_p">Quick Tasks</p>
             </div>
-            <div class="zone-card" onclick="openTaskInstruction('adscend', '🎬', 'Adscend Media', 20)">
+            <div class="zone-card" onclick="openTaskInstruction('adscend', '🎬', 'Adscend Media')">
                 <div class="zone-icon">🎬</div>
                 <h3>Adscend Media</h3>
                 <p data-i18n="pt_adscend_p">Watch Ads & Videos</p>
@@ -267,21 +277,18 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
-
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
-        let globalAdTimerSeconds = 25; // Default time
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS (Play Store Safe)
         const langData = {
@@ -293,8 +300,9 @@
                 "pt_cpx_p": "High Reward Surveys", "pt_bit_p": "Instant Coin Credit", "pt_inbrain_p": "Short & Fast Surveys", "pt_theorem_p": "Earn even if you fail", 
                 "pt_notik_p": "Quick Tasks", "pt_adscend_p": "Watch Ads & Videos", 
                 "pt_security": "All tasks are secured. Complete the offers genuinely. Points will be credited automatically to your wallet.", 
-                "err_early": "❌ Action Incomplete! You closed the sponsor wall before required time.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay active on the page.", "err_success": "🎉 Verified! Points added via ", "verifying": "Verifying tracking... ", "start_task": "Proceed to Offer",
-                "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Click below to enter the Offerwall.<br>2. Complete the required actions genuinely.<br>3. Stay active for the required time to sync.<br><br>⚠️ <i>Note: Please provide accurate information to receive your rewards.</i>"
+                "err_early": "❌ Action Incomplete! You closed the sponsor wall before required time.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay active on the page.", "err_success": "🎉 Verified! Points added via ", "verifying": "Verifying tracking... ", "start_task": "Proceed to Offer", "err_limit": "⏳ Daily Limit Reached! You have already completed this offer today. Come back tomorrow.",
+                "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Click below to enter the Offerwall.<br>2. Complete the required actions genuinely.<br>3. Stay active for the required time to sync.<br><br>⚠️ <i>Note: Please provide accurate information to receive your rewards.</i>",
+                "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection"
             },
             "hi": { 
                 "mx_title": "पार्टनर ऑफर्स", "pt_wallet_lbl": "पार्टनर रिवार्ड्स", "pt_sec1": "मेगा ऑफरवॉल्स", "pt_sec2": "प्रीमियम सर्वेक्षण", "pt_sec3": "अधिक रिवॉर्ड वॉल्स", 
@@ -304,20 +312,21 @@
                 "pt_cpx_p": "बड़े रिवॉर्ड सर्वे", "pt_bit_p": "तुरंत कॉइन क्रेडिट", "pt_inbrain_p": "छोटे और तेज़ सर्वे", "pt_theorem_p": "असफल होने पर भी कमाएं", 
                 "pt_notik_p": "त्वरित कार्य", "pt_adscend_p": "विज्ञापन और वीडियो देखें", 
                 "pt_security": "सभी कार्य सुरक्षित हैं। ऑफर्स ईमानदारी से पूरे करें। पॉइंट्स आपके वॉलेट में स्वतः क्रेडिट हो जाएंगे।", 
-                "err_early": "❌ अधूरा! आप आवश्यक समय से पहले बाहर आ गए।", "err_invalid": "❌ ट्रैकिंग रद्द: कृपया ऐप को बंद न करें और पेज पर बने रहें।", "err_success": "🎉 सत्यापित! पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "ट्रैकिंग चेक हो रही है... ", "start_task": "ऑफर शुरू करें",
-                "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. इस लिंक को खोलें।<br>2. पार्टनर द्वारा दिए गए नियमों का पालन करें।<br>3. ट्रैकिंग सिंक होने के लिए आवश्यक समय तक इंतज़ार करें।"
+                "err_early": "❌ अधूरा! आप आवश्यक समय से पहले बाहर आ गए।", "err_invalid": "❌ ट्रैकिंग रद्द: कृपया ऐप को बंद न करें और पेज पर बने रहें।", "err_success": "🎉 सत्यापित! पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "ट्रैकिंग चेक हो रही है... ", "start_task": "ऑफर शुरू करें", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आप आज इस ऑफर को पूरा कर चुके हैं। कल फिर आएं।",
+                "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. इस लिंक को खोलें।<br>2. पार्टनर द्वारा दिए गए नियमों का पालन करें।<br>3. ट्रैकिंग सिंक होने के लिए आवश्यक समय तक इंतज़ार करें।",
+                "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें"
             },
-            "bn": { "mx_title": "পার্টনার অফার", "pt_wallet_lbl": "পার্টনার রিওয়ার্ডস", "pt_sec1": "মেগা অফারওয়ালস", "pt_sec2": "প্রিমিয়াম জরিপ", "pt_sec3": "আরও রিওয়ার্ড ওয়াল", "pt_pop": "জনপ্রিয়", "pt_hot": "হট", "pt_easy": "সহজ", "pt_new": "নতুন", "pt_high": "হাই রিওয়ার্ড", "pt_auto": "অটো-পে", "pt_security": "সব টাস্ক নিরাপদ। অফারগুলো সততার সাথে সম্পূর্ণ করুন।", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি অফার পেজটি আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! যাচাইকরণের সময় পেজেই থাকুন।", "err_success": "🎉 যাচাইকৃত! আপনার ওয়ালেটে পয়েন্ট যোগ করা হয়েছে: ", "start_task": "শروع করুন", "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. লিংকটি খুলুন।<br>২. নিয়ম মেনে কাজ করুন।<br>৩. নির্ধারিত সময় অপেক্ষা করুন।" },
-            "te": { "mx_title": "పార్టనర్ ఆఫర్లు", "pt_wallet_lbl": "పార్టనర్ రివార్డ్స్", "pt_security": "ఆఫర్‌లను నిజాయితీగా పూర్తి చేయండి.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి ఆఫర్ పేజీలోనే ఉండండి.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి: ", "start_task": "ప్రారంభించండి" },
-            "mr": { "mx_title": "प्रीमियम ऑफर्स", "pt_wallet_lbl": "पार्टनर रिवॉर्ड्स", "pt_security": "ऑफर्स प्रामाणिकपणे पूर्ण करा.", "err_early": "❌ अपूर्ण! कृपया टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया ऑफर पेजवरच थांबा.", "err_success": "🎉 यशस्वी! पॉइंट्स जोडले गेले: ", "start_task": "सुरू करा" },
-            "ta": { "mx_title": "கூட்டாளர் சலுகைகள்", "pt_wallet_lbl": "கூட்டாளர் பரிசுகள்", "pt_security": "சலுகைகளை முழுமையாக முடிக்கவும்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ சலுகை பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 வெற்றி! புள்ளிகள் சேர்க்கப்பட்டன: ", "start_task": "தொடங்கு" },
-            "ur": { "mx_title": "پارٹنر آفرز", "pt_wallet_lbl": "پارٹنر انعامات", "pt_security": "آفرز کو ایمانداری سے مکمل کریں۔", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم آفر پیج پر رہیں۔", "err_success": "🎉 کامیابی! پوائنٹس شامل کر دیے گئے: ", "start_task": "شروع کریں" },
-            "gu": { "mx_title": "પાર્ટનર ઑફર્સ", "pt_wallet_lbl": "પાર્ટનર ઇનામ", "pt_security": "ઑફર્સ પ્રામાણિકપણે પૂર્ણ કરો.", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને ઑફર પેજ પર રહો.", "err_success": "🎉 સફળતા! પોઇન્ટ્સ ઉમેરાયા: ", "start_task": "શરૂ કરો" },
-            "es": { "mx_title": "Ofertas de Socios", "pt_wallet_lbl": "Recompensas de Socios", "pt_security": "Completa las acciones genuinamente.", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página del patrocinador.", "err_success": "🎉 ¡Éxito! Puntos añadidos: ", "start_task": "Empezar" },
-            "fr": { "mx_title": "Offres Partenaires", "pt_wallet_lbl": "Récompenses Partenaires", "pt_security": "Complétez les actions honnêtement.", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page du sponsor.", "err_success": "🎉 Succès ! Points ajoutés : ", "start_task": "Commencer" },
-            "ar": { "mx_title": "عروض الشركاء", "pt_wallet_lbl": "مكافآت الشركاء", "pt_security": "أكمل العروض بصدق.", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في صفحة العرض.", "err_success": "🎉 نجاح! تمت إضافة النقاط: ", "start_task": "ابدأ" },
-            "pt": { "mx_title": "Ofertas de Parceiros", "pt_wallet_lbl": "Recompensas de Parceiros", "pt_security": "Conclua as ações de forma genuína.", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página do patrocinador.", "err_success": "🎉 Sucesso! Pontos adicionados: ", "start_task": "Iniciar" },
-            "ru": { "mx_title": "Офферы партнеров", "pt_wallet_lbl": "Награды партнеров", "pt_security": "Выполняйте задания честно.", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице спонсора.", "err_success": "🎉 Успех! Очки добавлены: ", "start_task": "Начать" }
+            "bn": { "mx_title": "পার্টনার অফার", "pt_wallet_lbl": "পার্টনার রিওয়ার্ডস", "pt_sec1": "মেগা অফারওয়ালস", "pt_sec2": "প্রিমিয়াম জরিপ", "pt_sec3": "আরও রিওয়ার্ড ওয়াল", "pt_pop": "জনপ্রিয়", "pt_hot": "হট", "pt_easy": "সহজ", "pt_new": "নতুন", "pt_high": "হাই রিওয়ার্ড", "pt_auto": "অটো-পে", "pt_security": "সব টাস্ক নিরাপদ। অফারগুলো সততার সাথে সম্পূর্ণ করুন।", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি অফার পেজটি আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! যাচাইকরণের সময় পেজেই থাকুন।", "err_success": "🎉 যাচাইকৃত! আপনার ওয়ালেটে পয়েন্ট যোগ করা হয়েছে: ", "start_task": "শروع করুন", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. লিংকটি খুলুন।<br>২. নিয়ম মেনে কাজ করুন।<br>৩. নির্ধারিত সময় অপেক্ষা করুন।", "mod_no_net": "ইন্টারনেট নেই", "mod_no_net_d": "দয়া করে ডেটা বা ওয়াই-ফাই চালু করুন।", "mod_retry": "পুনরায় চেষ্টা করুন" },
+            "te": { "mx_title": "పార్టనర్ ఆఫర్లు", "pt_wallet_lbl": "పార్టనర్ రివార్డ్స్", "pt_security": "ఆఫర్‌లను నిజాయితీగా పూర్తి చేయండి.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి ఆఫర్ పేజీలోనే ఉండండి.", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి: ", "start_task": "ప్రారంభించండి", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది! రేపు మళ్లీ ప్రయత్నించండి.", "inst_generic": "👉 <b>నియమాలు:</b><br>నియమాలను అనుసరించండి మరియు టైమర్ ముగిసే వరకు వేచి ఉండండి.", "mod_no_net": "ఇంటర్నెట్ లేదు", "mod_no_net_d": "దయచేసి డేటాను ఆన్ చేయండి.", "mod_retry": "మళ్లీ ప్రయత్నించండి" },
+            "mr": { "mx_title": "प्रीमियम ऑफर्स", "pt_wallet_lbl": "पार्टनर रिवॉर्ड्स", "pt_security": "ऑफर्स प्रामाणिकपणे पूर्ण करा.", "err_early": "❌ अपूर्ण! कृपया पेज उघडा ठेवा.", "err_invalid": "❌ कृपया ऑफर पेजवरच थांबा.", "err_success": "🎉 यशस्वी! पॉइंट्स जोडले गेले: ", "start_task": "सुरू करा", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "inst_generic": "👉 <b>नियम:</b><br>नियम पाळा आणि वेळ संपेपर्यंत प्रतीक्षा करा.", "mod_no_net": "इंटरनेट नाही", "mod_no_net_d": "कृपया डेटा चालू करा.", "mod_retry": "पुन्हा प्रयत्न करा" },
+            "ta": { "mx_title": "கூட்டாளர் சலுகைகள்", "pt_wallet_lbl": "கூட்டாளர் பரிசுகள்", "pt_security": "சலுகைகளை முழுமையாக முடிக்கவும்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ சலுகை பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 வெற்றி! புள்ளிகள் சேர்க்கப்பட்டன: ", "start_task": "தொடங்கு", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "inst_generic": "👉 <b>விதிகள்:</b><br>விதிகளை பின்பற்றி நேரம் முடியும் வரை காத்திருக்கவும்.", "mod_no_net": "இணையம் இல்லை", "mod_no_net_d": "டேட்டாவை ஆன் செய்யவும்.", "mod_retry": "மீண்டும் முயற்சி செய்" },
+            "ur": { "mx_title": "پارٹنر آفرز", "pt_wallet_lbl": "پارٹنر انعامات", "pt_security": "آفرز کو ایمانداری سے مکمل کریں۔", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم آفر پیج پر رہیں۔", "err_success": "🎉 کامیابی! پوائنٹس شامل کر دیے گئے: ", "start_task": "شروع کریں", "err_limit": "⏳ روزانہ کی حد ختم ہو گئی!", "inst_generic": "👉 <b>قواعد:</b><br>قواعد پر عمل کریں اور وقت ختم ہونے تک انتظار کریں۔", "mod_no_net": "انٹرنیٹ نہیں ہے", "mod_no_net_d": "براہ کرم ڈیٹا آن کریں۔", "mod_retry": "دوبارہ کوشش کریں" },
+            "gu": { "mx_title": "પાર્ટનર ઑફર્સ", "pt_wallet_lbl": "પાર્ટનર ઇનામ", "pt_security": "ઑફર્સ પ્રામાણિકપણે પૂર્ણ કરો.", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને ઑફર પેજ પર રહો.", "err_success": "🎉 સફળતા! પોઇન્ટ્સ ઉમેરાયા: ", "start_task": "શરૂ કરો", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ!", "inst_generic": "👉 <b>નિયમો:</b><br>નિયમોનું પાલન કરો અને સમય પૂરો થાય ત્યાં સુધી રાહ જુઓ.", "mod_no_net": "ઈન્ટરનેટ નથી", "mod_no_net_d": "કૃપા કરીને ડેટા ચાલુ કરો.", "mod_retry": "ફરી પ્રયાસ કરો" },
+            "es": { "mx_title": "Ofertas de Socios", "pt_wallet_lbl": "Recompensas de Socios", "pt_security": "Completa las acciones genuinamente.", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página del patrocinador.", "err_success": "🎉 ¡Éxito! Puntos añadidos: ", "start_task": "Empezar", "err_limit": "⏳ ¡Límite Diario Alcanzado! Vuelve mañana.", "inst_generic": "👉 <b>PASOS:</b><br>Sigue las reglas y espera el tiempo requerido.", "mod_no_net": "Sin Internet", "mod_no_net_d": "Activa los datos o Wi-Fi.", "mod_retry": "Reintentar" },
+            "fr": { "mx_title": "Offres Partenaires", "pt_wallet_lbl": "Récompenses Partenaires", "pt_security": "Complétez les actions honnêtement.", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page du sponsor.", "err_success": "🎉 Succès ! Points ajoutés : ", "start_task": "Commencer", "err_limit": "⏳ Limite quotidienne atteinte ! Revenez demain.", "inst_generic": "👉 <b>ÉTAPES:</b><br>Suivez les règles et attendez le temps requis.", "mod_no_net": "Pas d'Internet", "mod_no_net_d": "Activez les données ou le Wi-Fi.", "mod_retry": "Réessayer" },
+            "ar": { "mx_title": "عروض الشركاء", "pt_wallet_lbl": "مكافآت الشركاء", "pt_security": "أكمل العروض بصدق.", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في صفحة العرض.", "err_success": "🎉 نجاح! تمت إضافة النقاط: ", "start_task": "ابدأ", "err_limit": "⏳ تم الوصول للحد اليومي! عد غداً.", "inst_generic": "👉 <b>الخطوات:</b><br>اتبع القواعد وانتظر الوقت المطلوب.", "mod_no_net": "لا يوجد إنترنت", "mod_no_net_d": "يرجى تفعيل البيانات أو الواي فاي.", "mod_retry": "إعادة المحاولة" },
+            "pt": { "mx_title": "Ofertas de Parceiros", "pt_wallet_lbl": "Recompensas de Parceiros", "pt_security": "Conclua as ações de forma genuína.", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página do patrocinador.", "err_success": "🎉 Sucesso! Pontos adicionados: ", "start_task": "Iniciar", "err_limit": "⏳ Limite diário atingido! Volte amanhã.", "inst_generic": "👉 <b>PASSOS:</b><br>Siga as regras e aguarde o tempo necessário.", "mod_no_net": "Sem Internet", "mod_no_net_d": "Ative os dados ou Wi-Fi.", "mod_retry": "Tentar novamente" },
+            "ru": { "mx_title": "Офферы партнеров", "pt_wallet_lbl": "Награды партнеров", "pt_security": "Выполняйте задания честно.", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице спонсора.", "err_success": "🎉 Успех! Очки добавлены: ", "start_task": "Начать", "err_limit": "⏳ Дневной лимит исчерпан! Возвращайтесь завтра.", "inst_generic": "👉 <b>ШАГИ:</b><br>Следуйте правилам и подождите нужное время.", "mod_no_net": "Нет интернета", "mod_no_net_d": "Включите данные или Wi-Fi.", "mod_retry": "Повторить" }
         };
 
         function changeLanguage(langCode) {
@@ -328,29 +337,55 @@
                 if(transObj[key]) elem.innerText = transObj[key];
             });
             document.getElementById("appLanguage").value = langCode;
+            
+            // Dynamic Button Update
+            if (document.getElementById("taskInstructionModal").style.display === "flex" && currentActiveTaskKey) {
+                let startBtn = document.getElementById("btnStartTask");
+                let timer = partnerLinksAdminConfig[currentActiveTaskKey].timer;
+                startBtn.innerText = `${transObj["start_task"] || "Proceed to Offer"} (${timer}s)`;
+            }
         }
 
         const uid = localStorage.getItem("userId");
+        let userDailyClicksData = {};
 
-        // 🔥 DYNAMIC ROUTING MAP FOR ALL 14 ADMIN CONFIGS
+        // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMERS & REWARDS FOR ALL 14 CATEGORIES
         let partnerLinksAdminConfig = {
-            default_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            torox: "", lootably: "", ayet: "", timewall: "", adgate: "", monlix: "", hangmyads: "", pubscale: "",
-            cpx: "", bitlabs: "", inbrain: "", theorem: "", notik: "", adscend: ""
+            torox: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            lootably: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            ayet: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            timewall: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            adgate: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            monlix: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            hangmyads: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            pubscale: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            cpx: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            bitlabs: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            inbrain: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            theorem: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            notik: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
+            adscend: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 }
         };
 
+        // Network Monitor
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
         document.addEventListener("DOMContentLoaded", () => {
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
             if (!uid) { window.location.replace("index.html"); return; }
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Live Balance Sync (Only Coins for Safe Mode) & Avatar Sync
+                    // 1. Live Balance & Daily Anti-Ban Fetch
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            userDailyClicksData = data.daily_premium_offers || {}; // Store Anti-Ban Clicks
                             
                             // Smart Avatar Sync
                             let userName = data.name || "Player";
@@ -370,43 +405,49 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners & All 14 Links & Time)
+                    // 2. Fetch Admin Configurations (Banners, Timers, Coins & Specific Links for 14 categories)
                     db.ref('global_system_runtime_configurations/premium_offers_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME
-                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
-
-                            // Load Banners
-                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
-
-                            // Load All 14 Ad/API Links Configuration
-                            partnerLinksAdminConfig.torox = adminData.link_torox || "";
-                            partnerLinksAdminConfig.lootably = adminData.link_lootably || "";
-                            partnerLinksAdminConfig.ayet = adminData.link_ayet || "";
-                            partnerLinksAdminConfig.timewall = adminData.link_timewall || "";
-                            partnerLinksAdminConfig.adgate = adminData.link_adgate || "";
-                            partnerLinksAdminConfig.monlix = adminData.link_monlix || "";
-                            partnerLinksAdminConfig.hangmyads = adminData.link_hangmyads || "";
-                            partnerLinksAdminConfig.pubscale = adminData.link_pubscale || "";
-                            partnerLinksAdminConfig.cpx = adminData.link_cpx || "";
-                            partnerLinksAdminConfig.bitlabs = adminData.link_bitlabs || "";
-                            partnerLinksAdminConfig.inbrain = adminData.link_inbrain || "";
-                            partnerLinksAdminConfig.theorem = adminData.link_theorem || "";
-                            partnerLinksAdminConfig.notik = adminData.link_notik || "";
-                            partnerLinksAdminConfig.adscend = adminData.link_adscend || "";
-
-                        } else {
-                            // Fallback
-                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
-                                if(globalSnap.exists()) {
-                                    partnerLinksAdminConfig.default_link = globalSnap.val();
-                                }
+                            // 🔥 EXTRACT 14 INDIVIDUAL SETTINGS 🔥
+                            let netKeys = ['torox', 'lootably', 'ayet', 'timewall', 'adgate', 'monlix', 'hangmyads', 'pubscale', 'cpx', 'bitlabs', 'inbrain', 'theorem', 'notik', 'adscend'];
+                            
+                            netKeys.forEach(cat => {
+                                if(adminData['link_' + cat]) partnerLinksAdminConfig[cat].url = adminData['link_' + cat];
+                                if(adminData['timer_' + cat]) partnerLinksAdminConfig[cat].timer = parseInt(adminData['timer_' + cat]);
+                                if(adminData['reward_' + cat]) partnerLinksAdminConfig[cat].reward = parseInt(adminData['reward_' + cat]);
                             });
+
+                            // Load Banners Safely (setTimeout fix)
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
+                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            
+                            let s4Code = (adminData.slot4 && adminData.slot4.code) ? adminData.slot4.code : adminData.slot4_code;
+                            let s4Active = (adminData.slot4 && adminData.slot4.active !== undefined) ? adminData.slot4.active : adminData.active;
+                            if (s4Code && s4Active !== false) {
+                                document.getElementById("adminBannerSlot4").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
+                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            
                         }
                     });
 
@@ -428,10 +469,7 @@
         }
 
         let currentActiveTaskKey = "";
-        let pendingCoinsReward = 0;
-        let activeWatchSession = null;
-        let targetWindow = null;
-        let platformTimer = null;
+        let offerTimer = null;
         let isValidationActive = false;
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
@@ -454,10 +492,15 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        function openTaskInstruction(taskKey, icon, prettyTitle, rewardAmt) {
+        function openTaskInstruction(taskKey, icon, prettyTitle) {
+            // 🔥 ANTI-BAN: 1 CLICK PER DAY LOGIC 🔥
+            let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+            if(userDailyClicksData[taskKey] === todayDateString) {
+                showCustomAlert("err_limit");
+                return; // Block opening the task
+            }
+
             currentActiveTaskKey = taskKey;
-            pendingCoinsReward = rewardAmt || 30; // Default reward if missing
-            
             let lang = localStorage.getItem("selectedLang") || "en";
             let transObj = langData[lang] || langData["en"];
 
@@ -466,23 +509,24 @@
             
             let startBtn = document.getElementById("btnStartTask");
             startBtn.disabled = false;
-            startBtn.innerText = transObj["start_task"] || "Proceed to Offer";
+            let currentTimerVal = partnerLinksAdminConfig[taskKey].timer;
+            startBtn.innerText = `${transObj["start_task"] || "Proceed to Offer"} (${currentTimerVal}s)`;
 
             document.getElementById("taskInstructionModal").style.display = "flex";
         }
 
         function closeTaskInstructionModal() {
             document.getElementById("taskInstructionModal").style.display = "none";
-            activeWatchSession = null;
             isValidationActive = false;
         }
 
-        // 🚀 PLAY STORE SAFE IN-APP SYSTEM VALIDATION LOGIC
+        // 🚀 PLAY STORE SAFE IN-APP SYSTEM VALIDATION LOGIC (WITH SMART TIMER)
         function executeTaskRedirection() {
             if(isValidationActive) return;
             isValidationActive = true;
 
             let taskKey = currentActiveTaskKey;
+            let config = partnerLinksAdminConfig[taskKey];
 
             const startBtn = document.getElementById("btnStartTask");
             let lang = localStorage.getItem("selectedLang") || "en";
@@ -490,47 +534,53 @@
 
             startBtn.disabled = true;
 
-            // Find matching admin link or use default
-            let targetSmartlink = partnerLinksAdminConfig[taskKey] || partnerLinksAdminConfig.default_link;
-            
-            let countdownTime = globalAdTimerSeconds;
+            let targetDestinationUrl = config.url;
+            let countdownTime = config.timer;
 
             // Show In-App Viewer
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
             
+            // 🔥 Wait for Ad to Load fully before countdown
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Offer...`;
+            
+            let iframeNode = document.getElementById("adIframe");
+
+            iframeNode.onload = function() {
+                if(offerTimer) clearInterval(offerTimer);
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                offerTimer = setInterval(() => {
+                    countdownTime--;
+                    startBtn.innerText = `${verifyText}(${countdownTime}s)`;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if (document.hidden) { 
+                        clearInterval(offerTimer);
+                        closeTaskInstructionModal();
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        showCustomAlert("err_invalid");
+                        return;
+                    }
+
+                    if (countdownTime <= 0) {
+                        clearInterval(offerTimer);
+                        startBtn.innerText = "SAVING...";
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
+                    }
+                }, 1000);
+            };
+
             // Load Ad URL into iframe
-            document.getElementById("adIframe").src = targetSmartlink;
-            
-            if(platformTimer) clearInterval(platformTimer);
-
-            platformTimer = setInterval(() => {
-                countdownTime--;
-                startBtn.innerText = `${verifyText}(${countdownTime}s)`;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if (document.hidden) { 
-                    clearInterval(platformTimer);
-                    closeTaskInstructionModal();
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    showCustomAlert("err_invalid");
-                    return;
-                }
-
-                if (countdownTime <= 0) {
-                    clearInterval(platformTimer);
-                    startBtn.innerText = "SAVING...";
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+            iframeNode.src = targetDestinationUrl;
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
+        // 💰 REWARD SYNC API, UNIVERSAL HISTORY & DAILY CHECKLIST INTEGRATION
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
@@ -544,27 +594,42 @@
             }
 
             let nameDisplay = taskKey.toUpperCase();
+            let rewardToGive = partnerLinksAdminConfig[taskKey].reward;
+            let todayDateString = new Date().toLocaleDateString("en-CA");
 
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
-                return (current || 0) + pendingCoinsReward;
+                return (current || 0) + rewardToGive;
             }).then(() => {
                 
-                // 2. Mark Daily Task 't6' as Complete
+                // 2. 🔥 ANTI-BAN LOGIC: Register Today's Date so user can't click again
+                db.ref(`users/${uid}/daily_premium_offers/${taskKey}`).set(todayDateString);
+
+                // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health & Referral)
+                db.ref(`users/${uid}/history`).push({
+                    title: `Premium Offer (${nameDisplay})`,
+                    amount: rewardToGive,
+                    type: "credit",
+                    txn_type: "offerwall",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // 4. Mark Daily Task 't14' as Complete 
                 db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                     let tasks = snap.val() || [];
-                    if (!tasks.includes("t6")) {
-                        tasks.push("t6");
+                    if (!tasks.includes("t14")) {
+                        tasks.push("t14");
                         db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
                     }
                 });
 
-                showCustomAlert("err_success", `${nameDisplay} Offer (${pendingCoinsReward} 🪙)`, true);
+                showCustomAlert("err_success", `${nameDisplay} (${rewardToGive} 🪙)`, true);
                 
             }).catch(() => {
                 alert("Task Verified but couldn't sync with server. Try again.");
             }).finally(() => {
-                activeWatchSession = null;
                 isValidationActive = false;
             });
         }

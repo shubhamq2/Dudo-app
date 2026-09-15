@@ -48,7 +48,7 @@
 
         /* Banner Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); box-sizing: border-box; display: none; }
 
         /* 🔥 UPGRADED: Offerwall Card UI Design */
         .offer-card { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(22, 78, 99, 0.9)); border-radius: 20px; padding: 25px 20px; text-align: center; box-sizing: border-box; border: 1px solid var(--accent-cyan); box-shadow: 0 10px 30px rgba(6, 182, 212, 0.25); position: relative; margin-bottom: 15px; backdrop-filter: blur(10px); }
@@ -87,7 +87,7 @@
         .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
         .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-cyan); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
@@ -141,7 +141,7 @@
     <div class="offer-card">
         <div class="brand-badge" data-i18n="bl_badge">Popular</div>
         <div class="offer-icon">📋</div>
-        <h3>Premium Surveys</h3>
+        <h3 data-i18n="bl_title">Premium Surveys</h3>
         <p data-i18n="bl_desc">Complete premium surveys and quick questionnaires to get points instantly.</p>
         
         <!-- 🔥 Stylish Rules & Instruction Box -->
@@ -171,15 +171,15 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -188,21 +188,21 @@
         let globalAdTimerSeconds = 25; // Default time
         let globalRewardCoins = 50;    // Default coins
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT
+        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH ANTI-BAN ALERT
         const langData = {
-            "en": { "bl_title": "Surveys & Offers", "bl_badge": "Popular", "bl_desc": "Complete premium surveys and quick questionnaires to get points instantly.", "bl_rules_title": "How to Earn?", "bl_rules_desc": "Open the survey page, stay active until the timer finishes, and answer genuinely. Do not close early!", "bl_btn": "OPEN SURVEYS", "bl_security": "Warning: Do not close the survey page early. Genuine opinions help you earn more rewards without restrictions.", "err_early": "❌ Incomplete Survey! You closed the dashboard too early. Please spend enough time.", "err_invalid": "❌ Tracking Alert: Task minimized. Please complete the survey genuinely without closing the app.", "err_success": "🎉 Wonderful! 50 Points credited successfully into your dashboard." },
-            "hi": { "bl_title": "सर्वेक्षण और ऑफ़र", "bl_badge": "लोकप्रिय", "bl_desc": "तुरंत पॉइंट्स प्राप्त करने के लिए प्रीमियम सर्वे और त्वरित प्रश्नावली को पूरा करें।", "bl_rules_title": "कैसे कमाएं?", "bl_rules_desc": "सर्वे पेज खोलें, टाइमर खत्म होने तक सक्रिय रहें और ईमानदारी से उत्तर दें। जल्दी बंद न करें!", "bl_btn": "सर्वे खोलें", "bl_security": "चेतावनी: सर्वे पेज को जल्दी बंद न करें। ईमानदारी से राय देने पर आपको ज्यादा इनाम मिलेंगे।", "err_early": "❌ अधूरा सर्वे! आपने डैशबोर्ड को बहुत जल्दी बंद कर दिया।", "err_invalid": "❌ सिस्टम अलर्ट: ऐप बंद करना मना है। कृपया ईमानदारी से कार्य पूरा करें।", "err_success": "🎉 बहुत बढ़िया! 50 पॉइंट्स आपके डैशबोर्ड में सफलतापूर्वक जोड़ दिए गए हैं।" },
-            "bn": { "bl_title": "জরিপ এবং অফার", "bl_badge": "জনপ্রিয়", "bl_desc": "তাত্ক্ষণিকভাবে পয়েন্ট পেতে প্রিমিয়াম সার্ভে সম্পূর্ণ করুন।", "bl_rules_title": "কিভাবে আয় করবেন?", "bl_rules_desc": "সার্ভে পৃষ্ঠা খুলুন, সক্রিয় থাকুন এবং সততার সাথে উত্তর দিন।", "bl_btn": "সার্ভে খুলুন", "bl_security": "সতর্কতা: সার্ভে পৃষ্ঠাটি তাড়াতাড়ি বন্ধ করবেন না। সততার সাথে কাজ করুন।", "err_early": "❌ অসম্পূর্ণ সার্ভে! আপনি খুব তাড়াতাড়ি বন্ধ করেছেন।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: অ্যাপ বন্ধ করবেন না।", "err_success": "🎉 চমৎকার! 50 পয়েন্ট সফলভাবে যোগ করা হয়েছে।" },
-            "te": { "bl_title": "సర్వేలు & ఆఫర్లు", "bl_badge": "పాపులర్", "bl_desc": "తక్షణమే పాయింట్లు పొందడానికి సర్వేలను పూర్తి చేయండి.", "bl_rules_title": "ఎలా సంపాదించాలి?", "bl_rules_desc": "సర్వే పేజీని తెరిచి, యాక్టివ్‌గా ఉండండి.", "bl_btn": "సర్వేలను ఓపెన్ చేయండి", "bl_security": "హెచ్చరిక: సర్వే పేజీని త్వరగా మూసివేయవద్దు.", "err_early": "❌ అసంపూర్ణ సర్వే! మీరు త్వరగా మూసివేశారు.", "err_invalid": "❌ దయచేసి టాస్క్‌ను నిజాయితీగా పూర్తి చేయండి.", "err_success": "🎉 అద్భుతం! 50 పాయింట్లు జోడించబడ్డాయి." },
-            "mr": { "bl_title": "सर्वेक्षण आणि ऑफर्स", "bl_badge": "लोकप्रिय", "bl_desc": "त्वरित पॉइंट्स मिळवण्यासाठी प्रीमियम सर्वे पूर्ण करा.", "bl_rules_title": "कसे कमवावे?", "bl_rules_desc": "सर्वे पेज उघडा, सक्रिय राहा आणि प्रामाणिकपणे उत्तरे द्या.", "bl_btn": "सर्वेक्षण सुरू करा", "bl_security": "चेतावणी: सर्वे पेज लवकर बंद करू नका.", "err_early": "❌ अपूर्ण सर्वे! तुम्ही डॅशबोर्ड लवकर बंद केला.", "err_invalid": "❌ कृपया प्रामाणिकपणे टास्क पूर्ण करा.", "err_success": "🎉 उत्कृष्ट! 50 पॉइंट्स तुमच्या खात्यात जमा झाले आहेत." },
-            "ta": { "bl_title": "கணக்கெடுப்பு & சலுகைகள்", "bl_badge": "பிரபலம்", "bl_desc": "புள்ளிகளைப் பெற கணக்கெடுப்புகளை முடிக்கவும்.", "bl_rules_title": "எப்படி சம்பாதிப்பது?", "bl_rules_desc": "கணக்கெடுப்பு பக்கத்தைத் திறந்து செயலில் இருக்கவும்.", "bl_btn": "கணக்கெடுப்பைத் திறக்கவும்", "bl_security": "எச்சரிக்கை: பக்கத்தை சீக்கிரம் மூட வேண்டாம்.", "err_early": "❌ கணக்கெடுப்பு முற்றுபெறவில்லை!", "err_invalid": "❌ பணியை நேர்மையாக முடிக்கவும்.", "err_success": "🎉 அற்புதம்! 50 புள்ளிகள் சேர்க்கப்பட்டன." },
-            "ur": { "bl_title": "سروے اور آفرز", "bl_badge": "مقبول", "bl_desc": "فوری پوائنٹس حاصل کرنے کے لیے سروے مکمل کریں۔", "bl_rules_title": "کیسے کمائیں؟", "bl_rules_desc": "سروے پیج کھولیں، فعال رہیں اور ایمانداری سے جواب دیں۔", "bl_btn": "سروے کھولیں", "bl_security": "انتباہ: سروے کا صفحہ جلدی بند نہ کریں۔", "err_early": "❌ نامکمل سروے! آپ نے جلدی بند کر دیا۔", "err_invalid": "❌ براہ کرم ایمانداری سے کام مکمل کریں۔", "err_success": "🎉 بہت خوب! 50 پوائنٹس شامل کر دیے گئے۔" },
-            "gu": { "bl_title": "સર્વેક્ષણ અને ઑફર્સ", "bl_badge": "લોકપ્રિય", "bl_desc": "તુરંત પોઇન્ટ્સ મેળવવા માટે સર્વેક્ષણો પૂર્ણ કરો.", "bl_rules_title": "કેવી રીતે કમાવવું?", "bl_rules_desc": "સર્વે પેજ ખોલો, સક્રિય રહો અને પ્રમાણિકતાથી જવાબ આપો.", "bl_btn": "સર્વે ઓપન કરો", "bl_security": "ચેતવણી: સર્વે પેજ વહેલું બંધ કરશો નહીં.", "err_early": "❌ અધૂરો સર્વે! તમે વહેલું બંધ કર્યું.", "err_invalid": "❌ કૃપા કરીને પ્રમાણિકપણે કાર્ય પૂર્ણ કરો.", "err_success": "🎉 અદ્ભુત! 50 પોઇન્ટ્સ ઉમેરવામાં આવ્યા છે." },
-            "es": { "bl_title": "Encuestas y Ofertas", "bl_badge": "Popular", "bl_desc": "Complete encuestas premium para obtener puntos al instante.", "bl_rules_title": "¿Cómo Ganar?", "bl_rules_desc": "Abra la encuesta, manténgase activo y responda genuinamente.", "bl_btn": "ABRIR ENCUESTAS", "bl_security": "Advertencia: No cierre la página de la encuesta antes de tiempo.", "err_early": "❌ ¡Encuesta incompleta! Cerró demasiado pronto.", "err_invalid": "❌ Por favor complete la tarea genuinamente.", "err_success": "🎉 ¡Excelente! Se han añadido 50 puntos." },
-            "fr": { "bl_title": "Sondages & Offres", "bl_badge": "Populaire", "bl_desc": "Complétez des sondages premium pour gagner des points instantanément.", "bl_rules_title": "Comment Gagner ?", "bl_rules_desc": "Ouvrez le sondage, restez actif et répondez honnêtement.", "bl_btn": "OUVRIR SONDAGES", "bl_security": "Attention: Ne fermez pas la page du sondage trop tôt.", "err_early": "❌ Sondage incomplet ! Vous avez fermé trop tôt.", "err_invalid": "❌ Veuillez terminer la tâche honnêtement.", "err_success": "🎉 Merveilleux ! 50 points crédités avec succès." },
-            "ar": { "bl_title": "الاستطلاعات والعروض", "bl_badge": "شائع", "bl_desc": "أكمل الاستطلاعات المميزة للحصول على نقاط فوراً.", "bl_rules_title": "كيف تكسب؟", "bl_rules_desc": "افتح الاستطلاع، وابق نشطاً وأجب بصدق.", "bl_btn": "فتح الاستطلاعات", "bl_security": "تحذير: لا تغلق صفحة الاستطلاع مبكراً.", "err_early": "❌ استطلاع غير مكتمل! لقد أغلقت مبكراً.", "err_invalid": "❌ يرجى إكمال المهمة بصدق.", "err_success": "🎉 رائع! تم إضافة 50 نقطة بنجاح." },
-            "pt": { "bl_title": "Pesquisas & Ofertas", "bl_badge": "Popular", "bl_desc": "Complete pesquisas premium para obter pontos instantaneamente.", "bl_rules_title": "Como Ganhar?", "bl_rules_desc": "Abra a pesquisa, fique ativo e responda genuinamente.", "bl_btn": "ABRIR PESQUISAS", "bl_security": "Aviso: Não feche a página da pesquisa antes do tempo.", "err_early": "❌ Pesquisa Incompleta! Você fechou antes do tempo.", "err_invalid": "❌ Por favor, complete a tarefa genuinamente.", "err_success": "🎉 Maravilhoso! 50 pontos creditados." },
-            "ru": { "bl_title": "Опросы и Предложения", "bl_badge": "Популярно", "bl_desc": "Заполняйте опросы и мгновенно получайте очки.", "bl_rules_title": "Как заработать?", "bl_rules_desc": "Откройте опрос, будьте активны и отвечайте честно.", "bl_btn": "ОТКРЫТЬ ОПРОСЫ", "bl_security": "Предупреждение: Не закрывайте страницу опроса раньше времени.", "err_early": "❌ Опрос не завершен! Вы слишком рано закрыли вкладку.", "err_invalid": "❌ Пожалуйста, выполняйте задание честно.", "err_success": "🎉 Замечательно! 50 очков успешно зачислены." }
+            "en": { "bl_title": "Surveys & Offers", "bl_badge": "Popular", "bl_desc": "Complete premium surveys and quick questionnaires to get points instantly.", "bl_rules_title": "How to Earn?", "bl_rules_desc": "Open the survey page, stay active until the timer finishes, and answer genuinely. Do not close early!", "bl_btn": "OPEN SURVEYS", "bl_security": "Warning: Do not close the survey page early. Genuine opinions help you earn more rewards without restrictions.", "err_early": "❌ Incomplete Survey! You closed the dashboard too early. Please spend enough time.", "err_invalid": "❌ Tracking Alert: Task minimized. Please complete the survey genuinely without closing the app.", "err_limit": "⏳ Daily Limit Reached! You can only do this once a day. Come back tomorrow.", "err_success": "🎉 Wonderful! Points credited successfully." },
+            "hi": { "bl_title": "सर्वेक्षण और ऑफ़र", "bl_badge": "लोकप्रिय", "bl_desc": "तुरंत पॉइंट्स प्राप्त करने के लिए प्रीमियम सर्वे और त्वरित प्रश्नावली को पूरा करें।", "bl_rules_title": "कैसे कमाएं?", "bl_rules_desc": "सर्वे पेज खोलें, टाइमर खत्म होने तक सक्रिय रहें और ईमानदारी से उत्तर दें। जल्दी बंद न करें!", "bl_btn": "सर्वे खोलें", "bl_security": "चेतावनी: सर्वे पेज को जल्दी बंद न करें। ईमानदारी से राय देने पर आपको ज्यादा इनाम मिलेंगे।", "err_early": "❌ अधूरा सर्वे! आपने डैशबोर्ड को बहुत जल्दी बंद कर दिया।", "err_invalid": "❌ सिस्टम अलर्ट: ऐप बंद करना मना है। कृपया ईमानदारी से कार्य पूरा करें।", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आप दिन में सिर्फ एक बार कर सकते हैं।", "err_success": "🎉 बहुत बढ़िया! पॉइंट्स आपके डैशबोर्ड में सफलतापूर्वक जोड़ दिए गए हैं।" },
+            "bn": { "bl_title": "জরিপ এবং অফার", "bl_badge": "জনপ্রিয়", "bl_desc": "তাত্ক্ষণিকভাবে পয়েন্ট পেতে প্রিমিয়াম সার্ভে সম্পূর্ণ করুন।", "bl_rules_title": "কিভাবে আয় করবেন?", "bl_rules_desc": "সার্ভে পৃষ্ঠা খুলুন, সক্রিয় থাকুন এবং সততার সাথে উত্তর দিন।", "bl_btn": "সার্ভে খুলুন", "bl_security": "সতর্কতা: সার্ভে পৃষ্ঠাটি তাড়াতাড়ি বন্ধ করবেন না। সততার সাথে কাজ করুন।", "err_early": "❌ অসম্পূর্ণ সার্ভে! আপনি খুব তাড়াতাড়ি বন্ধ করেছেন।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: অ্যাপ বন্ধ করবেন না।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "err_success": "🎉 চমৎকার! পয়েন্ট সফলভাবে যোগ করা হয়েছে।" },
+            "te": { "bl_title": "సర్వేలు & ఆఫర్లు", "bl_badge": "పాపులర్", "bl_desc": "తక్షణమే పాయింట్లు పొందడానికి సర్వేలను పూర్తి చేయండి.", "bl_rules_title": "ఎలా సంపాదించాలి?", "bl_rules_desc": "సర్వే పేజీని తెరిచి, యాక్టివ్‌గా ఉండండి.", "bl_btn": "సర్వేలను ఓపెన్ చేయండి", "bl_security": "హెచ్చరిక: సర్వే పేజీని త్వరగా మూసివేయవద్దు.", "err_early": "❌ అసంపూర్ణ సర్వే! మీరు త్వరగా మూసివేశారు.", "err_invalid": "❌ దయచేసి టాస్క్‌ను నిజాయితీగా పూర్తి చేయండి.", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "err_success": "🎉 అద్భుతం! పాయింట్లు జోడించబడ్డాయి." },
+            "mr": { "bl_title": "सर्वेक्षण आणि ऑफर्स", "bl_badge": "लोकप्रिय", "bl_desc": "त्वरित पॉइंट्स मिळवण्यासाठी प्रीमियम सर्वे पूर्ण करा.", "bl_rules_title": "कसे कमवावे?", "bl_rules_desc": "सर्वे पेज उघडा, सक्रिय राहा आणि प्रामाणिकपणे उत्तरे द्या.", "bl_btn": "सर्वेक्षण सुरू करा", "bl_security": "चेतावणी: सर्वे पेज लवकर बंद करू नका.", "err_early": "❌ अपूर्ण सर्वे! तुम्ही डॅशबोर्ड लवकर बंद केला.", "err_invalid": "❌ कृपया प्रामाणिकपणे टास्क पूर्ण करा.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "err_success": "🎉 उत्कृष्ट! पॉइंट्स तुमच्या खात्यात जमा झाले आहेत." },
+            "ta": { "bl_title": "கணக்கெடுப்பு & சலுகைகள்", "bl_badge": "பிரபலம்", "bl_desc": "புள்ளிகளைப் பெற கணக்கெடுப்புகளை முடிக்கவும்.", "bl_rules_title": "எப்படி சம்பாதிப்பது?", "bl_rules_desc": "கணக்கெடுப்பு பக்கத்தைத் திறந்து செயலில் இருக்கவும்.", "bl_btn": "கணக்கெடுப்பைத் திறக்கவும்", "bl_security": "எச்சரிக்கை: பக்கத்தை சீக்கிரம் மூட வேண்டாம்.", "err_early": "❌ கணக்கெடுப்பு முற்றுபெறவில்லை!", "err_invalid": "❌ பணியை நேர்மையாக முடிக்கவும்.", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "err_success": "🎉 அற்புதம்! புள்ளிகள் சேர்க்கப்பட்டன." },
+            "ur": { "bl_title": "سروے اور آفرز", "bl_badge": "مقبول", "bl_desc": "فوری پوائنٹس حاصل کرنے کے لیے سروے مکمل کریں۔", "bl_rules_title": "کیسے کمائیں؟", "bl_rules_desc": "سروے پیج کھولیں، فعال رہیں اور ایمانداری سے جواب دیں۔", "bl_btn": "سروے کھولیں", "bl_security": "انتباہ: سروے کا صفحہ جلدی بند نہ کریں۔", "err_early": "❌ نامکمل سروے! آپ نے جلدی بند کر دیا۔", "err_invalid": "❌ براہ کرم ایمانداری سے کام مکمل کریں۔", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی! کل دوبارہ آئیں۔", "err_success": "🎉 بہت خوب! پوائنٹس شامل کر دیے گئے۔" },
+            "gu": { "bl_title": "સર્વેક્ષણ અને ઑફર્સ", "bl_badge": "લોકપ્રિય", "bl_desc": "તુરંત પોઇન્ટ્સ મેળવવા માટે સર્વેક્ષણો પૂર્ણ કરો.", "bl_rules_title": "કેવી રીતે કમાવવું?", "bl_rules_desc": "સર્વે પેજ ખોલો, સક્રિય રહો અને પ્રમાણિકતાથી જવાબ આપો.", "bl_btn": "સર્વે ઓપન કરો", "bl_security": "ચેતવણી: સર્વે પેજ વહેલું બંધ કરશો નહીં.", "err_early": "❌ અધૂરો સર્વે! તમે વહેલું બંધ કર્યું.", "err_invalid": "❌ કૃપા કરીને પ્રમાણિકપણે કાર્ય પૂર્ણ કરો.", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ! કાલે ફરી પ્રયાસ કરો.", "err_success": "🎉 અદ્ભુત! પોઇન્ટ્સ ઉમેરવામાં આવ્યા છે." },
+            "es": { "bl_title": "Encuestas y Ofertas", "bl_badge": "Popular", "bl_desc": "Complete encuestas premium para obtener puntos al instante.", "bl_rules_title": "¿Cómo Ganar?", "bl_rules_desc": "Abra la encuesta, manténgase activo y responda genuinamente.", "bl_btn": "ABRIR ENCUESTAS", "bl_security": "Advertencia: No cierre la página de la encuesta antes de tiempo.", "err_early": "❌ ¡Encuesta incompleta! Cerró demasiado pronto.", "err_invalid": "❌ Por favor complete la tarea genuinamente.", "err_limit": "⏳ ¡Límite Diario Alcanzado! Vuelve mañana.", "err_success": "🎉 ¡Excelente! Puntos añadidos." },
+            "fr": { "bl_title": "Sondages & Offres", "bl_badge": "Populaire", "bl_desc": "Complétez des sondages premium pour gagner des points instantanément.", "bl_rules_title": "Comment Gagner ?", "bl_rules_desc": "Ouvrez le sondage, restez actif et répondez honnêtement.", "bl_btn": "OUVRIR SONDAGES", "bl_security": "Attention: Ne fermez pas la page du sondage trop tôt.", "err_early": "❌ Sondage incomplet ! Vous avez fermé trop tôt.", "err_invalid": "❌ Veuillez terminer la tâche honnêtement.", "err_limit": "⏳ Limite quotidienne atteinte ! Revenez demain.", "err_success": "🎉 Merveilleux ! Points crédités avec succès." },
+            "ar": { "bl_title": "الاستطلاعات والعروض", "bl_badge": "شائع", "bl_desc": "أكمل الاستطلاعات المميزة للحصول على نقاط فوراً.", "bl_rules_title": "كيف تكسب؟", "bl_rules_desc": "افتح الاستطلاع، وابق نشطاً وأجب بصدق.", "bl_btn": "فتح الاستطلاعات", "bl_security": "تحذير: لا تغلق صفحة الاستطلاع مبكراً.", "err_early": "❌ استطلاع غير مكتمل! لقد أغلقت مبكراً.", "err_invalid": "❌ يرجى إكمال المهمة بصدق.", "err_limit": "⏳ تم الوصول للحد اليومي! عد غداً.", "err_success": "🎉 رائع! تم إضافة النقاط بنجاح." },
+            "pt": { "bl_title": "Pesquisas & Ofertas", "bl_badge": "Popular", "bl_desc": "Complete pesquisas premium para obter pontos instantaneamente.", "bl_rules_title": "Como Ganhar?", "bl_rules_desc": "Abra a pesquisa, fique ativo e responda genuinamente.", "bl_btn": "ABRIR PESQUISAS", "bl_security": "Aviso: Não feche a página da pesquisa antes do tempo.", "err_early": "❌ Pesquisa Incompleta! Você fechou antes do tempo.", "err_invalid": "❌ Por favor, complete a tarefa genuinamente.", "err_limit": "⏳ Limite diário atingido! Volte amanhã.", "err_success": "🎉 Maravilhoso! Pontos creditados." },
+            "ru": { "bl_title": "Опросы и Предложения", "bl_badge": "Популярно", "bl_desc": "Заполняйте опросы и мгновенно получайте очки.", "bl_rules_title": "Как заработать?", "bl_rules_desc": "Откройте опрос, будьте активны и отвечайте честно.", "bl_btn": "ОТКРЫТЬ ОПРОСЫ", "bl_security": "Предупреждение: Не закрывайте страницу опроса раньше времени.", "err_early": "❌ Опрос не завершен! Вы слишком рано закрыли вкладку.", "err_invalid": "❌ Пожалуйста, выполняйте задание честно.", "err_limit": "⏳ Дневной лимит исчерпан! Возвращайтесь завтра.", "err_success": "🎉 Замечательно! Очки успешно зачислены." }
         };
 
         function changeLanguage(langCode) {
@@ -212,7 +212,7 @@
                 const key = elem.getAttribute("data-i18n");
                 if(transObj[key]) { 
                     if(elem.tagName === "BUTTON" || elem.id === "startSurveyBtn") {
-                        if(!elem.disabled) elem.innerText = transObj[key];
+                        if(!elem.disabled && !elem.innerText.includes("Connecting")) elem.innerText = transObj[key];
                     } else {
                         elem.innerText = transObj[key]; 
                     }
@@ -234,6 +234,7 @@
 
         const uid = localStorage.getItem("userId");
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
+        let userDailyClicksData = "";
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
@@ -244,20 +245,23 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Live Balance (Rupees removed) & Avatar Sync
+                    // 1. Live Balance, Avatar Sync, and Daily Limits Fetch
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Load Anti-Ban Click Data
+                            userDailyClicksData = data.daily_survey_clicks || "";
+
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
                             function createEmojiURI(emoji) {
                                 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
                                 return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
                             }
 
-                            // Smart Avatar Sync
-                            let userName = data.name || "Player";
-                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             let avatarContainer = document.getElementById("headerProfileIcon");
                             if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
                                 avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
@@ -276,11 +280,34 @@
                             if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
                             if (adminData.reward_coins) { globalRewardCoins = parseInt(adminData.reward_coins); }
                             
-                            // Load Banners
-                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            // 🔥 FIXED BANNER LOADING WITH SETTIMEOUT 🔥
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
+                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            
+                            let s4Code = (adminData.slot4 && adminData.slot4.code) ? adminData.slot4.code : adminData.slot4_code;
+                            let s4Active = (adminData.slot4 && adminData.slot4.active !== undefined) ? adminData.slot4.active : adminData.active;
+                            if (s4Code && s4Active !== false) {
+                                document.getElementById("adminBannerSlot4").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
+                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
 
                             // Setup Survey Link
                             if (adminData.bitlabs_link) {
@@ -306,6 +333,12 @@
 
             const alertBox = document.getElementById("customAlertBox");
             const overlay = document.getElementById("alertOverlay");
+            
+            // If it's a success message, inject the dynamic reward coins
+            if(msgKey === "err_success" && !translatedMsg.includes(globalRewardCoins)) {
+                translatedMsg += ` ${globalRewardCoins} 🪙`;
+            }
+            
             document.getElementById("alertMessage").innerText = translatedMsg;
             
             if(isSuccess) { alertBox.classList.add("success-border"); } 
@@ -320,10 +353,17 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🚀 TIMED SECURE IN-APP SURVEY VIEWER CONTROLLER
+        // 🚀 TIMED SECURE IN-APP SURVEY VIEWER CONTROLLER WITH SMART TIMER & ANTI-BAN
         let surveyTimer = null;
 
         function launchBitlabsTask() {
+            // 🔥 ANTI-BAN: 1 CLICK PER DAY LOGIC 🔥
+            let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+            if(userDailyClicksData === todayDateString) {
+                showCustomAlert("err_limit");
+                return; // Block opening the task
+            }
+
             const btn = document.getElementById("startSurveyBtn");
             let lang = localStorage.getItem("selectedLang") || "en";
             
@@ -337,33 +377,41 @@
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
             
+            // 🔥 Wait for Ad to Load fully before countdown
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Survey...`;
+            
+            let iframeNode = document.getElementById("adIframe");
+
+            iframeNode.onload = function() {
+                if(surveyTimer) clearInterval(surveyTimer);
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+                
+                surveyTimer = setInterval(() => {
+                    countdownTime--;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if (document.hidden) { 
+                        clearInterval(surveyTimer);
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        showCustomAlert("err_invalid");
+                        resetSurveyButton();
+                        return;
+                    }
+
+                    if (countdownTime <= 0) {
+                        clearInterval(surveyTimer);
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                    }
+                }, 1000);
+            };
+
             // Load Ad URL into iframe
-            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
-
-            if(surveyTimer) clearInterval(surveyTimer);
-
-            surveyTimer = setInterval(() => {
-                countdownTime--;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if (document.hidden) { 
-                    clearInterval(surveyTimer);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    showCustomAlert("err_invalid");
-                    resetSurveyButton();
-                    return;
-                }
-
-                if (countdownTime <= 0) {
-                    clearInterval(surveyTimer);
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+            iframeNode.src = activeAdminSmartlinkUrl;
         }
 
         // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION (PURE FIREBASE)
@@ -372,11 +420,28 @@
             document.getElementById("adIframe").src = ""; // Stop video/ad
 
             if (typeof uid !== 'undefined' && uid) {
+                let todayDateString = new Date().toLocaleDateString("en-CA");
+                
                 // Add Coins securely via Transaction
                 db.ref(`users/${uid}/coins`).transaction((current) => {
                     return (current || 0) + globalRewardCoins;
                 }).then(() => {
-                    // Mark Daily Task 't13' as Complete
+                    
+                    // 1. 🔥 ANTI-BAN LOGIC: Register Today's Date so user can't click again today
+                    db.ref(`users/${uid}/daily_survey_clicks`).set(todayDateString);
+
+                    // 2. 🔥 UNIVERSAL HISTORY PUSH
+                    db.ref(`users/${uid}/history`).push({
+                        title: `Premium Survey`,
+                        amount: globalRewardCoins,
+                        type: "credit",
+                        txn_type: "offerwall",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    // 3. Mark Daily Task 't13' as Complete
                     db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                         let tasks = snap.val() || [];
                         if (!tasks.includes("t13")) {
@@ -386,18 +451,7 @@
                     });
 
                     resetSurveyButton();
-                    
-                    // Replace "50" with Dynamic Coins in Success Message
-                    let currentLang = localStorage.getItem("selectedLang") || "en";
-                    let successMsg = langData[currentLang]["err_success"] || langData["en"]["err_success"];
-                    successMsg = successMsg.replace(/50/g, globalRewardCoins);
-                    
-                    const alertBox = document.getElementById("customAlertBox");
-                    const overlay = document.getElementById("alertOverlay");
-                    document.getElementById("alertMessage").innerText = successMsg;
-                    alertBox.classList.add("success-border");
-                    alertBox.style.display = "block";
-                    overlay.style.display = "block";
+                    showCustomAlert("err_success", true);
                     
                 }).catch(() => {
                     resetSurveyButton();

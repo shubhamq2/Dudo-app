@@ -48,7 +48,7 @@
 
         /* Banners Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(16, 185, 129, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(16, 185, 129, 0.4); box-sizing: border-box; display: none; }
 
         /* Main Controller Dashboard */
         .pool-container { width: 92%; max-width: 440px; background: var(--card-bg); border-radius: 24px; padding: 30px 20px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
@@ -98,7 +98,7 @@
         /* Security Box Info Board */
         .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-green); background: rgba(16, 185, 129, 0.08); border-radius: 16px; padding: 15px 18px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; margin-bottom: 20px; font-weight: 600; }
 
-        /* Modern Alert Modal Setup */
+        /* Custom Modern Alert Modal Setup */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 2000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
@@ -169,7 +169,6 @@
         </div>
     </div>
 
-    <!-- PLAY STORE SAFE: Only show Coins -->
     <div class="balance-card">
         <span style="color:var(--text-sub); font-size:14px; text-transform:uppercase; letter-spacing:1px;">🏆 Pool Balance</span>
         <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
@@ -238,15 +237,15 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -353,11 +352,34 @@
                             // 🔥 GET ADMIN CONTROLLED TIME
                             if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
 
-                            // Load Banners
-                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            // Load Banners (setTimeout fix for safety)
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
+                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            
+                            let s4Code = (adminData.slot4 && adminData.slot4.code) ? adminData.slot4.code : adminData.slot4_code;
+                            let s4Active = (adminData.slot4 && adminData.slot4.active !== undefined) ? adminData.slot4.active : adminData.active;
+                            if (s4Code && s4Active !== false) {
+                                document.getElementById("adminBannerSlot4").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
+                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
 
                             // Link & Min Fee Setup
                             if (adminData.task_ad_link) {
@@ -450,7 +472,7 @@
             executeDeductWalletViaFirebaseAndJoinQueue();
         }
 
-        // 💰 FIREBASE DEDUCTION AND MATCHMAKING CALCULATION
+        // 💰 FIREBASE DEDUCTION (UNIVERSAL HISTORY DEBIT) AND MATCHMAKING
         function executeDeductWalletViaFirebaseAndJoinQueue() {
             const btn = document.getElementById("poolJoinInitiatorBtn");
             btn.disabled = true;
@@ -464,6 +486,18 @@
                 return; // Abort if insufficient balance
             }).then((result) => {
                 if(result.committed) {
+                    
+                    // 🔥 1.5. Add Universal History Debit Log for Entry Fee 🔥
+                    db.ref(`users/${uid}/history`).push({
+                        title: `Multiplayer Pool Entry Fee`,
+                        amount: currentCustomBetValue,
+                        type: "debit",
+                        txn_type: "game_fee",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
                     // Match Decision Logic (40% Win Chance)
                     matchResultCalculated = (Math.random() < 0.4) ? "win" : "lose";
                     executeLaunchMatchmakingQueueScreen();
@@ -669,12 +703,24 @@
             }
         }
 
-        // 💰 REWARD ENGINE: Pure Firebase Transaction
+        // 💰 REWARD ENGINE: Pure Firebase Transaction + UNIVERSAL HISTORY CREDIT
         function executeFinalWinClaimFirebaseAPI() {
             // 1. Add Prize Pool Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
                 return (current || 0) + databaseCalculatedPrizePoolValue;
             }).then(() => {
+                
+                // 2. 🔥 Add Universal History Credit Log for Prize Win 🔥
+                db.ref(`users/${uid}/history`).push({
+                    title: `Multiplayer Pool Victory`,
+                    amount: databaseCalculatedPrizePoolValue,
+                    type: "credit",
+                    txn_type: "game_reward",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
                 executeResetApplicationToInitialPanelState();
                 showCustomAlert("win_msg", `${databaseCalculatedPrizePoolValue} 🪙`, true);
             }).catch(() => {

@@ -16,10 +16,10 @@
 
     <style>
         :root {
-            --bg-dark: #0b0f19; --card-bg: rgba(22, 30, 49, 0.75); --primary-blue: #3b82f6; 
+            --bg-dark: #0b0f19; --card-bg: rgba(22, 30, 49, 0.85); --primary-blue: #3b82f6; 
             --accent-cyan: #06b6d4; --accent-green: #10b981; --accent-gold: #f59e0b; 
             --accent-pink: #ef4444; --accent-purple: #a855f7; --text-main: #f8fafc; 
-            --text-sub: #94a3b8; --border-glow: rgba(59, 130, 246, 0.18);
+            --text-sub: #94a3b8; --border-glow: rgba(59, 130, 246, 0.25);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -27,94 +27,102 @@
         body { background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12) 0%, transparent 40%), radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.1) 0%, transparent 40%); color: var(--text-main); min-height: 100vh; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
 
         /* 👑 Header Bar */
-        .header { width: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        .header h2 { margin: 0; color: #fff; font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
+        .header { width: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
+        .header h2 { margin: 0; color: #fff; font-size: 24px; font-weight: 900; letter-spacing: 0.5px; }
         .header h2 span { color: var(--accent-cyan); }
-        .header-controls { display: flex; gap: 12px; align-items: center; }
-        .custom-lang-select { padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); outline: none; font-size: 11px; background: #1e293b; color: #fff; font-weight: bold; cursor: pointer; }
-        .notif-bell { position: relative; width: 38px; height: 38px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+        .header-controls { display: flex; gap: 14px; align-items: center; }
+        .custom-lang-select { padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); outline: none; font-size: 12px; background: #1e293b; color: #fff; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .notif-bell { position: relative; width: 42px; height: 42px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
         .notif-bell:active { transform: scale(0.9); }
-        .notif-badge { position: absolute; top: -2px; right: -2px; background: var(--accent-pink); color: white; font-size: 10px; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--bg-dark); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-        .header-profile-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; cursor: pointer; background: #1e293b; text-decoration: none; }
+        .notif-badge { position: absolute; top: -2px; right: -2px; background: var(--accent-pink); color: white; font-size: 11px; font-weight: 900; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--bg-dark); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+        .header-profile-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--primary-blue); overflow: hidden; cursor: pointer; background: #1e293b; text-decoration: none; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
         .header-profile-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
         /* 💳 Smart User Card */
-        .smart-user-card { width: 90%; max-width: 420px; background: linear-gradient(145deg, rgba(30,27,75,0.95) 0%, rgba(15,23,42,0.95) 100%); border-radius: 20px; padding: 18px; margin-top: 18px; border: 1px solid rgba(139, 92, 246, 0.4); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; backdrop-filter: blur(10px); gap: 10px; overflow: hidden; }
-        .card-left-info { display: flex; align-items: center; gap: 12px; width: 65%; }
-        .card-profile-img { width: 50px; height: 50px; min-width: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; background: #1e293b; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+        .smart-user-card { width: 92%; max-width: 460px; background: linear-gradient(145deg, rgba(30,27,75,0.95) 0%, rgba(15,23,42,0.95) 100%); border-radius: 24px; padding: 22px; margin-top: 20px; border: 1px solid rgba(139, 92, 246, 0.4); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; backdrop-filter: blur(10px); gap: 10px; overflow: hidden; position: relative; }
+        .smart-user-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--accent-cyan), var(--primary-blue), var(--accent-purple)); }
+        .card-left-info { display: flex; align-items: center; gap: 15px; width: 65%; }
+        .card-profile-img { width: 55px; height: 55px; min-width: 55px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; background: #1e293b; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
         .card-profile-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .user-text-details { display: flex; flex-direction: column; gap: 4px; width: calc(100% - 62px); overflow: hidden; }
-        .user-name { font-size: 16px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: capitalize; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-        .user-uid { font-size: 10.5px; color: #94a3b8; font-family: monospace; font-weight: bold; background: rgba(0, 0, 0, 0.3); padding: 3px 8px; border-radius: 6px; display: inline-block; border: 1px dashed rgba(255,255,255,0.1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box; }
-        .card-right-wallet { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; max-width: 35%; }
-        .coins-display { font-size: 18px; font-weight: 900; color: var(--accent-gold); display: flex; align-items: center; gap: 5px; text-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
-        .ledger-btn { background: linear-gradient(135deg, var(--accent-green), #059669); color: white; border: none; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.4); transition: 0.2s; text-transform: uppercase; white-space: nowrap; }
+        .user-text-details { display: flex; flex-direction: column; gap: 6px; width: calc(100% - 70px); overflow: hidden; }
+        .user-name { font-size: 18px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: capitalize; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+        .user-uid { font-size: 11px; color: #94a3b8; font-family: monospace; font-weight: bold; background: rgba(0, 0, 0, 0.4); padding: 4px 10px; border-radius: 8px; display: inline-block; border: 1px dashed rgba(255,255,255,0.15); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box; }
+        .card-right-wallet { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; max-width: 35%; }
+        .coins-display { font-size: 22px; font-weight: 900; color: var(--accent-gold); display: flex; align-items: center; gap: 6px; text-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+        .ledger-btn { background: linear-gradient(135deg, var(--accent-green), #059669); color: white; border: none; padding: 10px 18px; border-radius: 20px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.4); transition: 0.2s; text-transform: uppercase; white-space: nowrap; letter-spacing: 0.5px; }
         .ledger-btn:active { transform: scale(0.95); }
 
         /* 🟢 Marquee Live Ticker */
-        .reward-ticker-wrapper { width: 90%; max-width: 420px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glow); border-radius: 12px; margin-top: 15px; margin-bottom: 5px; padding: 8px 12px; overflow: hidden; box-sizing: border-box; display: flex; align-items: center; gap: 10px; }
-        .ticker-badge-live { background: var(--accent-pink); color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; animation: flashBadge 1s infinite alternate; }
-        @keyframes flashBadge { 0% { opacity: 0.6; } 100% { opacity: 1; } }
+        .reward-ticker-wrapper { width: 92%; max-width: 460px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; margin-top: 20px; margin-bottom: 5px; padding: 10px 14px; overflow: hidden; box-sizing: border-box; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .ticker-badge-live { background: var(--accent-pink); color: white; font-size: 11px; font-weight: 900; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; animation: flashBadge 1s infinite alternate; letter-spacing: 1px; }
+        @keyframes flashBadge { 0% { opacity: 0.6; box-shadow: 0 0 0px var(--accent-pink); } 100% { opacity: 1; box-shadow: 0 0 10px var(--accent-pink); } }
         .marquee-container-box { overflow: hidden; white-space: nowrap; width: 100%; }
-        #livePayoutStream { display: inline-block; padding-left: 100%; font-size: 12px; font-weight: 600; color: var(--text-sub); white-space: nowrap; animation: smoothMarqueeLoop 20s linear infinite; }
-        #livePayoutStream span { margin-right: 35px; color: var(--accent-green); }
+        #livePayoutStream { display: inline-block; padding-left: 100%; font-size: 13.5px; font-weight: 700; color: var(--text-sub); white-space: nowrap; animation: smoothMarqueeLoop 20s linear infinite; }
+        #livePayoutStream span { margin-right: 40px; color: var(--accent-green); }
         @keyframes smoothMarqueeLoop { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        /* 🧩 SMART FLEX GRID */
-        .smart-flex-grid { display: flex; flex-wrap: wrap; gap: 12px; width: 90%; max-width: 420px; margin-top: 15px; }
-        .zone-card { flex: 1 1 calc(50% - 12px); min-width: 130px; background: var(--card-bg); padding: 18px 12px; border-radius: 18px; text-align: center; text-decoration: none; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; border: 1px solid var(--border-glow); position: relative; backdrop-filter: blur(10px); min-height: 110px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .zone-card:active { transform: scale(0.95); background: rgba(30, 41, 59, 0.9); }
-        .full-width-card { flex: 1 1 100%; min-height: 90px; flex-direction: row; gap: 15px; }
-        .zone-icon { font-size: 30px; margin-bottom: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
-        .full-width-card .zone-icon { margin-bottom: 0; font-size: 36px; }
-        .zone-card h3 { margin: 0 0 4px 0; font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .zone-card p { margin: 0; font-size: 10px; color: var(--text-sub); font-weight: 600; }
-        .zone-badge { position: absolute; top: -6px; right: -6px; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 20px; color: #fff; text-transform: uppercase; box-shadow: 0 2px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); }
+       /* 🧩 SMART FLEX GRID (Medium Sized, Lite Design) */
+        .smart-flex-grid { display: flex; flex-wrap: wrap; gap: 12px; width: 92%; max-width: 460px; margin-top: 15px; }
+        
+        .zone-card { flex: 1 1 calc(50% - 12px); min-width: 130px; background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%); padding: 16px 12px; border-radius: 20px; text-align: center; text-decoration: none; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; transition: 0.2s ease-in-out; border: 1.5px solid var(--border-glow); position: relative; backdrop-filter: blur(10px); min-height: 115px; box-sizing: border-box; box-shadow: 0 6px 18px rgba(0,0,0,0.25); border-top: 1.5px solid rgba(255,255,255,0.1); }
+        .zone-card:active { transform: scale(0.96); background: rgba(15, 23, 42, 0.95); }
+        
+        .full-width-card { flex: 1 1 100%; min-height: 85px; flex-direction: row; gap: 15px; text-align: left; align-items: center; justify-content: flex-start; padding: 16px 20px; }
+        
+        .zone-icon { font-size: 26px; margin-bottom: 8px; background: rgba(255,255,255,0.05); width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: inset 0 2px 8px rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.15); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .full-width-card .zone-icon { margin-bottom: 0; font-size: 28px; width: 55px; height: 55px; }
+        
+        .zone-card h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 900; letter-spacing: 0.3px; line-height: 1.2; text-shadow: 0 2px 3px rgba(0,0,0,0.4); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .zone-card p { margin: 0; font-size: 11px; color: var(--text-sub); font-weight: 700; line-height: 1.3; opacity: 0.9; }
+        
+        .zone-badge { position: absolute; top: -6px; right: -6px; font-size: 9px; font-weight: 900; padding: 4px 10px; border-radius: 15px; color: #fff; text-transform: uppercase; box-shadow: 0 3px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); letter-spacing: 0.5px; }
         .badge-hot { background: linear-gradient(135deg, #ef4444, #991b1b); }
         .badge-new { background: linear-gradient(135deg, #10b981, #047857); }
         .badge-pro { background: linear-gradient(135deg, #f59e0b, #b45309); }
 
         /* 📢 Admin Banner Ads */
-        .ad-banner { width: 90%; max-width: 420px; min-height: 54px; margin: 15px 0; border-radius: 14px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.3); backdrop-filter: blur(8px); z-index: 10; color: var(--text-sub); font-size: 11px; font-weight: bold; }
+        .ad-banner { width: 92%; max-width: 460px; min-height: 54px; margin: 20px 0; border-radius: 16px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.2); backdrop-filter: blur(8px); z-index: 10; color: var(--text-sub); font-size: 12px; font-weight: bold; }
 
         /* Section Titles */
-        .section-title { width: 90%; max-width: 420px; margin: 25px 0 5px 0; font-size: 15px; color: #fff; font-weight: 900; text-align: left; text-transform: uppercase; letter-spacing: 0.5px; border-left: 4px solid var(--accent-cyan); padding-left: 10px; }
+        .section-title { width: 92%; max-width: 460px; margin: 30px 0 5px 0; font-size: 17px; color: #fff; font-weight: 900; text-align: left; text-transform: uppercase; letter-spacing: 1px; border-left: 5px solid var(--accent-cyan); padding-left: 12px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
 
         /* 🎯 Daily Tasks Progress Card */
-        .task-progress-card { width: 100%; background: linear-gradient(135deg, rgba(22, 30, 49, 0.95), rgba(15, 23, 42, 0.95)); border-radius: 20px; padding: 20px; box-sizing: border-box; border: 1px solid var(--border-glow); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
-        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .progress-title { font-size: 14px; font-weight: 900; color: #fff; }
-        .progress-track { position: relative; background: rgba(0,0,0,0.5); height: 12px; border-radius: 8px; margin: 25px 0 15px 0; border: 1px solid rgba(255,255,255,0.1); }
-        .progress-fill { background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan), var(--accent-green)); height: 100%; width: 0%; border-radius: 8px; transition: width 0.5s ease-in-out; }
-        .milestone { position: absolute; top: -6px; width: 24px; height: 24px; background: #1e293b; border: 2px solid var(--text-sub); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--text-sub); transform: translateX(-50%); z-index: 2; transition: 0.3s; }
-        .milestone.achieved { border-color: var(--accent-green); background: var(--accent-green); color: #fff; box-shadow: 0 0 15px rgba(16,185,129,0.6); }
-        .milestone-tag { position: absolute; top: -24px; font-size: 10px; font-weight: 900; color: var(--accent-gold); white-space: nowrap; transform: translateX(-50%); }
+        .task-progress-card { width: 100%; background: linear-gradient(135deg, rgba(22, 30, 49, 0.95), rgba(15, 23, 42, 0.95)); border-radius: 24px; padding: 25px; box-sizing: border-box; border: 1px solid var(--border-glow); box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .progress-title { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+        .progress-track { position: relative; background: rgba(0,0,0,0.6); height: 14px; border-radius: 10px; margin: 30px 0 20px 0; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); }
+        .progress-fill { background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan), var(--accent-green)); height: 100%; width: 0%; border-radius: 10px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+        .milestone { position: absolute; top: -7px; width: 28px; height: 28px; background: #1e293b; border: 2px solid var(--text-sub); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: var(--text-sub); transform: translateX(-50%); z-index: 2; transition: 0.3s; }
+        .milestone.achieved { border-color: var(--accent-green); background: var(--accent-green); color: #fff; box-shadow: 0 0 20px rgba(16,185,129,0.8); }
+        .milestone-tag { position: absolute; top: -28px; font-size: 11px; font-weight: 900; color: var(--accent-gold); white-space: nowrap; transform: translateX(-50%); text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
         .checklist-container { margin-top: 10px; max-height: 0px; overflow-y: auto; overflow-x: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .checklist-container.expanded { max-height: 300px; margin-top: 15px; }
-        .task-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px 14px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .task-info { display: flex; align-items: center; gap: 10px; }
-        .task-checkbox { width: 18px; height: 18px; accent-color: var(--accent-green); pointer-events: none; }
-        .task-text { font-size: 12.5px; color: #e2e8f0; font-weight: 700; }
-        .task-reward { font-size: 11.5px; font-weight: 900; color: var(--accent-green); background: rgba(16,185,129,0.15); padding: 3px 8px; border-radius: 8px; }
-        .task-item.completed .task-text { text-decoration: line-through; color: var(--text-sub); }
-        .toggle-tasks-btn { width: 100%; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; color: var(--primary-blue); padding: 12px; font-size: 12px; font-weight: 900; cursor: pointer; margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; transition: 0.2s; }
+        .checklist-container.expanded { max-height: 350px; margin-top: 20px; }
+        .task-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 16px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
+        .task-item:hover { background: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.1); }
+        .task-info { display: flex; align-items: center; gap: 12px; }
+        .task-checkbox { width: 20px; height: 20px; accent-color: var(--accent-green); pointer-events: none; }
+        .task-text { font-size: 13.5px; color: #e2e8f0; font-weight: 800; letter-spacing: 0.3px; }
+        .task-reward { font-size: 12.5px; font-weight: 900; color: var(--accent-green); background: rgba(16,185,129,0.15); padding: 5px 12px; border-radius: 10px; border: 1px solid rgba(16,185,129,0.2); }
+        .task-item.completed .task-text { text-decoration: line-through; color: var(--text-sub); opacity: 0.7; }
+        .toggle-tasks-btn { width: 100%; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 14px; color: #60a5fa; padding: 15px; font-size: 13.5px; font-weight: 900; cursor: pointer; margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px; }
+        .toggle-tasks-btn:active { background: rgba(59, 130, 246, 0.2); transform: scale(0.98); }
 
         /* 🏆 Winners Podium */
-        .winners-podium-container { width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border-radius: 20px; padding: 20px; box-sizing: border-box; border: 1px solid rgba(168, 85, 247, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .podium-title { font-size: 16px; color: #fff; font-weight: 900; text-align: left; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
-        .winner-rank-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 13.5px; font-weight: bold; }
+        .winners-podium-container { width: 92%; max-width: 460px; margin-top: 25px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border-radius: 24px; padding: 25px; box-sizing: border-box; border: 1px solid rgba(168, 85, 247, 0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        .podium-title { font-size: 18px; color: #fff; font-weight: 900; text-align: left; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; letter-spacing: 1px; }
+        .winner-rank-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed rgba(255,255,255,0.15); font-size: 14.5px; font-weight: bold; }
         .winner-rank-row:last-child { border-bottom: none; }
-        .rank-user-info { display: flex; align-items: center; gap: 12px; color: #e2e8f0; }
-        .winner-prize-tag { background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05)); color: var(--accent-green); font-size: 12px; font-weight: 900; padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .rank-user-info { display: flex; align-items: center; gap: 14px; color: #f8fafc; font-size: 15px; }
+        .winner-prize-tag { background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05)); color: var(--accent-green); font-size: 13px; font-weight: 900; padding: 6px 15px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 4px 10px rgba(16,185,129,0.2); }
 
         /* 📱 Bottom Navigation Bar */
-        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: calc(100% - 30px); max-width: 460px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px; padding: 8px 12px; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(25px); box-shadow: 0 15px 40px rgba(0,0,0,0.7); z-index: 999; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-sub); text-decoration: none; font-size: 10px; font-weight: 800; padding: 8px; border-radius: 20px; transition: 0.3s; flex: 1; text-align: center; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 460px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; padding: 8px 12px; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(20px); box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 999; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-sub); text-decoration: none; font-size: 10px; font-weight: 800; padding: 8px; border-radius: 20px; transition: 0.25s; flex: 1; text-align: center; cursor: pointer; }
         .nav-item i { font-size: 18px; margin-bottom: 2px; }
-        .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(6, 182, 212, 0.2); }
+        .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); transform: translateY(-3px); box-shadow: 0 6px 15px rgba(6, 182, 212, 0.2); }
 
-        .premium-footer { margin-top: 25px; text-align: center; padding-bottom: 20px; font-size: 11px; color: var(--text-sub); }
-        .safe-disclaimer { font-size: 9.5px; color: #475569; text-align: center; margin-top: 10px; padding: 0 20px; line-height: 1.5; font-weight: 600; }
+        .premium-footer { margin-top: 35px; text-align: center; padding-bottom: 30px; font-size: 12px; color: var(--text-sub); }
+        .safe-disclaimer { font-size: 10px; color: #475569; text-align: center; margin-top: 15px; padding: 0 25px; line-height: 1.6; font-weight: 700; }
 
         /* ==============================================================
            MODALS & ALERTS 
@@ -144,14 +152,13 @@
                 let style = document.createElement('style');
                 let cssRules = "";
                 for(let key in toggles) {
-                    // String aur Boolean dono check kiya gaya hai taaki flash na ho
                     if(toggles[key] === false || toggles[key] === "false" || toggles[key] === 0) {
                         cssRules += "#" + key + " { display: none !important; } ";
                     }
                 }
                 if(cssRules !== "") {
                     style.innerHTML = cssRules;
-                    document.documentElement.appendChild(style); // Append very early
+                    document.documentElement.appendChild(style);
                 }
             }
         } catch(e) {}
@@ -163,9 +170,9 @@
     <div class="system-modal-overlay" id="globalOfflineWarningOverlay">
         <div class="offline-card">
             <div style="font-size:60px; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(239,68,68,0.5));">📡❌</div>
-            <h2 style="color: var(--accent-pink); font-size: 22px; font-weight: 900; text-transform: uppercase;">No Internet</h2>
-            <p style="color: var(--text-sub); font-size: 13.5px; margin: 10px 0 20px 0; font-weight:600;">Please enable Mobile Data or Wi-Fi to continue earning.</p>
-            <button class="offline-btn" onclick="window.location.reload()">Retry Connection</button>
+            <h2 style="color: var(--accent-pink); font-size: 22px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet</h2>
+            <p style="color: var(--text-sub); font-size: 13.5px; margin: 10px 0 20px 0; font-weight:600;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+            <button class="offline-btn" onclick="window.location.reload()" data-i18n="mod_retry">Retry Connection</button>
         </div>
     </div>
 
@@ -173,8 +180,8 @@
     <div class="system-modal-overlay" id="interceptorMaintenanceScreenOverlay">
         <div class="offline-card" style="border-color: var(--accent-cyan); box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);">
             <div style="font-size:60px; margin-bottom:15px;">🛠️</div>
-            <h3 style="font-weight:900; margin-bottom:10px; font-size: 24px; color:var(--accent-cyan); text-transform:uppercase;">Maintenance</h3>
-            <p style="font-size:14px; color:var(--text-sub); font-weight:600; line-height:1.5;">App is undergoing system updates.<br>We will be back live shortly.</p>
+            <h3 style="font-weight:900; margin-bottom:10px; font-size: 24px; color:var(--accent-cyan); text-transform:uppercase;" data-i18n="mod_maint">Maintenance</h3>
+            <p style="font-size:14px; color:var(--text-sub); font-weight:600; line-height:1.5;" data-i18n="mod_maint_d">App is undergoing system updates.<br>We will be back live shortly.</p>
         </div>
     </div>
 
@@ -182,10 +189,10 @@
     <div class="system-modal-overlay" id="urgentTaskModalOverlay">
         <div class="urgent-card">
             <div style="font-size: 55px; margin-bottom: 10px;">🚨</div>
-            <h3 id="urgentTaskTitle" style="color:#fca5a5; font-size:22px; font-weight:900; text-transform:uppercase;">Priority Alert!</h3>
-            <p id="urgentTaskDesc" style="color:#fecaca; font-size:14px; margin: 12px 0 20px 0; font-weight:600;">Read the admin instruction here.</p>
-            <button class="urgent-btn" id="urgentTaskBtn">PROCEED NOW</button>
-            <button id="btnSkipUrgentTask" style="background:transparent; border:none; color:#fca5a5; margin-top:15px; font-size:12px; cursor:pointer; text-decoration:underline; font-weight:bold;">Skip for now</button>
+            <h3 id="urgentTaskTitle" style="color:#fca5a5; font-size:22px; font-weight:900; text-transform:uppercase;" data-i18n="mod_urgent">Priority Alert!</h3>
+            <p id="urgentTaskDesc" style="color:#fecaca; font-size:14px; margin: 12px 0 20px 0; font-weight:600;" data-i18n="mod_urgent_d">Read the admin instruction here.</p>
+            <button class="urgent-btn" id="urgentTaskBtn" data-i18n="mod_proceed">PROCEED NOW</button>
+            <button id="btnSkipUrgentTask" style="background:transparent; border:none; color:#fca5a5; margin-top:15px; font-size:12px; cursor:pointer; text-decoration:underline; font-weight:bold;" data-i18n="mod_skip">Skip for now</button>
         </div>
     </div>
 
@@ -193,11 +200,11 @@
     <div class="system-modal-overlay" id="megaWinnerModalOverlay">
         <div class="mega-winner-card">
             <div style="font-size: 75px; margin-bottom: 15px; animation: bounceGlow 2s infinite;">🏆</div>
-            <h2 style="color:var(--accent-gold); font-size:26px; font-weight:900; text-transform:uppercase; margin-bottom: 10px; text-shadow: 0 0 15px rgba(245,158,11,0.5);">Congratulations!</h2>
-            <h3 id="megaWinnerTitle" style="color:#fff; font-size:18px; margin-bottom: 12px; font-weight:800;">Mega Drop Winner</h3>
-            <p id="megaWinnerDesc" style="color:var(--text-sub); font-size:14px; margin-bottom: 25px; font-weight:600; line-height:1.4;">You have been chosen as the lucky winner! Your reward has been added.</p>
+            <h2 style="color:var(--accent-gold); font-size:26px; font-weight:900; text-transform:uppercase; margin-bottom: 10px; text-shadow: 0 0 15px rgba(245,158,11,0.5);" data-i18n="mod_congrats">Congratulations!</h2>
+            <h3 id="megaWinnerTitle" style="color:#fff; font-size:18px; margin-bottom: 12px; font-weight:800;" data-i18n="mod_mega_win">Mega Drop Winner</h3>
+            <p id="megaWinnerDesc" style="color:var(--text-sub); font-size:14px; margin-bottom: 25px; font-weight:600; line-height:1.4;" data-i18n="mod_mega_win_d">You have been chosen as the lucky winner! Your reward has been added.</p>
             <div id="megaWinnerPrize" style="font-size: 32px; color: var(--accent-green); font-weight: 900; margin-bottom: 25px; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: 15px; border: 1px dashed var(--accent-green);">+5000 🪙</div>
-            <button onclick="document.getElementById('megaWinnerModalOverlay').style.display='none'" style="background: linear-gradient(135deg, var(--accent-gold), #b45309); color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 900; font-size: 15px; cursor: pointer; text-transform: uppercase; width: 100%;">CLAIM REWARD</button>
+            <button onclick="document.getElementById('megaWinnerModalOverlay').style.display='none'" style="background: linear-gradient(135deg, var(--accent-gold), #b45309); color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 900; font-size: 15px; cursor: pointer; text-transform: uppercase; width: 100%;" data-i18n="mod_claim">CLAIM REWARD</button>
         </div>
     </div>
 
@@ -205,15 +212,14 @@
     <div class="system-modal-overlay" id="notificationCenterModal">
         <div class="notif-center-card">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:15px;">
-                <h3 style="margin:0; color:var(--accent-cyan); font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-bell"></i> Alerts</h3>
-                
+                <h3 style="margin:0; color:var(--accent-cyan); font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-bell"></i> <span data-i18n="mod_alerts">Alerts</span></h3>
                 <div style="display:flex; gap:12px; align-items:center;">
-                    <button onclick="document.getElementById('notifListContainer').innerHTML='<div style=\'text-align:center; color:var(--text-sub); margin-top:30px; font-weight:bold;\'>Cleared...</div>'" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">Clear All</button>
+                    <button onclick="document.getElementById('notifListContainer').innerHTML='<div style=\'text-align:center; color:var(--text-sub); margin-top:30px; font-weight:bold;\'>Cleared...</div>'" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;" data-i18n="mod_clear">Clear All</button>
                     <button onclick="document.getElementById('notificationCenterModal').style.display='none'" style="background:rgba(255,255,255,0.1); border:none; width:32px; height:32px; border-radius:50%; font-size:14px; font-weight:bold; color:#fff; cursor:pointer; transition:0.2s;">✕</button>
                 </div>
             </div>
             <div id="notifListContainer" style="overflow-y:auto; flex-grow:1; display:flex; flex-direction:column; padding-right:5px;">
-                <div style="text-align:center; color:var(--text-sub); font-size:13.5px; margin-top:30px; font-weight:600;">No new updates...</div>
+                <div style="text-align:center; color:var(--text-sub); font-size:13.5px; margin-top:30px; font-weight:600;" data-i18n="mod_no_notif">No new updates...</div>
             </div>
         </div>
     </div>
@@ -253,11 +259,10 @@
         </div>
         <div class="card-right-wallet">
             <div class="coins-display">🪙 <span id="liveCoins" class="notranslate">0</span></div>
-            <button class="ledger-btn" id="mod_my_point1" onclick="window.location.href='my_point1.html'" data-i18n="withdraw_btn">My Reward</button>
+            <button class="ledger-btn" id="mod_my_point1" onclick="window.location.href='my_point1.html'" data-i18n="btn_reward">My Reward</button>
         </div>
     </div>
 
-    <!-- ⚡⚡ INSTANT USER DATA CACHE ⚡⚡ -->
     <script>
         let cCoins = localStorage.getItem("d_coins");
         let cName = localStorage.getItem("d_name");
@@ -274,34 +279,28 @@
 
     <!-- 🟢 Admin Marquee Ticker -->
     <div class="reward-ticker-wrapper">
-        <div class="ticker-badge-live">LIVE</div>
+        <div class="ticker-badge-live" data-i18n="lbl_live">LIVE</div>
         <div class="marquee-container-box">
             <div id="livePayoutStream">
-                <span>• Fetching Live Feed...</span>
+                <span data-i18n="fetching_feed">• Fetching Live Feed...</span>
             </div>
         </div>
     </div>
 
-    <!-- ==============================================
-         EXACT LAYOUT FROM DRAWINGS (100% Modulated)
-         ============================================== -->
-
-    <!-- IMAGE 3 (1000005067.jpg) Layout -->
+    <!-- IMAGE 3 Layout -->
     <div class="smart-flex-grid">
-        <a href="daily.html" class="zone-card" id="mod_daily">
-            <div class="zone-icon">🎁</div><h3 style="color:var(--accent-green);">Daily Check-in</h3><p>Earn Points</p>
+        <a href="daily.html" class="zone-card" id="mod_daily" style="border-color: rgba(16, 185, 129, 0.5);">
+            <div class="zone-icon">🎁</div><h3 style="color:var(--accent-green);" data-i18n="c_daily_t">Daily Check-in</h3><p data-i18n="c_daily_d">Earn Points</p>
         </a>
-        <a href="tasks.html" class="zone-card" id="mod_video_zone">
-            <div class="zone-icon">📺</div><h3 style="color:var(--primary-blue);">Video Offers</h3><p>Watch & earn</p>
+        <a href="tasks.html" class="zone-card" id="mod_video_zone" style="border-color: rgba(59, 130, 246, 0.5);">
+            <div class="zone-icon">📺</div><h3 style="color:var(--primary-blue);" data-i18n="c_video_t">Video Offers</h3><p data-i18n="c_video_d">Watch & earn</p>
         </a>
-        
         <a href="spin.html" class="zone-card full-width-card" id="mod_spin" style="border-color: var(--accent-purple);">
             <div class="zone-icon">🎡</div>
-            <div style="text-align: left;"><h3 style="color: var(--accent-purple);">Lucky Spin</h3><p>Spin the wheel daily to win</p></div>
+            <div style="text-align: left;"><h3 style="color: var(--accent-purple); font-size: 18px;" data-i18n="c_spin_t">Lucky Spin</h3><p data-i18n="c_spin_d" style="font-size:12.5px;">Spin the wheel daily to win</p></div>
         </a>
     </div>
 
-    <!-- 📢 Banner Ad Slot 1 (Default visible as placeholder) -->
     <div class="ad-banner" id="bannerSlot1">
         <script type="text/javascript">
             atOptions = { 'key' : 'a1c908f939a51bb1a404ef5926c0fa52', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -310,11 +309,11 @@
     </div>
 
     <div class="smart-flex-grid">
-        <a href="app.html" class="zone-card" id="mod_app_testing" style="border-color: rgba(233, 30, 99, 0.4);">
-            <div class="zone-icon">📱</div><h3 style="color:#e91e63;">App Discovery</h3><p>Test & Earn</p>
+        <a href="app.html" class="zone-card" id="mod_app_testing" style="border-color: rgba(233, 30, 99, 0.5);">
+            <div class="zone-icon">📱</div><h3 style="color:#e91e63;" data-i18n="c_app_t">App Discovery</h3><p data-i18n="c_app_d">Test & Earn</p>
         </a>
-        <a href="social.html" class="zone-card" id="mod_social_tasks" style="border-color: rgba(0, 150, 136, 0.4);">
-            <div class="zone-icon">💬</div><h3 style="color:#009688;">Social Tasks</h3><p>Follow & Share</p>
+        <a href="social.html" class="zone-card" id="mod_social_tasks" style="border-color: rgba(0, 150, 136, 0.5);">
+            <div class="zone-icon">💬</div><h3 style="color:#009688;" data-i18n="c_social_t">Social Tasks</h3><p data-i18n="c_social_d">Follow & Share</p>
         </a>
     </div>
 
@@ -323,11 +322,11 @@
     </div>
 
     <div class="smart-flex-grid">
-        <a href="offer2.html" class="zone-card" id="mod_offerwalls" style="border-color: rgba(168, 85, 247, 0.4);">
-            <div class="zone-icon">🤝</div><h3 style="color: var(--accent-purple);">Partner Tasks</h3><p>Surveys</p>
+        <a href="offer2.html" class="zone-card" id="mod_offerwalls" style="border-color: rgba(168, 85, 247, 0.5);">
+            <div class="zone-icon">🤝</div><h3 style="color: var(--accent-purple);" data-i18n="c_partner_t">Partner Tasks</h3><p data-i18n="c_partner_d">Surveys</p>
         </a>
-        <a href="premium.html" class="zone-card" id="mod_secure_cloud" style="border-color: rgba(245, 158, 11, 0.4);">
-            <div class="zone-icon">🚀</div><h3 style="color: var(--accent-gold);">Premium Ads</h3><p>High Payouts</p>
+        <a href="premium.html" class="zone-card" id="mod_secure_cloud" style="border-color: rgba(245, 158, 11, 0.5);">
+            <div class="zone-icon">🚀</div><h3 style="color: var(--accent-gold);" data-i18n="c_prem_ads_t">Premium Ads</h3><p data-i18n="c_prem_ads_d">High Payouts</p>
         </a>
     </div>
 
@@ -339,27 +338,27 @@
     </div>
 
     <div class="smart-flex-grid">
-        <a href="video_tasks.html" class="zone-card" id="mod_smart_tasks" style="border-color: rgba(6, 182, 212, 0.4);">
-            <div class="zone-icon">🎯</div><h3 style="color: var(--accent-cyan);">Premium Task Zone</h3><p>Smart Validate</p>
+        <a href="video_tasks.html" class="zone-card" id="mod_smart_tasks" style="border-color: rgba(6, 182, 212, 0.5);">
+            <div class="zone-icon">🎯</div><h3 style="color: var(--accent-cyan);" data-i18n="c_prem_task_t">Premium Task Zone</h3><p data-i18n="c_prem_task_d">Smart Validate</p>
         </a>
-        <a href="special_missions.html" class="zone-card" id="mod_patner_offer" style="border-color: rgba(16, 185, 129, 0.4);">
-            <div class="zone-icon">🔥</div><h3 style="color: var(--accent-green);">Partner Offers</h3><p>Explore more</p>
+        <a href="special_missions.html" class="zone-card" id="mod_patner_offer" style="border-color: rgba(16, 185, 129, 0.5);">
+            <div class="zone-icon">🔥</div><h3 style="color: var(--accent-green);" data-i18n="c_partner_off_t">Partner Offers</h3><p data-i18n="c_partner_off_d">Explore more</p>
         </a>
     </div>
 
-    <!-- IMAGE 2 (1000005066.jpg) Layout -->
+    <!-- IMAGE 2 Layout -->
     <div class="smart-flex-grid">
-        <a href="adgem.html" class="zone-card" id="mod_adgem">
-            <div class="zone-icon">🎮</div><h3 style="color: var(--primary-blue);">AdGem Games</h3><p>Play & earn</p>
+        <a href="adgem.html" class="zone-card" id="mod_adgem" style="border-color: rgba(59, 130, 246, 0.5);">
+            <div class="zone-icon">🎮</div><h3 style="color: var(--primary-blue);" data-i18n="c_adgem_t">AdGem Games</h3><p data-i18n="c_adgem_d">Play & earn</p>
         </a>
-        <a href="greeting.html" class="zone-card" id="mod_greeting">
-            <div class="zone-icon">🎉</div><h3 style="color: var(--accent-gold);">Festive Wishes</h3><p>Share happiness</p>
+        <a href="greeting.html" class="zone-card" id="mod_greeting" style="border-color: rgba(245, 158, 11, 0.5);">
+            <div class="zone-icon">🎉</div><h3 style="color: var(--accent-gold);" data-i18n="c_festive_t">Festive Wishes</h3><p data-i18n="c_festive_d">Share happiness</p>
         </a>
-        <a href="offers.html" class="zone-card" id="mod_mega_offers">
-            <div class="zone-icon">💎</div><h3 style="color:var(--accent-pink);">Premium Offers</h3><p>Exclusive deals</p>
+        <a href="offers.html" class="zone-card" id="mod_mega_offers" style="border-color: rgba(239, 68, 68, 0.5);">
+            <div class="zone-icon">💎</div><h3 style="color:var(--accent-pink);" data-i18n="c_prem_off_t">Premium Offers</h3><p data-i18n="c_prem_off_d">Exclusive deals</p>
         </a>
-        <a href="bonus.html" class="zone-card" id="mod_extra_bonus">
-            <div class="zone-icon">🎁</div><h3 style="color:var(--accent-purple);">Extra Bonus</h3><p>Claim today</p>
+        <a href="bonus.html" class="zone-card" id="mod_extra_bonus" style="border-color: rgba(168, 85, 247, 0.5);">
+            <div class="zone-icon">🎁</div><h3 style="color:var(--accent-purple);" data-i18n="c_extra_t">Extra Bonus</h3><p data-i18n="c_extra_d">Claim today</p>
         </a>
     </div>
 
@@ -371,11 +370,11 @@
     </div>
 
     <div class="smart-flex-grid">
-        <a href="article.html" class="zone-card" id="mod_read_articles">
-            <div class="zone-icon">📰</div><h3 style="color: var(--accent-cyan);">Read Articles</h3><p>Knowledge pays</p>
+        <a href="article.html" class="zone-card" id="mod_read_articles" style="border-color: rgba(6, 182, 212, 0.5);">
+            <div class="zone-icon">📰</div><h3 style="color: var(--accent-cyan);" data-i18n="c_read_t">Read Articles</h3><p data-i18n="c_read_d">Knowledge pays</p>
         </a>
-        <a href="hourly_reward.html" class="zone-card" id="mod_hourly">
-            <div class="zone-icon">🔑</div><h3 style="color: var(--accent-pink);">Hourly Reward</h3><p>Free bonus keys</p>
+        <a href="hourly_reward.html" class="zone-card" id="mod_hourly" style="border-color: rgba(239, 68, 68, 0.5);">
+            <div class="zone-icon">🔑</div><h3 style="color: var(--accent-pink);" data-i18n="c_hourly_t">Hourly Reward</h3><p data-i18n="c_hourly_d">Free bonus keys</p>
         </a>
     </div>
 
@@ -384,20 +383,17 @@
     </div>
 
     <div class="smart-flex-grid">
-        <a href="mystery_gift_box.html" class="zone-card" id="mod_surprise_box">
-            <div class="zone-icon">📦</div><h3 style="color: var(--accent-gold);">Surprise Rewards</h3><p>Open box</p>
+        <a href="mystery_gift_box.html" class="zone-card" id="mod_surprise_box" style="border-color: rgba(245, 158, 11, 0.5);">
+            <div class="zone-icon">📦</div><h3 style="color: var(--accent-gold);" data-i18n="c_surprise_t">Surprise Rewards</h3><p data-i18n="c_surprise_d">Open box</p>
         </a>
-        
-        <!-- 🔥 FIX 2: WEEKLY DROP ID FIXED -->
-        <a href="surprise.html" class="zone-card" id="mod_mega_drop">
-            <div class="zone-icon">🏆</div><h3 style="color: var(--primary-blue);">Weekly Drop</h3><p>Mega coins</p>
+        <a href="surprise.html" class="zone-card" id="mod_mega_drop" style="border-color: rgba(59, 130, 246, 0.5);">
+            <div class="zone-icon">🏆</div><h3 style="color: var(--primary-blue);" data-i18n="c_weekly_t">Weekly Drop</h3><p data-i18n="c_weekly_d">Mega coins</p>
         </a>
-        
-        <a href="web_explorer.html" class="zone-card" id="mod_web_tasks">
-            <div class="zone-icon">🌐</div><h3 style="color: var(--text-sub);">Web Tasks</h3><p>Browse internet</p>
+        <a href="web_explorer.html" class="zone-card" id="mod_web_tasks" style="border-color: rgba(148, 163, 184, 0.5);">
+            <div class="zone-icon">🌐</div><h3 style="color: var(--text-sub);" data-i18n="c_web_t">Web Tasks</h3><p data-i18n="c_web_d">Browse internet</p>
         </a>
-        <a href="tap_rewards.html" class="zone-card" id="mod_scratch">
-            <div class="zone-icon">🧩</div><h3 style="color: var(--accent-green);">Smart Task Wall</h3><p>Scratch & Win</p>
+        <a href="tap_rewards.html" class="zone-card" id="mod_scratch" style="border-color: rgba(16, 185, 129, 0.5);">
+            <div class="zone-icon">🧩</div><h3 style="color: var(--accent-green);" data-i18n="c_smart_wall_t">Smart Task Wall</h3><p data-i18n="c_smart_wall_d">Scratch & Win</p>
         </a>
     </div>
 
@@ -409,11 +405,11 @@
     </div>
 
     <div class="smart-flex-grid">
-        <a href="special_missions.html" class="zone-card" id="mod_premium_web_task">
-            <div class="zone-icon">🌟</div><h3 style="color: var(--accent-gold);">Premium Web Task</h3><p>High yielding</p>
+        <a href="special_missions.html" class="zone-card" id="mod_premium_web_task" style="border-color: rgba(245, 158, 11, 0.5);">
+            <div class="zone-icon">🌟</div><h3 style="color: var(--accent-gold);" data-i18n="c_prem_task_t">Premium Web Task</h3><p data-i18n="c_prem_task_d">High yielding</p>
         </a>
-        <a href="task_wall.html" class="zone-card" id="mod_app_offers">
-            <div class="zone-icon">📲</div><h3 style="color: var(--accent-pink);">App Offers</h3><p>smart task</p>
+        <a href="task_wall.html" class="zone-card" id="mod_app_offers" style="border-color: rgba(239, 68, 68, 0.5);">
+            <div class="zone-icon">📲</div><h3 style="color: var(--accent-pink);" data-i18n="c_app_off_t">App Offers</h3><p data-i18n="c_app_off_d">Smart task</p>
         </a>
     </div>
 
@@ -421,7 +417,7 @@
     <div class="smart-flex-grid" id="mod_daily_progress">
         <div class="task-progress-card">
             <div class="progress-header">
-                <div class="progress-title">Daily Activities Done <span id="doneCount">0</span>/15</div>
+                <div class="progress-title"><span data-i18n="prog_title">Daily Activities Done</span> <span id="doneCount">0</span>/15</div>
             </div>
             <div class="progress-track">
                 <div class="progress-fill" id="taskProgressFill"></div>
@@ -430,7 +426,7 @@
                 <div class="milestone" style="left: 100%;" id="mNode3"><div class="milestone-tag">+100🪙</div>8</div>
             </div>
             <div class="checklist-container" id="dailyChecklistHTML"></div>
-            <button class="toggle-tasks-btn" id="btnToggleDailyChecklistMenu" onclick="toggleDailyTasksChecklistDisplay()">Show Tasks List ▼</button>
+            <button class="toggle-tasks-btn" id="btnToggleDailyChecklistMenu" onclick="toggleDailyTasksChecklistDisplay()" data-i18n="prog_show">Show Tasks List ▼</button>
         </div>
     </div>
 
@@ -438,20 +434,20 @@
         <ins style="width:320px;height:50px" data-width="320" data-height="50" class="a7cdb2f2905" data-domain="//data527.click" data-affquery="/16fb19ffc50f6235e355/7cdb2f2905/?placementName=Dudo"><script src="//data527.click/js/responsive.js" async></script></ins>
     </div>
 
-    <!-- IMAGE 1 (1000005068.jpg) Layout -->
-    <div class="section-title">⚡ Quick Tasks</div>
+    <!-- IMAGE 1 Layout -->
+    <div class="section-title" data-i18n="sec_quick">⚡ Quick Tasks</div>
     <div class="smart-flex-grid">
-        <a href="cpx.html" class="zone-card" id="mod_cpx">
-            <div class="zone-icon">📊</div><h3 style="color: #fff;">CPX Surveys</h3><p style="color: var(--accent-green);">Up to 50 🪙</p>
+        <a href="cpx.html" class="zone-card" id="mod_cpx" style="border-color: rgba(255, 255, 255, 0.3);">
+            <div class="zone-icon">📊</div><h3 style="color: #fff;" data-i18n="c_cpx_t">CPX Surveys</h3><p style="color: var(--accent-green);" data-i18n="c_cpx_d">Up to 50 🪙</p>
         </a>
-        <a href="milestones.html" class="zone-card" id="mod_tap_rewards">
-            <div class="zone-icon">⚡</div><h3 style="color: #fff;">Instant Point</h3><p style="color: var(--accent-green);">Instant 5 🪙</p>
+        <a href="milestones.html" class="zone-card" id="mod_tap_rewards" style="border-color: rgba(255, 255, 255, 0.3);">
+            <div class="zone-icon">⚡</div><h3 style="color: #fff;" data-i18n="c_instant_t">Instant Point</h3><p style="color: var(--accent-green);" data-i18n="c_instant_d">Instant 5 🪙</p>
         </a>
-        <a href="timewall.html" class="zone-card" id="mod_timewall">
-            <div class="zone-icon">⏱️</div><h3 style="color: #fff;">Time Wall</h3><p style="color: var(--accent-green);">Easy Tasks</p>
+        <a href="timewall.html" class="zone-card" id="mod_timewall" style="border-color: rgba(255, 255, 255, 0.3);">
+            <div class="zone-icon">⏱️</div><h3 style="color: #fff;" data-i18n="c_timewall_t">Time Wall</h3><p style="color: var(--accent-green);" data-i18n="c_timewall_d">Easy Tasks</p>
         </a>
-        <a href="tasks.html" class="zone-card" id="mod_mini_tasks">
-            <div class="zone-icon">📋</div><h3 style="color: #fff;">Tasks</h3><p style="color: var(--accent-green);">High Paying</p>
+        <a href="tasks.html" class="zone-card" id="mod_mini_tasks" style="border-color: rgba(255, 255, 255, 0.3);">
+            <div class="zone-icon">📋</div><h3 style="color: #fff;" data-i18n="c_tasks_t">Tasks</h3><p style="color: var(--accent-green);" data-i18n="c_tasks_d">High Paying</p>
         </a>
     </div>
 
@@ -462,91 +458,383 @@
         <script type="text/javascript" src="https://www.highperformanceformat.com/a1c908f939a51bb1a404ef5926c0fa52/invoke.js"></script>
     </div>
 
-    <div class="section-title">🎮 Game Zone</div>
+    <div class="section-title" data-i18n="sec_games">🎮 Game Zone</div>
     <div class="smart-flex-grid">
-        <a href="1v1.html" class="zone-card" id="mod_1v1">
-            <div class="zone-icon">⚔️</div><h3 style="color: var(--accent-gold);">Point Battle</h3><p>Clash to win</p>
+        <a href="1v1.html" class="zone-card" id="mod_1v1" style="border-color: rgba(245, 158, 11, 0.5);">
+            <div class="zone-icon">⚔️</div><h3 style="color: var(--accent-gold);" data-i18n="c_1v1_t">Point Battle</h3><p data-i18n="c_1v1_d">Clash to win</p>
         </a>
-        <a href="1v1_ga.html" class="zone-card" id="mod_rps">
-            <div class="zone-icon">✊🖐️✌️</div><h3 style="color: var(--accent-cyan);">Rock Paper Scissor</h3><p>Classic game</p>
+        <a href="1v1_ga.html" class="zone-card" id="mod_rps" style="border-color: rgba(6, 182, 212, 0.5);">
+    <div class="zone-icon" style="font-size: 15px; letter-spacing: -1px; white-space: nowrap;">✊🖐️✌️</div>
+    <h3 style="color: var(--accent-cyan);" data-i18n="c_rps_t">Rock Paper Scissor</h3>
+    <p data-i18n="c_rps_d">Classic game</p>
+</a>
+        <a href="game.html" class="zone-card" id="mod_arcade" style="border-color: rgba(239, 68, 68, 0.5);">
+            <div class="zone-icon">🎯</div><h3 style="color: var(--accent-pink);" data-i18n="c_square_t">Square Dash</h3><p data-i18n="c_square_d">Play & earn</p>
         </a>
-        <a href="game.html" class="zone-card" id="mod_arcade">
-            <div class="zone-icon">🎯</div><h3 style="color: var(--accent-pink);">Square Dash</h3><p>Play & earn</p>
-        </a>
-        <a href="pool.html" class="zone-card" id="mod_pool">
-            <div class="zone-icon">🎱</div><h3 style="color: var(--accent-green);">4-Player Pool</h3><p>Multiplayer</p>
+        <a href="pool.html" class="zone-card" id="mod_pool" style="border-color: rgba(16, 185, 129, 0.5);">
+            <div class="zone-icon">🎱</div><h3 style="color: var(--accent-green);" data-i18n="c_pool_t">4-Player Pool</h3><p data-i18n="c_pool_d">Multiplayer</p>
         </a>
         <a href="esports_zone.html" class="zone-card full-width-card" id="mod_esports" style="border-color: var(--accent-purple);">
             <div class="zone-icon">🪖</div>
-            <div style="text-align: left;"><h3 style="color: var(--accent-purple);">Esports Zone</h3><p>Join Arena Matches & Tournaments</p></div>
+            <div style="text-align: left;"><h3 style="color: var(--accent-purple); font-size: 18px;" data-i18n="c_esports_t">Esports Zone</h3><p data-i18n="c_esports_d" style="font-size:12.5px;">Join Arena Matches & Tournaments</p></div>
         </a>
     </div>
 
     <!-- 🏆 BIG LEADERBOARD BUTTON & WINNER PODIUM -->
     <div class="smart-flex-grid">
-        <a href="leaderboard.html" class="zone-card full-width-card" id="mod_leaderboard_btn" style="border-color: var(--accent-gold); background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0,0,0,0.5));">
+        <a href="leaderboard.html" class="zone-card full-width-card" id="mod_leaderboard_btn" style="border-color: var(--accent-gold); background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(0,0,0,0.6));">
             <div class="zone-icon">🏆</div>
             <div style="text-align: left;">
-                <h3 style="color: var(--accent-gold); font-size: 18px; text-transform:uppercase;">Leaderboard</h3>
-                <p>Check Top Players Global Ranking</p>
+                <h3 style="color: var(--accent-gold); font-size: 19px; text-transform:uppercase;" data-i18n="c_leaderboard_t">Leaderboard</h3>
+                <p data-i18n="c_leaderboard_d" style="font-size:12.5px;">Check Top Players Global Ranking</p>
             </div>
         </a>
     </div>
 
     <!-- Winners Podium -->
     <div class="winners-podium-container" id="anchor_retention">
-        <h3 class="podium-title">Winners</h3>
+        <h3 class="podium-title" data-i18n="sec_winners"><i class="fa-solid fa-crown" style="color:var(--accent-gold);"></i> Winners</h3>
         <div style="display:flex; flex-direction:column;">
-            <div class="winner-rank-row"><div class="rank-user-info"><span>🥇</span> <div><b>1st:</b> <span id="lblWinnerRank1Name">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank1Prize">--</div></div>
-            <div class="winner-rank-row"><div class="rank-user-info"><span>🥈</span> <div><b>2nd:</b> <span id="lblWinnerRank2Name">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank2Prize">--</div></div>
-            <div class="winner-rank-row"><div class="rank-user-info"><span>🥉</span> <div><b>3rd:</b> <span id="lblWinnerRank3Name">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank3Prize">--</div></div>
+            <div class="winner-rank-row"><div class="rank-user-info"><span>🥇</span> <div><b data-i18n="win_1st">1st:</b> <span id="lblWinnerRank1Name" data-i18n="win_loading">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank1Prize">--</div></div>
+            <div class="winner-rank-row"><div class="rank-user-info"><span>🥈</span> <div><b data-i18n="win_2nd">2nd:</b> <span id="lblWinnerRank2Name" data-i18n="win_loading">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank2Prize">--</div></div>
+            <div class="winner-rank-row"><div class="rank-user-info"><span>🥉</span> <div><b data-i18n="win_3rd">3rd:</b> <span id="lblWinnerRank3Name" data-i18n="win_loading">Loading...</span></div></div><div class="winner-prize-tag" id="lblWinnerRank3Prize">--</div></div>
         </div>
     </div>
     
-
     <!-- 🔥 ADMIN DYNAMIC CARDS CONTAINER -->
     <div id="dynamicAdminCardsContainer" class="smart-flex-grid" style="display: none;"></div>
 
     <div class="premium-footer notranslate">
         <p>Powered by <span style="color:var(--accent-green); font-weight:900;">Shubham</span> || <span style="color:var(--primary-blue); font-weight:900;">Postpriya</span></p>
-        <div class="safe-disclaimer">Disclaimer: This is a Reward-based App. Users collect virtual coins by completing tasks/playing games and can redeem them for digital game currency. This app does not offer real money gambling.</div>
+        <div class="safe-disclaimer" data-i18n="disclaimer">Disclaimer: This is a Reward-based App. Users collect virtual coins by completing tasks/playing games and can redeem them for digital game currency. This app does not offer real money gambling.</div>
     </div>
 
     <!-- 📱 5-BUTTON FLOATING BOTTOM NAVIGATION BAR -->
     <div class="bottom-nav" id="bottomNavContainer">
         <!-- Default Fallback -->
-        <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
-        <a href="tasks.html" class="nav-item"><i class="fa-solid fa-fire"></i><span>Offerwall</span></a>
-        <a href="daily.html" class="nav-item"><i class="fa-solid fa-gift"></i><span>Daily</span></a>
-        <a href="leaderboard.html" class="nav-item"><i class="fa-solid fa-trophy"></i><span>Leaders</span></a>
-        <a href="my_point1.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span>Vault</span></a>
+        <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span data-i18n="nav_home">Home</span></a>
+        <a href="tasks.html" class="nav-item"><i class="fa-solid fa-fire"></i><span data-i18n="nav_offerwall">Offerwall</span></a>
+        <a href="daily.html" class="nav-item"><i class="fa-solid fa-gift"></i><span data-i18n="nav_daily">Daily</span></a>
+        <a href="leaderboard.html" class="nav-item"><i class="fa-solid fa-trophy"></i><span data-i18n="nav_leaders">Leaders</span></a>
+        <a href="my_point1.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span data-i18n="nav_vault">Vault</span></a>
     </div>
-    <!-- 🚨 PRIORITY URGENT TASK POPUP (ADMIN CONTROLLED) -->
+
+    <!-- 🚨 PRIORITY URGENT TASK POPUP -->
     <div class="overlay" id="urgentTaskOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; backdrop-filter:blur(8px); justify-content:center; align-items:center;">
-        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border:2px solid #ef4444; border-radius:20px; padding:30px 20px; width:85%; max-width:350px; text-align:center; box-shadow:0 10px 40px rgba(239, 68, 68, 0.4); animation: popIn 0.5s ease;">
-            <div style="font-size:50px; margin-bottom:10px; color:#ef4444; filter: drop-shadow(0 4px 10px rgba(239,68,68,0.5));">
+        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border:2px solid #ef4444; border-radius:24px; padding:35px 20px; width:85%; max-width:380px; text-align:center; box-shadow:0 15px 50px rgba(239, 68, 68, 0.4); animation: popIn 0.5s ease;">
+            <div style="font-size:55px; margin-bottom:15px; color:#ef4444; filter: drop-shadow(0 4px 15px rgba(239,68,68,0.6));">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h2 id="urgentTaskTitle" style="color:#ef4444; margin:0 0 10px 0; font-weight:900; text-transform:uppercase;">IMPORTANT NOTICE</h2>
-            <p id="urgentTaskDesc" style="color:#e2e8f0; font-size:14px; font-weight:600; margin:0 0 20px 0; line-height:1.5;">Please read this urgent message.</p>
-            
-            <button id="urgentTaskBtn" style="background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; border:none; padding:14px 25px; border-radius:12px; font-weight:900; font-size:14px; cursor:pointer; width:100%; box-shadow:0 6px 15px rgba(239, 68, 68, 0.4); text-transform:uppercase; transition:0.2s;">TAKE ACTION</button>
-            
-            <button id="urgentTaskCloseBtn" style="background:transparent; color:#94a3b8; border:none; margin-top:15px; font-size:12px; font-weight:bold; cursor:pointer; text-decoration:underline;">Close & Continue</button>
+            <h2 id="urgentTaskTitle" style="color:#ef4444; margin:0 0 12px 0; font-weight:900; text-transform:uppercase; font-size:22px;">IMPORTANT NOTICE</h2>
+            <p id="urgentTaskDesc" style="color:#e2e8f0; font-size:14.5px; font-weight:600; margin:0 0 25px 0; line-height:1.6;">Please read this urgent message.</p>
+            <button id="urgentTaskBtn" style="background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; border:none; padding:16px 25px; border-radius:14px; font-weight:900; font-size:15px; cursor:pointer; width:100%; box-shadow:0 8px 20px rgba(239, 68, 68, 0.4); text-transform:uppercase; transition:0.2s;" data-i18n="mod_proceed">TAKE ACTION</button>
+            <button id="urgentTaskCloseBtn" style="background:transparent; color:#94a3b8; border:none; margin-top:18px; font-size:13px; font-weight:bold; cursor:pointer; text-decoration:underline;" data-i18n="mod_skip">Close & Continue</button>
         </div>
     </div>
     <style>@keyframes popIn { from {transform: scale(0.7); opacity: 0;} to {transform: scale(1); opacity: 1;} }</style>
-<!-- 🏆 HOME SCREEN WINNER POPUP -->
-    <div class="overlay" id="homeWinnerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; backdrop-filter:blur(5px); justify-content:center; align-items:center;">
-        <div style="background:linear-gradient(135deg, #1e1b4b, #4c1d95); border:2px solid #facc15; border-radius:20px; padding:30px 20px; width:85%; max-width:340px; text-align:center; box-shadow:0 10px 40px rgba(250,204,21,0.4); animation: popIn 0.5s ease;">
-            <div style="font-size:55px; margin-bottom:10px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🎉👑🥳</div>
-            <h2 style="color:#facc15; margin:0 0 10px 0; font-weight:900; text-transform:uppercase;">CONGRATULATIONS!</h2>
-            <p style="color:#e9d5ff; font-size:14px; font-weight:600; margin:0 0 15px 0;" id="homeWinnerText">You won the Drop!</p>
-            <div style="background:rgba(0,0,0,0.3); border:1px dashed #facc15; padding:15px; border-radius:12px; font-size:28px; font-weight:900; color:#10b981; margin-bottom:20px; text-shadow:0 0 10px rgba(16,185,129,0.4);" id="homeWinnerPrize">+0 COINS</div>
-            <button style="background:linear-gradient(135deg, #facc15, #d97706); color:#000; border:none; padding:14px 25px; border-radius:50px; font-weight:900; font-size:14px; cursor:pointer; width:100%; box-shadow:0 6px 15px rgba(250,204,21,0.4);" onclick="closeHomeWinnerPopup()">CLAIM REWARD 🪙</button>
+
+    <!-- 🏆 HOME SCREEN WINNER POPUP -->
+    <div class="overlay" id="homeWinnerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; backdrop-filter:blur(8px); justify-content:center; align-items:center;">
+        <div style="background:linear-gradient(135deg, #1e1b4b, #4c1d95); border:2px solid #facc15; border-radius:24px; padding:35px 20px; width:85%; max-width:380px; text-align:center; box-shadow:0 15px 50px rgba(250,204,21,0.5); animation: popIn 0.5s ease;">
+            <div style="font-size:65px; margin-bottom:15px; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.6));">🎉👑🥳</div>
+            <h2 style="color:#facc15; margin:0 0 12px 0; font-weight:900; text-transform:uppercase; font-size:26px;" data-i18n="mod_congrats">CONGRATULATIONS!</h2>
+            <p style="color:#e9d5ff; font-size:15px; font-weight:700; margin:0 0 18px 0;" id="homeWinnerText">You won the Drop!</p>
+            <div style="background:rgba(0,0,0,0.4); border:1px dashed #facc15; padding:18px; border-radius:16px; font-size:32px; font-weight:900; color:#10b981; margin-bottom:25px; text-shadow:0 0 15px rgba(16,185,129,0.5);" id="homeWinnerPrize">+0 COINS</div>
+            <button style="background:linear-gradient(135deg, #facc15, #d97706); color:#000; border:none; padding:16px 25px; border-radius:50px; font-weight:900; font-size:16px; cursor:pointer; width:100%; box-shadow:0 8px 25px rgba(250,204,21,0.5);" onclick="closeHomeWinnerPopup()" data-i18n="mod_claim">CLAIM REWARD 🪙</button>
         </div>
     </div>
-    <style>@keyframes popIn { from{transform:scale(0.7); opacity:0;} to{transform:scale(1); opacity:1;} }</style>
+    
+    <!-- 🌐 MULTI-LANGUAGE ENGINE -->
+    <!-- 🌐 100% FULL MULTI-LANGUAGE ENGINE (NO CUTS) -->
+    <script>
+        const langData = {
+            "en": { 
+                "nav_home": "Home", "nav_offerwall": "Offerwall", "nav_daily": "Daily", "nav_leaders": "Leaders", "nav_vault": "Vault",
+                "btn_reward": "My Reward", "lbl_live": "LIVE", "fetching_feed": "Fetching Live Feed...",
+                "sec_quick": "⚡ Quick Tasks", "sec_games": "🎮 Game Zone", "sec_winners": "Winners",
+                
+                "c_daily_t": "Daily Check-in", "c_daily_d": "Earn Points",
+                "c_video_t": "Video Offers", "c_video_d": "Watch & earn",
+                "c_spin_t": "Lucky Spin", "c_spin_d": "Spin the wheel daily to win",
+                "c_app_t": "App Discovery", "c_app_d": "Test & Earn",
+                "c_social_t": "Social Tasks", "c_social_d": "Follow & Share",
+                "c_partner_t": "Partner Tasks", "c_partner_d": "Surveys",
+                "c_prem_ads_t": "Premium Ads", "c_prem_ads_d": "High Payouts",
+                "c_prem_task_t": "Premium Task Zone", "c_prem_task_d": "Smart Validate",
+                "c_partner_off_t": "Partner Offers", "c_partner_off_d": "Explore more",
+                "c_adgem_t": "AdGem Games", "c_adgem_d": "Play & earn",
+                "c_festive_t": "Festive Wishes", "c_festive_d": "Share happiness",
+                "c_prem_off_t": "Premium Offers", "c_prem_off_d": "Exclusive deals",
+                "c_extra_t": "Extra Bonus", "c_extra_d": "Claim today",
+                "c_read_t": "Read Articles", "c_read_d": "Knowledge pays",
+                "c_hourly_t": "Hourly Reward", "c_hourly_d": "Free bonus keys",
+                "c_surprise_t": "Surprise Rewards", "c_surprise_d": "Open box",
+                "c_weekly_t": "Weekly Drop", "c_weekly_d": "Mega coins",
+                "c_web_t": "Web Tasks", "c_web_d": "Browse internet",
+                "c_smart_wall_t": "Smart Task Wall", "c_smart_wall_d": "Scratch & Win",
+                "c_app_off_t": "App Offers", "c_app_off_d": "Smart task",
+                "c_cpx_t": "CPX Surveys", "c_cpx_d": "Up to 50 🪙",
+                "c_instant_t": "Instant Point", "c_instant_d": "Instant 5 🪙",
+                "c_timewall_t": "Time Wall", "c_timewall_d": "Easy Tasks",
+                "c_tasks_t": "Tasks", "c_tasks_d": "High Paying",
+                "c_1v1_t": "Point Battle", "c_1v1_d": "Clash to win",
+                "c_rps_t": "Rock Paper Scissor", "c_rps_d": "Classic game",
+                "c_square_t": "Square Dash", "c_square_d": "Play & earn",
+                "c_pool_t": "4-Player Pool", "c_pool_d": "Multiplayer",
+                "c_esports_t": "Esports Zone", "c_esports_d": "Join Arena Matches & Tournaments",
+                "c_leaderboard_t": "Leaderboard", "c_leaderboard_d": "Check Top Players Global Ranking",
+                
+                "prog_title": "Daily Activities Done", "prog_show": "Show Tasks List ▼", "prog_hide": "Hide Tasks List ▲",
+                "win_1st": "1st:", "win_2nd": "2nd:", "win_3rd": "3rd:", "win_loading": "Loading...",
+                
+                "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection",
+                "mod_maint": "Maintenance", "mod_maint_d": "App is undergoing system updates. We will be back live shortly.",
+                "mod_urgent": "Priority Alert!", "mod_urgent_d": "Read the admin instruction here.", "mod_proceed": "PROCEED NOW", "mod_skip": "Skip for now",
+                "mod_congrats": "Congratulations!", "mod_mega_win": "Mega Drop Winner", "mod_mega_win_d": "You have been chosen as the lucky winner! Your reward has been added.", "mod_claim": "CLAIM REWARD",
+                "mod_alerts": "Alerts", "mod_clear": "Clear All", "mod_no_notif": "No new updates...",
+                "disclaimer": "Disclaimer: This is a Reward-based App. Users collect virtual coins by completing tasks/playing games and can redeem them for digital game currency. This app does not offer real money gambling."
+            },
+            "hi": { 
+                "nav_home": "होम", "nav_offerwall": "ऑफरवॉल", "nav_daily": "दैनिक", "nav_leaders": "लीडर्स", "nav_vault": "वॉलेट",
+                "btn_reward": "मेरे रिवॉर्ड", "lbl_live": "लाइव", "fetching_feed": "लाइव फीड प्राप्त कर रहा है...",
+                "sec_quick": "⚡ क्विक टास्क", "sec_games": "🎮 गेम ज़ोन", "sec_winners": "विजेता",
+                
+                "c_daily_t": "दैनिक चेक-इन", "c_daily_d": "पॉइंट्स कमाएं", "c_video_t": "वीडियो ऑफर्स", "c_video_d": "देखें और कमाएं",
+                "c_spin_t": "लकी स्पिन", "c_spin_d": "रोजाना पहिया घुमाएं", "c_app_t": "ऐप डिस्कवरी", "c_app_d": "टेस्ट करें",
+                "c_social_t": "सोशल टास्क", "c_social_d": "फॉलो और शेयर", "c_partner_t": "पार्टनर टास्क", "c_partner_d": "सर्वेक्षण",
+                "c_prem_ads_t": "प्रीमियम एड्स", "c_prem_ads_d": "बड़ी कमाई", "c_prem_task_t": "प्रीमियम टास्क", "c_prem_task_d": "स्मार्ट कार्य",
+                "c_partner_off_t": "पार्टनर ऑफर्स", "c_partner_off_d": "और देखें", "c_adgem_t": "AdGem गेम्स", "c_adgem_d": "खेलें और कमाएं",
+                "c_festive_t": "फेस्टिव विश", "c_festive_d": "खुशियाँ बांटें", "c_prem_off_t": "प्रीमियम ऑफर्स", "c_prem_off_d": "एक्सक्लूसिव डील",
+                "c_extra_t": "एक्स्ट्रा बोनस", "c_extra_d": "आज ही लें", "c_read_t": "आर्टिकल पढ़ें", "c_read_d": "ज्ञान बढ़ाएं",
+                "c_hourly_t": "हर घंटे रिवॉर्ड", "c_hourly_d": "फ्री बोनस", "c_surprise_t": "सरप्राइज बॉक्स", "c_surprise_d": "बॉक्स खोलें",
+                "c_weekly_t": "वीकली ड्रॉप", "c_weekly_d": "मेगा कॉइन्स", "c_web_t": "वेब टास्क", "c_web_d": "इंटरनेट ब्राउज़",
+                "c_smart_wall_t": "स्मार्ट टास्क वॉल", "c_smart_wall_d": "स्क्रैच कार्ड", "c_app_off_t": "ऐप ऑफर्स", "c_app_off_d": "स्मार्ट टास्क",
+                "c_cpx_t": "CPX सर्वे", "c_cpx_d": "50 🪙 तक", "c_instant_t": "इंस्टेंट पॉइंट", "c_instant_d": "तुरंत 5 🪙",
+                "c_timewall_t": "टाइम वॉल", "c_timewall_d": "आसान टास्क", "c_tasks_t": "टास्क", "c_tasks_d": "ज्यादा कमाई",
+                "c_1v1_t": "पॉइंट बैटल", "c_1v1_d": "जीतने के लिए खेलें", "c_rps_t": "रॉक पेपर सीज़र", "c_rps_d": "क्लासिक गेम",
+                "c_square_t": "स्क्वायर डैश", "c_square_d": "खेलें और जीतें", "c_pool_t": "4-प्लेयर पूल", "c_pool_d": "मल्टीप्लेयर",
+                "c_esports_t": "ई-स्पोर्ट्स ज़ोन", "c_esports_d": "टूर्नामेंट खेलें", "c_leaderboard_t": "लीडरबोर्ड", "c_leaderboard_d": "टॉप प्लेयर रैंकिंग",
+                
+                "prog_title": "आज के टास्क पूरे किए", "prog_show": "टास्क लिस्ट देखें ▼", "prog_hide": "टास्क लिस्ट छुपाएं ▲",
+                "win_1st": "पहला:", "win_2nd": "दूसरा:", "win_3rd": "तीसरा:", "win_loading": "लोड हो रहा है...",
+                
+                "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें",
+                "mod_maint": "मेंटेनेंस", "mod_maint_d": "ऐप अपडेट हो रहा है। हम जल्द वापस आएंगे।",
+                "mod_urgent": "जरूरी सूचना!", "mod_urgent_d": "एडमिन का निर्देश यहाँ पढ़ें।", "mod_proceed": "अभी जाएँ", "mod_skip": "बाद में",
+                "mod_congrats": "बधाई हो!", "mod_mega_win": "मेगा ड्रॉप विनर", "mod_mega_win_d": "आप विजेता चुने गए हैं! आपका इनाम जोड़ दिया गया है।", "mod_claim": "इनाम लें",
+                "mod_alerts": "अलर्ट्स", "mod_clear": "सभी हटाएँ", "mod_no_notif": "कोई नया अपडेट नहीं...",
+                "disclaimer": "डिस्क्लेमर: यह एक रिवॉर्ड ऐप है। यूज़र्स टास्क पूरे करके कॉइन्स कमाते हैं। इसमें असली पैसे का जुआ नहीं होता।"
+            },
+            "bn": { 
+                "nav_home": "হোম", "nav_offerwall": "অফারওয়াল", "nav_daily": "দৈনিক", "nav_leaders": "লিডারস", "nav_vault": "ভল্ট",
+                "btn_reward": "আমার পুরস্কার", "lbl_live": "লাইভ", "fetching_feed": "লাইভ ফিড আসছে...",
+                "sec_quick": "⚡ কুইক টাস্ক", "sec_games": "🎮 গেম জোন", "sec_winners": "বিজয়ী",
+                
+                "c_daily_t": "দৈনিক চেক-ইন", "c_daily_d": "পয়েন্ট আয় করুন", "c_video_t": "ভিডিও অফার", "c_video_d": "দেখুন ও আয় করুন",
+                "c_spin_t": "লাকি স্পিন", "c_spin_d": "প্রতিদিন ঘোরান", "c_app_t": "অ্যাপ আবিষ্কার", "c_app_d": "টেস্ট করুন",
+                "c_social_t": "সোশ্যাল টাস্ক", "c_social_d": "ফলো করুন", "c_partner_t": "পার্টনার টাস্ক", "c_partner_d": "জরিপ",
+                "c_prem_ads_t": "প্রিমিয়াম অ্যাডস", "c_prem_ads_d": "বেশি আয়", "c_prem_task_t": "প্রিমিয়াম টাস্ক জোন", "c_prem_task_d": "স্মার্ট কাজ",
+                "c_partner_off_t": "পার্টনার অফার", "c_partner_off_d": "আরও দেখুন", "c_adgem_t": "AdGem গেমস", "c_adgem_d": "খেলুন ও আয় করুন",
+                "c_festive_t": "উৎসবের শুভেচ্ছা", "c_festive_d": "আনন্দ ভাগ করুন", "c_prem_off_t": "প্রিমিয়াম অফার", "c_prem_off_d": "এক্সক্লুসিভ ডিল",
+                "c_extra_t": "অতিরিক্ত বোনাস", "c_extra_d": "আজই নিন", "c_read_t": "প্রবন্ধ পড়ুন", "c_read_d": "জ্ঞান বাড়ান",
+                "c_hourly_t": "ঘণ্টার পুরস্কার", "c_hourly_d": "ফ্রি বোনাস", "c_surprise_t": "সারপ্রাইজ বক্স", "c_surprise_d": "বক্স খুলুন",
+                "c_weekly_t": "উইকলি ড্র", "c_weekly_d": "মেগা কয়েন", "c_web_t": "ওয়েব টাস্ক", "c_web_d": "ব্রাউজ করুন",
+                "c_smart_wall_t": "স্মার্ট টাস্ক", "c_smart_wall_d": "স্ক্র্যাচ করুন", "c_app_off_t": "অ্যাপ অফার", "c_app_off_d": "স্মার্ট টাস্ক",
+                "c_cpx_t": "CPX জরিপ", "c_cpx_d": "৫০ 🪙 পর্যন্ত", "c_instant_t": "তাৎক্ষণিক পয়েন্ট", "c_instant_d": "সাথে সাথে ৫ 🪙",
+                "c_timewall_t": "টাইম ওয়াল", "c_timewall_d": "সহজ কাজ", "c_tasks_t": "টাস্ক", "c_tasks_d": "বেশি আয়",
+                "c_1v1_t": "পয়েন্ট ব্যাটল", "c_1v1_d": "জেতার জন্য খেলুন", "c_rps_t": "রক পেপার সিজার", "c_rps_d": "ক্লাসিক গেম",
+                "c_square_t": "স্কয়ার ড্যাশ", "c_square_d": "খেলুন ও জিতুন", "c_pool_t": "৪-প্লেয়ার পুল", "c_pool_d": "মাল্টিপ্লেয়ার",
+                "c_esports_t": "ই-স্পোর্টস জোন", "c_esports_d": "টুর্নামেন্ট খেলুন", "c_leaderboard_t": "লিডারবোর্ড", "c_leaderboard_d": "শীর্ষ খেলোয়াড়দের র‍্যাঙ্কিং",
+                
+                "prog_title": "আজকের কাজ সম্পন্ন", "prog_show": "তালিকা দেখুন ▼", "prog_hide": "তালিকা লুকান ▲",
+                "win_1st": "১ম:", "win_2nd": "২য়:", "win_3rd": "৩য়:", "win_loading": "লোড হচ্ছে...",
+                
+                "mod_no_net": "ইন্টারনেট নেই", "mod_no_net_d": "দয়া করে মোবাইল ডেটা বা ওয়াই-ফাই চালু করুন।", "mod_retry": "পুনরায় চেষ্টা করুন",
+                "mod_maint": "রক্ষণাবেক্ষণ", "mod_maint_d": "অ্যাপ আপডেট হচ্ছে। আমরা শীঘ্রই ফিরে আসব।",
+                "mod_urgent": "জরুরী সতর্কতা!", "mod_urgent_d": "এখানে এডমিনের নির্দেশ পড়ুন।", "mod_proceed": "এগিয়ে যান", "mod_skip": "এখন এড়িয়ে যান",
+                "mod_congrats": "অভিনন্দন!", "mod_mega_win": "মেগা ড্র বিজয়ী", "mod_mega_win_d": "আপনি বিজয়ী হয়েছেন! আপনার পুরস্কার যোগ করা হয়েছে।", "mod_claim": "পুরস্কার নিন",
+                "mod_alerts": "সতর্কতা", "mod_clear": "সব মুছুন", "mod_no_notif": "নতুন কোনো আপডেট নেই...",
+                "disclaimer": "দাবিত্যাগ: এটি একটি পুরস্কার-ভিত্তিক অ্যাপ। কোনো বাস্তব জুয়া খেলা হয় না।"
+            },
+            "te": { 
+                "nav_home": "హోమ్", "nav_offerwall": "ఆఫర్‌వాల్", "nav_daily": "రోజువారీ", "nav_leaders": "లీడర్స్", "nav_vault": "వాలెట్",
+                "btn_reward": "నా రివార్డ్", "lbl_live": "లైవ్", "fetching_feed": "లైవ్ ఫీడ్ వస్తోంది...",
+                "sec_quick": "⚡ క్విక్ టాస్క్‌లు", "sec_games": "🎮 గేమ్ జోన్", "sec_winners": "విజేతలు",
+                
+                "c_daily_t": "చెక్-ఇన్", "c_daily_d": "పాయింట్లు పొందండి", "c_video_t": "వీడియో ఆఫర్‌లు", "c_video_d": "చూడండి & పొందండి",
+                "c_spin_t": "లక్కీ స్పిన్", "c_spin_d": "రోజూ తిప్పండి", "c_app_t": "యాప్ డిస్కవరీ", "c_app_d": "పరీక్షించండి",
+                "c_social_t": "సామాజిక పనులు", "c_social_d": "ఫాలో అవ్వండి", "c_partner_t": "భాగస్వామి పనులు", "c_partner_d": "సర్వేలు",
+                "c_prem_ads_t": "ప్రీమియం యాడ్స్", "c_prem_ads_d": "అధిక చెల్లింపులు", "c_prem_task_t": "ప్రీమియం టాస్క్", "c_prem_task_d": "స్మార్ట్ పని",
+                "c_partner_off_t": "పార్టనర్ ఆఫర్‌లు", "c_partner_off_d": "మరిన్ని చూడండి", "c_adgem_t": "AdGem గేమ్స్", "c_adgem_d": "ఆడండి & సంపాదించండి",
+                "c_festive_t": "పండుగ శుభాకాంక్షలు", "c_festive_d": "సంతోషం పంచండి", "c_prem_off_t": "ప్రీమియం ఆఫర్‌లు", "c_prem_off_d": "ప్రత్యేక డీల్స్",
+                "c_extra_t": "అదనపు బోనస్", "c_extra_d": "ఇప్పుడే పొందండి", "c_read_t": "ఆర్టికల్స్ చదవండి", "c_read_d": "జ్ఞానం పెంచుకోండి",
+                "c_hourly_t": "గంటకోసారి రివార్డ్", "c_hourly_d": "ఉచిత బోనస్", "c_surprise_t": "సర్ప్రైజ్ బాక్స్", "c_surprise_d": "బాక్స్ తెరవండి",
+                "c_weekly_t": "వీక్లీ డ్రాప్", "c_weekly_d": "మెగా కాయిన్స్", "c_web_t": "వెబ్ టాస్క్‌లు", "c_web_d": "బ్రౌజ్ చేయండి",
+                "c_smart_wall_t": "స్మార్ట్ టాస్క్", "c_smart_wall_d": "స్క్రాచ్ చేయండి", "c_app_off_t": "యాప్ ఆఫర్‌లు", "c_app_off_d": "స్మార్ట్ టాస్క్",
+                "c_cpx_t": "CPX సర్వేలు", "c_cpx_d": "50 🪙 వరకు", "c_instant_t": "తక్షణ పాయింట్", "c_instant_d": "వెంటనే 5 🪙",
+                "c_timewall_t": "టైమ్ వాల్", "c_timewall_d": "సులభమైన పనులు", "c_tasks_t": "టాస్క్‌లు", "c_tasks_d": "ఎక్కువ సంపాదన",
+                "c_1v1_t": "పాయింట్ బ్యాటిల్", "c_1v1_d": "గెలవడానికి ఆడండి", "c_rps_t": "రాక్ పేపర్ సిజర్", "c_rps_d": "క్లాసిక్ గేమ్",
+                "c_square_t": "స్క్వేర్ డాష్", "c_square_d": "ఆడండి & గెలవండి", "c_pool_t": "4-ప్లేయర్ పూల్", "c_pool_d": "మల్టీప్లేయర్",
+                "c_esports_t": "ఈస్పోర్ట్స్ జోన్", "c_esports_d": "టోర్నమెంట్ ఆడండి", "c_leaderboard_t": "లీడర్‌బోర్డ్", "c_leaderboard_d": "టాప్ ప్లేయర్ ర్యాంకింగ్",
+                
+                "prog_title": "రోజువారీ పనులు పూర్తయ్యాయి", "prog_show": "జాబితా చూడండి ▼", "prog_hide": "జాబితా దాచండి ▲",
+                "win_1st": "1వ:", "win_2nd": "2వ:", "win_3rd": "3వ:", "win_loading": "లోడ్ అవుతోంది...",
+                
+                "mod_no_net": "ఇంటర్నెట్ లేదు", "mod_no_net_d": "దయచేసి మొబైల్ డేటా లేదా Wi-Fi ఆన్ చేయండి.", "mod_retry": "మళ్లీ ప్రయత్నించండి",
+                "mod_maint": "నిర్వహణ", "mod_maint_d": "యాప్ నవీకరించబడుతోంది. త్వరలో తిరిగి వస్తాము.",
+                "mod_urgent": "ముఖ్యమైన గమనిక!", "mod_urgent_d": "అడ్మిన్ సూచనను ఇక్కడ చదవండి.", "mod_proceed": "కొనసాగండి", "mod_skip": "తరువాత",
+                "mod_congrats": "అభినందనలు!", "mod_mega_win": "మెగా డ్రాప్ విజేత", "mod_mega_win_d": "మీరు విజేతగా ఎంపికయ్యారు! రివార్డ్ జోడించబడింది.", "mod_claim": "రివార్డ్ పొందండి",
+                "mod_alerts": "నోటిఫికేషన్లు", "mod_clear": "అన్నీ క్లియర్ చేయండి", "mod_no_notif": "కొత్త అప్‌డేట్‌లు లేవు...",
+                "disclaimer": "నిరాకరణ: ఇది రివార్డ్ యాప్. నిజమైన డబ్బు జూదం లేదు."
+            },
+            "mr": { 
+                "nav_home": "होम", "nav_offerwall": "ऑफरवॉल", "nav_daily": "दैनिक", "nav_leaders": "लीडर्स", "nav_vault": "वॉलेट",
+                "btn_reward": "माझे बक्षीस", "lbl_live": "लाईव्ह", "fetching_feed": "लाईव्ह फीड घेत आहे...",
+                "sec_quick": "⚡ जलद टास्क", "sec_games": "🎮 गेम झोन", "sec_winners": "विजेते",
+                
+                "c_daily_t": "दैनिक चेक-इन", "c_daily_d": "पॉइंट्स मिळवा", "c_video_t": "व्हिडिओ ऑफर", "c_video_d": "पहा आणि मिळवा",
+                "c_spin_t": "लकी स्पिन", "c_spin_d": "दररोज फिरवा", "c_app_t": "अॅप शोधा", "c_app_d": "चाचणी करा",
+                "c_social_t": "सोशल टास्क", "c_social_d": "फॉलो करा", "c_partner_t": "पार्टनर टास्क", "c_partner_d": "सर्वेक्षण",
+                "c_prem_ads_t": "प्रीमियम जाहिराती", "c_prem_ads_d": "जास्त कमाई", "c_prem_task_t": "प्रीमियम टास्क झोन", "c_prem_task_d": "स्मार्ट काम",
+                "c_partner_off_t": "पार्टनर ऑफर", "c_partner_off_d": "अधिक पहा", "c_adgem_t": "AdGem गेम्स", "c_adgem_d": "खेळा आणि कमवा",
+                "c_festive_t": "सणांच्या शुभेच्छा", "c_festive_d": "आनंद वाटा", "c_prem_off_t": "प्रीमियम ऑफर", "c_prem_off_d": "खास डील",
+                "c_extra_t": "अतिरिक्त बोनस", "c_extra_d": "आजच मिळवा", "c_read_t": "लेख वाचा", "c_read_d": "ज्ञान वाढवा",
+                "c_hourly_t": "तासाचा बोनस", "c_hourly_d": "मोफत बोनस", "c_surprise_t": "सरप्राईज बॉक्स", "c_surprise_d": "बॉक्स उघडा",
+                "c_weekly_t": "साप्ताहिक ड्रॉप", "c_weekly_d": "मेगा कॉइन्स", "c_web_t": "वेब टास्क", "c_web_d": "ब्राउझ करा",
+                "c_smart_wall_t": "स्मार्ट टास्क", "c_smart_wall_d": "स्क्रॅच करा", "c_app_off_t": "अॅप ऑफर", "c_app_off_d": "स्मार्ट टास्क",
+                "c_cpx_t": "CPX सर्वेक्षण", "c_cpx_d": "50 🪙 पर्यंत", "c_instant_t": "इन्स्टंट पॉईंट", "c_instant_d": "लगेच 5 🪙",
+                "c_timewall_t": "टाइम वॉल", "c_timewall_d": "सोपे टास्क", "c_tasks_t": "टास्क", "c_tasks_d": "जास्त कमाई",
+                "c_1v1_t": "पॉइंट बॅटल", "c_1v1_d": "जिंकण्यासाठी खेळा", "c_rps_t": "रॉक पेपर सिझर", "c_rps_d": "क्लासिक गेम",
+                "c_square_t": "स्क्वेअर डॅश", "c_square_d": "खेळा आणि जिंका", "c_pool_t": "4-प्लेअर पूल", "c_pool_d": "मल्टीप्लेयर",
+                "c_esports_t": "ई-स्पोर्ट्स झोन", "c_esports_d": "टूर्नामेंट खेळा", "c_leaderboard_t": "लीडरबोर्ड", "c_leaderboard_d": "टॉप प्लेयर रँकिंग",
+                
+                "prog_title": "आजचे टास्क पूर्ण", "prog_show": "टास्क लिस्ट पहा ▼", "prog_hide": "टास्क लिस्ट लपवा ▲",
+                "win_1st": "पहिले:", "win_2nd": "दुसरे:", "win_3rd": "तिसरे:", "win_loading": "लोड होत आहे...",
+                
+                "mod_no_net": "इंटरनेट नाही", "mod_no_net_d": "कृपया मोबाईल डेटा किंवा वाय-फाय चालू करा.", "mod_retry": "पुन्हा प्रयत्न करा",
+                "mod_maint": "देखभाल", "mod_maint_d": "अॅप अपडेट होत आहे. आम्ही लवकरच परत येऊ.",
+                "mod_urgent": "महत्त्वाची सूचना!", "mod_urgent_d": "अॅडमिनची सूचना येथे वाचा.", "mod_proceed": "पुढे जा", "mod_skip": "नंतर",
+                "mod_congrats": "अभिनंदन!", "mod_mega_win": "मेगा ड्रॉप विजेता", "mod_mega_win_d": "तुम्ही विजेता म्हणून निवडले गेला आहात! तुमचे बक्षीस जोडले गेले आहे.", "mod_claim": "बक्षीस मिळवा",
+                "mod_alerts": "सूचना", "mod_clear": "सर्व काढा", "mod_no_notif": "कोणतेही नवीन अपडेट नाही...",
+                "disclaimer": "अस्वीकरण: हे बक्षीस अॅप आहे. यात खरा जुगार नाही."
+            },
+            "ur": { 
+                "nav_home": "ہوم", "nav_offerwall": "آفر وال", "nav_daily": "روزانہ", "nav_leaders": "لیڈرز", "nav_vault": "والٹ",
+                "btn_reward": "میرا انعام", "lbl_live": "لائیو", "fetching_feed": "لائیو فیڈ لا رہا ہے...",
+                "sec_quick": "⚡ فوری ٹاسک", "sec_games": "🎮 گیم زون", "sec_winners": "فاتحین",
+                
+                "c_daily_t": "روزانہ حاضری", "c_daily_d": "پوائنٹس کمائیں", "c_video_t": "ویڈیو آفرز", "c_video_d": "دیکھیں اور کمائیں",
+                "c_spin_t": "لکی اسپن", "c_spin_d": "پہیہ گھمائیں", "c_app_t": "ایپ دریافت", "c_app_d": "ٹیسٹ کریں",
+                "c_social_t": "سوشل ٹاسک", "c_social_d": "فالو کریں", "c_partner_t": "پارٹنر ٹاسک", "c_partner_d": "سروے",
+                "c_prem_ads_t": "پریمیم اشتہارات", "c_prem_ads_d": "بڑی کمائی", "c_prem_task_t": "پریمیم ٹاسک زون", "c_prem_task_d": "سمارٹ کام",
+                "c_partner_off_t": "پارٹنر آفرز", "c_partner_off_d": "مزید دیکھیں", "c_adgem_t": "AdGem گیمز", "c_adgem_d": "کھیلیں اور کمائیں",
+                "c_festive_t": "تہوار کی مبارکباد", "c_festive_d": "خوشیاں بانٹیں", "c_prem_off_t": "پریمیم آفرز", "c_prem_off_d": "خصوصی ڈیلز",
+                "c_extra_t": "اضافی بونس", "c_extra_d": "آج ہی لیں", "c_read_t": "مضامین پڑھیں", "c_read_d": "علم بڑھائیں",
+                "c_hourly_t": "ہر گھنٹے انعام", "c_hourly_d": "مفت بونس", "c_surprise_t": "سرپرائز باکس", "c_surprise_d": "باکس کھولیں",
+                "c_weekly_t": "ہفتہ وار ڈراپ", "c_weekly_d": "میگا کوائنز", "c_web_t": "ویب ٹاسک", "c_web_d": "براؤز کریں",
+                "c_smart_wall_t": "سمارٹ ٹاسک", "c_smart_wall_d": "اسکریچ کریں", "c_app_off_t": "ایپ آفرز", "c_app_off_d": "سمارٹ ٹاسک",
+                "c_cpx_t": "CPX سروے", "c_cpx_d": "50 🪙 تک", "c_instant_t": "فوری پوائنٹ", "c_instant_d": "فوری 5 🪙",
+                "c_timewall_t": "ٹائم وال", "c_timewall_d": "آسان ٹاسک", "c_tasks_t": "ٹاسک", "c_tasks_d": "زیادہ کمائی",
+                "c_1v1_t": "پوائنٹ بیٹل", "c_1v1_d": "جیتنے کے لیے کھیلیں", "c_rps_t": "راک پیپر سیزر", "c_rps_d": "کلاسک گیم",
+                "c_square_t": "اسکوائر ڈیش", "c_square_d": "کھیلیں اور جیتیں", "c_pool_t": "4-پلیئر پول", "c_pool_d": "ملٹی پلیئر",
+                "c_esports_t": "ای اسپورٹس زون", "c_esports_d": "ٹورنامنٹ کھیلیں", "c_leaderboard_t": "لیڈر بورڈ", "c_leaderboard_d": "ٹاپ پلیئر رینکنگ",
+                
+                "prog_title": "آج کے ٹاسک مکمل", "prog_show": "ٹاسک لسٹ دیکھیں ▼", "prog_hide": "ٹاسک لسٹ چھپائیں ▲",
+                "win_1st": "پہلا:", "win_2nd": "دوسرا:", "win_3rd": "تیسرا:", "win_loading": "لوڈ ہو رہا ہے...",
+                
+                "mod_no_net": "انٹرنیٹ نہیں ہے", "mod_no_net_d": "براہ کرم موبائل ڈیٹا یا وائی فائی آن کریں۔", "mod_retry": "دوبارہ کوشش کریں",
+                "mod_maint": "دیکھ بھال", "mod_maint_d": "ایپ اپ ڈیٹ ہو رہی ہے۔ ہم جلد واپس آئیں گے۔",
+                "mod_urgent": "اہم اطلاع!", "mod_urgent_d": "ایڈمن کی ہدایت یہاں پڑھیں۔", "mod_proceed": "آگے بڑھیں", "mod_skip": "بعد میں",
+                "mod_congrats": "مبارک ہو!", "mod_mega_win": "میگا ڈراپ فاتح", "mod_mega_win_d": "آپ کو فاتح منتخب کیا گیا ہے! آپ کا انعام شامل کر دیا گیا ہے۔", "mod_claim": "انعام لیں",
+                "mod_alerts": "اطلاعات", "mod_clear": "سب ہٹائیں", "mod_no_notif": "کوئی نئی اپ ڈیٹ نہیں...",
+                "disclaimer": "دستبرداری: یہ ایک انعام پر مبنی ایپ ہے۔ کوئی حقیقی جوا نہیں ہے۔"
+            },
+            "ta": { 
+                "nav_home": "முகப்பு", "nav_offerwall": "சலுகைகள்", "nav_daily": "தினசரி", "nav_leaders": "தலைவர்கள்", "nav_vault": "பணப்பை",
+                "btn_reward": "வெகுமதிகள்", "lbl_live": "நேரலை", "fetching_feed": "நேரலை தரவு...",
+                "sec_quick": "⚡ விரைவான பணிகள்", "sec_games": "🎮 விளையாட்டு", "sec_winners": "வெற்றியாளர்கள்",
+                "c_daily_t": "தினசரி செக்-இன்", "c_daily_d": "புள்ளிகள் பெற", "c_video_t": "வீடியோ சலுகைகள்", "c_video_d": "பாருங்கள்", "c_spin_t": "லக்கி ஸ்பின்", "c_spin_d": "சுழற்றி வெல்லுங்கள்", "c_app_t": "ஆப் தேடல்", "c_app_d": "சோதனை", "c_social_t": "சமூக பணிகள்", "c_social_d": "பகிரவும்", "c_partner_t": "கூட்டாளர் பணிகள்", "c_partner_d": "ஆய்வுகள்", "c_prem_ads_t": "பிரீமியம் விளம்பரங்கள்", "c_prem_ads_d": "அதிக வருமானம்", "c_prem_task_t": "பிரீமியம் பணிகள்", "c_prem_task_d": "ஸ்மார்ட் பணிகள்", "c_partner_off_t": "கூட்டாளர் சலுகைகள்", "c_partner_off_d": "மேலும் காண்க", "c_adgem_t": "AdGem கேம்ஸ்", "c_adgem_d": "விளையாடுங்கள்", "c_festive_t": "பண்டிகை வாழ்த்துக்கள்", "c_festive_d": "மகிழ்ச்சியைப் பகிரவும்", "c_prem_off_t": "பிரீமியம் சலுகைகள்", "c_prem_off_d": "சிறப்பு சலுகைகள்", "c_extra_t": "கூடுதல் போனஸ்", "c_extra_d": "இன்றே பெறுங்கள்", "c_read_t": "கட்டுரைகள் படிக்க", "c_read_d": "அறிவு வளரும்", "c_hourly_t": "மணிநேர வெகுமதி", "c_hourly_d": "இலவச போனஸ்", "c_surprise_t": "ஆச்சரியம் பெட்டி", "c_surprise_d": "பெட்டியைத் திறக்கவும்", "c_weekly_t": "வாராந்திர டிராப்", "c_weekly_d": "மெகா நாணயங்கள்", "c_web_t": "வலைப் பணிகள்", "c_web_d": "இணையத்தில் தேடுங்கள்", "c_smart_wall_t": "ஸ்மார்ட் டாஸ்க்", "c_smart_wall_d": "கீறல் அட்டை", "c_app_off_t": "ஆப் சலுகைகள்", "c_app_off_d": "ஸ்மார்ட் பணி", "c_cpx_t": "CPX ஆய்வுகள்", "c_cpx_d": "50 🪙 வரை", "c_instant_t": "உடனடி புள்ளி", "c_instant_d": "உடனடியாக 5 🪙", "c_timewall_t": "டைம் வால்", "c_timewall_d": "எளிய பணிகள்", "c_tasks_t": "பணிகள்", "c_tasks_d": "அதிக வருமானம்", "c_1v1_t": "பாயிண்ட் போர்", "c_1v1_d": "வெல்லப் போராடுங்கள்", "c_rps_t": "ராக் பேப்பர் சிசர்", "c_rps_d": "கிளாசிக் கேம்", "c_square_t": "ஸ்கொயர் டேஷ்", "c_square_d": "விளையாடுங்கள்", "c_pool_t": "4-நபர் பூல்", "c_pool_d": "மல்டிபிளேயர்", "c_esports_t": "இ-ஸ்போர்ட்ஸ்", "c_esports_d": "போட்டிகளில் சேரவும்", "c_leaderboard_t": "லீடர்போர்டு", "c_leaderboard_d": "தரவரிசை",
+                "prog_title": "இன்றைய பணிகள் முடிந்தது", "prog_show": "பட்டியலைக் காட்டு ▼", "prog_hide": "பட்டியலை மறை ▲",
+                "win_1st": "1வது:", "win_2nd": "2வது:", "win_3rd": "3வது:", "win_loading": "ஏற்றுகிறது...",
+                "mod_no_net": "இணையம் இல்லை", "mod_no_net_d": "மொபைல் டேட்டா அல்லது வைஃபை ஆன் செய்யவும்.", "mod_retry": "மீண்டும் முயற்சி செய்", "mod_maint": "பராமரிப்பு", "mod_maint_d": "பராமரிப்பு பணி நடக்கிறது. விரைவில் வருவோம்.", "mod_urgent": "முக்கிய அறிவிப்பு!", "mod_urgent_d": "நிர்வாகியின் வழிமுறைகளைப் படிக்கவும்.", "mod_proceed": "தொடரவும்", "mod_skip": "தவிர்க்கவும்", "mod_congrats": "வாழ்த்துக்கள்!", "mod_mega_win": "மெகா டிராப் வெற்றியாளர்", "mod_mega_win_d": "நீங்கள் வெற்றியாளர்! உங்கள் வெகுமதி சேர்க்கப்பட்டது.", "mod_claim": "வெகுமதியைப் பெறுங்கள்", "mod_alerts": "அறிவிப்புகள்", "mod_clear": "அனைத்தையும் அழி", "mod_no_notif": "புதிய அறிவிப்புகள் இல்லை...",
+                "disclaimer": "பொறுப்பு துறப்பு: இது ஒரு வெகுமதி ஆப். இதில் நிஜப் பணம் கொண்டு சூதாட்டம் நடைபெறாது."
+            },
+            "gu": { 
+                "nav_home": "હોમ", "nav_offerwall": "ઓફરવોલ", "nav_daily": "દૈનિક", "nav_leaders": "લીડર્સ", "nav_vault": "વોલેટ",
+                "btn_reward": "ઇનામો", "lbl_live": "લાઇવ", "fetching_feed": "લાઇવ ફીડ લાવે છે...",
+                "sec_quick": "⚡ ઝડપી કાર્યો", "sec_games": "🎮 ગેમ ઝોન", "sec_winners": "વિજેતાઓ",
+                "c_daily_t": "દૈનિક ચેક-ઇન", "c_daily_d": "પોઈન્ટ્સ મેળવો", "c_video_t": "વિડિઓ ઓફર્સ", "c_video_d": "જુઓ અને કમાઓ", "c_spin_t": "લકી સ્પિન", "c_spin_d": "દરરોજ ફેરવો", "c_app_t": "એપ ડિસ્કવરી", "c_app_d": "ટેસ્ટ કરો", "c_social_t": "સામાજિક કાર્યો", "c_social_d": "ફોલો કરો", "c_partner_t": "પાર્ટનર કાર્યો", "c_partner_d": "સર્વેક્ષણો", "c_prem_ads_t": "પ્રીમિયમ જાહેરાતો", "c_prem_ads_d": "વધુ કમાણી", "c_prem_task_t": "પ્રીમિયમ કાર્યો", "c_prem_task_d": "સ્માર્ટ કાર્યો", "c_partner_off_t": "પાર્ટનર ઓફર્સ", "c_partner_off_d": "વધુ જુઓ", "c_adgem_t": "AdGem ગેમ્સ", "c_adgem_d": "રમો અને કમાઓ", "c_festive_t": "તહેવારની શુભેચ્છાઓ", "c_festive_d": "ખુશીઓ વહેંચો", "c_prem_off_t": "પ્રીમિયમ ઓફર્સ", "c_prem_off_d": "ખાસ ડીલ્સ", "c_extra_t": "વધારાનું બોનસ", "c_extra_d": "આજે જ મેળવો", "c_read_t": "લેખ વાંચો", "c_read_d": "જ્ઞાન વધારો", "c_hourly_t": "કલાકનું ઇનામ", "c_hourly_d": "મફત બોનસ", "c_surprise_t": "સરપ્રાઈઝ બોક્સ", "c_surprise_d": "બોક્સ ખોલો", "c_weekly_t": "અઠવાડિક ડ્રોપ", "c_weekly_d": "મેગા સિક્કા", "c_web_t": "વેબ કાર્યો", "c_web_d": "ઇન્ટરનેટ બ્રાઉઝ કરો", "c_smart_wall_t": "સ્માર્ટ ટાસ્ક", "c_smart_wall_d": "સ્ક્રેચ કરો", "c_app_off_t": "એપ ઓફર્સ", "c_app_off_d": "સ્માર્ટ કાર્ય", "c_cpx_t": "CPX સર્વે", "c_cpx_d": "50 🪙 સુધી", "c_instant_t": "ઇન્સ્ટન્ટ પોઇન્ટ", "c_instant_d": "તરત જ 5 🪙", "c_timewall_t": "ટાઈમ વોલ", "c_timewall_d": "સરળ કાર્યો", "c_tasks_t": "કાર્યો", "c_tasks_d": "વધુ કમાણી", "c_1v1_t": "પોઈન્ટ બેટલ", "c_1v1_d": "જીતવા માટે રમો", "c_rps_t": "રોક પેપર સિઝર", "c_rps_d": "ક્લાસિક ગેમ", "c_square_t": "સ્ક્વેર ડેશ", "c_square_d": "રમો અને જીતો", "c_pool_t": "4-પ્લેયર પૂલ", "c_pool_d": "મલ્ટિપ્લેયર", "c_esports_t": "ઇ-સ્પોર્ટ્સ ઝોન", "c_esports_d": "ટુર્નામેન્ટ રમો", "c_leaderboard_t": "લીડરબોર્ડ", "c_leaderboard_d": "રેન્કિંગ",
+                "prog_title": "આજના કાર્યો પૂર્ણ", "prog_show": "યાદી જુઓ ▼", "prog_hide": "યાદી છુપાવો ▲",
+                "win_1st": "1લું:", "win_2nd": "2જું:", "win_3rd": "3જું:", "win_loading": "લોડ થઈ રહ્યું છે...",
+                "mod_no_net": "ઈન્ટરનેટ નથી", "mod_no_net_d": "કૃપા કરીને મોબાઈલ ડેટા અથવા Wi-Fi ચાલુ કરો.", "mod_retry": "ફરી પ્રયાસ કરો", "mod_maint": "જાળવણી", "mod_maint_d": "એપ અપડેટ થઈ રહી છે. અમે જલ્દી પાછા આવીશું.", "mod_urgent": "મહત્વપૂર્ણ સૂચના!", "mod_urgent_d": "એડમિનની સૂચના અહીં વાંચો.", "mod_proceed": "આગળ વધો", "mod_skip": "પછીથી", "mod_congrats": "અભિનંદન!", "mod_mega_win": "મેગા ડ્રોપ વિજેતા", "mod_mega_win_d": "તમે વિજેતા તરીકે પસંદ થયા છો! તમારું ઇનામ ઉમેરવામાં આવ્યું છે.", "mod_claim": "ઇનામ મેળવો", "mod_alerts": "સૂચનાઓ", "mod_clear": "બધું કાઢી નાખો", "mod_no_notif": "કોઈ નવું અપડેટ નથી...",
+                "disclaimer": "અસ્વીકરણ: આ એક ઈનામ એપ છે. તેમાં વાસ્તવિક જુગાર નથી."
+            },
+            "es": { 
+                "nav_home": "Inicio", "nav_offerwall": "Ofertas", "nav_daily": "Diario", "nav_leaders": "Líderes", "nav_vault": "Bóveda",
+                "btn_reward": "Mi Premio", "lbl_live": "EN VIVO", "fetching_feed": "Cargando Feed...",
+                "sec_quick": "⚡ Tareas Rápidas", "sec_games": "🎮 Juegos", "sec_winners": "Ganadores",
+                "c_daily_t": "Check-in Diario", "c_daily_d": "Gana Puntos", "c_video_t": "Ofertas de Video", "c_video_d": "Mira y gana", "c_spin_t": "Giro de Suerte", "c_spin_d": "Gira para ganar", "c_app_t": "Descubrir Apps", "c_app_d": "Prueba y Gana", "c_social_t": "Tareas Sociales", "c_social_d": "Sigue y Comparte", "c_partner_t": "Tareas de Socios", "c_partner_d": "Encuestas", "c_prem_ads_t": "Anuncios Premium", "c_prem_ads_d": "Altos Pagos", "c_prem_task_t": "Tareas Premium", "c_prem_task_d": "Validación Inteligente", "c_partner_off_t": "Ofertas de Socios", "c_partner_off_d": "Explorar más", "c_adgem_t": "Juegos AdGem", "c_adgem_d": "Juega y gana", "c_festive_t": "Deseos Festivos", "c_festive_d": "Comparte felicidad", "c_prem_off_t": "Ofertas Premium", "c_prem_off_d": "Ofertas exclusivas", "c_extra_t": "Bono Extra", "c_extra_d": "Reclamar hoy", "c_read_t": "Leer Artículos", "c_read_d": "El conocimiento paga", "c_hourly_t": "Premio por Hora", "c_hourly_d": "Bono gratis", "c_surprise_t": "Recompensas Sorpresa", "c_surprise_d": "Caja abierta", "c_weekly_t": "Drop Semanal", "c_weekly_d": "Mega monedas", "c_web_t": "Tareas Web", "c_web_d": "Navegar por internet", "c_smart_wall_t": "Muro Inteligente", "c_smart_wall_d": "Rasca y Gana", "c_app_off_t": "Ofertas de App", "c_app_off_d": "Tarea inteligente", "c_cpx_t": "Encuestas CPX", "c_cpx_d": "Hasta 50 🪙", "c_instant_t": "Punto Instantáneo", "c_instant_d": "5 🪙 al instante", "c_timewall_t": "Time Wall", "c_timewall_d": "Tareas Fáciles", "c_tasks_t": "Tareas", "c_tasks_d": "Altos ingresos", "c_1v1_t": "Batalla de Puntos", "c_1v1_d": "Juega para ganar", "c_rps_t": "Piedra Papel Tijera", "c_rps_d": "Juego clásico", "c_square_t": "Square Dash", "c_square_d": "Juega y gana", "c_pool_t": "Billar de 4", "c_pool_d": "Multijugador", "c_esports_t": "Zona Esports", "c_esports_d": "Torneos", "c_leaderboard_t": "Clasificación", "c_leaderboard_d": "Ranking Mundial",
+                "prog_title": "Tareas Diarias Hechas", "prog_show": "Ver Lista ▼", "prog_hide": "Ocultar Lista ▲",
+                "win_1st": "1º:", "win_2nd": "2º:", "win_3rd": "3º:", "win_loading": "Cargando...",
+                "mod_no_net": "Sin Internet", "mod_no_net_d": "Activa los datos o el Wi-Fi.", "mod_retry": "Reintentar", "mod_maint": "Mantenimiento", "mod_maint_d": "La app se está actualizando. Volveremos pronto.", "mod_urgent": "¡Alerta Prioritaria!", "mod_urgent_d": "Lee las instrucciones del administrador.", "mod_proceed": "PROCEDER AHORA", "mod_skip": "Omitir", "mod_congrats": "¡Felicidades!", "mod_mega_win": "Ganador del Mega Drop", "mod_mega_win_d": "¡Has ganado! Tu recompensa ha sido añadida.", "mod_claim": "RECLAMAR PREMIO", "mod_alerts": "Notificaciones", "mod_clear": "Borrar todo", "mod_no_notif": "No hay notificaciones...",
+                "disclaimer": "Descargo: Esta app es de recompensas. No hay apuestas con dinero real."
+            },
+            "fr": { 
+                "nav_home": "Accueil", "nav_offerwall": "Offres", "nav_daily": "Quotidien", "nav_leaders": "Leaders", "nav_vault": "Portefeuille",
+                "btn_reward": "Récompense", "lbl_live": "DIRECT", "fetching_feed": "Chargement...",
+                "sec_quick": "⚡ Tâches Rapides", "sec_games": "🎮 Jeux", "sec_winners": "Gagnants",
+                "c_daily_t": "Check-in Quotidien", "c_daily_d": "Gagnez des points", "c_video_t": "Offres Vidéo", "c_video_d": "Regardez et gagnez", "c_spin_t": "Tour de Chance", "c_spin_d": "Tournez la roue", "c_app_t": "Découvrir Apps", "c_app_d": "Testez et gagnez", "c_social_t": "Tâches Sociales", "c_social_d": "Suivez et partagez", "c_partner_t": "Tâches Partenaires", "c_partner_d": "Sondages", "c_prem_ads_t": "Annonces Premium", "c_prem_ads_d": "Gains élevés", "c_prem_task_t": "Tâches Premium", "c_prem_task_d": "Validation intelligente", "c_partner_off_t": "Offres Partenaires", "c_partner_off_d": "Explorer plus", "c_adgem_t": "Jeux AdGem", "c_adgem_d": "Jouez et gagnez", "c_festive_t": "Vœux de Fêtes", "c_festive_d": "Partagez le bonheur", "c_prem_off_t": "Offres Premium", "c_prem_off_d": "Offres exclusives", "c_extra_t": "Bonus Extra", "c_extra_d": "Réclamez aujourd'hui", "c_read_t": "Lire Articles", "c_read_d": "Le savoir paie", "c_hourly_t": "Récompense Horaire", "c_hourly_d": "Bonus gratuit", "c_surprise_t": "Boîte Surprise", "c_surprise_d": "Ouvrez la boîte", "c_weekly_t": "Drop Hebdomadaire", "c_weekly_d": "Méga pièces", "c_web_t": "Tâches Web", "c_web_d": "Naviguer sur internet", "c_smart_wall_t": "Mur Intelligent", "c_smart_wall_d": "Grattez et gagnez", "c_app_off_t": "Offres App", "c_app_off_d": "Tâche intelligente", "c_cpx_t": "Sondages CPX", "c_cpx_d": "Jusqu'à 50 🪙", "c_instant_t": "Point Instantané", "c_instant_d": "5 🪙 direct", "c_timewall_t": "Time Wall", "c_timewall_d": "Tâches Faciles", "c_tasks_t": "Tâches", "c_tasks_d": "Gains élevés", "c_1v1_t": "Bataille de Points", "c_1v1_d": "Jouez pour gagner", "c_rps_t": "Pierre Papier", "c_rps_d": "Jeu classique", "c_square_t": "Square Dash", "c_square_d": "Jouez et gagnez", "c_pool_t": "Billard à 4", "c_pool_d": "Multijoueur", "c_esports_t": "Zone Esports", "c_esports_d": "Tournois", "c_leaderboard_t": "Classement", "c_leaderboard_d": "Classement mondial",
+                "prog_title": "Activités du jour", "prog_show": "Voir Liste ▼", "prog_hide": "Cacher Liste ▲",
+                "win_1st": "1er:", "win_2nd": "2e:", "win_3rd": "3e:", "win_loading": "Chargement...",
+                "mod_no_net": "Pas d'Internet", "mod_no_net_d": "Activez les données ou le Wi-Fi.", "mod_retry": "Réessayer", "mod_maint": "Maintenance", "mod_maint_d": "L'application est en mise à jour.", "mod_urgent": "Alerte Prioritaire !", "mod_urgent_d": "Lisez les instructions de l'administrateur.", "mod_proceed": "PROCÉDER", "mod_skip": "Passer", "mod_congrats": "Félicitations !", "mod_mega_win": "Gagnant du Mega Drop", "mod_mega_win_d": "Vous avez gagné ! Votre récompense est ajoutée.", "mod_claim": "RÉCLAMER", "mod_alerts": "Alertes", "mod_clear": "Effacer", "mod_no_notif": "Aucune nouveauté...",
+                "disclaimer": "Avis: C'est une application de récompense sans jeux d'argent réels."
+            },
+            "ar": { 
+                "nav_home": "الرئيسية", "nav_offerwall": "عروض", "nav_daily": "يومي", "nav_leaders": "القادة", "nav_vault": "محفظة",
+                "btn_reward": "مكافأتي", "lbl_live": "مباشر", "fetching_feed": "جاري التحميل...",
+                "sec_quick": "⚡ مهام سريعة", "sec_games": "🎮 ألعاب", "sec_winners": "الفائزون",
+                "c_daily_t": "تسجيل يومي", "c_daily_d": "اكسب نقاط", "c_video_t": "عروض فيديو", "c_video_d": "شاهد واربح", "c_spin_t": "دوران الحظ", "c_spin_d": "دور واربح", "c_app_t": "استكشاف التطبيقات", "c_app_d": "اختبر واربح", "c_social_t": "مهام اجتماعية", "c_social_d": "تابع وشارك", "c_partner_t": "مهام الشركاء", "c_partner_d": "استطلاعات", "c_prem_ads_t": "إعلانات مميزة", "c_prem_ads_d": "أرباح عالية", "c_prem_task_t": "مهام مميزة", "c_prem_task_d": "تحقق ذكي", "c_partner_off_t": "عروض الشركاء", "c_partner_off_d": "استكشف أكثر", "c_adgem_t": "ألعاب AdGem", "c_adgem_d": "العب واربح", "c_festive_t": "أمنيات العيد", "c_festive_d": "شارك السعادة", "c_prem_off_t": "عروض مميزة", "c_prem_off_d": "صفقات حصرية", "c_extra_t": "مكافأة إضافية", "c_extra_d": "اطلب اليوم", "c_read_t": "قراءة المقالات", "c_read_d": "المعرفة تدفع", "c_hourly_t": "مكافأة بالساعة", "c_hourly_d": "بونص مجاني", "c_surprise_t": "صندوق مفاجآت", "c_surprise_d": "افتح الصندوق", "c_weekly_t": "قطرة أسبوعية", "c_weekly_d": "عملات ميجا", "c_web_t": "مهام ويب", "c_web_d": "تصفح الإنترنت", "c_smart_wall_t": "حائط المهام", "c_smart_wall_d": "امسح واربح", "c_app_off_t": "عروض تطبيقات", "c_app_off_d": "مهمة ذكية", "c_cpx_t": "استطلاعات CPX", "c_cpx_d": "حتى 50 🪙", "c_instant_t": "نقطة فورية", "c_instant_d": "فوري 5 🪙", "c_timewall_t": "جدار الوقت", "c_timewall_d": "مهام سهلة", "c_tasks_t": "المهام", "c_tasks_d": "أرباح عالية", "c_1v1_t": "معركة النقاط", "c_1v1_d": "العب لتفوز", "c_rps_t": "حجر ورقة", "c_rps_d": "لعبة كلاسيكية", "c_square_t": "اندفاع المربع", "c_square_d": "العب واربح", "c_pool_t": "بلياردو 4", "c_pool_d": "متعدد اللاعبين", "c_esports_t": "منطقة الرياضات", "c_esports_d": "انضم للبطولات", "c_leaderboard_t": "المتصدرين", "c_leaderboard_d": "ترتيب اللاعبين",
+                "prog_title": "الأنشطة اليومية", "prog_show": "إظهار القائمة ▼", "prog_hide": "إخفاء ▲",
+                "win_1st": "الأول:", "win_2nd": "الثاني:", "win_3rd": "الثالث:", "win_loading": "جاري...",
+                "mod_no_net": "لا يوجد إنترنت", "mod_no_net_d": "يرجى تفعيل البيانات أو الواي فاي.", "mod_retry": "إعادة المحاولة", "mod_maint": "صيانة", "mod_maint_d": "التطبيق قيد التحديث. سنعود قريباً.", "mod_urgent": "تنبيه هام!", "mod_urgent_d": "اقرأ تعليمات الإدارة هنا.", "mod_proceed": "استمر الآن", "mod_skip": "تخطي", "mod_congrats": "تهانينا!", "mod_mega_win": "فائز ميجا", "mod_mega_win_d": "لقد فزت! تمت إضافة مكافأتك.", "mod_claim": "احصل على الجائزة", "mod_alerts": "إشعارات", "mod_clear": "مسح الكل", "mod_no_notif": "لا توجد تحديثات...",
+                "disclaimer": "إخلاء مسؤولية: هذا تطبيق مكافآت. لا يوجد مقامرة بأموال حقيقية."
+            },
+            "pt": { 
+                "nav_home": "Início", "nav_offerwall": "Ofertas", "nav_daily": "Diário", "nav_leaders": "Líderes", "nav_vault": "Cofre",
+                "btn_reward": "Prêmios", "lbl_live": "AO VIVO", "fetching_feed": "Buscando Feed...",
+                "sec_quick": "⚡ Tarefas Rápidas", "sec_games": "🎮 Jogos", "sec_winners": "Vencedores",
+                "c_daily_t": "Check-in Diário", "c_daily_d": "Ganhe Pontos", "c_video_t": "Ofertas Vídeo", "c_video_d": "Assista e Ganhe", "c_spin_t": "Giro da Sorte", "c_spin_d": "Gire para ganhar", "c_app_t": "Descobrir Apps", "c_app_d": "Teste e Ganhe", "c_social_t": "Tarefas Sociais", "c_social_d": "Siga e Compartilhe", "c_partner_t": "Tarefas Parceiras", "c_partner_d": "Pesquisas", "c_prem_ads_t": "Anúncios Premium", "c_prem_ads_d": "Altos Pagamentos", "c_prem_task_t": "Tarefas Premium", "c_prem_task_d": "Validação Inteligente", "c_partner_off_t": "Ofertas Parceiras", "c_partner_off_d": "Explore mais", "c_adgem_t": "Jogos AdGem", "c_adgem_d": "Jogue e ganhe", "c_festive_t": "Desejos Festivos", "c_festive_d": "Compartilhe alegria", "c_prem_off_t": "Ofertas Premium", "c_prem_off_d": "Ofertas exclusivas", "c_extra_t": "Bônus Extra", "c_extra_d": "Resgate hoje", "c_read_t": "Ler Artigos", "c_read_d": "Conhecimento paga", "c_hourly_t": "Bônus por Hora", "c_hourly_d": "Chaves grátis", "c_surprise_t": "Caixa Surpresa", "c_surprise_d": "Abra a caixa", "c_weekly_t": "Drop Semanal", "c_weekly_d": "Mega moedas", "c_web_t": "Tarefas Web", "c_web_d": "Navegar na internet", "c_smart_wall_t": "Mural Inteligente", "c_smart_wall_d": "Raspadinha", "c_app_off_t": "Ofertas App", "c_app_off_d": "Tarefa inteligente", "c_cpx_t": "Pesquisas CPX", "c_cpx_d": "Até 50 🪙", "c_instant_t": "Ponto Instantâneo", "c_instant_d": "5 🪙 na hora", "c_timewall_t": "Time Wall", "c_timewall_d": "Tarefas Fáceis", "c_tasks_t": "Tarefas", "c_tasks_d": "Altos ganhos", "c_1v1_t": "Batalha de Pontos", "c_1v1_d": "Jogue para ganhar", "c_rps_t": "Pedra Papel Tesoura", "c_rps_d": "Jogo clássico", "c_square_t": "Square Dash", "c_square_d": "Jogue e ganhe", "c_pool_t": "Bilhar de 4", "c_pool_d": "Multijogador", "c_esports_t": "Zona Esports", "c_esports_d": "Torneios", "c_leaderboard_t": "Classificação", "c_leaderboard_d": "Ranking Mundial",
+                "prog_title": "Tarefas de Hoje", "prog_show": "Ver Lista ▼", "prog_hide": "Ocultar Lista ▲",
+                "win_1st": "1º:", "win_2nd": "2º:", "win_3rd": "3º:", "win_loading": "Carregando...",
+                "mod_no_net": "Sem Internet", "mod_no_net_d": "Ative os dados ou Wi-Fi.", "mod_retry": "Tentar novamente", "mod_maint": "Manutenção", "mod_maint_d": "O app está sendo atualizado.", "mod_urgent": "Alerta Urgente!", "mod_urgent_d": "Leia a instrução do admin.", "mod_proceed": "PROSSEGUIR", "mod_skip": "Pular", "mod_congrats": "Parabéns!", "mod_mega_win": "Ganhador do Mega Drop", "mod_mega_win_d": "Você ganhou! Sua recompensa foi adicionada.", "mod_claim": "RESGATAR", "mod_alerts": "Notificações", "mod_clear": "Apagar tudo", "mod_no_notif": "Sem novidades...",
+                "disclaimer": "Aviso: App de recompensas. Não há jogos de azar com dinheiro real."
+            },
+            "ru": { 
+                "nav_home": "Главная", "nav_offerwall": "Офферы", "nav_daily": "Ежедневно", "nav_leaders": "Лидеры", "nav_vault": "Кошелек",
+                "btn_reward": "Награды", "lbl_live": "ЭФИР", "fetching_feed": "Загрузка...",
+                "sec_quick": "⚡ Быстрые задачи", "sec_games": "🎮 Игры", "sec_winners": "Победители",
+                "c_daily_t": "Ежедневная отметка", "c_daily_d": "Очки", "c_video_t": "Видео Офферы", "c_video_d": "Смотри и зарабатывай", "c_spin_t": "Колесо удачи", "c_spin_d": "Вращай каждый день", "c_app_t": "Новые Приложения", "c_app_d": "Тестируй", "c_social_t": "Соц. задания", "c_social_d": "Смотри и делись", "c_partner_t": "Задания от партнеров", "c_partner_d": "Опросы", "c_prem_ads_t": "Премиум Реклама", "c_prem_ads_d": "Высокие выплаты", "c_prem_task_t": "Премиум Задачи", "c_prem_task_d": "Умная проверка", "c_partner_off_t": "Офферы партнеров", "c_partner_off_d": "Смотреть больше", "c_adgem_t": "Игры AdGem", "c_adgem_d": "Играй и зарабатывай", "c_festive_t": "Праздничные пожелания", "c_festive_d": "Делись счастьем", "c_prem_off_t": "Премиум Офферы", "c_prem_off_d": "Эксклюзив", "c_extra_t": "Экстра Бонус", "c_extra_d": "Получить сегодня", "c_read_t": "Читать статьи", "c_read_d": "Знания платят", "c_hourly_t": "Бонус каждый час", "c_hourly_d": "Бесплатно", "c_surprise_t": "Коробка с сюрпризом", "c_surprise_d": "Открой", "c_weekly_t": "Недельный Дроп", "c_weekly_d": "Мега монеты", "c_web_t": "Веб-задачи", "c_web_d": "Браузер", "c_smart_wall_t": "Умная Стена", "c_smart_wall_d": "Сотри и выиграй", "c_app_off_t": "Офферы Приложений", "c_app_off_d": "Умные задачи", "c_cpx_t": "Опросы CPX", "c_cpx_d": "До 50 🪙", "c_instant_t": "Мгновенный поинт", "c_instant_d": "Сразу 5 🪙", "c_timewall_t": "Time Wall", "c_timewall_d": "Легко", "c_tasks_t": "Задания", "c_tasks_d": "Дорого", "c_1v1_t": "Битва Очков", "c_1v1_d": "Играй для победы", "c_rps_t": "Камень Ножницы", "c_rps_d": "Классика", "c_square_t": "Square Dash", "c_square_d": "Играй", "c_pool_t": "Бильярд", "c_pool_d": "Мультиплеер", "c_esports_t": "Киберспорт", "c_esports_d": "Турниры", "c_leaderboard_t": "Рейтинг", "c_leaderboard_d": "Топ игроков",
+                "prog_title": "Задачи на сегодня", "prog_show": "Показать список ▼", "prog_hide": "Скрыть список ▲",
+                "win_1st": "1-е:", "win_2nd": "2-е:", "win_3rd": "3-е:", "win_loading": "Загрузка...",
+                "mod_no_net": "Нет интернета", "mod_no_net_d": "Включите Wi-Fi или данные.", "mod_retry": "Повторить", "mod_maint": "Техработы", "mod_maint_d": "Обновление системы. Скоро вернемся.", "mod_urgent": "Важное уведомление!", "mod_urgent_d": "Прочтите инструкции админа.", "mod_proceed": "ПЕРЕЙТИ", "mod_skip": "Пропустить", "mod_congrats": "Поздравляем!", "mod_mega_win": "Победитель Mega Drop", "mod_mega_win_d": "Вы выиграли! Награда добавлена.", "mod_claim": "ПОЛУЧИТЬ", "mod_alerts": "Уведомления", "mod_clear": "Очистить все", "mod_no_notif": "Нет обновлений...",
+                "disclaimer": "Отказ: Это приложение для наград. Никаких азартных игр на реальные деньги."
+            }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) {
+                    elem.innerText = transObj[key];
+                }
+            });
+
+            if(document.getElementById("appLanguage")) document.getElementById("appLanguage").value = langCode;
+        }
+    </script>
 
     <script>
         // Check for Wins on Home Screen Load
@@ -562,39 +850,29 @@
                 document.getElementById("homeWinnerOverlay").style.display = "none";
             };
 
-// 🚨 PRIORITY POPUP LISTENER (Connects to Admin Panel)
-firebase.database().ref('global_system_runtime_configurations/urgent_task').on('value', (snap) => {
-    const overlay = document.getElementById("urgentTaskOverlay");
-    if (snap.exists() && overlay) {
-        const data = snap.val();
-        
-        // Check if Admin has turned it "true"
-        if (data.active === "true") {
-            document.getElementById("urgentTaskTitle").innerText = data.title || "IMPORTANT NOTICE";
-            document.getElementById("urgentTaskDesc").innerText = data.desc || "";
-            
-            const actionBtn = document.getElementById("urgentTaskBtn");
-            
-            // Agar Admin ne koi URL link diya hai toh button show karo
-            if (data.url && data.url.trim() !== "") {
-                actionBtn.style.display = "block";
-                actionBtn.innerText = "GO NOW";
-                actionBtn.onclick = () => window.location.href = data.url;
-            } else {
-                // Agar link nahi diya, toh button hata do
-                actionBtn.style.display = "none";
-            }
-            
-            // Close button functionality
-            document.getElementById("urgentTaskCloseBtn").onclick = () => overlay.style.display = "none";
-            
-            overlay.style.display = "flex";
-        } else {
-            // Agar Admin ne "false" kar diya, toh hata do
-            overlay.style.display = "none";
-        }
-    }
-});
+            // PRIORITY POPUP LISTENER
+            firebase.database().ref('global_system_runtime_configurations/urgent_task').on('value', (snap) => {
+                const overlay = document.getElementById("urgentTaskOverlay");
+                if (snap.exists() && overlay) {
+                    const data = snap.val();
+                    if (data.active === "true") {
+                        document.getElementById("urgentTaskTitle").innerText = data.title || "IMPORTANT NOTICE";
+                        document.getElementById("urgentTaskDesc").innerText = data.desc || "";
+                        const actionBtn = document.getElementById("urgentTaskBtn");
+                        if (data.url && data.url.trim() !== "") {
+                            actionBtn.style.display = "block";
+                            actionBtn.innerText = "GO NOW";
+                            actionBtn.onclick = () => window.location.href = data.url;
+                        } else {
+                            actionBtn.style.display = "none";
+                        }
+                        document.getElementById("urgentTaskCloseBtn").onclick = () => overlay.style.display = "none";
+                        overlay.style.display = "flex";
+                    } else {
+                        overlay.style.display = "none";
+                    }
+                }
+            });
 
             // Mini Drop Listener
             firebase.database().ref('mini_drop').on('value', snap => {
@@ -623,19 +901,20 @@ firebase.database().ref('global_system_runtime_configurations/urgent_task').on('
             });
         });
     </script>
+
     <!-- 🟢 FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
-        firebase.initializeApp(firebaseConfig);
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
@@ -646,42 +925,6 @@ firebase.database().ref('global_system_runtime_configurations/urgent_task').on('
         }
         window.addEventListener('online', checkUserNetworkStatusConnection);
         window.addEventListener('offline', checkUserNetworkStatusConnection);
-
-        const langData = {
-            "en": { 
-                "withdraw_btn": "My Reward", "daily_checkin": "Daily Check-in", "daily_desc": "Earn Points", 
-                "watch_ads": "Video Offers", "watch_desc": "Watch & earn", "app_testing": "App Discovery", 
-                "app_desc": "Test & Earn", "social_tasks": "Social Tasks", "social_desc": "Follow & Share", 
-                "spin_win": "Lucky Spin", "spin_desc": "Spin the wheel daily to win" 
-            },
-            "hi": { 
-                "withdraw_btn": "मेरे रिवॉर्ड", "daily_checkin": "दैनिक चेक-इन", "daily_desc": "पॉइंट्स कमाएं", 
-                "watch_ads": "वीडियो ऑफर्स", "watch_desc": "देखें और कमाएं", "app_testing": "ऐप डिस्कवरी", 
-                "app_desc": "टेस्ट करें", "social_tasks": "सोशल टास्क", "social_desc": "फॉलो करें", 
-                "spin_win": "लकी स्पिन", "spin_desc": "रोजाना घुमाएं" 
-            },
-            "bn": { "withdraw_btn": "রিওয়ার্ড", "daily_checkin": "দৈনিক চেক-ইন", "daily_desc": "পয়েন্ট আয়", "watch_ads": "ভিডিও অফার", "watch_desc": "দেখুন ও আয়", "app_testing": "অ্যাপ আবিষ্কার", "app_desc": "টেস্ট করুন", "social_tasks": "সোশ্যাল টাস্ক", "social_desc": "ফলো করুন", "spin_win": "লাকি স্পিন", "spin_desc": "প্রতিদিন ঘোরান" },
-            "te": { "withdraw_btn": "రివార్డులు", "daily_checkin": "రోజువారీ చెక్-ఇన్", "daily_desc": "పాయింట్లు పొందండి", "watch_ads": "వీడియో ఆఫర్‌లు", "watch_desc": "చూడండి & పొందండి", "app_testing": "యాప్ డిస్కవరీ", "app_desc": "పరీక్షించండి", "social_tasks": "సామాజిక పనులు", "social_desc": "ఫాలో అవ్వండి", "spin_win": "లక్కీ స్పిన్", "spin_desc": "రోజూ తిప్పండి" },
-            "mr": { "withdraw_btn": "माझे बक्षिसे", "daily_checkin": "दैनिक चेक-इन", "daily_desc": "पॉइंट्स मिळवा", "watch_ads": "व्हिडिओ ऑफर", "watch_desc": "पहा आणि मिळवा", "app_testing": "अॅप शोधा", "app_desc": "चाचणी करा", "social_tasks": "सोशल टास्क", "social_desc": "फॉलो करा", "spin_win": "लकी स्पिन", "spin_desc": "दररोज फिरवा" },
-            "ta": { "withdraw_btn": "வெகுமதிகள்", "daily_checkin": "தினசரி செக்-இன்", "daily_desc": "புள்ளிகள் பெற", "watch_ads": "வீடியோ சலுகைகள்", "watch_desc": "பாருங்கள்", "app_testing": "ஆப் தேடல்", "app_desc": "சோதனை", "social_tasks": "சமூக பணிகள்", "social_desc": "பகிரவும்", "spin_win": "லக்கி ஸ்பின்", "spin_desc": "சுழற்றுங்கள்" },
-            "ur": { "withdraw_btn": "انعامات", "daily_checkin": "روزانہ چیک ان", "daily_desc": "پوائنٹس حاصل کریں", "watch_ads": "ویڈیو آفرز", "watch_desc": "دیکھیں اور کمائیں", "app_testing": "ایپ دریافت", "app_desc": "ٹیسٹ کریں", "social_tasks": "سوشل ٹاسک", "social_desc": "فالو کریں", "spin_win": "لکی اسپن", "spin_desc": "روزانہ گھمائیں" },
-            "gu": { "withdraw_btn": "ઈનામો", "daily_checkin": "દૈનિક ચેક-ઇન", "daily_desc": "પોઈન્ટ્સ મેળવો", "watch_ads": "વિડિઓ ઓફર્સ", "watch_desc": "જુઓ અને કમાઓ", "app_testing": "એપ ડિસ્કવરી", "app_desc": "ટેસ્ટ કરો", "social_tasks": "સામાજિક કાર્યો", "social_desc": "ફોલો કરો", "spin_win": "લકી સ્પિન", "spin_desc": "દરરોજ ફેરવો" },
-            "es": { "withdraw_btn": "Mi Premio", "daily_checkin": "Check-in Diario", "daily_desc": "Gana Puntos", "watch_ads": "Ofertas Video", "watch_desc": "Mira y gana", "app_testing": "Descubrir Apps", "app_desc": "Prueba y Gana", "social_tasks": "Tareas Sociales", "social_desc": "Sigue y Comparte", "spin_win": "Giro Suerte", "spin_desc": "Gira para ganar" },
-            "fr": { "withdraw_btn": "Récompense", "daily_checkin": "Check-in Quotidien", "daily_desc": "Gagnez Points", "watch_ads": "Offres Vidéo", "watch_desc": "Regardez et Gagnez", "app_testing": "Découvrir Apps", "app_desc": "Testez", "social_tasks": "Tâches Sociales", "social_desc": "Suivez", "spin_win": "Tour de Chance", "spin_desc": "Tournez par jour" },
-            "ar": { "withdraw_btn": "مكافآتي", "daily_checkin": "تسجيل يومي", "daily_desc": "اكسب نقاط", "watch_ads": "عروض فيديو", "watch_desc": "شاهد واربح", "app_testing": "استكشاف التطبيقات", "app_desc": "اختبر", "social_tasks": "مهام اجتماعية", "social_desc": "تابع وشارك", "spin_win": "دوران الحظ", "spin_desc": "دور واربح" },
-            "pt": { "withdraw_btn": "Meu Prêmio", "daily_checkin": "Check-in Diário", "daily_desc": "Ganhe Pontos", "watch_ads": "Ofertas Vídeo", "watch_desc": "Assista e Ganhe", "app_testing": "Descobrir Apps", "app_desc": "Teste e Ganhe", "social_tasks": "Tarefas Sociais", "social_desc": "Siga", "spin_win": "Giro da Sorte", "spin_desc": "Gire para ganhar" },
-            "ru": { "withdraw_btn": "Награды", "daily_checkin": "Ежедневная отметка", "daily_desc": "Очки", "watch_ads": "Видео Офферы", "watch_desc": "Смотри и зарабатывай", "app_testing": "Новые Приложения", "app_desc": "Тестируй", "social_tasks": "Соц. задания", "social_desc": "Смотри", "spin_win": "Колесо удачи", "spin_desc": "Вращай каждый день" }
-        };
-
-        function changeLanguage(langCode) {
-            localStorage.setItem("selectedLang", langCode);
-            const transObj = langData[langCode] || langData["en"];
-            document.querySelectorAll('[data-i18n]').forEach(elem => {
-                const key = elem.getAttribute("data-i18n");
-                if(transObj[key]) elem.innerText = transObj[key];
-            });
-            if(document.getElementById("appLanguage")) document.getElementById("appLanguage").value = langCode;
-        }
 
         const dailyTasksList = [
             { id: "t5", text: "Scratch Card Bonus", coins: 20 }, { id: "t10", text: "Secure Server Validation", coins: 30 },
@@ -732,7 +975,18 @@ firebase.database().ref('global_system_runtime_configurations/urgent_task').on('
             auth.onAuthStateChanged((user) => {
                 if (user) {
                     const uid = user.uid;
-                    
+                    // ⚠️ Admin Alert Listener (Realtime)
+db.ref(`users/${uid}/admin_alert`).on('value', (snap) => {
+    if (snap.exists()) {
+        let alertData = snap.val();
+        
+        // यूज़र को अलर्ट बॉक्स दिखाएं
+        alert("⚠️ ADMIN NOTICE ⚠️\n\n" + alertData.message);
+        
+        // अलर्ट दिखाने के बाद डेटाबेस से तुरंत डिलीट कर दें ताकि हर बार पेज रीफ्रेश करने पर बार-बार ना आए
+        db.ref(`users/${uid}/admin_alert`).remove();
+    }
+});
                     // 1. Fetch User Profile
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
@@ -758,6 +1012,21 @@ firebase.database().ref('global_system_runtime_configurations/urgent_task').on('
                         }
                     });
 
+                    // 1.5. 🔥 AUTO-SYNC TASK EARNINGS FOR REFERRAL UNLOCK
+                    db.ref(`users/${uid}/history`).on('value', (snap) => {
+                        if(snap.exists()) {
+                            let totalTaskCoins = 0;
+                            snap.forEach(child => {
+                                let item = child.val();
+                                let title = (item.title || "").toLowerCase();
+                                if(!title.includes("welcome") && !title.includes("referral") && !title.includes("admin") && !title.includes("refund")) {
+                                    totalTaskCoins += parseFloat(item.amount || 0);
+                                }
+                            });
+                            db.ref(`users/${uid}/total_task_earnings`).set(totalTaskCoins);
+                        }
+                    });
+
                     // 2. Marquee Feed
                     db.ref('global_system_runtime_configurations/incentives_popup_array_feed_source').on('value', (snap) => {
                         if (snap.exists()) {
@@ -767,7 +1036,7 @@ firebase.database().ref('global_system_runtime_configurations/urgent_task').on('
                         }
                     });
 
-                    // 3. Admin Urgent Task (24 HOUR COOLDOWN)
+                    // 3. Admin Urgent Task
                     db.ref('global_system_runtime_configurations/urgent_task').on('value', snap => {
                         if(snap.exists()) {
                             let task = snap.val();
@@ -826,7 +1095,7 @@ firebase.database().ref('global_system_runtime_configurations/urgent_task').on('
                         } else { badge.style.display = "none"; container.innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:13.5px; margin-top:30px; font-weight:bold;">No new updates...</div>`; }
                     });
 
-                    // 6. ✅ UNIVERSAL ADMIN HIDE/SHOW MODULE TOGGLES (Fixed Firebase listener)
+                    // 6. UNIVERSAL ADMIN HIDE/SHOW MODULE TOGGLES
                     db.ref('global_system_runtime_configurations/module_toggles').on('value', (snap) => {
                         if(snap.exists()) {
                             const toggles = snap.val();
@@ -835,7 +1104,6 @@ firebase.database().ref('global_system_runtime_configurations/urgent_task').on('
                             document.querySelectorAll('[id^="mod_"]').forEach(el => {
                                 if (toggles[el.id] !== undefined) {
                                     let state = toggles[el.id];
-                                    // 🔥 FIX: Check both string and boolean explicitly
                                     if(state === false || state === "false" || state === 0) {
                                         el.style.display = 'none'; 
                                     } else {
@@ -846,56 +1114,60 @@ firebase.database().ref('global_system_runtime_configurations/urgent_task').on('
                         }
                     });
 
-                    // 7. BANNERS DISPLAY
+                    // 7. BANNERS DISPLAY (FIXED: Sequential Loading)
                     db.ref('global_system_runtime_configurations/banner_ads').on('value', (snap) => {
                         const adsData = snap.exists() ? snap.val() : {};
                         for(let i=1; i<=8; i++) {
                             let slot = document.getElementById("bannerSlot" + i);
                             if(slot) {
-                                if(adsData["slot" + i] && adsData["slot" + i].active && adsData["slot" + i].code) {
-                                    slot.style.display = "flex";
-                                    setAdHTML(slot, adsData["slot" + i].code);
-                                } else if(adsData["slot" + i] && adsData["slot" + i].active === false) {
-                                    slot.style.display = "none";
-                                } else {
-                                    // Default show placeholder script if nothing touched in admin
-                                    slot.style.display = "flex";
-                                }
+                                setTimeout(() => {
+                                    if(adsData["slot" + i] && adsData["slot" + i].active && adsData["slot" + i].code) {
+                                        slot.style.display = "flex";
+                                        setAdHTML(slot, adsData["slot" + i].code);
+                                    } else if(adsData["slot" + i] && adsData["slot" + i].active === false) {
+                                        slot.style.display = "none";
+                                    } else {
+                                        slot.style.display = "flex";
+                                    }
+                                }, i * 400); 
                             }
                         }
                     });
 
                     // 8. DYNAMIC BOTTOM NAV
-db.ref('global_system_runtime_configurations/bottom_tabs').on('value', (snap) => {
-    const container = document.getElementById("bottomNavContainer");
-    if (snap.exists()) {
-        const t = snap.val();
-        container.innerHTML = `
-                                <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
-                                <a href="${t.t2_url || 'tasks.html'}" class="nav-item"><i class="${t.t2_icon || 'fa-solid fa-fire'}"></i><span>${t.t2_name || 'Offerwall'}</span></a>
-                                <a href="${t.t3_url || 'daily.html'}" class="nav-item"><i class="${t.t3_icon || 'fa-solid fa-gift'}"></i><span>${t.t3_name || 'Daily'}</span></a>
-                                <a href="${t.t4_url || 'leaderboard.html'}" class="nav-item"><i class="${t.t4_icon || 'fa-solid fa-trophy'}"></i><span>${t.t4_name || 'Leaders'}</span></a>
-                                <a href="${t.t5_url || 'my_point1.html'}" class="nav-item"><i class="${t.t5_icon || 'fa-solid fa-wallet'}"></i><span>${t.t5_name || 'Vault'}</span></a>
+                    db.ref('global_system_runtime_configurations/bottom_tabs').on('value', (snap) => {
+                        const container = document.getElementById("bottomNavContainer");
+                        if (snap.exists()) {
+                            const t = snap.val();
+                            container.innerHTML = `
+                                <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span data-i18n="nav_home">Home</span></a>
+                                <a href="${t.t2_url || 'tasks.html'}" class="nav-item"><i class="${t.t2_icon || 'fa-solid fa-fire'}"></i><span data-i18n="nav_offerwall">${t.t2_name || 'Offerwall'}</span></a>
+                                <a href="${t.t3_url || 'daily.html'}" class="nav-item"><i class="${t.t3_icon || 'fa-solid fa-gift'}"></i><span data-i18n="nav_daily">${t.t3_name || 'Daily'}</span></a>
+                                <a href="${t.t4_url || 'leaderboard.html'}" class="nav-item"><i class="${t.t4_icon || 'fa-solid fa-trophy'}"></i><span data-i18n="nav_leaders">${t.t4_name || 'Leaders'}</span></a>
+                                <a href="${t.t5_url || 'my_point1.html'}" class="nav-item"><i class="${t.t5_icon || 'fa-solid fa-wallet'}"></i><span data-i18n="nav_vault">${t.t5_name || 'Vault'}</span></a>
                             `;
-    } else {
-        // Default Fallback
-        container.innerHTML = `
-                                <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
-                                <a href="tasks.html" class="nav-item"><i class="fa-solid fa-fire"></i><span>Offerwall</span></a>
-                                <a href="daily.html" class="nav-item"><i class="fa-solid fa-gift"></i><span>Daily</span></a>
-                                <a href="leaderboard.html" class="nav-item"><i class="fa-solid fa-trophy"></i><span>Leaders</span></a>
-                                <a href="my_point1.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span>Vault</span></a>
+                        } else {
+                            container.innerHTML = `
+                                <a href="ho.html" class="nav-item active"><i class="fa-solid fa-house"></i><span data-i18n="nav_home">Home</span></a>
+                                <a href="tasks.html" class="nav-item"><i class="fa-solid fa-fire"></i><span data-i18n="nav_offerwall">Offerwall</span></a>
+                                <a href="daily.html" class="nav-item"><i class="fa-solid fa-gift"></i><span data-i18n="nav_daily">Daily</span></a>
+                                <a href="leaderboard.html" class="nav-item"><i class="fa-solid fa-trophy"></i><span data-i18n="nav_leaders">Leaders</span></a>
+                                <a href="my_point1.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span data-i18n="nav_vault">Vault</span></a>
                             `;
-    }
-});
-// 🛑 Admin Maintenance Lock Listener
-db.ref('global_system_runtime_configurations/app_maintenance').on('value', (snap) => {
-    if (snap.exists() && snap.val() === "ON") {
-        document.getElementById("interceptorMaintenanceScreenOverlay").style.display = "flex";
-    } else {
-        document.getElementById("interceptorMaintenanceScreenOverlay").style.display = "none";
-    }
-});
+                        }
+                        // Re-apply translation immediately
+                        changeLanguage(localStorage.getItem("selectedLang") || "en");
+                    });
+
+                    // Admin Maintenance Lock
+                    db.ref('global_system_runtime_configurations/app_maintenance').on('value', (snap) => {
+                        if (snap.exists() && snap.val() === "ON") {
+                            document.getElementById("interceptorMaintenanceScreenOverlay").style.display = "flex";
+                        } else {
+                            document.getElementById("interceptorMaintenanceScreenOverlay").style.display = "none";
+                        }
+                    });
+
                     // 9. NEW DYNAMIC CARDS FROM ADMIN
                     db.ref('global_system_runtime_configurations/custom_cards').on('value', (snap) => {
                         const container = document.getElementById("dynamicAdminCardsContainer");
@@ -909,11 +1181,10 @@ db.ref('global_system_runtime_configurations/app_maintenance').on('value', (snap
                         } else { container.style.display = "none"; }
                     });
 
-                    // 10. 🏆 TOP WINNERS PODIUM (LIVE FROM ADMIN)
+                    // 10. TOP WINNERS PODIUM
                     db.ref('global_system_runtime_configurations/top_winners_podium').on('value', (snap) => {
                         if (snap.exists()) {
                             let podium = snap.val();
-                            
                             if(podium.rank1) {
                                 document.getElementById("lblWinnerRank1Name").innerText = podium.rank1.name;
                                 document.getElementById("lblWinnerRank1Prize").innerText = podium.rank1.prize;
@@ -929,7 +1200,9 @@ db.ref('global_system_runtime_configurations/app_maintenance').on('value', (snap
                         }
                     });
 
-                } else { window.location.replace("index.html"); }
+                } else {
+                    window.location.replace("index.html");
+                }
             });
         });
     </script>

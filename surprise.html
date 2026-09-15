@@ -50,7 +50,7 @@
         .coin-txt { color: var(--accent-gold) !important; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 20px !important; }
 
         /* 📢 AD SLOTS */
-        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(234, 179, 8, 0.4); box-sizing: border-box; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: none; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(234, 179, 8, 0.4); box-sizing: border-box; }
 
         /* 🎫 Mega Reward Display Card */
         .reward-banner-card { background: linear-gradient(135deg, #ca8a04, #854d0e); border-radius: 24px; padding: 30px 20px; text-align: center; box-shadow: 0 15px 35px rgba(234, 179, 8, 0.3); color: #fff; position: relative; overflow: hidden; border: 1px solid #facc15; }
@@ -100,6 +100,8 @@
         .winner-amount-box { background: rgba(0,0,0,0.4); padding:20px; border-radius:20px; border:2px dashed var(--accent-gold); font-size:32px; font-weight:900; color:var(--accent-green); margin:20px 0; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
         .winner-claim-btn { width:100%; background: linear-gradient(135deg, var(--accent-gold), #b45309); color:#000; border:none; padding:16px; border-radius:50px; font-size:16px; font-weight:900; cursor:pointer; text-transform:uppercase; box-shadow: 0 6px 20px rgba(234, 179, 8, 0.4); transition: 0.2s; letter-spacing: 0.5px; }
         .winner-claim-btn:active { transform: scale(0.96); }
+
+        #globalOfflineWarningOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,9,19,0.95); z-index:99999999; flex-direction:column; justify-content:center; align-items:center; text-align:center; backdrop-filter:blur(10px); }
     </style>
 </head>
 <body>
@@ -109,6 +111,14 @@
         <h4 id="alertHeader">ALERT</h4>
         <p id="alertMessage">Message</p>
         <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
     <!-- 🎉 WINNER CELEBRATION POPUP FRAME -->
@@ -153,7 +163,7 @@
         <!-- Grand Reward Presentation Banner -->
         <div class="reward-banner-card">
             <div data-i18n="wd_hero_sub">🔥 Weekly Mega Reward 🔥</div>
-            <h3 data-i18n="wd_hero_main">🎁 SURPRISE COINS</h3>
+            <h3 id="jackpotAmountDisplay" data-i18n="wd_hero_main">🎁 SURPRISE COINS</h3>
             <p data-i18n="wd_hero_desc">More Entry Passes = Higher Chances!</p>
         </div>
 
@@ -212,7 +222,7 @@
                 "wd_active_list": "Your Active Pass Codes", "wd_no_pass": "You don't hold any passes for this week yet.",
                 "err_nsf_title": "❌ INSUFFICIENT COINS", "err_nsf_desc": "Not enough coins! Complete more tasks to earn more.",
                 "pass_success_title": "🎉 PASS CLAIMED", "pass_success_desc": "acquired successfully! Keep participating to increase your chances.",
-                "win_title": "CONGRATULATIONS!", "win_desc": "You are the Champion of this week's Mega Drop!", "win_btn": "Claim Reward 🪙"
+                "win_title": "CONGRATULATIONS!", "win_desc": "You are the Champion of this week's Mega Drop!", "win_btn": "Claim Reward 🪙", "mod_no_net": "No Internet", "mod_retry": "Retry Connection"
             },
             "hi": {
                 "wd_title": "साप्ताहिक ड्रॉप", "wd_wallet": "🎟️ साप्ताहिक ड्रॉप", "wd_hero_sub": "🔥 साप्ताहिक मेगा रिवॉर्ड 🔥", "wd_hero_main": "🎁 सरप्राइज कॉइन्स", "wd_hero_desc": "अधिक पास = जीतने के अधिक अवसर!",
@@ -220,7 +230,7 @@
                 "wd_active_list": "आपके सक्रिय पास कोड", "wd_no_pass": "आपके पास इस सप्ताह के लिए कोई पास नहीं है।",
                 "err_nsf_title": "❌ अपर्याप्त कॉइन्स", "err_nsf_desc": "पर्याप्त कॉइन्स नहीं हैं! कमाने के लिए और टास्क पूरे करें।",
                 "pass_success_title": "🎉 पास प्राप्त हुआ", "pass_success_desc": "सफलतापूर्वक प्राप्त हुआ! अवसर बढ़ाने के लिए भाग लेते रहें।",
-                "win_title": "बधाई हो!", "win_desc": "आप इस सप्ताह के मेगा ड्रॉप के चैंपियन हैं!", "win_btn": "रिवॉर्ड क्लेम करें 🪙"
+                "win_title": "बधाई हो!", "win_desc": "आप इस सप्ताह के मेगा ड्रॉप के चैंपियन हैं!", "win_btn": "रिवॉर्ड क्लेम करें 🪙", "mod_no_net": "इंटरनेट नहीं है", "mod_retry": "फिर से कोशिश करें"
             },
             "bn": { "wd_title": "সাপ্তাহিক ড্রপ", "wd_hero_main": "🎁 সারপ্রাইজ কয়েন", "wd_btn_claim": "এন্ট্রি পাস নিন", "err_nsf_title": "❌ কয়েন নেই", "pass_success_title": "🎉 পাস পেয়েছেন", "win_title": "অভিনন্দন!" },
             "te": { "wd_title": "వీక్లీ డ్రాప్", "wd_hero_main": "🎁 సర్ప్రైజ్ కాయిన్స్", "wd_btn_claim": "పాస్ పొందండి", "err_nsf_title": "❌ కాయిన్స్ లేవు", "pass_success_title": "🎉 పాస్ వచ్చింది", "win_title": "అభినందనలు!" },
@@ -259,6 +269,10 @@
             return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
         }
 
+        // Network Monitor
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
         const uid = localStorage.getItem("userId");
         let userMasterCoinsCounter = 0;
         let singlePassCostInt = 50; 
@@ -266,6 +280,8 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
+
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
@@ -322,9 +338,20 @@
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // Load Banners
-                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            // Load Banners (Safely with setTimeout)
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
 
                             if(adminData.pass_cost) {
                                 singlePassCostInt = parseInt(adminData.pass_cost);
@@ -332,6 +359,7 @@
                             }
                             if(adminData.jackpot_amount) {
                                 jackpotAmountInt = parseInt(adminData.jackpot_amount);
+                                document.getElementById("jackpotAmountDisplay").innerText = `🎁 ${jackpotAmountInt} COINS`;
                             }
                         }
                     });
@@ -363,6 +391,7 @@
             });
         });
 
+        // Script Injector for Admin Banners
         function setAdHTML(container, html) {
             container.innerHTML = html;
             Array.from(container.querySelectorAll("script")).forEach(oldScript => {
@@ -373,7 +402,7 @@
             });
         }
 
-        // 🚀 CLAIM PASS (PURE FIREBASE TRANSACTION)
+        // 🚀 CLAIM PASS (PURE FIREBASE TRANSACTION + UNIVERSAL HISTORY DEBIT)
         function executeClaimEntryPass() {
             let currentLang = localStorage.getItem("selectedLang") || "en";
             
@@ -398,30 +427,34 @@
                     let newCode = "DRP-" + Math.floor(Math.random() * 900000 + 100000);
                     
                     // 2. Add pass to user
-                    db.ref(`users/${uid}/weekly_passes`).push({
+                    let p1 = db.ref(`users/${uid}/weekly_passes`).push({
                         code: newCode,
                         timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
 
                     // 3. Increment global counter
-                    db.ref('weekly_drop/global_passes_count').transaction((count) => {
+                    let p2 = db.ref('weekly_drop/global_passes_count').transaction((count) => {
                         return (count || 0) + 1;
                     });
 
-                    // 4. Record Transaction History
-                    db.ref(`users/${uid}/transactions`).push({
-                        action: "buy_weekly_pass",
-                        amount: -singlePassCostInt,
+                    // 🔥 4. UNIVERSAL HISTORY PUSH FOR DEBIT (Account Health)
+                    let p3 = db.ref(`users/${uid}/history`).push({
+                        title: `Bought Weekly Pass`,
+                        amount: singlePassCostInt,
+                        type: "debit",
+                        txn_type: "lottery_pass",
                         status: "SUCCESSFUL",
-                        details: `Weekly Pass: ${newCode}`,
-                        timestamp: Date.now()
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
 
-                    let descTxt = langData[currentLang]["pass_success_desc"] || "acquired successfully! Keep participating.";
-                    showCustomAlert("pass_success_title", `Pass Code ${newCode} ${descTxt}`, true);
+                    return Promise.all([p1, p2, p3]).then(() => newCode);
                 } else {
                     throw new Error("Transaction aborted");
                 }
+            }).then((newCode) => {
+                let descTxt = langData[currentLang]["pass_success_desc"] || "acquired successfully! Keep participating.";
+                showCustomAlert("pass_success_title", `Pass Code ${newCode} ${descTxt}`, true);
             }).catch((err) => {
                 showCustomAlert("err_nsf_title", "Transaction failed.", false);
             }).finally(() => {
@@ -431,7 +464,7 @@
             });
         }
 
-        // 🏆 CLAIM MEGA REWARD (PURE FIREBASE TRANSACTION)
+        // 🏆 CLAIM MEGA REWARD (PURE FIREBASE TRANSACTION + UNIVERSAL HISTORY CREDIT)
         function executeClaimJackpotPoolCredits() {
             const btn = document.querySelector(".winner-claim-btn");
             btn.disabled = true;
@@ -441,14 +474,21 @@
                 return (current || 0) + jackpotAmountInt;
             }).then((result) => {
                 if(result.committed) {
-                    db.ref(`users/${uid}/transactions`).push({
-                        action: "won_weekly_jackpot",
+                    
+                    // 🔥 UNIVERSAL HISTORY PUSH FOR WIN (Account Health)
+                    let p1 = db.ref(`users/${uid}/history`).push({
+                        title: `Mega Drop Winner!`,
                         amount: jackpotAmountInt,
+                        type: "credit",
+                        txn_type: "jackpot_win",
                         status: "SUCCESSFUL",
-                        details: `Weekly Mega Drop Winner!`,
-                        timestamp: Date.now()
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
-                    return db.ref(`users/${uid}/claimed_jackpot`).set(true);
+
+                    let p2 = db.ref(`users/${uid}/claimed_jackpot`).set(true);
+
+                    return Promise.all([p1, p2]);
                 }
             }).then(() => {
                 document.getElementById("lotteryWinnerModalFrame").style.display = "none";

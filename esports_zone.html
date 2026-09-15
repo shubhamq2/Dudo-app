@@ -45,7 +45,7 @@
 
         /* Banner Ads Slots */
         .ad-container-block { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(249, 115, 22, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(249, 115, 22, 0.4); box-sizing: border-box; display: none; }
 
         /* TAB NAVIGATION */
         .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
@@ -113,6 +113,8 @@
         .btn-cancel { background: rgba(255,255,255,0.05); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); box-shadow: none; margin-top: 10px; }
 
         .loading-text { text-align: center; color: var(--text-sub); font-weight: bold; padding: 20px; }
+        
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
     
     <!-- ⚡⚡ ANTI-FLICKER SCRIPT FOR SAFE MODE ⚡⚡ -->
@@ -126,6 +128,14 @@
     </script>
 </head>
 <body>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
+    </div>
 
     <div class="header">
         <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
@@ -214,15 +224,15 @@
     <!-- 🔥 FIREBASE ENGINE -->
     <script>
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -235,7 +245,8 @@
                 "modal_join_title": "Participation Details", "modal_join_desc": "Enter your Player ID / In-Game Name so our system can verify your entry.",
                 "btn_confirm": "Confirm Entry", "btn_cancel": "Cancel",
                 "modal_succ_title": "Registration Confirmed!", "modal_succ_desc": "You successfully registered. Click the Alarm Bell to get reminded!",
-                "ps_safe_title": "System Maintenance", "ps_safe_desc": "This feature is temporarily unavailable due to scheduled server upgrades."
+                "ps_safe_title": "System Maintenance", "ps_safe_desc": "This feature is temporarily unavailable due to scheduled server upgrades.",
+                "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi.", "mod_retry": "Retry Connection"
             },
             "hi": { 
                 "sa_title": "स्किल्स एरिना", "sa_banner_title": "डेली स्किल्स एरिना", "sa_banner_desc": "कस्टम रूम्स ज्वाइन करें और इनाम जीतें!",
@@ -243,7 +254,8 @@
                 "modal_join_title": "भाग लेने की जानकारी", "modal_join_desc": "अपनी प्लेयर ID या इन-गेम नाम दर्ज करें ताकि हम आपकी प्रविष्टि सत्यापित कर सकें।",
                 "btn_confirm": "पुष्टि करें", "btn_cancel": "रद्द करें",
                 "modal_succ_title": "पंजीकरण सफल!", "modal_succ_desc": "आप सफलतापूर्वक रजिस्टर हो गए हैं। अलार्म बेल पर क्लिक करना न भूलें!",
-                "ps_safe_title": "सिस्टम मेंटेनेंस", "ps_safe_desc": "सर्वर अपग्रेड के कारण यह फीचर अभी उपलब्ध नहीं है।"
+                "ps_safe_title": "सिस्टम मेंटेनेंस", "ps_safe_desc": "सर्वर अपग्रेड के कारण यह फीचर अभी उपलब्ध नहीं है।",
+                "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "कृपया मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें"
             },
             "bn": { "sa_title": "স্কিলস এরিনা" }, "te": { "sa_title": "స్కిల్స్ అరేనా" }, "mr": { "sa_title": "स्किल्स एरिना" },
             "ta": { "sa_title": "திறன்கள் அரங்கம்" }, "ur": { "sa_title": "مہارت کا میدان" }, "gu": { "sa_title": "સ્કિલ્સ એરેના" },
@@ -257,7 +269,7 @@
                 const key = elem.getAttribute("data-i18n");
                 if(transObj[key]) { 
                     if(elem.tagName === "BUTTON") {
-                        if(!elem.disabled && !elem.innerHTML.includes("fa-")) elem.innerText = transObj[key];
+                        if(!elem.disabled && !elem.innerHTML.includes("fa-") && !elem.innerText.includes("PROCESSING")) elem.innerText = transObj[key];
                     } else { elem.innerText = transObj[key]; }
                 }
             });
@@ -281,6 +293,10 @@
         let allMatches = {};
         let allParticipants = {};
 
+        // Network Monitor
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -290,6 +306,8 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
+
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
@@ -311,7 +329,7 @@
                             if(adminData.module_toggles && adminData.module_toggles.esports_zone !== undefined) {
                                 isArenaActive = adminData.module_toggles.esports_zone === true || adminData.module_toggles.esports_zone === "true";
                             }
-                            // If Safe Mode (play_store_review_safe_mode) is ON, force close Arena too
+                            // If Safe Mode is ON, force close Arena too
                             if(adminData.module_toggles && (adminData.module_toggles.play_store_review_safe_mode === true || adminData.module_toggles.play_store_review_safe_mode === "true")) {
                                 isArenaActive = false;
                             }
@@ -325,10 +343,21 @@
                                 document.getElementById("masterArenaContainer").style.display = "none";
                             }
 
-                            // Setup Banners
-                            if(adminData.banner_ads) {
-                                if(adminData.banner_ads.slot1 && adminData.banner_ads.slot1.active) setAdHTML(document.getElementById("adminBannerSlot1"), adminData.banner_ads.slot1.code);
-                                if(adminData.banner_ads.slot2 && adminData.banner_ads.slot2.active) setAdHTML(document.getElementById("adminBannerSlot2"), adminData.banner_ads.slot2.code);
+                            // Setup Banners via esports_configs (Fixed with setTimeout)
+                            if(adminData.esports_configs) {
+                                let s1Code = (adminData.esports_configs.slot1 && adminData.esports_configs.slot1.code) ? adminData.esports_configs.slot1.code : adminData.esports_configs.slot1_code;
+                                let s1Active = (adminData.esports_configs.slot1 && adminData.esports_configs.slot1.active !== undefined) ? adminData.esports_configs.slot1.active : adminData.esports_configs.active;
+                                if (s1Code && s1Active !== false) {
+                                    document.getElementById("adminBannerSlot1").style.display = "flex";
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                                } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                                
+                                let s2Code = (adminData.esports_configs.slot2 && adminData.esports_configs.slot2.code) ? adminData.esports_configs.slot2.code : adminData.esports_configs.slot2_code;
+                                let s2Active = (adminData.esports_configs.slot2 && adminData.esports_configs.slot2.active !== undefined) ? adminData.esports_configs.slot2.active : adminData.esports_configs.active;
+                                if (s2Code && s2Active !== false) {
+                                    document.getElementById("adminBannerSlot2").style.display = "flex";
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                                } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
                             }
                         }
                     });
@@ -415,9 +444,7 @@
 
         function castVote(optionKey) {
             if(!currentPollData || !currentPollData.poll_id) return;
-            // 1. Mark user as voted
             db.ref(`users/${uid}/poll_voted/${currentPollData.poll_id}`).set(true).then(() => {
-                // 2. Increment global vote count
                 db.ref(`arena_game_1/live_poll/options/${optionKey}/votes`).set(firebase.database.ServerValue.increment(1));
             });
         }
@@ -457,7 +484,7 @@
             let gameType = m._game || 'game_1';
             let badgeColor = gameType === 'game_1' ? 'rgba(249, 115, 22, 0.2)' : 'rgba(234, 179, 8, 0.2)';
             let badgeTextColor = gameType === 'game_1' ? '#fdba74' : '#fde047';
-            let badgeText = gameType === 'game_1' ? '🔥 ARENA 1' : '🪖 ARENA 2'; // SAFE NAMES FOR PLAY STORE
+            let badgeText = gameType === 'game_1' ? '🔥 ARENA 1' : '🪖 ARENA 2'; 
 
             if(isActive) {
                 if(isJoined) {
@@ -513,7 +540,7 @@
             } else { alert(`🔔 Reminder Saved! Check the app 15 minutes before ${time}.`); }
         }
 
-        // JOINING LOGIC & HISTORY UPDATE
+        // JOINING LOGIC & UNIVERSAL HISTORY UPDATE 🔥
         function openJoinModal(matchId, registrationPoints, title, gameType) {
             activeJoiningMatch = { id: matchId, fee: registrationPoints, title: title, game: gameType };
             document.getElementById("playerIdInput").value = "";
@@ -534,12 +561,12 @@
                 if (error || !committed) {
                     alert("❌ Transaction failed due to network or insufficient balance."); resetJoinBtn(btn);
                 } else {
-                    // Register participant in Safe Arena node
+                    // Register participant
                     let p1 = db.ref(`arena_${activeJoiningMatch.game}/participants/${activeJoiningMatch.id}/${uid}`).set({
                         game_uid: playerIdValue, joinedAt: firebase.database.ServerValue.TIMESTAMP
                     });
 
-                    // 🔥 Add to Global Ledger (History) 🔥
+                    // Old Transactions List (for legacy display)
                     let p2 = db.ref(`users/${uid}/transactions`).push({ 
                         action: `Arena Reg: ${activeJoiningMatch.title}`, 
                         amount: -activeJoiningMatch.fee, 
@@ -548,7 +575,18 @@
                         timestamp: Date.now() 
                     });
 
-                    Promise.all([p1, p2]).then(() => {
+                    // 🔥 NEW UNIVERSAL HISTORY PUSH (For Account Health) 🔥
+                    let p3 = db.ref(`users/${uid}/history`).push({
+                        title: `Arena Reg: ${activeJoiningMatch.title}`,
+                        amount: activeJoiningMatch.fee, // Shown as debit type below
+                        type: "debit",
+                        txn_type: "game_fee",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    Promise.all([p1, p2, p3]).then(() => {
                         document.getElementById('joinDetailsModal').style.display = 'none';
                         document.getElementById("successModal").style.display = "flex";
                         resetJoinBtn(btn);

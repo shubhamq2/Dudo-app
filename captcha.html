@@ -49,7 +49,7 @@
 
         /* Banner Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(236, 72, 153, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(236, 72, 153, 0.4); box-sizing: border-box; display: none; }
 
         /* Main Captcha Card Box */
         .captcha-main-card { width: 92%; max-width: 440px; background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); margin-bottom: 10px; }
@@ -98,6 +98,14 @@
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,9,19,0.95); z-index:99999999; flex-direction:column; justify-content:center; align-items:center; text-align:center; backdrop-filter:blur(10px);">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
+    </div>
+
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
@@ -138,6 +146,7 @@
     </div>
 
     <div class="captcha-main-card">
+        <div id="captchaCounterBox" style="font-size:12px; font-weight:800; color:var(--text-sub); text-align:right; margin-bottom:10px;"><span id="todayCaptchaDone">0</span> / <span id="totalCaptchaLimit">10</span> Today</div>
         <h3 style="margin:0; font-size: 22px; color: var(--accent-pink); font-weight: 900;" data-i18n="cc_h3">Type Captcha</h3>
         <p style="font-size: 13px; color:var(--text-sub); margin: 8px 0 20px 0; font-weight: 600;" data-i18n="cc_p">Type the verification code exactly as shown below to claim instant rewards!</p>
         
@@ -159,22 +168,22 @@
 
     <div class="security-box">
         <span style="font-size: 16px;">🛡️</span>
-        <span data-i18n="cc_security">Please type the words accurately. Stay on the sponsor page for 25 seconds to successfully claim your reward points.</span>
+        <span data-i18n="cc_security">Please type the words accurately. Stay on the sponsor page to successfully claim your reward points.</span>
     </div>
 
     <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
         // 1. Firebase Config
-       const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -182,36 +191,39 @@
         // 🔥 ADMIN CONTROLLED DYNAMIC TIME & COINS 🔥
         let globalAdTimerSeconds = 25; // Default time
         let globalRewardCoins = 5;     // Default coins
+        let globalDailyLimit = 10;     // Default daily max claims
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT (WITH POLITE ERRORS)
+        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
             "en": { 
                 "cc_title": "Captcha Type", "cc_h3": "Type Captcha", "cc_p": "Type the verification code exactly as shown below to claim instant rewards!", "cc_btn": "SUBMIT CAPTCHA", 
                 "cc_security": "Please type the words accurately. Stay on the sponsor page to successfully claim your reward points.", 
                 "err_wrong": "❌ Mismatched Captcha! Please check the code and type carefully.", 
-                "err_early": "❌ Verification Incomplete! Please keep the sponsor tab open for the required time.", 
                 "err_invalid": "❌ Tracking Interrupted: Please stay on the sponsor page to complete verification.", 
-                "err_success": "🎉 Verified! 5 Points added to your account.", "wait_txt": "Verifying... " 
+                "err_limit": "⏳ Daily Limit Reached! You have completed all captchas for today. Come back tomorrow.",
+                "err_success": "🎉 Verified! Reward added to your account.", "wait_txt": "Verifying... ",
+                "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection"
             },
             "hi": { 
                 "cc_title": "कैप्चा टाइप", "cc_h3": "कैप्चा टाइप करें", "cc_p": "तुरंत रिवॉर्ड का दावा करने के लिए नीचे दिखाए गए वेरिफिकेशन कोड को बिल्कुल सही टाइप करें!", "cc_btn": "सबमिट करें", 
                 "cc_security": "कृपया शब्दों को सही ढंग से टाइप करें। अपने रिवॉर्ड पॉइंट्स को सफलतापूर्वक प्राप्त करने के लिए स्पॉन्सर पेज पर रहें।", 
                 "err_wrong": "❌ गलत कैप्चा! कृपया कोड को ध्यान से चेक करें और टाइप करें।", 
-                "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए स्पॉन्सर टैब खुला रखें।", 
                 "err_invalid": "❌ ट्रैकिंग रद्द: कृपया सत्यापन पूरा करने के लिए स्पॉन्सर पेज पर ही रहें।", 
-                "err_success": "🎉 सत्यापित! आपके खाते में 5 पॉइंट्स जोड़ दिए गए हैं।", "wait_txt": "चेक हो रहा है... " 
+                "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज के सभी कैप्चा पूरे कर लिए हैं। कल फिर आएं।",
+                "err_success": "🎉 सत्यापित! आपके खाते में रिवॉर्ड जोड़ दिए गए हैं।", "wait_txt": "चेक हो रहा है... ",
+                "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें"
             },
-            "bn": { "cc_title": "ক্যাপচা টাইপ", "cc_h3": "ক্যাপচা টাইপ করুন", "cc_p": "রিওয়ার্ড পেতে নিচের কোডটি হুবহু টাইপ করুন!", "cc_btn": "জমা দিন", "cc_security": "সঠিকভাবে শব্দ টাইপ করুন। পুরস্কার পেতে স্পনসর পেজে থাকুন।", "err_wrong": "❌ ভুল ক্যাপচা! দয়া করে সঠিকভাবে টাইপ করুন।", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি আরও কিছুক্ষণ খোলা রাখুন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে: স্পনসর পেজে থাকুন।", "err_success": "🎉 যাচাইকৃত! 5 পয়েন্ট যোগ করা হয়েছে।", "wait_txt": "যাচাই করা হচ্ছে... " },
-            "te": { "cc_title": "క్యాప్చా టైప్", "cc_h3": "క్యాప్చా ఎంటర్ చేయండి", "cc_p": "రివార్డ్స్ పొందడానికి కోడ్‌ను సరిగ్గా టైప్ చేయండి!", "cc_btn": "సమర్పించండి", "cc_security": "పదాలను సరిగ్గా టైప్ చేయండి. రివార్డ్ పొందడానికి స్పాన్సర్ పేజీలో ఉండండి.", "err_wrong": "❌ తప్పు క్యాప్చా! దయచేసి జాగ్రత్తగా టైప్ చేయండి.", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని కొద్దిసేపు తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి స్పాన్సర్ పేజీలోనే ఉండండి.", "err_success": "🎉 ధృవీకరించబడింది! 5 పాయింట్లు జోడించబడ్డాయి.", "wait_txt": "ధృవీకరిస్తోంది... " },
-            "mr": { "cc_title": "कॅप्चा टाईप", "cc_h3": "कॅप्चा टाईप करा", "cc_p": "रिवॉर्ड्स मिळवण्यासाठी खालील कोड अचूक टाईप करा!", "cc_btn": "सबमिट करा", "cc_security": "शब्द अचूक टाईप करा. रिवॉर्ड मिळवण्यासाठी स्पॉन्सर पेजवर थांबा.", "err_wrong": "❌ चुकीचा कॅप्चा! कृपया काळजीपूर्वक टाईप करा.", "err_early": "❌ अपूर्ण! कृपया स्पॉन्सर टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया स्पॉन्सर पेजवरच थांबा.", "err_success": "🎉 यशस्वी! 5 पॉइंट्स जोडले गेले.", "wait_txt": "पडताळणी सुरू आहे... " },
-            "ta": { "cc_title": "கேப்ட்சா வகை", "cc_h3": "கேப்ட்சாவை உள்ளிடுக", "cc_p": "சரியான குறியீட்டை உள்ளிட்டு பரிசுகளைப் பெறுங்கள்!", "cc_btn": "சமர்ப்பி", "cc_security": "வார்த்தைகளை சரியாக தட்டச்சு செய்யவும். விளம்பரப் பக்கத்தில் காத்திருக்கவும்.", "err_wrong": "❌ தவறான கேப்ட்சா! சரியாக தட்டச்சு செய்யவும்.", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ விளம்பரப் பக்கத்திலேயே இருக்கவும்.", "err_success": "🎉 சரிபார்க்கப்பட்டது! 5 புள்ளிகள் சேர்க்கப்பட்டன.", "wait_txt": "சரிபார்க்கிறது... " },
-            "ur": { "cc_title": "کیپچا ٹائپ", "cc_h3": "کیپچا درج کریں", "cc_p": "انعام حاصل کرنے کے لیے کوڈ بالکل صحیح ٹائپ کریں!", "cc_btn": "جمع کریں", "cc_security": "الفاظ درست ٹائپ کریں۔ سپانسر پیج پر رہیں۔", "err_wrong": "❌ غلط کیپچا! براہ کرم احتیاط سے ٹائپ کریں۔", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم سپانسر پیج پر رہیں۔", "err_success": "🎉 تصدیق ہو گئی! 5 پوائنٹس شامل کر دیے گئے۔", "wait_txt": "تصدیق ہو رہی ہے... " },
-            "gu": { "cc_title": "કેપ્ચા ટાઇપ", "cc_h3": "કેપ્ચા દાખલ કરો", "cc_p": "ઇનામ મેળવવા માટે કોડ બરાબર ટાઇપ કરો!", "cc_btn": "સબમિટ કરો", "cc_security": "શબ્દો યોગ્ય રીતે ટાઇપ કરો. સ્પોન્સર પેજ પર રહો.", "err_wrong": "❌ ખોટો કેપ્ચા! કૃપા કરીને ધ્યાનથી ટાઇપ કરો.", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને સ્પોન્સર પેજ પર રહો.", "err_success": "🎉 ચકાસણી સફળ! 5 પોઇન્ટ્સ ઉમેરાયા.", "wait_txt": "ચકાસણી... " },
-            "es": { "cc_title": "Tipo Captcha", "cc_h3": "Escribe el Captcha", "cc_p": "¡Escribe el código exactamente para ganar puntos!", "cc_btn": "ENVIAR", "cc_security": "Escribe con precisión. Mantente en la página del patrocinador.", "err_wrong": "❌ ¡Captcha incorrecto! Revisa el código.", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página del patrocinador.", "err_success": "🎉 ¡Verificado! 5 Puntos añadidos.", "wait_txt": "Verificando... " },
-            "fr": { "cc_title": "Type Captcha", "cc_h3": "Tapez le Captcha", "cc_p": "Tapez le code exactement pour gagner des points !", "cc_btn": "SOUMETTRE", "cc_security": "Tapez avec précision. Restez sur la page du sponsor.", "err_wrong": "❌ Captcha incorrect ! Vérifiez le code.", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page du sponsor.", "err_success": "🎉 Vérifié ! 5 Points ajoutés.", "wait_txt": "Vérification... " },
-            "ar": { "cc_title": "كتابة الكابتشا", "cc_h3": "اكتب الكابتشا", "cc_p": "اكتب الكود بالضبط لكسب النقاط!", "cc_btn": "إرسال", "cc_security": "اكتب بدقة. ابق في صفحة الراعي.", "err_wrong": "❌ كابتشا خاطئ! تحقق من الكود.", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في صفحة الراعي.", "err_success": "🎉 تم التحقق! أضيفت 5 نقاط.", "wait_txt": "التحقق... " },
-            "pt": { "cc_title": "Digitar Captcha", "cc_h3": "Digite o Captcha", "cc_p": "Digite o código exatamente para ganhar pontos!", "cc_btn": "ENVIAR", "cc_security": "Digite com precisão. Fique na página do patrocinador.", "err_wrong": "❌ Captcha incorreto! Verifique o código.", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página do patrocinador.", "err_success": "🎉 Verificado! 5 Pontos adicionados.", "wait_txt": "Verificando... " },
-            "ru": { "cc_title": "Ввод Капчи", "cc_h3": "Введите Капчу", "cc_p": "Введите код точно для получения очков!", "cc_btn": "ОТПРАВИТЬ", "cc_security": "Вводите точно. Оставайтесь на странице спонсора.", "err_wrong": "❌ Неверная капча! Проверьте код.", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице спонсора.", "err_success": "🎉 Проверено! 5 очков добавлено.", "wait_txt": "Проверка... " }
+            "bn": { "cc_title": "ক্যাপচা টাইপ", "cc_h3": "ক্যাপচা টাইপ করুন", "cc_p": "রিওয়ার্ড পেতে নিচের কোডটি হুবহু টাইপ করুন!", "cc_btn": "জমা দিন", "cc_security": "সঠিকভাবে শব্দ টাইপ করুন। স্পনসর পেজে থাকুন।", "err_wrong": "❌ ভুল ক্যাপচা! সঠিকভাবে টাইপ করুন।", "err_invalid": "❌ স্পনসর পেজে থাকুন।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "err_success": "🎉 যাচাইকৃত! পয়েন্ট যোগ করা হয়েছে।", "wait_txt": "যাচাই করা হচ্ছে... ", "mod_no_net": "ইন্টারনেট নেই", "mod_no_net_d": "দয়া করে ডেটা বা ওয়াই-ফাই চালু করুন।", "mod_retry": "পুনরায় চেষ্টা করুন" },
+            "te": { "cc_title": "క్యాప్చా టైప్", "cc_h3": "క్యాప్చా ఎంటర్ చేయండి", "cc_p": "కోడ్‌ను సరిగ్గా టైప్ చేయండి!", "cc_btn": "సమర్పించండి", "cc_security": "స్పాన్సర్ పేజీలో ఉండండి.", "err_wrong": "❌ తప్పు క్యాప్చా!", "err_invalid": "❌ దయచేసి స్పాన్సర్ పేజీలోనే ఉండండి.", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి.", "wait_txt": "ధృవీకరిస్తోంది... ", "mod_no_net": "ఇంటర్నెట్ లేదు", "mod_no_net_d": "దయచేసి డేటాను ఆన్ చేయండి.", "mod_retry": "మళ్లీ ప్రయత్నించండి" },
+            "mr": { "cc_title": "कॅप्चा टाईप", "cc_h3": "कॅप्चा टाईप करा", "cc_p": "रिवॉर्ड्स मिळवण्यासाठी खालील कोड अचूक टाईप करा!", "cc_btn": "सबमिट करा", "cc_security": "स्पॉन्सर पेजवर थांबा.", "err_wrong": "❌ चुकीचा कॅप्चा!", "err_invalid": "❌ कृपया स्पॉन्सर पेजवरच थांबा.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "err_success": "🎉 यशस्वी! पॉइंट्स जोडले गेले.", "wait_txt": "पडताळणी सुरू आहे... ", "mod_no_net": "इंटरनेट नाही", "mod_no_net_d": "कृपया डेटा चालू करा.", "mod_retry": "पुन्हा प्रयत्न करा" },
+            "ta": { "cc_title": "கேப்ட்சா வகை", "cc_h3": "கேப்ட்சாவை உள்ளிடுக", "cc_p": "சரியான குறியீட்டை உள்ளிடவும்!", "cc_btn": "சமர்ப்பி", "cc_security": "விளம்பரப் பக்கத்தில் காத்திருக்கவும்.", "err_wrong": "❌ தவறான கேப்ட்சா!", "err_invalid": "❌ விளம்பரப் பக்கத்திலேயே இருக்கவும்.", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "err_success": "🎉 சரிபார்க்கப்பட்டது! புள்ளிகள் சேர்க்கப்பட்டன.", "wait_txt": "சரிபார்க்கிறது... ", "mod_no_net": "இணையம் இல்லை", "mod_no_net_d": "டேட்டாவை ஆன் செய்யவும்.", "mod_retry": "மீண்டும் முயற்சி செய்" },
+            "ur": { "cc_title": "کیپچا ٹائپ", "cc_h3": "کیپچا درج کریں", "cc_p": "کوڈ بالکل صحیح ٹائپ کریں!", "cc_btn": "جمع کریں", "cc_security": "سپانسر پیج پر رہیں۔", "err_wrong": "❌ غلط کیپچا!", "err_invalid": "❌ براہ کرم سپانسر پیج پر رہیں۔", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی!", "err_success": "🎉 تصدیق ہو گئی! پوائنٹس شامل کر دیے گئے۔", "wait_txt": "تصدیق ہو رہی ہے... ", "mod_no_net": "انٹرنیٹ نہیں ہے", "mod_no_net_d": "براہ کرم ڈیٹا آن کریں۔", "mod_retry": "دوبارہ کوشش کریں" },
+            "gu": { "cc_title": "કેપ્ચા ટાઇપ", "cc_h3": "કેપ્ચા દાખલ કરો", "cc_p": "ઇનામ મેળવવા માટે કોડ બરાબર ટાઇપ કરો!", "cc_btn": "સબમિટ કરો", "cc_security": "સ્પોન્સર પેજ પર રહો.", "err_wrong": "❌ ખોટો કેપ્ચા!", "err_invalid": "❌ કૃપા કરીને સ્પોન્સર પેજ પર રહો.", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ!", "err_success": "🎉 ચકાસણી સફળ! પોઇન્ટ્સ ઉમેરાયા.", "wait_txt": "ચકાસણી... ", "mod_no_net": "ઈન્ટરનેટ નથી", "mod_no_net_d": "કૃપા કરીને ડેટા ચાલુ કરો.", "mod_retry": "ફરી પ્રયાસ કરો" },
+            "es": { "cc_title": "Tipo Captcha", "cc_h3": "Escribe Captcha", "cc_p": "¡Escribe el código exactamente!", "cc_btn": "ENVIAR", "cc_security": "Mantente en la página del patrocinador.", "err_wrong": "❌ ¡Captcha incorrecto!", "err_invalid": "❌ Quédate en la página del patrocinador.", "err_limit": "⏳ ¡Límite Diario Alcanzado!", "err_success": "🎉 ¡Verificado! Puntos añadidos.", "wait_txt": "Verificando... ", "mod_no_net": "Sin Internet", "mod_no_net_d": "Activa los datos o Wi-Fi.", "mod_retry": "Reintentar" },
+            "fr": { "cc_title": "Type Captcha", "cc_h3": "Tapez Captcha", "cc_p": "Tapez le code exactement !", "cc_btn": "SOUMETTRE", "cc_security": "Restez sur la page du sponsor.", "err_wrong": "❌ Captcha incorrect !", "err_invalid": "❌ Restez sur la page du sponsor.", "err_limit": "⏳ Limite quotidienne atteinte !", "err_success": "🎉 Vérifié ! Points ajoutés.", "wait_txt": "Vérification... ", "mod_no_net": "Pas d'Internet", "mod_no_net_d": "Activez les données ou le Wi-Fi.", "mod_retry": "Réessayer" },
+            "ar": { "cc_title": "كتابة الكابتشا", "cc_h3": "اكتب الكابتشا", "cc_p": "اكتب الكود بالضبط!", "cc_btn": "إرسال", "cc_security": "ابق في صفحة الراعي.", "err_wrong": "❌ كابتشا خاطئ!", "err_invalid": "❌ يرجى البقاء في صفحة الراعي.", "err_limit": "⏳ تم الوصول للحد اليومي!", "err_success": "🎉 تم التحقق! أضيفت النقاط.", "wait_txt": "التحقق... ", "mod_no_net": "لا يوجد إنترنت", "mod_no_net_d": "يرجى تفعيل البيانات أو الواي فاي.", "mod_retry": "إعادة المحاولة" },
+            "pt": { "cc_title": "Digitar Captcha", "cc_h3": "Digite o Captcha", "cc_p": "Digite o código exatamente!", "cc_btn": "ENVIAR", "cc_security": "Fique na página do patrocinador.", "err_wrong": "❌ Captcha incorreto!", "err_invalid": "❌ Fique na página do patrocinador.", "err_limit": "⏳ Limite diário atingido!", "err_success": "🎉 Verificado! Pontos adicionados.", "wait_txt": "Verificando... ", "mod_no_net": "Sem Internet", "mod_no_net_d": "Ative os dados ou Wi-Fi.", "mod_retry": "Tentar novamente" },
+            "ru": { "cc_title": "Ввод Капчи", "cc_h3": "Введите Капчу", "cc_p": "Введите код точно!", "cc_btn": "ОТПРАВИТЬ", "cc_security": "Оставайтесь на странице спонсора.", "err_wrong": "❌ Неверная капча!", "err_invalid": "❌ Оставайтесь на странице спонсора.", "err_limit": "⏳ Дневной лимит исчерпан!", "err_success": "🎉 Проверено! Очки добавлены.", "wait_txt": "Проверка... ", "mod_no_net": "Нет интернета", "mod_no_net_d": "Включите данные или Wi-Fi.", "mod_retry": "Повторить" }
         };
 
         function changeLanguage(langCode) {
@@ -243,9 +255,17 @@
 
         const uid = localStorage.getItem("userId");
         let currentActiveCaptchaCode = "";
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback default
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; 
+        
+        let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+        let userTodayClaimsCount = 0;
+
+        // Network Monitor
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
 
         document.addEventListener("DOMContentLoaded", () => {
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
             if (!uid) { window.location.replace("index.html"); return; }
             
             // Sync Language from Home Page
@@ -255,20 +275,29 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Live Balance
+                    // 1. Live Balance & Avatar Sync & Daily Limits Fetch
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            // Load Anti-Ban Click Data (Daily limit logic)
+                            if(data.daily_captcha_claims && data.daily_captcha_claims.date === todayDateString) {
+                                userTodayClaimsCount = data.daily_captcha_claims.count || 0;
+                            } else {
+                                userTodayClaimsCount = 0;
+                            }
+                            document.getElementById("todayCaptchaDone").innerText = userTodayClaimsCount;
+
+                            // Smart Avatar
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
                             function createEmojiURI(emoji) {
                                 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
                                 return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
                             }
 
-                            // Smart Avatar Sync
-                            let userName = data.name || "Player";
-                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             let avatarContainer = document.getElementById("headerProfileIcon");
                             if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
                                 avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
@@ -278,30 +307,52 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners & Captcha Link & Coins/Time)
+                    // 2. Fetch Admin Configurations (Banners, Captcha Link, Limit, Coins/Time)
                     db.ref('global_system_runtime_configurations/captcha_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME AND COINS
+                            // 🔥 GET ADMIN CONTROLLED SETTINGS
                             if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
                             if (adminData.reward_coins) { globalRewardCoins = parseInt(adminData.reward_coins); }
+                            if (adminData.daily_limit) { 
+                                globalDailyLimit = parseInt(adminData.daily_limit); 
+                                document.getElementById("totalCaptchaLimit").innerText = globalDailyLimit;
+                            }
 
-                            // Load Banners
-                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            // Load Banners (Fixed with setTimeout)
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
+                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            
+                            let s4Code = (adminData.slot4 && adminData.slot4.code) ? adminData.slot4.code : adminData.slot4_code;
+                            let s4Active = (adminData.slot4 && adminData.slot4.active !== undefined) ? adminData.slot4.active : adminData.active;
+                            if (s4Code && s4Active !== false) {
+                                document.getElementById("adminBannerSlot4").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
+                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
 
                             // Setup Captcha Link
                             if (adminData.captcha_link) {
                                 activeAdminSmartlinkUrl = adminData.captcha_link;
                             }
-                        } else {
-                            // Fallback to Global Smartlink
-                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
-                                if(globalSnap.exists()) activeAdminSmartlinkUrl = globalSnap.val();
-                            });
                         }
                     });
 
@@ -323,9 +374,11 @@
             document.getElementById("captchaInputText").value = "";
         }
 
-        function showCustomAlert(msgKey, isSuccess = false) {
+        function showCustomAlert(msgKey, isSuccess = false, replaceText = null) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
             let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
+
+            if(replaceText) msgStr = msgStr.replace(/5/g, replaceText);
 
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");
@@ -344,8 +397,14 @@
         let platformTimer = null;
         let isValidationActive = false;
 
-        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH IN-APP VIEWER
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH SMART TIMER & IN-APP VIEWER
         function verifyCaptchaCodeSubmit() {
+            // 🔥 ANTI-BAN: Custom Limit Check
+            if(userTodayClaimsCount >= globalDailyLimit) {
+                showCustomAlert("err_limit");
+                return;
+            }
+
             if (isValidationActive) return;
 
             const userInput = document.getElementById("captchaInputText").value.trim().toUpperCase();
@@ -373,33 +432,41 @@
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
             
+            // 🔥 Wait for Ad to Load fully before countdown
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+            
+            let iframeNode = document.getElementById("adIframe");
+
+            iframeNode.onload = function() {
+                if (platformTimer) clearInterval(platformTimer);
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+                
+                platformTimer = setInterval(() => {
+                    countdownTime--;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if (document.hidden) { 
+                        clearInterval(platformTimer);
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        resetCaptchaSubmitButton();
+                        showCustomAlert("err_invalid");
+                        return;
+                    }
+
+                    if (countdownTime <= 0) {
+                        clearInterval(platformTimer);
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
+                    }
+                }, 1000);
+            };
+
             // Load Ad URL into iframe
-            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
-
-            if (platformTimer) clearInterval(platformTimer);
-
-            platformTimer = setInterval(() => {
-                countdownTime--;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if (document.hidden) { 
-                    clearInterval(platformTimer);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    resetCaptchaSubmitButton();
-                    showCustomAlert("err_invalid");
-                    return;
-                }
-
-                if (countdownTime <= 0) {
-                    clearInterval(platformTimer);
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+            iframeNode.src = activeAdminSmartlinkUrl;
         }
 
         // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION (PURE FIREBASE)
@@ -412,7 +479,24 @@
                 return (current || 0) + globalRewardCoins;
             }).then(() => {
                 
-                // Mark Daily Task 't9' as Complete
+                // 1. 🔥 ANTI-BAN LOGIC: Register limits
+                db.ref(`users/${uid}/daily_captcha_claims`).set({
+                    date: todayDateString,
+                    count: userTodayClaimsCount + 1
+                });
+
+                // 2. 🔥 UNIVERSAL HISTORY PUSH
+                db.ref(`users/${uid}/history`).push({
+                    title: `Captcha Reward`,
+                    amount: globalRewardCoins,
+                    type: "credit",
+                    txn_type: "captcha",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // 3. Mark Daily Task 't9' as Complete
                 db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                     let tasks = snap.val() || [];
                     if (!tasks.includes("t9")) {
@@ -424,17 +508,7 @@
                 resetCaptchaSubmitButton();
                 generateNewCaptchaCode();
                 
-                // Success message with dynamic coins replacement
-                let currentLang = localStorage.getItem("selectedLang") || "en";
-                let successMsg = langData[currentLang]["err_success"] || langData["en"]["err_success"];
-                successMsg = successMsg.replace(/5/g, globalRewardCoins);
-                
-                const alertBox = document.getElementById("customAlertBox");
-                const overlay = document.getElementById("alertOverlay");
-                document.getElementById("alertMessage").innerText = successMsg;
-                alertBox.classList.add("success-border");
-                alertBox.style.display = "block";
-                overlay.style.display = "block";
+                showCustomAlert("err_success", true, globalRewardCoins);
                 
             }).catch(() => {
                 resetCaptchaSubmitButton();

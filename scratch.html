@@ -52,7 +52,7 @@
         .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: none; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(236, 72, 153, 0.4); box-sizing: border-box; }
 
         /* Main Game Playground Card */
-        .scratch-main-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .scratch-main-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); position: relative; }
         
         /* Interactive Scratch Canvas Container */
         .scratch-canvas-container { position: relative; width: 280px; height: 160px; margin: 20px auto; background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 16px; border: 2px dashed var(--accent-pink); overflow: hidden; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
@@ -138,6 +138,8 @@
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+        
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
 
    <!-- ⚡⚡ ANTI-FLICKER SCRIPT FOR INDEPENDENT TOGGLES ⚡⚡ -->
@@ -162,6 +164,14 @@
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
         <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
@@ -210,7 +220,10 @@
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="scratch-main-card">
-            <h3 style="margin:0 0 8px 0; font-size: 22px; color: var(--accent-pink); font-weight: 900;" data-i18n="sc_h3">Scratch Rewards</h3>
+            <!-- 🔥 DAILY LIMIT COUNTER -->
+            <div id="dailyClaimsCounterBox" style="position: absolute; top: 15px; right: 15px; font-size:11px; font-weight:800; color:var(--text-sub); text-align:right; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);"><span id="todayScratchDone">0</span> / <span id="totalScratchLimit">15</span> Today</div>
+
+            <h3 style="margin: 0 0 8px 0; font-size: 22px; color: var(--accent-pink); font-weight: 900;" data-i18n="sc_h3">Scratch Rewards</h3>
             <p style="font-size: 13.5px; color:var(--text-sub); margin: 0; font-weight: 600;" data-i18n="sc_p">Rub the silver layer below to unlock secret tokens!</p>
             
             <div class="scratch-canvas-container">
@@ -290,27 +303,36 @@
         </div>
 
         <div class="ad-banner-slot" id="adminBannerSlot2"></div>
+        <div class="ad-banner-slot" id="adminBannerSlot3"></div>
+        <div class="ad-banner-slot" id="adminBannerSlot4"></div>
     </div>
 
     <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME, LIMITS & REWARDS 🔥
         let globalAdTimerSeconds = 25; // Default time
+        let globalMinReward = 10;      // Default Min
+        let globalMaxReward = 30;      // Default Max
+        let globalDailyLimit = 15;     // Default Daily Limit
+        
+        let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+        let userTodayClaimsCount = 0;
+        let currentJackpotWinAmount = 0;
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
@@ -319,26 +341,28 @@
                 "mb_sun": "Every Sunday", "mb_week_title": "Weekly Mega Drop", "mb_week_desc": "Draw is active this weekend. Buy a pass to enter.", "mb_prev": "Previous Winner", "mb_buy": "Unlock Entry Pass (200 🪙)", "mb_active": "🎟️ Your Active Passes",
                 "market_head": "Premium Passes Marketplace", "pl_r_title": "Marketplace Rules:", "pl_r1": "Redeem your coins for Premium Passes.", "pl_r2": "Passes grant immediate access to high-reward scratch cards.", "pl_r3": "Rewards are randomized within the specified tier limits.",
                 "tier1_t": "Bronze Scratch Pass", "tier1_d": "Win random bonus up to 250 Coins", "tier2_t": "Silver Scratch Pass", "tier2_d": "Guaranteed returns up to 1000 Coins", "tier3_t": "Gold Premium Pass", "tier3_d": "Ultimate premium tier multiplier loop", "btn_buy": "Redeem",
-                "nsf_coins": "❌ Not enough coins to unlock this pass!", "buy_success": "🎉 Pass Activated! Scratch the card matrix now.", "err_early": "❌ Verification Incomplete! Please keep the sponsor page open.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page to verify."
+                "nsf_coins": "❌ Not enough coins to unlock this pass!", "buy_success": "🎉 Pass Activated! Scratch the card matrix now.", "err_early": "❌ Verification Incomplete! Please keep the sponsor page open.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page to verify.", "err_limit": "⏳ Daily Limit Reached! You have scratched all available cards for today. Come back tomorrow.",
+                "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection"
             },
             "hi": { 
                 "sc_title": "रिवॉर्ड्स ज़ोन", "wd_wallet": "वॉलेट बैलेंस", "sc_h3": "स्क्रैच रिवॉर्ड्स", "sc_p": "सीक्रेट टोकन अनलॉक करने के लिए नीचे दी गई सिल्वर परत को रगड़ें!", "sc_btn": "कार्ड स्क्रैच करें", "err_success": "🎉 सफलता! आपके खाते में सिक्के जोड़ दिए गए हैं: ", "wait_txt": "चेक हो रहा है... ",
                 "mb_sun": "हर रविवार", "mb_week_title": "साप्ताहिक मेगा ड्रॉप", "mb_week_desc": "इस वीकेंड ड्रॉ सक्रिय है। भाग लेने के लिए पास प्राप्त करें।", "mb_prev": "पिछला विजेता", "mb_buy": "एंट्री पास अनलॉक करें (200 🪙)", "mb_active": "🎟️ आपके सक्रिय पास",
                 "market_head": "प्रीमियम पास मार्केटप्लेस", "pl_r_title": "मार्केटप्लेस के नियम:", "pl_r1": "प्रीमियम पास के लिए अपने सिक्के रिडीम करें।", "pl_r2": "पास आपको बड़े रिवॉर्ड वाले स्क्रैच कार्ड देते हैं।", "pl_r3": "इनाम संबंधित टियर लिमिट के अनुसार रैंडम होते हैं।",
                 "tier1_t": "कांस्य स्क्रैच पास", "tier1_d": "250 कॉइन्स तक का रैंडम बोनस", "tier2_t": "रजत स्क्रैच पास", "tier2_d": "1000 कॉइन्स तक का रिटर्न", "tier3_t": "स्वर्ण प्रीमियम पास", "tier3_d": "अल्टीमेट प्रीमियम टियर", "btn_buy": "रिडीम करें",
-                "nsf_coins": "❌ इस पास को अनलॉक करने के लिए पर्याप्त सिक्के नहीं हैं!", "buy_success": "🎉 पास सक्रिय! अब अपना कार्ड स्क्रैच करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर ही रहें।"
+                "nsf_coins": "❌ इस पास को अनलॉक करने के लिए पर्याप्त सिक्के नहीं हैं!", "buy_success": "🎉 पास सक्रिय! अब अपना कार्ड स्क्रैच करें।", "err_early": "❌ सत्यापन अधूरा! कृपया स्पॉन्सर पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर ही रहें।", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज के सभी कार्ड स्क्रैच कर लिए हैं। कल फिर आएं।",
+                "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें"
             },
-            "bn": { "sc_title": "রিওয়ার্ড জোন", "wd_wallet": "ওয়ালেট ব্যালেন্স", "sc_btn": "স্ক্র্যাচ করুন", "err_success": "🎉 সফল! কয়েন যোগ করা হয়েছে: ", "wait_txt": "যাচাই হচ্ছে... ", "btn_buy": "রিডিম", "nsf_coins": "❌ কয়েন অপর্যাপ্ত!", "buy_success": "🎉 পাস অ্যাক্টিভ! এখন কার্ড স্ক্র্যাচ করুন।", "err_early": "❌ যাচাই অসম্পূর্ণ!", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে!" },
-            "te": { "sc_title": "రివార్డ్స్ జోన్", "sc_btn": "స్క్రాచ్ చేయండి", "err_success": "🎉 విజయం! జోడించబడింది: ", "btn_buy": "పొందండి", "nsf_coins": "❌ కాయిన్స్ సరిపోవు!", "buy_success": "🎉 పాస్ యాక్టివ్! ఇప్పుడు స్క్రాచ్ చేయండి.", "err_early": "❌ అసంపూర్ణం!", "err_invalid": "❌ దయచేసి పేజీలోనే ఉండండి." },
-            "mr": { "sc_title": "रिवॉर्ड्स झोन", "sc_btn": "स्क्रॅच करा", "err_success": "🎉 यशस्वी! जोडले गेले: ", "btn_buy": "मिळवा", "nsf_coins": "❌ कॉइन्स अपुरे!", "buy_success": "🎉 पास अ‍ॅक्टिव्ह! आता स्क्रॅच करा.", "err_early": "❌ अपूर्ण!", "err_invalid": "❌ कृपया पेजवरच थांबा." },
-            "ta": { "sc_title": "ரிவார்ட் மண்டலம்", "sc_btn": "கீறவும்", "err_success": "🎉 வெற்றி! சேர்க்கப்பட்டது: ", "btn_buy": "பெறுக", "nsf_coins": "❌ நாணயங்கள் போதாது!", "buy_success": "🎉 பாஸ் ஆக்டிவ்!", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ அதே பக்கத்திலேயே இருக்கவும்." },
-            "ur": { "sc_title": "ریوارڈز زون", "sc_btn": "اسکریچ کریں", "err_success": "🎉 کامیابی! شامل کیے گئے: ", "btn_buy": "حاصل کریں", "nsf_coins": "❌ کوئنز ناکافی ہیں!", "buy_success": "🎉 پاس فعال ہو گیا!", "err_early": "❌ نامکمل!", "err_invalid": "❌ براہ کرم پیج پر رہیں۔" },
-            "gu": { "sc_title": "ઇનામ ઝોન", "sc_btn": "સ્ક્રેચ કરો", "err_success": "🎉 સફળતા! ઉમેરાયા: ", "btn_buy": "મેળવો", "nsf_coins": "❌ સિક્કા અપૂરતા છે!", "buy_success": "🎉 પાસ સક્રિય!", "err_early": "❌ અધૂરું!", "err_invalid": "❌ કૃપા કરીને પેજ પર રહો." },
-            "es": { "sc_title": "Zona de Recompensas", "sc_btn": "RASCAR TARJETA", "err_success": "🎉 ¡Éxito! Añadido: ", "btn_buy": "Canjear", "nsf_coins": "❌ ¡Monedas insuficientes!", "buy_success": "🎉 ¡Pase activado!", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ Quédate en la página." },
-            "fr": { "sc_title": "Zone de Récompenses", "sc_btn": "GRATTER", "err_success": "🎉 Succès ! Ajouté : ", "btn_buy": "Échanger", "nsf_coins": "❌ Pièces insuffisantes !", "buy_success": "🎉 Pass activé !", "err_early": "❌ Incomplet !", "err_invalid": "❌ Restez sur la page." },
-            "ar": { "sc_title": "منطقة المكافآت", "sc_btn": "اخدش البطاقة", "err_success": "🎉 نجاح! أُضيف: ", "btn_buy": "استرداد", "nsf_coins": "❌ عملات غير كافية!", "buy_success": "🎉 تم تفعيل التذكرة!", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ يرجى البقاء في الصفحة." },
-            "pt": { "sc_title": "Zona de Recompensas", "sc_btn": "RASPAR", "err_success": "🎉 Sucesso! Adicionado: ", "btn_buy": "Resgatar", "nsf_coins": "❌ Moedas insuficientes!", "buy_success": "🎉 Passe ativado!", "err_early": "❌ Incompleto!", "err_invalid": "❌ Fique na página." },
-            "ru": { "sc_title": "Зона Наград", "sc_btn": "СТЕРЕТЬ", "err_success": "🎉 Успех! Добавлено: ", "btn_buy": "Обменять", "nsf_coins": "❌ Недостаточно монет!", "buy_success": "🎉 Пропуск активирован!", "err_early": "❌ Не завершено!", "err_invalid": "❌ Оставайтесь на странице." }
+            "bn": { "sc_title": "রিওয়ার্ড জোন", "wd_wallet": "ওয়ালেট ব্যালেন্স", "sc_btn": "স্ক্র্যাচ করুন", "err_success": "🎉 সফল! কয়েন যোগ করা হয়েছে: ", "wait_txt": "যাচাই হচ্ছে... ", "btn_buy": "রিডিম", "nsf_coins": "❌ কয়েন অপর্যাপ্ত!", "buy_success": "🎉 পাস অ্যাক্টিভ! এখন কার্ড স্ক্র্যাচ করুন।", "err_early": "❌ যাচাই অসম্পূর্ণ!", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে!", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "mod_no_net": "ইন্টারনেট নেই", "mod_no_net_d": "দয়া করে ডেটা বা ওয়াই-ফাই চালু করুন।", "mod_retry": "পুনরায় চেষ্টা করুন" },
+            "te": { "sc_title": "రివార్డ్స్ జోన్", "sc_btn": "స్క్రాచ్ చేయండి", "err_success": "🎉 విజయం! జోడించబడింది: ", "btn_buy": "పొందండి", "nsf_coins": "❌ కాయిన్స్ సరిపోవు!", "buy_success": "🎉 పాస్ యాక్టివ్! ఇప్పుడు స్క్రాచ్ చేయండి.", "err_early": "❌ అసంపూర్ణం!", "err_invalid": "❌ దయచేసి పేజీలోనే ఉండండి.", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "mod_no_net": "ఇంటర్నెట్ లేదు", "mod_no_net_d": "దయచేసి డేటాను ఆన్ చేయండి.", "mod_retry": "మళ్లీ ప్రయత్నించండి" },
+            "mr": { "sc_title": "रिवॉर्ड्स झोन", "sc_btn": "स्क्रॅच करा", "err_success": "🎉 यशस्वी! जोडले गेले: ", "btn_buy": "मिळवा", "nsf_coins": "❌ कॉइन्स अपुरे!", "buy_success": "🎉 पास अ‍ॅक्टिव्ह! आता स्क्रॅच करा.", "err_early": "❌ अपूर्ण!", "err_invalid": "❌ कृपया पेजवरच थांबा.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "mod_no_net": "इंटरनेट नाही", "mod_no_net_d": "कृपया डेटा चालू करा.", "mod_retry": "पुन्हा प्रयत्न करा" },
+            "ta": { "sc_title": "ரிவார்ட் மண்டலம்", "sc_btn": "கீறவும்", "err_success": "🎉 வெற்றி! சேர்க்கப்பட்டது: ", "btn_buy": "பெறுக", "nsf_coins": "❌ நாணயங்கள் போதாது!", "buy_success": "🎉 பாஸ் ஆக்டிவ்!", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ அதே பக்கத்திலேயே இருக்கவும்.", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "mod_no_net": "இணையம் இல்லை", "mod_no_net_d": "டேட்டாவை ஆன் செய்யவும்.", "mod_retry": "மீண்டும் முயற்சி செய்" },
+            "ur": { "sc_title": "ریوارڈز زون", "sc_btn": "اسکریچ کریں", "err_success": "🎉 کامیابی! شامل کیے گئے: ", "btn_buy": "حاصل کریں", "nsf_coins": "❌ کوئنز ناکافی ہیں!", "buy_success": "🎉 پاس فعال ہو گیا!", "err_early": "❌ نامکمل!", "err_invalid": "❌ براہ کرم پیج پر رہیں۔", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی!", "mod_no_net": "انٹرنیٹ نہیں ہے", "mod_no_net_d": "براہ کرم ڈیٹا آن کریں۔", "mod_retry": "دوبارہ کوشش کریں" },
+            "gu": { "sc_title": "ઇનામ ઝોન", "sc_btn": "સ્ક્રેચ કરો", "err_success": "🎉 સફળતા! ઉમેરાયા: ", "btn_buy": "મેળવો", "nsf_coins": "❌ સિક્કા અપૂરતા છે!", "buy_success": "🎉 પાસ સક્રિય!", "err_early": "❌ અધૂરું!", "err_invalid": "❌ કૃપા કરીને પેજ પર રહો.", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ!", "mod_no_net": "ઈન્ટરનેટ નથી", "mod_no_net_d": "કૃપા કરીને ડેટા ચાલુ કરો.", "mod_retry": "ફરી પ્રયાસ કરો" },
+            "es": { "sc_title": "Zona de Recompensas", "sc_btn": "RASCAR TARJETA", "err_success": "🎉 ¡Éxito! Añadido: ", "btn_buy": "Canjear", "nsf_coins": "❌ ¡Monedas insuficientes!", "buy_success": "🎉 ¡Pase activado!", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ Quédate en la página.", "err_limit": "⏳ ¡Límite Diario Alcanzado!", "mod_no_net": "Sin Internet", "mod_no_net_d": "Activa los datos o Wi-Fi.", "mod_retry": "Reintentar" },
+            "fr": { "sc_title": "Zone de Récompenses", "sc_btn": "GRATTER", "err_success": "🎉 Succès ! Ajouté : ", "btn_buy": "Échanger", "nsf_coins": "❌ Pièces insuffisantes !", "buy_success": "🎉 Pass activé !", "err_early": "❌ Incomplet !", "err_invalid": "❌ Restez sur la page.", "err_limit": "⏳ Limite quotidienne atteinte !", "mod_no_net": "Pas d'Internet", "mod_no_net_d": "Activez les données ou le Wi-Fi.", "mod_retry": "Réessayer" },
+            "ar": { "sc_title": "منطقة المكافآت", "sc_btn": "اخدش البطاقة", "err_success": "🎉 نجاح! أُضيف: ", "btn_buy": "استرداد", "nsf_coins": "❌ عملات غير كافية!", "buy_success": "🎉 تم تفعيل التذكرة!", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ يرجى البقاء في الصفحة.", "err_limit": "⏳ تم الوصول للحد اليومي!", "mod_no_net": "لا يوجد إنترنت", "mod_no_net_d": "يرجى تفعيل البيانات أو الواي فاي.", "mod_retry": "إعادة المحاولة" },
+            "pt": { "sc_title": "Zona de Recompensas", "sc_btn": "RASPAR", "err_success": "🎉 Sucesso! Adicionado: ", "btn_buy": "Resgatar", "nsf_coins": "❌ Moedas insuficientes!", "buy_success": "🎉 Passe ativado!", "err_early": "❌ Incompleto!", "err_invalid": "❌ Fique na página.", "err_limit": "⏳ Limite diário atingido!", "mod_no_net": "Sem Internet", "mod_no_net_d": "Ative os dados ou Wi-Fi.", "mod_retry": "Tentar novamente" },
+            "ru": { "sc_title": "Зона Наград", "sc_btn": "СТЕРЕТЬ", "err_success": "🎉 Успех! Добавлено: ", "btn_buy": "Обменять", "nsf_coins": "❌ Недостаточно монет!", "buy_success": "🎉 Пропуск активирован!", "err_early": "❌ Не завершено!", "err_invalid": "❌ Оставайтесь на странице.", "err_limit": "⏳ Дневной лимит исчерпан!", "mod_no_net": "Нет интернета", "mod_no_net_d": "Включите данные или Wi-Fi.", "mod_retry": "Повторить" }
         };
 
         function changeLanguage(langCode) {
@@ -360,14 +384,25 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+
         const uid = localStorage.getItem("userId");
         let randomCoinsReward = 0; 
         let isScratchedPassed = false;
         let userCurrentCoinsMaster = 0;
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
         
-        let isLotterySystemActive = false; // Admin Toggle
-        let isMarketplaceActive = false;   // Admin Toggle
+        let isLotterySystemActive = false; 
+        let isMarketplaceActive = false;   
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
@@ -376,12 +411,20 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Live Balance
+                    // 1. Live Balance & Daily Limits Fetch
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             userCurrentCoinsMaster = data.coins || 0;
                             document.getElementById("liveUserCoins").innerText = userCurrentCoinsMaster;
+                            
+                            // Load Anti-Ban Click Data
+                            if(data.daily_scratch_claims && data.daily_scratch_claims.date === todayDateString) {
+                                userTodayClaimsCount = data.daily_scratch_claims.count || 0;
+                            } else {
+                                userTodayClaimsCount = 0;
+                            }
+                            document.getElementById("todayScratchDone").innerText = userTodayClaimsCount;
                         }
                     });
 
@@ -390,25 +433,36 @@
                         if (snap.exists()) {
                             const adminData = snap.val();
                             
-                            // Load Banners & Time
                             if (adminData.scratch_pass_configs) {
-                                
-                                // 🔥 GET ADMIN CONTROLLED TIME
+                                // 🔥 GET ADMIN CONTROLLED SETTINGS
                                 if (adminData.scratch_pass_configs.ad_timer) { globalAdTimerSeconds = parseInt(adminData.scratch_pass_configs.ad_timer); }
+                                if (adminData.scratch_pass_configs.min_reward) { globalMinReward = parseInt(adminData.scratch_pass_configs.min_reward); }
+                                if (adminData.scratch_pass_configs.max_reward) { globalMaxReward = parseInt(adminData.scratch_pass_configs.max_reward); }
+                                if (adminData.scratch_pass_configs.daily_limit) { 
+                                    globalDailyLimit = parseInt(adminData.scratch_pass_configs.daily_limit); 
+                                    document.getElementById("totalScratchLimit").innerText = globalDailyLimit;
+                                }
 
+                                // Load Banners with setTimeout
                                 if (adminData.scratch_pass_configs.slot1_code && adminData.scratch_pass_configs.active !== false) {
                                     document.getElementById("adminBannerSlot1").style.display = "flex";
-                                    setAdHTML(document.getElementById("adminBannerSlot1"), adminData.scratch_pass_configs.slot1_code);
-                                } else {
-                                    document.getElementById("adminBannerSlot1").style.display = "none";
-                                }
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), adminData.scratch_pass_configs.slot1_code), 400);
+                                } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
                                 
                                 if (adminData.scratch_pass_configs.slot2_code && adminData.scratch_pass_configs.active !== false) {
                                     document.getElementById("adminBannerSlot2").style.display = "flex";
-                                    setAdHTML(document.getElementById("adminBannerSlot2"), adminData.scratch_pass_configs.slot2_code);
-                                } else {
-                                    document.getElementById("adminBannerSlot2").style.display = "none";
-                                }
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), adminData.scratch_pass_configs.slot2_code), 800);
+                                } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                                
+                                if (adminData.scratch_pass_configs.slot3_code && adminData.scratch_pass_configs.active !== false) {
+                                    document.getElementById("adminBannerSlot3").style.display = "flex";
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), adminData.scratch_pass_configs.slot3_code), 1200);
+                                } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                                
+                                if (adminData.scratch_pass_configs.slot4_code && adminData.scratch_pass_configs.active !== false) {
+                                    document.getElementById("adminBannerSlot4").style.display = "flex";
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), adminData.scratch_pass_configs.slot4_code), 1600);
+                                } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
                                 
                                 if (adminData.scratch_pass_configs.scratch_ad_link) {
                                     activeAdminSmartlinkUrl = adminData.scratch_pass_configs.scratch_ad_link;
@@ -430,7 +484,7 @@
                                 document.getElementById("mod_marketplace_arena").style.display = isMarketplaceActive ? 'flex' : 'none';
                             }
                             
-                            // Latest Winner (From scratch_settings)
+                            // Latest Winner
                             if (adminData.scratch_settings && adminData.scratch_settings.latest_winner_name) {
                                 document.getElementById("latestWinnerDisplayBlock").style.display = "block";
                                 document.getElementById("lwWinnerNameDisplay").innerText = adminData.scratch_settings.latest_winner_name;
@@ -444,7 +498,8 @@
                         if(snap.exists()) {
                             let wDrop = snap.val();
                             if(wDrop.winner_uid === uid && !localStorage.getItem("ack_jackpot_win")) {
-                                document.getElementById("winnerCoinsYieldDisplay").innerText = `+${wDrop.jackpot_amount || 5000} COINS`;
+                                currentJackpotWinAmount = parseInt(wDrop.jackpot_amount || 5000);
+                                document.getElementById("winnerCoinsYieldDisplay").innerText = `+${currentJackpotWinAmount} COINS`;
                                 document.getElementById("lotteryWinnerModalFrame").style.display = "flex";
                             }
                         }
@@ -460,16 +515,6 @@
 
             resetScratchModuleLocally();
         });
-
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
-        }
 
         // 🎟️ MOCK USER PASSES (Pure Firebase Live Fetch)
         function fetchUserPassesFromFirebase() {
@@ -605,8 +650,10 @@
 
         function resetScratchModuleLocally() {
             isScratchedPassed = false;
-            // Free Daily Card Values (Unless overridden by Marketplace)
-            if(randomCoinsReward === 0) randomCoinsReward = Math.floor(Math.random() * 20) + 1; 
+            // Free Daily Card Values (Admin Managed Min/Max)
+            if(randomCoinsReward === 0) {
+                randomCoinsReward = Math.floor(Math.random() * (globalMaxReward - globalMinReward + 1)) + globalMinReward; 
+            }
             
             document.getElementById("rewardCoinsDisplay").innerText = `+ ${randomCoinsReward} COINS`;
 
@@ -622,16 +669,15 @@
         // 🚀 PLAY STORE SAFE VALIDATION (WITH IN-APP VIEWER)
         let platformTimer = null;
         let countdownTime = 25;
-        let targetWindow = null;
-        let totalSecondsOpen = 0;
         let isValidationActive = false;
 
-        window.hasMainTabHidden = false; 
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { window.hasMainTabHidden = true; }
-        });
-
         function triggerSecureVerification() {
+            // 🔥 ANTI-BAN: Custom Limit Check
+            if(userTodayClaimsCount >= globalDailyLimit) {
+                showCustomAlert("err_limit");
+                return;
+            }
+
             if(isValidationActive) return;
             isValidationActive = true;
 
@@ -640,8 +686,6 @@
             let currentLang = localStorage.getItem("selectedLang") || "en";
 
             countdownTime = globalAdTimerSeconds;
-            totalSecondsOpen = 0;
-            window.hasMainTabHidden = false; 
             
             let initialWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
             btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
@@ -681,7 +725,7 @@
             }, 1000);
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5) via PURE FIREBASE
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5) via PURE FIREBASE + UNIVERSAL HISTORY
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
@@ -691,16 +735,24 @@
                 return (current || 0) + randomCoinsReward;
             }).then(() => {
                 
-                // 🔥 Add to Transaction Ledger History
-                db.ref(`users/${uid}/transactions`).push({
-                    action: "scratch_card_win",
+                // 2. 🔥 ANTI-BAN LOGIC: Register limits
+                db.ref(`users/${uid}/daily_scratch_claims`).set({
+                    date: todayDateString,
+                    count: userTodayClaimsCount + 1
+                });
+
+                // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
+                db.ref(`users/${uid}/history`).push({
+                    title: `Scratch Card Reward`,
                     amount: randomCoinsReward,
+                    type: "credit",
+                    txn_type: "scratch_card",
                     status: "SUCCESSFUL",
-                    details: "Daily Scratch Reward",
-                    timestamp: Date.now()
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
                 
-                // Mark Daily Task 't5' as Complete
+                // 4. Mark Daily Task 't5' as Complete
                 db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                     let tasks = snap.val() || [];
                     if (!tasks.includes("t5")) {
@@ -720,7 +772,7 @@
             });
         }
 
-        // 🏪 MARKETPLACE PURCHASE (PURE FIREBASE TRANSACTION WITH ADMIN SYNC)
+        // 🏪 MARKETPLACE PURCHASE (PURE FIREBASE TRANSACTION + UNIVERSAL HISTORY DEBIT)
         function executeMarketplacePurchase(tierTypeString, costCoinsInt) {
             if(userCurrentCoinsMaster < costCoinsInt) { showCustomAlert("nsf_coins"); return; }
 
@@ -733,13 +785,15 @@
             }).then((result) => {
                 if(result.committed) {
                     
-                    // 🔥 Add to Transaction Ledger History
-                    db.ref(`users/${uid}/transactions`).push({
-                        action: `buy_premium_pass_${tierTypeString}`,
-                        amount: -costCoinsInt,
+                    // 🔥 UNIVERSAL HISTORY DEBIT PUSH (Account Health)
+                    db.ref(`users/${uid}/history`).push({
+                        title: `Bought Scratch Pass (${tierTypeString})`,
+                        amount: costCoinsInt,
+                        type: "debit",
+                        txn_type: "pass_purchase",
                         status: "SUCCESSFUL",
-                        details: `Premium Scratch Pass`,
-                        timestamp: Date.now()
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
 
                     // 🔥 UPDATE ADMIN PANEL METRICS LIVE (Passes Sold Tracking)
@@ -769,7 +823,7 @@
             });
         }
 
-        // 🎟️ WEEKLY ENTRY PASS (ADMIN PANEL LOTTERY SYNC)
+        // 🎟️ WEEKLY ENTRY PASS (ADMIN PANEL LOTTERY SYNC + UNIVERSAL HISTORY DEBIT)
         function executeBuyWeeklyLotteryTicket(ticketPriceCoins) {
             if(userCurrentCoinsMaster < ticketPriceCoins) { showCustomAlert("nsf_coins"); return; }
             
@@ -784,30 +838,32 @@
                     // Generate Ticket ID
                     let tId = "DUDO-" + Math.floor(Math.random() * 900000 + 100000);
                     
-                    // 🔥 2. Add to User's Active Passes
+                    // 2. Add to User's Active Passes
                     let p1 = db.ref(`users/${uid}/active_passes/${tId}`).set({
                         ticket_id: tId,
                         purchased_at: firebase.database.ServerValue.TIMESTAMP,
                         valid_until: "Sunday"
                     });
 
-                    // 🔥 3. Sync with Admin Panel Lottery Bids Tracker
+                    // 3. Sync with Admin Panel Lottery Bids Tracker
                     let p2 = db.ref(`lottery_bids_tracker/${tId}`).set({
                         uid: uid,
                         ticket_id: tId,
                         timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
 
-                    // 🔥 4. Increment Admin Panel Global Passes Count
+                    // 4. Increment Admin Panel Global Passes Count
                     let p3 = db.ref(`weekly_drop/global_passes_count`).set(firebase.database.ServerValue.increment(1));
 
-                    // 🔥 5. Add to Transaction Ledger History
-                    let p4 = db.ref(`users/${uid}/transactions`).push({
-                        action: "buy_lottery_pass",
-                        amount: -ticketPriceCoins,
+                    // 🔥 5. UNIVERSAL HISTORY DEBIT PUSH (For Account Health)
+                    let p4 = db.ref(`users/${uid}/history`).push({
+                        title: `Bought Weekly Pass`,
+                        amount: ticketPriceCoins,
+                        type: "debit",
+                        txn_type: "lottery_pass",
                         status: "SUCCESSFUL",
-                        details: `Lottery Pass: #${tId}`,
-                        timestamp: Date.now()
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
 
                     return Promise.all([p1, p2, p3, p4]).then(() => tId);
@@ -822,11 +878,33 @@
             });
         }
 
-        // 🏆 CLAIM JACKPOT WIN
+        // 🏆 CLAIM JACKPOT WIN (FIXED: NOW PROPERLY GIVES COINS)
         function executeClaimJackpotPoolCredits() {
-            document.getElementById("lotteryWinnerModalFrame").style.display = "none";
-            localStorage.setItem("ack_jackpot_win", "true");
-            alert(`🔥 Reward Synchronized! Check your balance.`);
+            if(currentJackpotWinAmount <= 0) return;
+
+            // 1. Give Coins via Transaction
+            db.ref(`users/${uid}/coins`).transaction((currentCoins) => {
+                return (currentCoins || 0) + currentJackpotWinAmount;
+            }).then(() => {
+                
+                // 2. UNIVERSAL HISTORY CREDIT PUSH
+                db.ref(`users/${uid}/history`).push({
+                    title: `Mega Drop Winner!`,
+                    amount: currentJackpotWinAmount,
+                    type: "credit",
+                    txn_type: "jackpot_win",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                document.getElementById("lotteryWinnerModalFrame").style.display = "none";
+                localStorage.setItem("ack_jackpot_win", "true");
+                showCustomAlert("err_success", `${currentJackpotWinAmount} 🪙`, true);
+
+            }).catch((err) => {
+                alert("Failed to claim reward due to network error. Try again.");
+            });
         }
     </script>
 </body>

@@ -103,7 +103,7 @@
         .fee-adjuster { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 18px 0; background: rgba(15, 23, 42, 0.8); padding: 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); }
         .fee-btn { background: #334155; border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .fee-btn:active { background: var(--accent-pink); transform: scale(0.9); }
-        .fee-amount { font-size: 24px; font-weight: 900; color: var(--accent-gold); width: 90px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+        .fee-amount { font-size: 24px; font-weight: 900; color: var(--accent-gold); width: 90px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); text-align: center; }
 
         /* 1v1 Matching Display Layout */
         .vs-container { display: flex; justify-content: space-around; align-items: center; margin: 30px 0; position: relative; }
@@ -145,9 +145,9 @@
     <!-- 🌐 OFFLINE SCREEN -->
     <div id="globalOfflineWarningOverlay">
         <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
-        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;">No Internet Connection</h2>
-        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;">Please enable Mobile Data or Wi-Fi to continue.</p>
-        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;">Retry Connection</button>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
@@ -235,30 +235,159 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
-        firebase.initializeApp(firebaseConfig);
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
         
         let adPartnerLink = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
         
         // 🔥 ADMIN CONTROLS VARIABLES 🔥
-        let globalAdTimerSeconds = 25; // Default time
-        let globalWinMultiplier = 2;   // Default coins multiplier (20 lgao 40 pao)
+        let globalAdTimerSeconds = 25; 
+        let globalWinMultiplier = 2;   
 
-        // PLAY STORE COMPLIANT TRANSLATIONS (13+ Languages)
+        // PLAY STORE COMPLIANT TRANSLATIONS
         const langData = {
-            "en": { "cb_title": "Point Battles", "cb_wallet": "Available Points", "cb_desc": "Set your Entry Fee. Fast tap the highest number block to beat your opponent. Minimizing app cancels the match!", "cb_searching": "Searching...", "cb_btn_find": "Find Challenger ⚔️", "cb_question": "WHICH NUMBER IS HIGHEST?", "cb_connecting": "Connecting Matchmaking...", "cb_active": "Battle Active! 🎯" },
-            "hi": { "cb_title": "पॉइंट बैटल", "cb_wallet": "उपलब्ध पॉइंट्स", "cb_desc": "एंट्री फीस सेट करें। विरोधी को हराने के लिए सबसे बड़े नंबर पर जल्दी टैप करें। ऐप मिनिमाइज़ करने पर मैच रद्द हो जाएगा!", "cb_searching": "खोज रहे हैं...", "cb_btn_find": "चैलेंजर खोजें ⚔️", "cb_question": "कौन सा नंबर बड़ा है?", "cb_connecting": "कनेक्ट हो रहा है...", "cb_active": "बैटल शुरू! 🎯" }
-        };
+            
+    "en": {
+        "arena_title": "Arena",
+        "cb_wallet": "Available Points",
+        "cb_desc": "Set your Entry Fee. Fast tap the highest number block to beat your opponent. Minimizing app cancels the match!",
+        "cb_searching": "Searching...",
+        "cb_btn_find": "Find Challenger ⚔️",
+        "cb_question": "WHICH NUMBER IS HIGHEST?",
+        "cb_connecting": "Connecting Matchmaking...",
+        "cb_active": "Battle Active! 🎯"
+    },
+    "hi": {
+        "arena_title": "अरीना",
+        "cb_wallet": "उपलब्ध पॉइंट्स",
+        "cb_desc": "एंट्री फीस सेट करें। विरोधी को हराने के लिए सबसे बड़े नंबर पर जल्दी टैप करें। ऐप मिनिमाइज़ करने पर मैच रद्द हो जाएगा!",
+        "cb_searching": "खोज रहे हैं...",
+        "cb_btn_find": "चैलेंजर खोजें ⚔️",
+        "cb_question": "कौन सा नंबर बड़ा है?",
+        "cb_connecting": "कनेक्ट हो रहा है...",
+        "cb_active": "बैटल शुरू! 🎯"
+    },
+    "bn": {
+        "arena_title": "অ্যারিনা",
+        "cb_wallet": "উপলব্ধ পয়েন্ট",
+        "cb_desc": "আপনার এন্ট্রি ফি সেট করুন। প্রতিপক্ষকে হারাতে সবচেয়ে বড় নম্বরে দ্রুত ট্যাপ করুন। অ্যাপ মিনিমাইজ করলে ম্যাচ বাতিল হয়ে যাবে!",
+        "cb_searching": "খুঁজছে...",
+        "cb_btn_find": "চ্যালেঞ্জার খুঁজুন ⚔️",
+        "cb_question": "কোন নম্বরটি বড়?",
+        "cb_connecting": "কানেক্ট হচ্ছে...",
+        "cb_active": "ব্যাটল শুরু! 🎯"
+    },
+    "te": {
+        "arena_title": "అరేనా",
+        "cb_wallet": "అందుబాటులో ఉన్న పాయింట్లు",
+        "cb_desc": "మీ ఎంట్రీ ఫీజు సెట్ చేయండి. ప్రత్యర్థిని ఓడించడానికి పెద్ద సంఖ్యను వేగంగా నొక్కండి. యాప్ మినిమైజ్ చేస్తే మ్యాచ్ రద్దవుతుంది!",
+        "cb_searching": "వెతుకుతోంది...",
+        "cb_btn_find": "ఛాలెంజర్‌ను వెతకండి ⚔️",
+        "cb_question": "ఏ సంఖ్య పెద్దది?",
+        "cb_connecting": "కనెక్ట్ అవుతోంది...",
+        "cb_active": "బ్యాటిల్ మొదలైంది! 🎯"
+    },
+    "mr": {
+        "arena_title": "अरीना",
+        "cb_wallet": "उपलब्ध पॉईंट्स",
+        "cb_desc": "तुमची एंट्री फी सेट करा. प्रतिस्पर्ध्याला हरवण्यासाठी सर्वात मोठ्या नंबरवर जलद टॅप करा. ॲप मिनिमाईज केल्यास मॅच रद्द होईल!",
+        "cb_searching": "शोधत आहे...",
+        "cb_btn_find": "चॅलेंजर शोधा ⚔️",
+        "cb_question": "कोणता नंबर मोठा आहे?",
+        "cb_connecting": "कनेक्ट होत आहे...",
+        "cb_active": "बॅटल सुरू! 🎯"
+    },
+    "ur": {
+        "arena_title": "ارینا",
+        "cb_wallet": "دستیاب پوائنٹس",
+        "cb_desc": "اپنی انٹری فیس سیٹ کریں۔ مخالف کو ہرانے کے لیے سب سے بڑے نمبر پر جلدی ٹیپ کریں۔ ایپ کو منیمائز کرنے سے میچ کینسل ہو جائے گا!",
+        "cb_searching": "تلاش کر رہا ہے...",
+        "cb_btn_find": "چیلنجر تلاش کریں ⚔️",
+        "cb_question": "کون سا نمبر بڑا ہے؟",
+        "cb_connecting": "کنیکٹ ہو رہا ہے...",
+        "cb_active": "مقابلہ شروع! 🎯"
+    },
+    "ta": {
+        "arena_title": "அரங்கம்",
+        "cb_wallet": "கிடைக்கும் புள்ளிகள்",
+        "cb_desc": "நுழைவுக் கட்டணத்தை அமைக்கவும். எதிராளியை வெல்ல பெரிய எண்ணை வேகமாக அழுத்தவும். ஆப்பை சிறிதாக்கினால் போட்டி ரத்தாகும்!",
+        "cb_searching": "தேடுகிறது...",
+        "cb_btn_find": "சவாலாளரைத் தேடு ⚔️",
+        "cb_question": "எந்த எண் பெரியது?",
+        "cb_connecting": "இணைகிறது...",
+        "cb_active": "போட்டி ஆரம்பம்! 🎯"
+    },
+    "gu": {
+        "arena_title": "અરેના",
+        "cb_wallet": "ઉપલબ્ધ પોઈન્ટ્સ",
+        "cb_desc": "તમારી એન્ટ્રી ફી સેટ કરો. વિરોધીને હરાવવા માટે સૌથી મોટા નંબર પર ઝડપથી ટેપ કરો. એપ મિનિમાઇઝ કરવાથી મેચ રદ થશે!",
+        "cb_searching": "શોધી રહ્યા છે...",
+        "cb_btn_find": "ચેલેન્જર શોધો ⚔️",
+        "cb_question": "કયો નંબર મોટો છે?",
+        "cb_connecting": "કનેક્ટ થઈ રહ્યું છે...",
+        "cb_active": "બેટલ શરૂ! 🎯"
+    },
+    "es": {
+        "arena_title": "Arena",
+        "cb_wallet": "Puntos Disponibles",
+        "cb_desc": "Establece tu cuota de entrada. Toca rápido el número más alto para vencer. ¡Minimizar la app cancela la partida!",
+        "cb_searching": "Buscando...",
+        "cb_btn_find": "Buscar Retador ⚔️",
+        "cb_question": "¿QUÉ NÚMERO ES MAYOR?",
+        "cb_connecting": "Conectando Matchmaking...",
+        "cb_active": "¡Batalla Activa! 🎯"
+    },
+    "fr": {
+        "arena_title": "Arène",
+        "cb_wallet": "Points Disponibles",
+        "cb_desc": "Fixez votre frais d'entrée. Touchez rapidement le plus grand nombre pour gagner. Minimiser l'appli annule le match !",
+        "cb_searching": "Recherche...",
+        "cb_btn_find": "Trouver un adversaire ⚔️",
+        "cb_question": "QUEL EST LE PLUS GRAND NOMBRE ?",
+        "cb_connecting": "Connexion en cours...",
+        "cb_active": "Bataille Active ! 🎯"
+    },
+    "ar": {
+        "arena_title": "الساحة",
+        "cb_wallet": "النقاط المتاحة",
+        "cb_desc": "حدد رسوم الدخول. انقر بسرعة على الرقم الأكبر لتهزم خصمك. تصغير التطبيق يلغي المباراة!",
+        "cb_searching": "جاري البحث...",
+        "cb_btn_find": "البحث عن منافس ⚔️",
+        "cb_question": "أي رقم هو الأكبر؟",
+        "cb_connecting": "جاري الاتصال...",
+        "cb_active": "المعركة بدأت! 🎯"
+    },
+    "pt": {
+        "arena_title": "Arena",
+        "cb_wallet": "Pontos Disponíveis",
+        "cb_desc": "Defina sua taxa de entrada. Toque rápido no maior número para vencer. Minimizar o app cancela a partida!",
+        "cb_searching": "Procurando...",
+        "cb_btn_find": "Encontrar Desafiante ⚔️",
+        "cb_question": "QUAL NÚMERO É MAIOR?",
+        "cb_connecting": "Conectando...",
+        "cb_active": "Batalha Ativa! 🎯"
+    },
+    "ru": {
+        "arena_title": "Арена",
+        "cb_wallet": "Доступные Очки",
+        "cb_desc": "Установите взнос. Быстро нажмите на наибольшее число, чтобы победить. Сворачивание отменяет матч!",
+        "cb_searching": "Поиск...",
+        "cb_btn_find": "Найти Соперника ⚔️",
+        "cb_question": "КАКОЕ ЧИСЛО БОЛЬШЕ?",
+        "cb_connecting": "Подключение...",
+        "cb_active": "Битва началась! 🎯"
+    }
+};
 
         function changeLanguage(langCode) {
             localStorage.setItem("selectedLang", langCode);
@@ -314,7 +443,6 @@
                             let userName = data.name || "Player";
                             document.getElementById("userNameTxt").innerText = userName;
                             
-                            // 🔥 SMART AVATAR LOGIC
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
                             document.getElementById("headerProfileIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
@@ -327,7 +455,6 @@
                         if (snap.exists()) {
                             const adminData = snap.val();
                             
-                            // Load Post Match Ad Link
                             if (adminData.battle_link && adminData.battle_link.trim() !== "") {
                                 adPartnerLink = adminData.battle_link;
                             }
@@ -339,24 +466,22 @@
                             if (adminData.win_multiplier) {
                                 globalWinMultiplier = parseFloat(adminData.win_multiplier);
                             }
-                            // Update badge live
                             adjustEntryFee(0);
                             
-                            // Load Banner Slot 1
-                            if (adminData.slot1_code && adminData.active !== false) {
-                                document.getElementById("battleAdSlot1").style.display = "flex";
-                                setAdHTML(document.getElementById("battleAdSlot1"), adminData.slot1_code);
-                            } else {
-                                document.getElementById("battleAdSlot1").style.display = "none";
-                            }
-                            
-                            // Load Banner Slot 2
-                            if (adminData.slot2_code && adminData.active !== false) {
-                                document.getElementById("battleAdSlot2").style.display = "flex";
-                                setAdHTML(document.getElementById("battleAdSlot2"), adminData.slot2_code);
-                            } else {
-                                document.getElementById("battleAdSlot2").style.display = "none";
-                            }
+                            // 🔥 FIXED Banner Ad Clash & Visibility 🔥
+if (adminData.slot1 && adminData.slot1.code && adminData.slot1.active !== false) {
+    document.getElementById("battleAdSlot1").style.display = "flex";
+    setTimeout(() => setAdHTML(document.getElementById("battleAdSlot1"), adminData.slot1.code), 400);
+} else {
+    document.getElementById("battleAdSlot1").style.display = "none";
+}
+
+if (adminData.slot2 && adminData.slot2.code && adminData.slot2.active !== false) {
+    document.getElementById("battleAdSlot2").style.display = "flex";
+    setTimeout(() => setAdHTML(document.getElementById("battleAdSlot2"), adminData.slot2.code), 800);
+} else {
+    document.getElementById("battleAdSlot2").style.display = "none";
+}
                         }
                     });
 
@@ -381,7 +506,7 @@
             document.getElementById("poolPrizeBadge").innerText = `🏆 REWARD POOL: ${calculatedPool} POINTS`;
         }
 
-        // 🧠 MATCHMAKING ENGINE (Bot 2 Matches Per 24 Hrs Limit Rule)
+        // 🧠 MATCHMAKING ENGINE
         function executeStartMatchmakingLoop() {
             if(currentWalletCoinsBalance < currentFeeAmount) {
                 alert(`❌ Insufficient Balance! You need at least ${currentFeeAmount} points to join this pool.`);
@@ -393,7 +518,6 @@
             let lang = localStorage.getItem("selectedLang") || "en";
             btn.innerText = langData[lang]["cb_connecting"] || "Connecting Matchmaking...";
 
-            // 🟢 Check 24hr Bot Match Limit Logic
             let todayDate = new Date().toDateString();
             if(localStorage.getItem("bot_match_date") !== todayDate) {
                 localStorage.setItem("bot_match_count", "0");
@@ -406,19 +530,16 @@
             let matchmakingInterval = setInterval(() => {
                 stepCount++;
                 
-                // Shuffle names to simulate searching
                 let randomSystemIndex = Math.floor(Math.random() * systemOpponentNamesList.length);
                 document.getElementById("oppNameTxt").innerText = systemOpponentNamesList[randomSystemIndex];
                 document.getElementById("oppAvatar").innerText = systemOpponentAvatarsList[randomSystemIndex];
 
                 if(stepCount >= 3) {
                     if(botMatchesPlayed < 2) {
-                        // Allow Bot Match
                         clearInterval(matchmakingInterval);
                         localStorage.setItem("bot_match_count", botMatchesPlayed + 1);
                         finalizeMatchStart(btn, lang);
                     } else {
-                        // 🟢 Limit Reached - Wait for Real Player Indefinitely
                         clearInterval(matchmakingInterval);
                         document.getElementById("oppNameTxt").innerText = "Waiting for Real Player...";
                         document.getElementById("oppAvatar").innerText = "⏳";
@@ -432,7 +553,6 @@
             btn.innerText = langData[lang]["cb_active"] || "Battle Active! 🎯";
             isBattleActive = true;
             
-            // Deduct Fee Immediately via Firebase Transaction
             const uid = localStorage.getItem("userId");
             db.ref(`users/${uid}/coins`).transaction(current => (current || 0) - currentFeeAmount);
 
@@ -462,18 +582,15 @@
             }
         });
 
-        // ⚔️ TRANSACTION LOGIC: Evaluates Win/Loss properly
+        // ⚔️ TRANSACTION LOGIC
         function executeSubmitGameAction(selectedDirectionString) {
             if(!isBattleActive) return;
             isBattleActive = false;
 
             document.getElementById("gameplayPanelBox").style.display = "none";
             
-            // Calculate reward dynamically from Admin Multiplier
             let rewardPool = Math.floor(currentFeeAmount * globalWinMultiplier); 
             
-            const uid = localStorage.getItem("userId");
-
             if(selectedDirectionString === 'timeout_cancel') {
                 alert("❌ Session Interrupted! Match cancelled. Entry fee lost.");
                 executeResetBattleTerminalState();
@@ -481,14 +598,9 @@
             }
 
             if(selectedDirectionString === mathematicallyCorrectAnswerStr) {
-                // WINNER PATH 
                 alert(`🎉 Victory! Watch a quick ad to claim your ${rewardPool} Points.`);
-                
-                // 🔥 In-App Ad Viewer Call with Admin Controlled Time & Coins
                 openInAppAdViewer(adPartnerLink, rewardPool, globalAdTimerSeconds, '1v1_battle_win');
-                
             } else {
-                // LOST PATH (Fee already deducted at start)
                 alert(`❌ Defeat! Incorrect or too slow.`);
                 executeResetBattleTerminalState();
             }
@@ -505,50 +617,71 @@
             isBattleActive = false;
         }
 
-        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC 🔥
+        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC WITH UNIVERSAL HISTORY 🔥
         let adTimerInterval = null;
         let pendingRewardCoins = 0; 
         let pendingTaskName = "";   
 
         function openInAppAdViewer(adUrl, rewardCoinsAmount, timerSeconds, taskName = "ad_task") {
-            pendingRewardCoins = rewardCoinsAmount; 
-            pendingTaskName = taskName;
+    pendingRewardCoins = rewardCoinsAmount;
+    pendingTaskName = taskName;
+    let countdownTime = timerSeconds;
+    
+    document.getElementById("inAppAdViewer").style.display = "flex";
+    document.getElementById("adTimerDisplay").style.display = "flex";
+    document.getElementById("adCloseBtn").style.display = "none";
+    
+    // 🔥 जब तक ऐड लोड होगा, टाइमर नहीं घटेगा
+    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+    
+    let iframeNode = document.getElementById("adIframe");
+    
+    // 🔥 iframe.onload का मतलब है "जब ऐड 100% स्क्रीन पर आ जाए, तभी टाइमर शुरू करो"
+    iframeNode.onload = function() {
+        if (adTimerInterval) clearInterval(adTimerInterval);
+        
+        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+        
+        adTimerInterval = setInterval(() => {
+            countdownTime--;
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
             
-            let countdownTime = timerSeconds; 
-            
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-            
-            // Load Ad URL
-            document.getElementById("adIframe").src = adUrl;
+            if (countdownTime <= 0) {
+                clearInterval(adTimerInterval);
+                document.getElementById("adTimerDisplay").style.display = "none";
+                document.getElementById("adCloseBtn").style.display = "block";
+            }
+        }, 1000);
+    };
+    
+    // अब ऐड को लोड करना शुरू करो
+    iframeNode.src = adUrl;
+}
 
-            adTimerInterval = setInterval(() => {
-                countdownTime--;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                if(countdownTime <= 0) {
-                    clearInterval(adTimerInterval);
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
-        }
-
-        // Jab user X button dabayega tab usko reward mil jayega
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
-            document.getElementById("adIframe").src = ""; // Stop video/ad
+            document.getElementById("adIframe").src = ""; 
 
             const uid = localStorage.getItem("userId");
             if(pendingRewardCoins > 0 && typeof uid !== 'undefined' && uid) {
-                // Grant Reward Coins
+                
+                // 1. Grant Coins
                 db.ref(`users/${uid}/coins`).transaction((current) => {
                     return (current || 0) + pendingRewardCoins;
                 }).then(() => {
-                    // Update Task History
+                    
+                    // 2. 🔥 Push to Universal History (For Account Health & Referral Unlock)
+                    db.ref(`users/${uid}/history`).push({
+                        title: "Point Battle Win",
+                        amount: pendingRewardCoins,
+                        type: "credit",
+                        txn_type: "credit",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    // 3. Update Daily Tasks
                     db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                         let tasks = snap.val() || [];
                         if (!tasks.includes(pendingTaskName)) { 
@@ -558,7 +691,7 @@
                     });
                     
                     alert(`💰 Reward Credited: +${pendingRewardCoins} Points!`);
-                    executeResetBattleTerminalState(); // Battle reset
+                    executeResetBattleTerminalState(); 
                     pendingRewardCoins = 0; 
                 }).catch(() => {
                     alert("Error connecting to server. Please check internet.");

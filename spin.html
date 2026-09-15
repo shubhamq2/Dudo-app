@@ -64,14 +64,14 @@
         
         .wheel-outer-ring { position: absolute; width: 335px; height: 335px; border-radius: 50%; border: 5px dashed var(--accent-orange); animation: spinRing 20s linear infinite; opacity: 0.6; box-shadow: 0 0 25px rgba(249, 115, 22, 0.3); backface-visibility: hidden; transform-origin: center center; }
         
-        /* 🔥 FIX 2: translateZ(0) से WebView में ग्राफ़िक्स नहीं कांपेगा */
+        /* 🔥 FIX 2: translateZ(0) and will-change से WebView में ग्राफ़िक्स नहीं कांपेगा */
         @keyframes spinRing { 100% { transform: rotate(360deg) translateZ(0); } }
         
         /* The Pointer */
         .wheel-pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%) translateZ(0); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid var(--accent-pink); z-index: 10; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); backface-visibility: hidden; }
 
         /* The Wheel itself */
-        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 10px solid var(--accent-gold); box-sizing: border-box; box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), inset 0 0 30px rgba(0,0,0,0.9); overflow: hidden; position: relative; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); background: conic-gradient( var(--accent-orange) 0deg 45deg, #1e293b 45deg 90deg, var(--accent-orange) 90deg 135deg, #1e293b 135deg 180deg, var(--accent-orange) 180deg 225deg, #1e293b 225deg 270deg, var(--accent-orange) 270deg 315deg, #1e293b 315deg 360deg ); z-index: 5; backface-visibility: hidden; transform: translateZ(0); /* Anti-shake Trick */ transform-origin: center center; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 10px solid var(--accent-gold); box-sizing: border-box; box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), inset 0 0 30px rgba(0,0,0,0.9); overflow: hidden; position: relative; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); background: conic-gradient( var(--accent-orange) 0deg 45deg, #1e293b 45deg 90deg, var(--accent-orange) 90deg 135deg, #1e293b 135deg 180deg, var(--accent-orange) 180deg 225deg, #1e293b 225deg 270deg, var(--accent-orange) 270deg 315deg, #1e293b 315deg 360deg ); z-index: 5; backface-visibility: hidden; transform: translateZ(0); will-change: transform; transform-origin: center center; }
         
         /* Wheel Center Dot */
         .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: radial-gradient(circle, #ffffff, #e2e8f0); border-radius: 50%; border: 6px solid var(--accent-gold); box-shadow: 0 0 20px rgba(0,0,0,0.9); z-index: 10; }
@@ -105,9 +105,9 @@
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
         .custom-alert p { margin: 0 0 20px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
-        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 30px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 30px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); }
         .custom-alert button:active { transform: scale(0.95); }
-        .custom-alert.success-border button { background: var(--accent-green); }
+        .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
 
         /* Notice Board Security Safe Box */
@@ -119,6 +119,8 @@
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+        
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -127,6 +129,14 @@
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
         <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
@@ -180,7 +190,11 @@
     </div>
 
     <div class="controls">
-        <div class="spins-left"><span data-i18n="spins_left">Spins Left Today:</span> <span id="spinCountText" style="color:#fff;"><i class="fa-solid fa-circle-notch fa-spin"></i></span></div>
+        <div class="spins-left">
+            <span data-i18n="spins_left">Spins Left Today:</span> 
+            <span id="spinCountText" style="color:#fff;"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+            <span id="dailyAdSpinCountBox" style="font-size: 10px; color: var(--text-sub); display: block; margin-top: 5px; font-weight: 700;">(Ad Spins: <span id="todayAdSpinsDone">0</span> / <span id="totalAdSpinLimit">10</span>)</span>
+        </div>
         
         <button class="action-btn btn-spin" id="spinBtn" onclick="executeSecureSpinRequest()"><i class="fa-solid fa-dharmachakra"></i> <span data-i18n="btn_spin">SPIN NOW</span></button>
         <button class="action-btn btn-ad" id="adBtn" onclick="watchAdForSpin()"><i class="fa-solid fa-play"></i> <span data-i18n="btn_watch_ad">WATCH AD FOR 1 SPIN</span></button>
@@ -198,32 +212,36 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & LIMITS 🔥
         let globalAdTimerSeconds = 25; // Default time
+        let globalDailyAdLimit = 10;   // Default max ad spins per day
+        
+        let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+        let userTodayAdSpinsCount = 0;
 
         // 🌐 FULL MULTILINGUAL SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "spin_title": "Spin & Win", "total_coins": "Total Coins", "spins_left": "Spins Left Today:", "btn_spin": "SPIN NOW", "btn_watch_ad": "WATCH AD FOR 1 SPIN", "err_early": "❌ Verification Incomplete! You closed the sponsor page early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "spin_added": "🎉 1 Extra Spin Added successfully!", "won_msg": "🎉 Congratulations! You won ", "lost_msg": "😢 Oops! Better luck next time.", "sec_msg": "Verification protocols are active. Do not minimize the app during the ad view to ensure you receive your extra spin." },
-            "hi": { "spin_title": "स्पिन और विन", "total_coins": "कुल सिक्के", "spins_left": "आज बचे हुए स्पिन:", "btn_spin": "अभी घुमाएं", "btn_watch_ad": "1 स्पिन के लिए विज्ञापन देखें", "err_early": "❌ सत्यापन अधूरा! आपने स्पॉन्सर पेज को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें।", "spin_added": "🎉 1 अतिरिक्त स्पिन सफलतापूर्वक जुड़ गया!", "won_msg": "🎉 बधाई हो! आपने जीते हैं ", "lost_msg": "😢 ऊप्स! अगली बार बेहतर किस्मत।", "sec_msg": "सत्यापन प्रक्रिया सक्रिय है। अतिरिक्त स्पिन प्राप्त करने के लिए विज्ञापन देखते समय ऐप बंद न करें।" },
-            "bn": { "spin_title": "স্পিন এবং জয়", "total_coins": "মোট কয়েন", "spins_left": "বাকি স্পিন:", "btn_spin": "এখন ঘুরান", "btn_watch_ad": "অ্যাড দেখুন (১ স্পিন)", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি স্পনসর পেজ আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ বন্ধ করবেন না।", "spin_added": "🎉 ১টি স্পিন যোগ হয়েছে!", "won_msg": "🎉 আপনি জিতেছেন ", "lost_msg": "😢 পরের বার আরও ভালো ভাগ্য।", "sec_msg": "অ্যাপ বন্ধ করলে স্পিন বাতিল হবে।" },
-            "mr": { "spin_title": "स्पिन आणि जिंका", "total_coins": "एकूण नाणी", "spins_left": "उर्वरित स्पिन:", "btn_spin": "आता फिरवा", "btn_watch_ad": "१ स्पिनसाठी जाहिरात पहा", "err_early": "❌ अपूर्ण! आपण जाहिरात लवकर बंद केली.", "err_invalid": "❌ ट्रॅकिंग थांबले! ॲप मिनिमाईज करू नका.", "spin_added": "🎉 1 स्पिन जोडले!", "won_msg": "🎉 तुम्ही जिंकलात ", "lost_msg": "😢 पुढच्या वेळी चांगले नशीब.", "sec_msg": "जाहिरात पाहताना ॲप बंद करू नका." },
-            "te": { "spin_title": "స్పిన్ & విన్", "btn_spin": "స్పిన్ చేయండి", "err_success": "🎉 గెలిచారు: ", "lost_msg": "😢 మళ్లీ ప్రయత్నించండి." },
-            "ta": { "spin_title": "சுழற்றி வெல்லுங்கள்", "btn_spin": "சுழற்று", "err_success": "🎉 வென்றீர்கள்: ", "lost_msg": "😢 மீண்டும் முயற்சிக்கவும்." },
-            "ur": { "spin_title": "اسپن اور جیتیں", "btn_spin": "اسپن کریں", "err_success": "🎉 آپ نے جیتا: ", "lost_msg": "😢 اگلی بار کے لئے گڈ لک۔" },
-            "gu": { "spin_title": "સ્પિન અને જીતો", "btn_spin": "સ્પિન કરો", "err_success": "🎉 તમે જીત્યા: ", "lost_msg": "😢 ફરી પ્રયાસ કરો." }
+            "en": { "spin_title": "Spin & Win", "total_coins": "Total Coins", "spins_left": "Spins Left Today:", "btn_spin": "SPIN NOW", "btn_watch_ad": "WATCH AD FOR 1 SPIN", "err_early": "❌ Verification Incomplete! You closed the sponsor page early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "err_limit": "⏳ Daily Limit Reached! You have watched the maximum ads for spins today. Come back tomorrow.", "spin_added": "🎉 1 Extra Spin Added successfully!", "won_msg": "🎉 Congratulations! You won ", "lost_msg": "😢 Oops! Better luck next time.", "sec_msg": "Verification protocols are active. Do not minimize the app during the ad view to ensure you receive your extra spin.", "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection" },
+            "hi": { "spin_title": "स्पिन और विन", "total_coins": "कुल सिक्के", "spins_left": "आज बचे हुए स्पिन:", "btn_spin": "अभी घुमाएं", "btn_watch_ad": "1 स्पिन के लिए विज्ञापन देखें", "err_early": "❌ सत्यापन अधूरा! आपने स्पॉन्सर पेज को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें。", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज स्पिन के लिए अधिकतम विज्ञापन देख लिए हैं। कल फिर आएं।", "spin_added": "🎉 1 अतिरिक्त स्पिन सफलतापूर्वक जुड़ गया!", "won_msg": "🎉 बधाई हो! आपने जीते हैं ", "lost_msg": "😢 ऊप्स! अगली बार बेहतर किस्मत।", "sec_msg": "सत्यापन प्रक्रिया सक्रिय है। अतिरिक्त स्पिन प्राप्त करने के लिए विज्ञापन देखते समय ऐप बंद न करें।", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें" },
+            "bn": { "spin_title": "স্পিন এবং জয়", "total_coins": "মোট কয়েন", "spins_left": "বাকি স্পিন:", "btn_spin": "এখন ঘুরান", "btn_watch_ad": "অ্যাড দেখুন (১ স্পিন)", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি স্পনসর পেজ আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ বন্ধ করবেন না।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "spin_added": "🎉 ১টি স্পিন যোগ হয়েছে!", "won_msg": "🎉 আপনি জিতেছেন ", "lost_msg": "😢 পরের বার আরও ভালো ভাগ্য।", "sec_msg": "অ্যাপ বন্ধ করলে স্পিন বাতিল হবে।", "mod_no_net": "ইন্টারনেট নেই", "mod_no_net_d": "দয়া করে ডেটা বা ওয়াই-ফাই চালু করুন।", "mod_retry": "পুনরায় চেষ্টা করুন" },
+            "mr": { "spin_title": "स्पिन आणि जिंका", "total_coins": "एकूण नाणी", "spins_left": "उर्वरित स्पिन:", "btn_spin": "आता फिरवा", "btn_watch_ad": "१ स्पिनसाठी जाहिरात पहा", "err_early": "❌ अपूर्ण! आपण जाहिरात लवकर बंद केली.", "err_invalid": "❌ ट्रॅकिंग थांबले! ॲप मिनिमाईज करू नका.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "spin_added": "🎉 1 स्पिन जोडले!", "won_msg": "🎉 तुम्ही जिंकलात ", "lost_msg": "😢 पुढच्या वेळी चांगले नशीब.", "sec_msg": "जाहिरात पाहताना ॲप बंद करू नका.", "mod_no_net": "इंटरनेट नाही", "mod_no_net_d": "कृपया डेटा चालू करा.", "mod_retry": "पुन्हा प्रयत्न करा" },
+            "te": { "spin_title": "స్పిన్ & విన్", "btn_spin": "స్పిన్ చేయండి", "btn_watch_ad": "యాడ్ చూడండి", "err_limit": "⏳ పరిమితి ముగిసింది!", "err_success": "🎉 గెలిచారు: ", "lost_msg": "😢 మళ్లీ ప్రయత్నించండి.", "mod_no_net": "ఇంటర్నెట్ లేదు", "mod_retry": "మళ్లీ ప్రయత్నించండి" },
+            "ta": { "spin_title": "சுழற்றி வெல்லுங்கள்", "btn_spin": "சுழற்று", "btn_watch_ad": "விளம்பரம் பார்க்கவும்", "err_limit": "⏳ வரம்பு முடிந்தது!", "err_success": "🎉 வென்றீர்கள்: ", "lost_msg": "😢 மீண்டும் முயற்சிக்கவும்." },
+            "ur": { "spin_title": "اسپن اور جیتیں", "btn_spin": "اسپن کریں", "btn_watch_ad": "ایڈ دیکھیں", "err_limit": "⏳ حد پوری ہو گئی!", "err_success": "🎉 آپ نے جیتا: ", "lost_msg": "😢 اگلی بار کے لئے گڈ لک۔" },
+            "gu": { "spin_title": "સ્પિન અને જીતો", "btn_spin": "સ્પિન કરો", "btn_watch_ad": "જાહેરાત જુઓ", "err_limit": "⏳ મર્યાદા પૂર્ણ!", "err_success": "🎉 તમે જીત્યા: ", "lost_msg": "😢 ફરી પ્રયાસ કરો." }
         };
 
         function changeLanguage(langCode) {
@@ -260,20 +278,34 @@
             { label: 5, angle: 337.5 }
         ];
 
+        // Network Monitor
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
+
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Live Balance & Avatar Sync
+                    // 1. Live Balance, Spins, & Anti-Ban Limit Fetch
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             document.getElementById("wallCoins").innerText = (data.coins || 0) + " 🪙";
                             
-                            // Client reads spins from DB
+                            // Check Anti-Ban Daily Ad Clicks for Spins
+                            if(data.daily_spin_ad_claims && data.daily_spin_ad_claims.date === todayDateString) {
+                                userTodayAdSpinsCount = data.daily_spin_ad_claims.count || 0;
+                            } else {
+                                userTodayAdSpinsCount = 0;
+                            }
+                            document.getElementById("todayAdSpinsDone").innerText = userTodayAdSpinsCount;
+
+                            // Client reads free spins from DB
                             let today = new Date().toLocaleDateString();
                             if(data.lastSpinDate !== today) {
                                 spinsLeft = 2; // Default daily free spins
@@ -296,7 +328,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Time & Links from spin_win_configs node)
+                    // 2. Fetch Admin Configurations (Banners, Time, Limits & Link)
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -304,20 +336,24 @@
                             if (adminData.spin_win_configs) {
                                 const swConfig = adminData.spin_win_configs;
                                 
-                                // 🔥 GET ADMIN CONTROLLED TIME
+                                // 🔥 GET ADMIN CONTROLLED SETTINGS
                                 if (swConfig.ad_timer) { globalAdTimerSeconds = parseInt(swConfig.ad_timer); }
+                                if (swConfig.daily_limit) { 
+                                    globalDailyAdLimit = parseInt(swConfig.daily_limit); 
+                                    document.getElementById("totalAdSpinLimit").innerText = globalDailyAdLimit;
+                                }
                                 
-                                // Load Banners
+                                // Load Banners with setTimeout
                                 if (swConfig.slot1_code) {
                                     document.getElementById("adminBannerSlot1").style.display = "flex";
-                                    setAdHTML(document.getElementById("adminBannerSlot1"), swConfig.slot1_code);
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), swConfig.slot1_code), 400);
                                 } else {
                                     document.getElementById("adminBannerSlot1").style.display = "none";
                                 }
                                 
                                 if (swConfig.slot2_code) {
                                     document.getElementById("adminBannerSlot2").style.display = "flex";
-                                    setAdHTML(document.getElementById("adminBannerSlot2"), swConfig.slot2_code);
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), swConfig.slot2_code), 800);
                                 } else {
                                     document.getElementById("adminBannerSlot2").style.display = "none";
                                 }
@@ -395,13 +431,7 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🔥 ADDED TAB TRACKER 
-        window.hasMainTabHidden = false;
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { window.hasMainTabHidden = true; }
-        });
-
-        // 🎰 SECURE SPIN LOGIC (Pure Firebase)
+        // 🎰 SECURE SPIN LOGIC (Pure Firebase + UNIVERSAL HISTORY)
         function executeSecureSpinRequest() {
             if(isSpinning || spinsLeft <= 0) return;
             isSpinning = true;
@@ -410,13 +440,13 @@
 
             // 1. Calculate random reward based on probabilities
             const probabilities = [
-                { val: 0, chance: 30 }, // 30% chance
+                { val: 0, chance: 30 }, 
                 { val: 1, chance: 20 },
                 { val: 2, chance: 20 },
                 { val: 3, chance: 15 },
                 { val: 5, chance: 10 },
                 { val: 10, chance: 4 },
-                { val: 20, chance: 1 }  // 1% chance
+                { val: 20, chance: 1 }  
             ];
             
             let rand = Math.random() * 100;
@@ -433,11 +463,12 @@
             }).then((result) => {
                 if(result.committed) {
                     
-                    // Deduct Spin & Add Daily Task 't4'
+                    // Deduct Spin
                     spinsLeft--;
                     let today = new Date().toLocaleDateString();
                     updateSpinsToFirebase(spinsLeft, today);
                     
+                    // Add Daily Task 't4'
                     db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                         let tasks = snap.val() || [];
                         if (!tasks.includes("t4")) {
@@ -445,6 +476,19 @@
                             db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
                         }
                     });
+
+                    // 🔥 Add to Universal History (Account Health)
+                    if(wonCoins > 0) {
+                        db.ref(`users/${uid}/history`).push({
+                            title: `Lucky Spin Reward`,
+                            amount: wonCoins,
+                            type: "credit",
+                            txn_type: "spin_win",
+                            status: "SUCCESSFUL",
+                            date: new Date().toLocaleDateString(),
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    }
 
                     // 3. UI Wheel Animation Logic
                     let targetSliceIndex = prizesMap.findIndex(p => p.label === wonCoins);
@@ -456,7 +500,7 @@
                     currentRotation += extraSpins + stopAngle;
                     
                     let wheel = document.getElementById("spinWheel");
-                    // 🔥 FIX 3: JavaScript में भी translateZ(0) जोड़ दिया ताकि स्पिन होते समय ग्राफिक्स ना फटे
+                    // 🔥 FIX 3: Hardware Acceleration for perfectly smooth rotation
                     wheel.style.transform = `rotate(${currentRotation}deg) translateZ(0)`;
 
                     setTimeout(() => {
@@ -484,16 +528,18 @@
         // 📺 SECURE AD VERIFICATION WITH IN-APP VIEWER
         let platformTimer = null;
         let countdownTime = 25;
-        let targetWindow = null;
-        let totalSecondsOpen = 0;
 
         function watchAdForSpin() {
+            // 🔥 ANTI-BAN: Limit check before showing ad
+            if(userTodayAdSpinsCount >= globalDailyAdLimit) {
+                showCustomAlert("err_limit");
+                return;
+            }
+
             const btn = document.getElementById("adBtn");
             btn.disabled = true;
 
             countdownTime = globalAdTimerSeconds;
-            totalSecondsOpen = 0;
-            window.hasMainTabHidden = false; // Tracker reset
             
             btn.innerText = `Verifying... (${countdownTime}s)`;
 
@@ -534,6 +580,12 @@
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
+
+            // 🔥 ANTI-BAN LOGIC: Register Daily Limit
+            db.ref(`users/${uid}/daily_spin_ad_claims`).set({
+                date: todayDateString,
+                count: userTodayAdSpinsCount + 1
+            });
 
             // Add +1 Spin and Save to Server
             spinsLeft++;

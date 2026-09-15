@@ -15,66 +15,103 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
     
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: #334155; padding-bottom: 40px; min-height: 100vh;}
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-pink: #ef4444;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(59, 130, 246, 0.1) 0%, transparent 60%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
         
-        /* Corporate Clean Header */
-        .header { width: 100%; background: #ffffff; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e2e8f0; }
-        .back-btn { font-size: 20px; font-weight: bold; color: #0f172a; text-decoration: none; padding: 5px 12px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; transition: 0.2s; }
+        /* Premium Corporate Sync Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--primary-blue); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--primary-blue); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); transition: 0.2s; border: 1px solid rgba(59, 130, 246, 0.3); }
         .back-btn:active { transform: scale(0.9); }
-        .header h2 { margin: 0; font-size: 18px; color: #0f172a; font-weight: 800; flex-grow: 1; text-align: center; }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 10px; letter-spacing: 0.5px; }
         
-        /* Language Dropdown */
-        .custom-lang-select { padding: 5px 8px; border-radius: 6px; border: 1px solid #cbd5e1; outline: none; font-size: 12px; background: #ffffff; color: #0f172a; font-weight: bold; cursor: pointer; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--primary-blue); font-weight: bold; cursor: pointer; }
 
         /* Dynamic Admin Ad Banner Slots */
-        .ad-container-block { width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
-        .ad-banner-slot { width: 100%; min-height: 52px; border-radius: 10px; display: flex; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: #ffffff; border: 1px dashed #cbd5e1; margin: 0; }
+        .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(59, 130, 246, 0.4); box-sizing: border-box; display: none; }
 
-        /* Form Container */
-        .form-container { width: 90%; max-width: 400px; background: #ffffff; border-radius: 16px; padding: 25px 20px; box-sizing: border-box; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        /* 🔥 PREMIUM Form Container */
+        .form-container { width: 92%; max-width: 440px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border-radius: 20px; padding: 30px 20px; box-sizing: border-box; border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); text-align: center; position: relative; overflow: hidden; }
+        .form-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #3b82f6, #06b6d4); }
         
-        /* 🔥 PROFILE AVATAR EDITOR */
+        /* PROFILE AVATAR EDITOR */
         .avatar-edit-section { text-align: center; margin-bottom: 25px; position: relative; }
         .avatar-preview-box { position: relative; display: inline-block; cursor: pointer; }
-        .profile-img-preview { width: 95px; height: 95px; border-radius: 50%; border: 4px solid #2563eb; background: #f8fafc; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .profile-img-preview { width: 95px; height: 95px; border-radius: 50%; border: 4px solid var(--primary-blue); background: #0f172a; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .profile-img-preview img { width: 100%; height: 100%; object-fit: cover; }
         
-        .edit-badge-icon { position: absolute; bottom: 0; right: -5px; background: #10b981; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s; }
+        .edit-badge-icon { position: absolute; bottom: 0; right: -5px; background: var(--accent-green); color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #0b0f19; box-shadow: 0 2px 5px rgba(0,0,0,0.5); transition: 0.2s; }
         .avatar-preview-box:active .edit-badge-icon { transform: scale(0.9); }
         
-        .input-group { width: 100%; margin-bottom: 16px; text-align: left; }
-        .input-group label { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 6px; }
-        .input-group input { width: 100%; padding: 13px 15px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-size: 15px; font-weight: 600; box-sizing: border-box; background: #f8fafc; color: #0f172a; transition: 0.2s; }
-        .input-group input:focus:not(:disabled) { border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .input-group { width: 100%; margin-bottom: 18px; text-align: left; position: relative; }
+        .input-group label { font-size: 11.5px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; display: block; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .input-group input { width: 100%; padding: 15px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); outline: none; font-size: 15px; font-weight: 700; box-sizing: border-box; background: rgba(0,0,0,0.4); color: #fff; transition: 0.3s; }
         
-        /* Locked/Disabled Style for Registration Data */
-        .input-group input:disabled { background: #e2e8f0; color: #64748b; cursor: not-allowed; border-color: #cbd5e1; font-weight: 700; }
-        .locked-tag { font-size: 10px; color: #ef4444; font-weight: bold; float: right; text-transform: uppercase; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+        .input-group input:focus:not(:disabled) { border-color: var(--primary-blue); background: rgba(0,0,0,0.6); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3), inset 0 2px 5px rgba(0,0,0,0.5); }
+        
+        /* Locked/Disabled Style */
+        .input-group input:disabled { background: rgba(255,255,255,0.05); color: #94a3b8; cursor: not-allowed; border-color: rgba(255,255,255,0.05); font-weight: 700; }
+        .locked-tag { font-size: 10px; color: var(--accent-pink); font-weight: 900; float: right; text-transform: uppercase; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
 
-        .save-btn { width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); text-transform: uppercase; margin-top: 10px; letter-spacing: 0.5px; }
-        .save-btn:active { transform: scale(0.97); }
+        .save-btn { width: 100%; background: linear-gradient(135deg, var(--primary-blue), #1e3a8a); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 15px; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4); text-transform: uppercase; margin-top: 10px; letter-spacing: 1px; outline: none; }
+        .save-btn:active:not(:disabled) { transform: scale(0.97); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, #1e3a8a, var(--primary-blue)); }
+        .save-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
         /* 🔥 SAFE PRE-LOADED AVATAR MODAL */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 1000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
-        .avatar-modal { background: #ffffff; width: 100%; max-width: 400px; border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px; box-sizing: border-box; text-align: center; border-top: 4px solid #2563eb; animation: slideUp 0.3s ease-out; max-height: 80vh; display: flex; flex-direction: column; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 1000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
+        .avatar-modal { background: var(--card-bg); width: 100%; max-width: 440px; border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px; box-sizing: border-box; text-align: center; border-top: 4px solid var(--primary-blue); animation: slideUp 0.3s ease-out; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
-        .avatar-modal h3 { margin: 0 0 5px 0; color: #0f172a; font-size: 18px; font-weight: 900; }
-        .avatar-modal p { margin: 0 0 15px 0; color: #64748b; font-size: 12px; font-weight: bold; }
+        .avatar-modal h3 { margin: 0 0 5px 0; color: #fff; font-size: 18px; font-weight: 900; }
+        .avatar-modal p { margin: 0 0 15px 0; color: var(--text-sub); font-size: 12px; font-weight: bold; }
         
         .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; overflow-y: auto; padding-right: 5px; padding-bottom: 10px; }
         .avatar-grid::-webkit-scrollbar { width: 5px; }
-        .avatar-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .avatar-grid::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         
-        .avatar-option { width: 100%; aspect-ratio: 1/1; border-radius: 50%; background: #f1f5f9; border: 2px solid #cbd5e1; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .avatar-option { width: 100%; aspect-ratio: 1/1; border-radius: 50%; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .avatar-option img { width: 100%; height: 100%; object-fit: cover; }
-        .avatar-option:hover, .avatar-option.selected { border-color: #2563eb; transform: scale(1.1); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
+        .avatar-option:hover, .avatar-option.selected { border-color: var(--primary-blue); transform: scale(1.1); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
 
-        .close-modal-btn { background: transparent; color: #ef4444; border: 2px solid #ef4444; padding: 14px; border-radius: 10px; width: 100%; font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; margin-top: auto; transition: 0.2s; }
-        .close-modal-btn:active { background: #fef2f2; }
+        .close-modal-btn { background: transparent; color: var(--accent-pink); border: 2px solid var(--accent-pink); padding: 14px; border-radius: 14px; width: 100%; font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; margin-top: auto; transition: 0.2s; outline: none; }
+        .close-modal-btn:active { background: rgba(239, 68, 68, 0.15); }
+
+        /* Custom Alert Popup */
+        .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
+        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 35px; border-radius: 50px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); text-transform: uppercase; transition: 0.2s; outline: none; }
+        .custom-alert button:active { transform: scale(0.95); }
+        .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
+
+    <div class="overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlertBox">
+        <p id="alertMessage">Message</p>
+        <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--accent-pink); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--accent-pink); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
+    </div>
 
     <div class="header">
         <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
@@ -102,7 +139,7 @@
                 <div id="editDisplayPic" class="profile-img-preview"></div>
                 <div class="edit-badge-icon"><i class="fa-solid fa-pen"></i></div>
             </div>
-            <div style="font-size: 12px; color: #64748b; font-weight: bold; margin-top: 10px;" data-i18n="tap_avatar">Tap to change Avatar</div>
+            <div style="font-size: 12px; color: var(--text-sub); font-weight: bold; margin-top: 10px;" data-i18n="tap_avatar">Tap to change Avatar</div>
         </div>
 
         <!-- 🔒 LOCKED: User ID -->
@@ -112,14 +149,14 @@
             <input type="text" id="displayUID" disabled>
         </div>
 
-        <!-- 🔒 LOCKED: Email Address (Primary Auth Login) -->
+        <!-- 🔒 LOCKED: Email Address -->
         <div class="input-group">
             <span class="locked-tag"><i class="fa-solid fa-lock"></i> <span data-i18n="locked">Locked</span></span>
             <label data-i18n="lbl_email">Gmail Address / Email</label>
             <input type="email" id="displayEmail" disabled>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
 
         <!-- ✏️ EDITABLE: Full Name -->
         <div class="input-group">
@@ -142,7 +179,7 @@
         <div class="ad-banner-slot" id="adminBannerSlot4"></div>
     </div>
 
-    <!-- 🎭 SAFE PRE-LOADED AVATAR MODAL (Mapped to Bot Avatars) -->
+    <!-- 🎭 SAFE PRE-LOADED AVATAR MODAL -->
     <div class="modal-overlay" id="avatarModal">
         <div class="avatar-modal">
             <h3>🎮 Choose Your Avatar</h3>
@@ -160,34 +197,38 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
+        // Check Network Status
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
         // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
-            "en": { "edit_title": "Edit Profile", "locked": "Locked", "lbl_uid": "User Unique ID (UID)", "lbl_name": "Full Name", "lbl_email": "Gmail Address / Email", "lbl_state": "State / Region", "btn_save": "Update Profile", "success_msg": "Profile metadata updated successfully!", "tap_avatar": "Tap to change Avatar" },
-            "hi": { "edit_title": "प्रोफाइल बदलें", "locked": "सुरक्षित", "lbl_uid": "यूज़र यूनिक ID (UID)", "lbl_name": "पूरा नाम", "lbl_email": "जीमेल एड्रेस / ईमेल", "lbl_state": "राज्य / क्षेत्र", "btn_save": "प्रोफाइल अपडेट करें", "success_msg": "आपकी प्रोफाइल जानकारी सफलतापूर्वक बदल दी गई है!", "tap_avatar": "अवतार बदलने के लिए टैप करें" },
-            "bn": { "edit_title": "প্রোফাইল সম্পাদনা", "locked": "লক করা", "lbl_uid": "ব্যবহারকারী আইডি", "lbl_name": "সম্পূর্ণ নাম", "lbl_email": "ইমেইল", "lbl_state": "রাজ্য / অঞ্চল", "btn_save": "আপডেট করুন", "success_msg": "প্রোফাইল সফলভাবে আপডেট হয়েছে!", "tap_avatar": "অবতার পরিবর্তন করতে ট্যাপ করুন" },
-            "te": { "edit_title": "ప్రొఫైల్ సవరించండి", "locked": "లాక్ చేయబడింది", "lbl_uid": "యూజర్ ఐడి", "lbl_name": "పూర్తి పేరు", "lbl_email": "ఈమెయిల్", "lbl_state": "రాష్ట్రం", "btn_save": "అప్‌డేట్ చేయండి", "success_msg": "ప్రొఫైల్ విజయవంతంగా అప్‌డేట్ చేయబడింది!", "tap_avatar": "అవతార్ మార్చడానికి నొక్కండి" },
-            "mr": { "edit_title": "प्रोफाइल संपादित करा", "locked": "लॉक केलेले", "lbl_uid": "वापरकर्ता आयडी", "lbl_name": "पूर्ण नाव", "lbl_email": "ईमेल", "lbl_state": "राज्य", "btn_save": "अपडेट करा", "success_msg": "प्रोफाइल यशस्वीरित्या अपडेट केले!", "tap_avatar": "अवतार बदलण्यासाठी टॅप करा" },
-            "ta": { "edit_title": "சுயவிவரத்தைத் திருத்து", "locked": "பூட்டப்பட்டது", "lbl_uid": "பயனர் ஐடி", "lbl_name": "முழு பெயர்", "lbl_email": "மின்னஞ்சல்", "lbl_state": "மாநிலம்", "btn_save": "புதுப்பி", "success_msg": "சுயவிவரம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது!", "tap_avatar": "அவதாரத்தை மாற்ற தட்டவும்" },
-            "ur": { "edit_title": "پروفائل میں ترمیم", "locked": "مقفل", "lbl_uid": "صارف کی شناخت", "lbl_name": "پورا نام", "lbl_email": "ای میل", "lbl_state": "ریاست", "btn_save": "اپ ڈیٹ کریں", "success_msg": "پروفائل کامیابی سے اپ ڈیٹ ہو گیا!", "tap_avatar": "اوتار تبدیل کرنے کے لیے تھپتھپائیں" },
-            "gu": { "edit_title": "પ્રોફાઇલ સંપાદિત કરો", "locked": "લોક કરેલ", "lbl_uid": "વપરાશકર્તા ID", "lbl_name": "પૂરું નામ", "lbl_email": "ઇમેઇલ", "lbl_state": "રાજ્ય", "btn_save": "અપડેટ કરો", "success_msg": "પ્રોફાઇલ સફળતાપૂર્વક અપડેટ થઈ!", "tap_avatar": "અવતાર બદલવા માટે ટેપ કરો" },
-            "es": { "edit_title": "Editar Perfil", "locked": "Bloqueado", "lbl_uid": "ID de Usuario", "lbl_name": "Nombre Completo", "lbl_email": "Correo", "lbl_state": "Estado / Región", "btn_save": "Actualizar", "success_msg": "¡Perfil actualizado con éxito!", "tap_avatar": "Toca para cambiar de avatar" },
-            "fr": { "edit_title": "Éditer le Profil", "locked": "Verrouillé", "lbl_uid": "ID Utilisateur", "lbl_name": "Nom Complet", "lbl_email": "E-mail", "lbl_state": "État / Région", "btn_save": "Mettre à jour", "success_msg": "Profil mis à jour avec succès !", "tap_avatar": "Appuyez pour changer d'avatar" },
-            "ar": { "edit_title": "تعديل الملف", "locked": "مغلق", "lbl_uid": "معرف المستخدم", "lbl_name": "الاسم الكامل", "lbl_email": "البريد الإلكتروني", "lbl_state": "الولاية", "btn_save": "تحديث", "success_msg": "تم تحديث الملف الشخصي بنجاح!", "tap_avatar": "انقر لتغيير الصورة" },
-            "pt": { "edit_title": "Editar Perfil", "locked": "Bloqueado", "lbl_uid": "ID do Usuário", "lbl_name": "Nome Completo", "lbl_email": "E-mail", "lbl_state": "Estado", "btn_save": "Atualizar", "success_msg": "Perfil atualizado com sucesso!", "tap_avatar": "Toque para mudar o avatar" },
-            "ru": { "edit_title": "Изменить профиль", "locked": "Заблокировано", "lbl_uid": "ID пользователя", "lbl_name": "Полное имя", "lbl_email": "Почта", "lbl_state": "Штат / Регион", "btn_save": "Обновить", "success_msg": "Профиль успешно обновлен!", "tap_avatar": "Нажмите, чтобы изменить аватар" }
+            "en": { "edit_title": "Edit Profile", "locked": "Locked", "lbl_uid": "User Unique ID (UID)", "lbl_name": "Full Name", "lbl_email": "Gmail Address / Email", "lbl_state": "State / Region", "btn_save": "Update Profile", "success_msg": "Profile metadata updated successfully!", "tap_avatar": "Tap to change Avatar", "err_empty": "❌ Full Name cannot be empty!", "err_server": "❌ Update Failed. Please try again.", "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection" },
+            "hi": { "edit_title": "प्रोफाइल बदलें", "locked": "सुरक्षित", "lbl_uid": "यूज़र यूनिक ID (UID)", "lbl_name": "पूरा नाम", "lbl_email": "जीमेल एड्रेस / ईमेल", "lbl_state": "राज्य / क्षेत्र", "btn_save": "प्रोफाइल अपडेट करें", "success_msg": "आपकी प्रोफाइल जानकारी सफलतापूर्वक बदल दी गई है!", "tap_avatar": "अवतार बदलने के लिए टैप करें", "err_empty": "❌ पूरा नाम खाली नहीं हो सकता!", "err_server": "❌ अपडेट विफल। कृपया पुनः प्रयास करें।", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें" },
+            "bn": { "edit_title": "প্রোফাইল সম্পাদনা", "locked": "লক করা", "lbl_uid": "ব্যবহারকারী আইডি", "lbl_name": "সম্পূর্ণ নাম", "lbl_email": "ইমেইল", "lbl_state": "রাজ্য / অঞ্চল", "btn_save": "আপডেট করুন", "success_msg": "প্রোফাইল সফলভাবে আপডেট হয়েছে!", "tap_avatar": "অবতার পরিবর্তন করতে ট্যাপ করুন", "err_empty": "❌ নাম ফাঁকা রাখা যাবে না!", "err_server": "❌ আপডেট ব্যর্থ হয়েছে।" },
+            "te": { "edit_title": "ప్రొఫైల్ సవరించండి", "locked": "లాక్ చేయబడింది", "lbl_uid": "యూజర్ ఐడి", "lbl_name": "పూర్తి పేరు", "lbl_email": "ఈమెయిల్", "lbl_state": "రాష్ట్రం", "btn_save": "అప్‌డేట్ చేయండి", "success_msg": "ప్రొఫైల్ విజయవంతంగా అప్‌డేట్ చేయబడింది!", "tap_avatar": "అవతార్ మార్చడానికి నొక్కండి", "err_empty": "❌ పేరు తప్పనిసరి!", "err_server": "❌ సర్వర్ లోపం." },
+            "mr": { "edit_title": "प्रोफाइल संपादित करा", "locked": "लॉक केलेले", "lbl_uid": "वापरकर्ता आयडी", "lbl_name": "पूर्ण नाव", "lbl_email": "ईमेल", "lbl_state": "राज्य", "btn_save": "अपडेट करा", "success_msg": "प्रोफाइल यशस्वीरित्या अपडेट केले!", "tap_avatar": "अवतार बदलण्यासाठी टॅप करा", "err_empty": "❌ नाव रिकामे असू शकत नाही!", "err_server": "❌ अपडेट अयशस्वी." },
+            "ta": { "edit_title": "சுயவிவரத்தைத் திருத்து", "locked": "பூட்டப்பட்டது", "lbl_uid": "பயனர் ஐடி", "lbl_name": "முழு பெயர்", "lbl_email": "மின்னஞ்சல்", "lbl_state": "மாநிலம்", "btn_save": "புதுப்பி", "success_msg": "சுயவிவரம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது!", "tap_avatar": "அவதாரத்தை மாற்ற தட்டவும்", "err_empty": "❌ பெயர் காலியாக இருக்கக்கூடாது!", "err_server": "❌ பிழை ஏற்பட்டது." },
+            "ur": { "edit_title": "پروفائل میں ترمیم", "locked": "مقفل", "lbl_uid": "صارف کی شناخت", "lbl_name": "پورا نام", "lbl_email": "ای میل", "lbl_state": "ریاست", "btn_save": "اپ ڈیٹ کریں", "success_msg": "پروفائل کامیابی سے اپ ڈیٹ ہو گیا!", "tap_avatar": "اوتار تبدیل کرنے کے لیے تھپتھپائیں", "err_empty": "❌ نام ضروری ہے!", "err_server": "❌ سرور کا مسئلہ۔" },
+            "gu": { "edit_title": "પ્રોફાઇલ સંપાદિત કરો", "locked": "લોક કરેલ", "lbl_uid": "વપરાશકર્તા ID", "lbl_name": "પૂરું નામ", "lbl_email": "ઇમેઇલ", "lbl_state": "રાજ્ય", "btn_save": "અપડેટ કરો", "success_msg": "પ્રોફાઇલ સફળતાપૂર્વક અપડેટ થઈ!", "tap_avatar": "અવતાર બદલવા માટે ટેપ કરો", "err_empty": "❌ નામ ખાલી ન હોઈ શકે!", "err_server": "❌ સર્વર સમસ્યા." },
+            "es": { "edit_title": "Editar Perfil", "locked": "Bloqueado", "lbl_uid": "ID de Usuario", "lbl_name": "Nombre Completo", "lbl_email": "Correo", "lbl_state": "Estado / Región", "btn_save": "Actualizar", "success_msg": "¡Perfil actualizado con éxito!", "tap_avatar": "Toca para cambiar de avatar", "err_empty": "❌ ¡El nombre es obligatorio!", "err_server": "❌ Error al actualizar." },
+            "fr": { "edit_title": "Éditer le Profil", "locked": "Verrouillé", "lbl_uid": "ID Utilisateur", "lbl_name": "Nom Complet", "lbl_email": "E-mail", "lbl_state": "État / Région", "btn_save": "Mettre à jour", "success_msg": "Profil mis à jour avec succès !", "tap_avatar": "Appuyez pour changer d'avatar", "err_empty": "❌ Le nom est obligatoire !", "err_server": "❌ Échec de la mise à jour." },
+            "ar": { "edit_title": "تعديل الملف", "locked": "مغلق", "lbl_uid": "معرف المستخدم", "lbl_name": "الاسم الكامل", "lbl_email": "البريد الإلكتروني", "lbl_state": "الولاية", "btn_save": "تحديث", "success_msg": "تم تحديث الملف الشخصي بنجاح!", "tap_avatar": "انقر لتغيير الصورة", "err_empty": "❌ الاسم مطلوب!", "err_server": "❌ فشل التحديث." },
+            "pt": { "edit_title": "Editar Perfil", "locked": "Bloqueado", "lbl_uid": "ID do Usuário", "lbl_name": "Nome Completo", "lbl_email": "E-mail", "lbl_state": "Estado", "btn_save": "Atualizar", "success_msg": "Perfil atualizado com sucesso!", "tap_avatar": "Toque para mudar o avatar", "err_empty": "❌ O nome é obrigatório!", "err_server": "❌ Falha na atualização." },
+            "ru": { "edit_title": "Изменить профиль", "locked": "Заблокировано", "lbl_uid": "ID пользователя", "lbl_name": "Полное имя", "lbl_email": "Почта", "lbl_state": "Штат / Регион", "btn_save": "Обновить", "success_msg": "Профиль успешно обновлен!", "tap_avatar": "Нажмите, чтобы изменить аватар", "err_empty": "❌ Имя обязательно!", "err_server": "❌ Ошибка обновления." }
         };
 
         function changeLanguage(langCode) {
@@ -203,7 +244,7 @@
         const uid = localStorage.getItem("userId");
         let pendingAvatarUrl = "https://api.dicebear.com/7.x/fun-emoji/svg?seed=Smile&backgroundColor=b6e3f4"; // Fallback
         
-        // 🔥 MAPPED BOT AVATARS FROM 1v1.html / game.html (Exact Matching)
+        // 🔥 MAPPED BOT AVATARS FROM 1v1.html / game.html
         const systemAvatarsList = [
             "🎯", "🦊", "🥷", "🦁", "🐉", "🦅", "💀", "👦", "😎", "👩", 
             "https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul&backgroundColor=b6e3f4",
@@ -218,6 +259,7 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.href = "index.html"; return; }
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
 
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
@@ -249,10 +291,35 @@
                     db.ref('global_system_runtime_configurations/edit_profile_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
-                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            
+                            // Load Banners safely to prevent app crash
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
+                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            
+                            let s4Code = (adminData.slot4 && adminData.slot4.code) ? adminData.slot4.code : adminData.slot4_code;
+                            let s4Active = (adminData.slot4 && adminData.slot4.active !== undefined) ? adminData.slot4.active : adminData.active;
+                            if (s4Code && s4Active !== false) {
+                                document.getElementById("adminBannerSlot4").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
+                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
                         }
                     });
                 } else {
@@ -300,13 +367,36 @@
         function openAvatarModal() { document.getElementById("avatarModal").style.display = "flex"; }
         function closeAvatarModal() { document.getElementById("avatarModal").style.display = "none"; }
 
+        function showCustomAlert(msgKey, isSuccess = false, redirectUrl = null) {
+            let currentLang = localStorage.getItem("selectedLang") || "en";
+            let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey] || msgKey;
+
+            const box = document.getElementById("customAlertBox");
+            if(isSuccess) box.classList.add("success-border");
+            else box.classList.remove("success-border");
+
+            document.getElementById("alertMessage").innerText = msgStr;
+            document.getElementById("alertOverlay").style.display = "block";
+            box.style.display = "block";
+
+            box.querySelector("button").onclick = () => {
+                closeCustomAlert();
+                if(redirectUrl) window.location.href = redirectUrl;
+            };
+        }
+
+        function closeCustomAlert() {
+            document.getElementById("customAlertBox").style.display = "none";
+            document.getElementById("alertOverlay").style.display = "none";
+        }
+
         // 🚀 SECURE PROFILE SAVE TO PURE FIREBASE DATABASE
         function saveProfileData() {
             let nameInput = document.getElementById("editName").value.trim();
             let stateInput = document.getElementById("editState").value.trim();
 
             if(!nameInput) {
-                alert("❌ Full Name cannot be empty!");
+                showCustomAlert("err_empty");
                 return;
             }
 
@@ -324,12 +414,10 @@
             })
             .then(() => {
                 localStorage.setItem("userName", nameInput);
-                let successMsg = langData[currentLang]["success_msg"] || "Profile updated successfully!";
-                alert("🎉 " + successMsg);
-                window.location.href = "profile.html"; 
+                showCustomAlert("success_msg", true, "profile.html"); 
             })
             .catch((error) => {
-                alert("❌ Update Failed: " + error.message);
+                showCustomAlert("err_server");
             })
             .finally(() => {
                 btn.innerText = langData[currentLang]["btn_save"] || "Update Profile";

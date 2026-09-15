@@ -48,7 +48,7 @@
 
         /* Banner Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); box-sizing: border-box; display: none; }
 
         /* Grid Layout Components */
         .section-label { width: 92%; max-width: 440px; font-size: 13.5px; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 10px 0; text-align: left; border-left: 4px solid var(--accent-cyan); padding-left: 8px; }
@@ -212,29 +212,25 @@
 
     <div class="security-box">
         <span style="font-size: 18px;">🔒</span>
-        <span data-i18n="art_security">Scroll and read the article completely for 60 seconds. Quick closing will result in zero points. Genuine reading helps you earn more!</span>
+        <span data-i18n="art_security">Scroll and read the article completely. Quick closing will result in zero points. Genuine reading helps you earn more!</span>
     </div>
 
     <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
-
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & COINS 🔥
-        let globalAdTimerSeconds = 60; // Default time
-        let globalRewardCoins = 25;    // Default coins
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
@@ -247,6 +243,7 @@
                 "art_security": "Scroll and read the article completely. Quick closing will result in zero points. Genuine reading helps you earn more!", 
                 "err_early": "❌ Reading Incomplete! You must read the article for the full duration.", 
                 "err_invalid": "❌ Tracking Interrupted: Task minimized. Stay on the blog page to get rewarded.", 
+                "err_limit": "⏳ Daily Limit Reached! You can only read this once a day. Come back tomorrow.",
                 "err_success": "🎉 Task Verified! Reward added to your wallet via ", "verifying": "Reading... ", "start_task": "Read & Earn",
                 "inst_generic": "👉 <b>STEPS TO EARN:</b><br>1. Click the button below to open the blog post.<br>2. Scroll down slowly and read the content.<br>3. Stay on the article page until the timer finishes.<br><br>⚠️ <i>Note: Do not close the tab early. Enjoy the reading!</i>"
             },
@@ -259,29 +256,21 @@
                 "art_security": "पूरा लेख पढ़ें। पेज को जल्दी बंद करने पर कोई पॉइंट नहीं मिलेंगे।", 
                 "err_early": "❌ टास्क पूरा नहीं हुआ! आपको पूरा समय लेख पढ़ना होगा।", 
                 "err_invalid": "❌ सिस्टम अलर्ट: टैब स्विच करना मना है। ब्लॉग पेज पर ही रहें।", 
+                "err_limit": "⏳ दैनिक सीमा पूरी हुई! आप इसे दिन में सिर्फ एक बार पढ़ सकते हैं।",
                 "err_success": "🎉 टास्क पूरा हुआ! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "पढ़ रहे हैं... ", "start_task": "पढ़ें और कमाएं",
                 "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. ब्लॉग पोस्ट खोलने के लिए नीचे क्लिक करें।<br>2. धीरे-धीरे नीचे स्क्रॉल करें और लेख को पढ़ें।<br>3. टाइमर खत्म होने तक पेज पर रुकें।<br><br>⚠️ <i>ध्यान दें: पेज को समय से पहले बंद न करें।</i>"
             },
-            "bn": { 
-                "art_title": "আর্টিকেল পড়ুন", "art_label1": "প্রিমিয়াম ব্লগ", "art_label2": "আরও ক্যাটাগরি", 
-                "art_tech": "টেক নিউজ", "art_tech_desc": "গ্যাজেটের খবর", "art_crypto": "ক্রिप्टো আপডেট", "art_crypto_desc": "মার্কেট ট্রেন্ডস", 
-                "art_health": "হেলথ টিপস", "art_health_desc": "ফিটনেস ও লাইফস্টাইল", "art_gaming": "গেমিং ওয়ার্ল্ড", "art_gaming_desc": "ইস্পোর্টস নিউজ", 
-                "art_finance": "ফাইন্যান্স গাইড", "art_finance_desc": "মানি ম্যানেজমেন্ট", "art_sports": "স্পোর্টস নিউজ", "art_sports_desc": "খেলার খবর", 
-                "art_top": "টপ", "art_pop": "হট", "art_new": "নতুন", 
-                "art_security": "আর্টিকেলটি পড়ুন। আগে বন্ধ করলে পয়েন্ট পাবেন না।", 
-                "err_early": "❌ টাস্ক অসম্পূর্ণ! আপনাকে পুরো সময় পড়তে হবে।", 
-                "err_invalid": "❌ সিস্টেম অ্যালার্ট: ব্লগ পেজেই থাকুন।", 
-                "err_success": "🎉 টাস্ক ভেরিফাইড! পয়েন্ট যোগ করা হয়েছে: ", "verifying": "পড়ছেন... ", "start_task": "পড়ুন এবং আয় করুন",
-                "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. ব্লগ খুলতে নিচে ক্লিক করুন।<br>২. ধীরে ধীরে স্ক্রোল করে পড়ুন।<br>৩. টাইম শেষ হওয়া পর্যন্ত পেজে থাকুন।"
-            },
-            "te": { "art_title": "వ్యాసాలు చదవండి", "art_label1": "ప్రీమియం బ్లాగులు", "art_label2": "మరిన్ని విభాగాలు", "art_tech": "టెక్ న్యూస్", "art_tech_desc": "గ్యాడ్జెట్ సమాచారం", "art_crypto": "క్రిప్టో అప్‌డేట్‌లు", "art_crypto_desc": "మార్కెట్ ట్రెండ్స్", "art_health": "ఆరోగ్య చిట్కాలు", "art_health_desc": "ఫిట్‌నెస్", "art_gaming": "గేమింగ్ వరల్డ్", "art_gaming_desc": "ఈస్పోర్ట్స్ వార్తలు", "art_finance": "ఫైనాన్స్ గైడ్", "art_finance_desc": "డబ్బు నిర్వహణ", "art_sports": "క్రీడా వార్తలు", "art_sports_desc": "క్రికెట్ స్కోర్లు", "art_security": "వ్యాసాన్ని పూర్తిగా చదవండి. త్వరగా మూసివేస్తే పాయింట్లు రావు.", "err_early": "❌ చదవడం పూర్తికాలేదు! మీరు పూర్తి సమయం చదవాలి.", "err_invalid": "❌ దయచేసి బ్లాగ్ పేజీలోనే ఉండండి.", "err_success": "🎉 టాస్క్ ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "verifying": "చదువుతున్నారు... ", "start_task": "చదవండి & సంపాదించండి", "inst_generic": "👉 <b>నియమాలు:</b><br>1. బ్లాగ్ తెరవడానికి క్రింద క్లిక్ చేయండి.<br>2. చదవండి.<br>3. టైమర్ ముగిసే వరకు ఉండండి." },
-            "mr": { "art_title": "लेख वाचा", "art_label1": "प्रीमियम ब्लॉग्स", "art_label2": "अधिक श्रेणी", "art_tech": "टेक न्यूज", "art_tech_desc": "गॅजेट्सची माहिती", "art_crypto": "क्रिप्टो अपडेट्स", "art_crypto_desc": "मार्केट ट्रेंड्स", "art_health": "आरोग्य टिप्स", "art_health_desc": "फिटनेस", "art_gaming": "गेमिंग वर्ल्ड", "art_gaming_desc": "ईस्पोर्ट्स बातम्या", "art_finance": "फायनान्स गाईड", "art_finance_desc": "मनी मॅनेजमेंट", "art_sports": "क्रीडा बातम्या", "art_sports_desc": "क्रिकेट स्कोअर", "art_security": "लेख वाचा. लवकर बंद केल्यास पॉइंट्स मिळणार नाहीत.", "err_early": "❌ अपूर्ण! तुम्हाला पूर्ण वेळ लेख वाचावा लागेल.", "err_invalid": "❌ कृपया ब्लॉग पेजवरच राहा.", "err_success": "🎉 टास्क यशस्वी! पॉइंट्स जोडले गेले: ", "verifying": "वाचत आहे... ", "start_task": "वाचा आणि कमवा", "inst_generic": "👉 <b>नियम:</b><br>1. ब्लॉग उघडण्यासाठी खाली क्लिक करा.<br>2. वाचा.<br>3. पूर्ण वेळ थांबा." },
-            "ur": { "art_title": "مضامین پڑھیں", "art_label1": "پریمیم بلاگز", "art_label2": "مزید کیٹیگریز", "art_security": "مضمون مکمل پڑھیں۔ جلدی بند کرنے پر پوائنٹس نہیں ملیں گے۔", "err_early": "❌ نامکمل! آپ کو پورا وقت پڑھنا ہوگا۔", "err_invalid": "❌ براہ کرم بلاگ پیج پر رہیں۔", "err_success": "🎉 ٹاسک تصدیق شدہ! پوائنٹس شامل ہو گئے: ", "verifying": "پڑھ رہے ہیں... ", "start_task": "پڑھیں اور کمائیں", "inst_generic": "👉 <b>قواعد:</b><br>1. بلاگ کھولنے کے لیے نیچے کلک کریں۔<br>2. پورا وقت صفحے پر رہیں۔" },
-            "es": { "art_title": "Leer Artículos", "art_label1": "Blogs Premium", "art_label2": "Más Categorías", "art_security": "Lee el artículo completamente. Si cierras rápido no obtendrás puntos.", "err_early": "❌ ¡Incompleto! Debes leer todo el tiempo.", "err_invalid": "❌ Quédate en la página del blog.", "err_success": "🎉 ¡Verificado! Puntos añadidos: ", "verifying": "Leyendo... ", "start_task": "Leer y Ganar", "inst_generic": "👉 <b>PASOS:</b><br>1. Abre el blog.<br>2. Lee y quédate todo el tiempo." },
-            "fr": { "art_title": "Lire des Articles", "art_label1": "Blogs Premium", "art_label2": "Plus de Catégories", "art_security": "Lisez l'article complètement pour obtenir des points.", "err_early": "❌ Incomplet ! Lisez pendant tout le temps.", "err_invalid": "❌ Restez sur la page du blog.", "err_success": "🎉 Vérifié ! Points ajoutés: ", "verifying": "Lecture... ", "start_task": "Lire et Gagner", "inst_generic": "👉 <b>ÉTAPES:</b><br>1. Ouvrez le blog.<br>2. Restez tout le temps requis." },
-            "ar": { "art_title": "قراءة المقالات", "art_label1": "مدونات مميزة", "art_label2": "المزيد من الفئات", "art_security": "اقرأ المقال بالكامل. الإغلاق السريع لن يمنحك أي نقاط.", "err_early": "❌ غير مكتمل! يجب قراءة المقال طوال الوقت.", "err_invalid": "❌ يرجى البقاء في صفحة المدونة.", "err_success": "🎉 تم التحقق من المهمة! تمت إضافة نقاط عبر ", "verifying": "جارِ القراءة... ", "start_task": "اقرأ واربح", "inst_generic": "👉 <b>الخطوات:</b><br>1. انقر لفتح المدونة.<br>2. ابق في الصفحة حتى ينتهي الوقت." },
-            "pt": { "art_title": "Ler Artigos", "art_label1": "Blogs Premium", "art_label2": "Mais Categorias", "art_security": "Leia o artigo completamente. Fechar rápido resultará em zero pontos.", "err_early": "❌ Incompleto! Você deve ler o tempo todo.", "err_invalid": "❌ Fique na página do blog.", "err_success": "🎉 Tarefa Verificada! Pontos adicionados via ", "verifying": "Lendo... ", "start_task": "Ler e Ganhar", "inst_generic": "👉 <b>PASSOS:</b><br>1. Clique para abrir o blog.<br>2. Fique até o tempo acabar." },
-            "ru": { "art_title": "Читать статьи", "art_label1": "Премиум блоги", "art_label2": "Больше категорий", "art_security": "Читайте статью полностью. Быстрое закрытие не принесет очков.", "err_early": "❌ Не завершено! Читайте всё время.", "err_invalid": "❌ Оставайтесь на странице блога.", "err_success": "🎉 Задание выполнено! Добавлено очков через ", "verifying": "Чтение... ", "start_task": "Читать и заработать", "inst_generic": "👉 <b>ШАГИ:</b><br>1. Нажмите, чтобы открыть блог.<br>2. Оставайтесь, пока не закончится время." }
+            "bn": { "art_title": "আর্টিকেল পড়ুন", "art_label1": "প্রিমিয়াম ব্লগ", "art_label2": "আরও ক্যাটাগরি", "art_tech": "টেক নিউজ", "art_tech_desc": "গ্যাজেটের খবর", "art_crypto": "ক্রিপ্টো আপডেট", "art_crypto_desc": "মার্কেট ট্রেন্ডস", "art_health": "হেলথ টিপস", "art_health_desc": "ফিটনেস ও লাইফস্টাইল", "art_gaming": "গেমিং ওয়ার্ল্ড", "art_gaming_desc": "ইস্পোর্টস নিউজ", "art_finance": "ফাইন্যান্স গাইড", "art_finance_desc": "মানি ম্যানেজমেন্ট", "art_sports": "স্পোর্টস নিউজ", "art_sports_desc": "খেলার খবর", "art_top": "টপ", "art_pop": "হট", "art_new": "নতুন", "art_security": "আর্টিকেলটি পড়ুন। আগে বন্ধ করলে পয়েন্ট পাবেন না।", "err_early": "❌ টাস্ক অসম্পূর্ণ! আপনাকে পুরো সময় পড়তে হবে।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: ব্লগ পেজেই থাকুন।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "err_success": "🎉 টাস্ক ভেরিফাইড! পয়েন্ট যোগ করা হয়েছে: ", "verifying": "পড়ছেন... ", "start_task": "পড়ুন এবং আয় করুন", "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. ব্লগ খুলতে নিচে ক্লিক করুন।<br>২. ধীরে ধীরে স্ক্রোল করে পড়ুন।<br>৩. টাইম শেষ হওয়া পর্যন্ত পেজে থাকুন।" },
+            "te": { "art_title": "వ్యాసాలు చదవండి", "art_label1": "ప్రీమియం బ్లాగులు", "art_label2": "మరిన్ని విభాగాలు", "art_tech": "టెక్ న్యూస్", "art_tech_desc": "గ్యాడ్జెట్ సమాచారం", "art_crypto": "క్రిప్టో అప్‌డేట్‌లు", "art_crypto_desc": "మార్కెట్ ట్రెండ్స్", "art_health": "ఆరోగ్య చిట్కాలు", "art_health_desc": "ఫిట్‌నెస్", "art_gaming": "గేమింగ్ వరల్డ్", "art_gaming_desc": "ఈస్పోర్ట్స్ వార్తలు", "art_finance": "ఫైనాన్స్ గైడ్", "art_finance_desc": "డబ్బు నిర్వహణ", "art_sports": "క్రీడా వార్తలు", "art_sports_desc": "క్రికెట్ స్కోర్లు", "art_security": "వ్యాసాన్ని పూర్తిగా చదవండి.", "err_early": "❌ చదవడం పూర్తికాలేదు!", "err_invalid": "❌ దయచేసి బ్లాగ్ పేజీలోనే ఉండండి.", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "err_success": "🎉 టాస్క్ ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "verifying": "చదువుతున్నారు... ", "start_task": "చదవండి & సంపాదించండి", "inst_generic": "👉 <b>నియమాలు:</b><br>1. బ్లాగ్ తెరవడానికి క్లిక్ చేయండి.<br>2. చదవండి." },
+            "mr": { "art_title": "लेख वाचा", "art_label1": "प्रीमियम ब्लॉग्स", "art_label2": "अधिक श्रेणी", "art_tech": "टेक न्यूज", "art_tech_desc": "गॅजेट्सची माहिती", "art_crypto": "क्रिप्टो अपडेट्स", "art_crypto_desc": "मार्केट ट्रेंड्स", "art_health": "आरोग्य टिप्स", "art_health_desc": "फिटनेस", "art_gaming": "गेमिंग वर्ल्ड", "art_gaming_desc": "ईस्पोर्ट्स बातम्या", "art_finance": "फायनान्स गाईड", "art_finance_desc": "मनी मॅनेजमेंट", "art_sports": "क्रीडा बातम्या", "art_sports_desc": "क्रिकेट स्कोअर", "art_security": "लेख वाचा. लवकर बंद केल्यास पॉइंट्स मिळणार नाहीत.", "err_early": "❌ अपूर्ण! तुम्हाला पूर्ण वेळ लेख वाचावा लागेल.", "err_invalid": "❌ कृपया ब्लॉग पेजवरच राहा.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "err_success": "🎉 टास्क यशस्वी! पॉइंट्स जोडले गेले: ", "verifying": "वाचत आहे... ", "start_task": "वाचा आणि कमवा", "inst_generic": "👉 <b>नियम:</b><br>1. ब्लॉग उघडण्यासाठी खाली क्लिक करा.<br>2. पूर्ण वेळ थांबा." },
+            "ur": { "art_title": "مضامین پڑھیں", "art_label1": "پریمیم بلاگز", "art_label2": "مزید کیٹیگریز", "art_security": "مضمون مکمل پڑھیں۔ جلدی بند کرنے پر پوائنٹس نہیں ملیں گے۔", "err_early": "❌ نامکمل!", "err_invalid": "❌ بلاگ پیج پر رہیں۔", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی! کل دوبارہ آئیں۔", "err_success": "🎉 ٹاسک تصدیق شدہ! پوائنٹس شامل ہو گئے: ", "verifying": "پڑھ رہے ہیں... ", "start_task": "پڑھیں اور کمائیں", "inst_generic": "👉 <b>قواعد:</b><br>1. بلاگ کھولنے کے لیے نیچے کلک کریں۔" },
+            "ta": { "art_title": "கட்டுரைகள் படிக்க", "art_label1": "பிரீமியம் வலைப்பதிவுகள்", "art_label2": "மேலும் வகைகள்", "art_security": "கட்டுரையை முழுமையாகப் படிக்கவும்.", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ வலைப்பதிவுப் பக்கத்திலேயே இருக்கவும்.", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "err_success": "🎉 பணி சரிபார்க்கப்பட்டது! புள்ளிகள் சேர்க்கப்பட்டன: ", "verifying": "படிக்கிறது... ", "start_task": "படித்து சம்பாதி", "inst_generic": "👉 <b>விதிகள்:</b><br>1. வலைப்பதிவைத் திறக்க கிளிக் செய்யவும்." },
+            "gu": { "art_title": "લેખ વાંચો", "art_label1": "પ્રીમિયમ બ્લોગ્સ", "art_label2": "વધુ કેટેગરીઝ", "art_security": "લેખ સંપૂર્ણ વાંચો.", "err_early": "❌ અધૂરું!", "err_invalid": "❌ બ્લોગ પેજ પર જ રહો.", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ!", "err_success": "🎉 ટાસ્ક ચકાસાયેલ છે! પોઇન્ટ્સ ઉમેરવામાં આવ્યા: ", "verifying": "વાંચી રહ્યા છીએ... ", "start_task": "વાંચો અને કમાઓ", "inst_generic": "👉 <b>નિયમો:</b><br>1. બ્લોગ ખોલવા માટે ક્લિક કરો." },
+            "es": { "art_title": "Leer Artículos", "art_label1": "Blogs Premium", "art_label2": "Más Categorías", "art_security": "Lee el artículo completamente. Si cierras rápido no obtendrás puntos.", "err_early": "❌ ¡Incompleto! Debes leer todo el tiempo.", "err_invalid": "❌ Quédate en la página del blog.", "err_limit": "⏳ ¡Límite Diario Alcanzado! Vuelve mañana.", "err_success": "🎉 ¡Verificado! Puntos añadidos: ", "verifying": "Leyendo... ", "start_task": "Leer y Ganar", "inst_generic": "👉 <b>PASOS:</b><br>1. Abre el blog.<br>2. Lee y quédate todo el tiempo." },
+            "fr": { "art_title": "Lire des Articles", "art_label1": "Blogs Premium", "art_label2": "Plus de Catégories", "art_security": "Lisez l'article complètement pour obtenir des points.", "err_early": "❌ Incomplet ! Lisez pendant tout le temps.", "err_invalid": "❌ Restez sur la page du blog.", "err_limit": "⏳ Limite quotidienne atteinte ! Revenez demain.", "err_success": "🎉 Vérifié ! Points ajoutés: ", "verifying": "Lecture... ", "start_task": "Lire et Gagner", "inst_generic": "👉 <b>ÉTAPES:</b><br>1. Ouvrez le blog.<br>2. Restez tout le temps requis." },
+            "ar": { "art_title": "قراءة المقالات", "art_label1": "مدونات مميزة", "art_label2": "المزيد من الفئات", "art_security": "اقرأ المقال بالكامل. الإغلاق السريع لن يمنحك أي نقاط.", "err_early": "❌ غير مكتمل! يجب قراءة المقال طوال الوقت.", "err_invalid": "❌ يرجى البقاء في صفحة المدونة.", "err_limit": "⏳ تم الوصول للحد اليومي! عد غداً.", "err_success": "🎉 تم التحقق من المهمة! تمت إضافة نقاط عبر ", "verifying": "جارِ القراءة... ", "start_task": "اقرأ واربح", "inst_generic": "👉 <b>الخطوات:</b><br>1. انقر لفتح المدونة.<br>2. ابق في الصفحة حتى ينتهي الوقت." },
+            "pt": { "art_title": "Ler Artigos", "art_label1": "Blogs Premium", "art_label2": "Mais Categorias", "art_security": "Leia o artigo completamente. Fechar rápido resultará em zero pontos.", "err_early": "❌ Incompleto! Você deve ler o tempo todo.", "err_invalid": "❌ Fique na página do blog.", "err_limit": "⏳ Limite diário atingido! Volte amanhã.", "err_success": "🎉 Tarefa Verificada! Pontos adicionados via ", "verifying": "Lendo... ", "start_task": "Ler e Ganhar", "inst_generic": "👉 <b>PASSOS:</b><br>1. Clique para abrir o blog.<br>2. Fique até o tempo acabar." },
+            "ru": { "art_title": "Читать статьи", "art_label1": "Премиум блоги", "art_label2": "Больше категорий", "art_security": "Читайте статью полностью. Быстрое закрытие не принесет очков.", "err_early": "❌ Не завершено! Читайте всё время.", "err_invalid": "❌ Оставайтесь на странице блога.", "err_limit": "⏳ Дневной лимит исчерпан! Возвращайтесь завтра.", "err_success": "🎉 Задание выполнено! Добавлено очков: ", "verifying": "Чтение... ", "start_task": "Читать и заработать", "inst_generic": "👉 <b>ШАГИ:</b><br>1. Нажмите, чтобы открыть блог.<br>2. Оставайтесь, пока не закончится время." }
         };
 
         function changeLanguage(langCode) {
@@ -312,15 +301,17 @@
 
         const uid = localStorage.getItem("userId");
 
-        // 🔥 DYNAMIC ROUTING MAP FOR ALL 6 ARTICLE CATEGORIES
+        // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMER & REWARD FOR ALL 6 ARTICLES 🔥
         let articleLinksAdminConfig = {
-            tech: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            crypto: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            health: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            gaming: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            finance: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js",
-            sports: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
+            tech: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
+            crypto: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
+            health: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
+            gaming: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
+            finance: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
+            sports: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 }
         };
+
+        let userDailyClicksData = {};
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
@@ -330,20 +321,22 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Live Balance
+                    // 1. Live Balance & Daily Anti-Ban Fetch
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
+                            
+                            userDailyClicksData = data.daily_article_clicks || {}; // Sync daily clicks
+
+                            let userName = data.name || "Player";
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
                             function createEmojiURI(emoji) {
                                 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
                                 return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
                             }
 
-                            // Smart Avatar Sync
-                            let userName = data.name || "Player";
-                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             let avatarContainer = document.getElementById("headerProfileIcon");
                             if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
                                 avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
@@ -353,28 +346,46 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Time, Coins, & Links)
+                    // 2. Fetch Admin Configurations (Banners & 6 Specific Links/Timers/Rewards)
                     db.ref('global_system_runtime_configurations/read_articles').on('value', (snap) => {
                         if(snap.exists()) {
                             const aData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME AND COINS
-                            if (aData.ad_timer) { globalAdTimerSeconds = parseInt(aData.ad_timer); }
-                            if (aData.reward_coins) { globalRewardCoins = parseInt(aData.reward_coins); }
+                            // Load Individual Configurations
+                            ['tech', 'crypto', 'health', 'gaming', 'finance', 'sports'].forEach(cat => {
+                                if(aData['link_' + cat]) articleLinksAdminConfig[cat].url = aData['link_' + cat];
+                                if(aData['timer_' + cat]) articleLinksAdminConfig[cat].timer = parseInt(aData['timer_' + cat]);
+                                if(aData['reward_' + cat]) articleLinksAdminConfig[cat].reward = parseInt(aData['reward_' + cat]);
+                            });
 
-                            // Load Banners
-                            if(aData.slot1_code && aData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), aData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(aData.slot2_code && aData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), aData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(aData.slot3_code && aData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), aData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            if(aData.slot4_code && aData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), aData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
-
-                            // Load 6 Specific Article Links
-                            if(aData.link_tech) articleLinksAdminConfig.tech = aData.link_tech;
-                            if(aData.link_crypto) articleLinksAdminConfig.crypto = aData.link_crypto;
-                            if(aData.link_health) articleLinksAdminConfig.health = aData.link_health;
-                            if(aData.link_gaming) articleLinksAdminConfig.gaming = aData.link_gaming;
-                            if(aData.link_finance) articleLinksAdminConfig.finance = aData.link_finance;
-                            if(aData.link_sports) articleLinksAdminConfig.sports = aData.link_sports;
+                            // 🔥 FIXED BANNER LOADING WITH SETTIMEOUT 🔥
+                            let s1Code = (aData.slot1 && aData.slot1.code) ? aData.slot1.code : aData.slot1_code;
+                            let s1Active = (aData.slot1 && aData.slot1.active !== undefined) ? aData.slot1.active : aData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (aData.slot2 && aData.slot2.code) ? aData.slot2.code : aData.slot2_code;
+                            let s2Active = (aData.slot2 && aData.slot2.active !== undefined) ? aData.slot2.active : aData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (aData.slot3 && aData.slot3.code) ? aData.slot3.code : aData.slot3_code;
+                            let s3Active = (aData.slot3 && aData.slot3.active !== undefined) ? aData.slot3.active : aData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            
+                            let s4Code = (aData.slot4 && aData.slot4.code) ? aData.slot4.code : aData.slot4_code;
+                            let s4Active = (aData.slot4 && aData.slot4.active !== undefined) ? aData.slot4.active : aData.active;
+                            if (s4Code && s4Active !== false) {
+                                document.getElementById("adminBannerSlot4").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
+                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
                         }
                     });
 
@@ -384,7 +395,6 @@
             });
         });
 
-        // 🔥 STATE VEHICLE PARAMETERS FOR ACTIVE TASK VIEWPORT
         let currentActiveTaskKey = "";
         let offerTimer = null;
         let pendingRewardCoins = 0;
@@ -411,6 +421,13 @@
         }
 
         function openArticleInstruction(taskKey, icon, prettyTitle) {
+            // 🔥 ANTI-BAN: 1 CLICK PER DAY LOGIC 🔥
+            let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+            if(userDailyClicksData[taskKey] === todayDateString) {
+                showCustomAlert("err_limit");
+                return; // Block opening the task
+            }
+
             currentActiveTaskKey = taskKey;
             let lang = localStorage.getItem("selectedLang") || "en";
             let transObj = langData[lang] || langData["en"];
@@ -421,8 +438,9 @@
             let startBtn = document.getElementById("btnStartArticleTask");
             startBtn.disabled = false;
             
-            // Setup dynamic button text based on admin timer
-            startBtn.innerText = transObj["start_task"] ? transObj["start_task"].replace('60', globalAdTimerSeconds).replace('60s', `${globalAdTimerSeconds}s`) : `Read & Earn (${globalAdTimerSeconds}s)`;
+            // Setup dynamic button text based on specific article timer
+            let specificTimer = articleLinksAdminConfig[taskKey].timer;
+            startBtn.innerText = transObj["start_task"] ? `${transObj["start_task"]} (${specificTimer}s)` : `Read & Earn (${specificTimer}s)`;
 
             document.getElementById("articleInstructionModal").style.display = "flex";
         }
@@ -431,57 +449,63 @@
             document.getElementById("articleInstructionModal").style.display = "none";
         }
 
-        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH IN-APP VIEWER
+        // 🚀 SMART TIMER LOGIC WITH IN-APP VIEWER
         function executeArticleTaskRedirection() {
             let taskKey = currentActiveTaskKey;
             pendingTaskKey = taskKey;
-            pendingRewardCoins = globalRewardCoins;
+            
+            let config = articleLinksAdminConfig[taskKey];
+            pendingRewardCoins = config.reward;
 
             const startBtn = document.getElementById("btnStartArticleTask");
-            let lang = localStorage.getItem("selectedLang") || "en";
-            let verifyText = langData[lang] && langData[lang]["verifying"] ? langData[lang]["verifying"] : "Reading... ";
-
             startBtn.disabled = true;
 
-            // Target link logic
-            let targetDestinationUrl = articleLinksAdminConfig[taskKey] || "https://www.google.com";
-            let countdownTime = globalAdTimerSeconds;
+            let targetDestinationUrl = config.url;
+            let countdownTime = config.timer;
             
             // Show In-App Viewer
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
             
+            // 🔥 Wait for Ad to Load fully before countdown
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Blog...`;
+            
+            let iframeNode = document.getElementById("adIframe");
+
+            iframeNode.onload = function() {
+                if(offerTimer) clearInterval(offerTimer);
+
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+                
+                offerTimer = setInterval(() => {
+                    countdownTime--;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if (document.hidden) { 
+                        clearInterval(offerTimer);
+                        closeArticleInstructionModal();
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        showCustomAlert("err_invalid");
+                        pendingRewardCoins = 0;
+                        return;
+                    }
+
+                    if (countdownTime <= 0) {
+                        clearInterval(offerTimer);
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                    }
+                }, 1000);
+            };
+
             // Load Ad URL into iframe
-            document.getElementById("adIframe").src = targetDestinationUrl;
-
-            if(offerTimer) clearInterval(offerTimer);
-
-            offerTimer = setInterval(() => {
-                countdownTime--;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if (document.hidden) { 
-                    clearInterval(offerTimer);
-                    closeArticleInstructionModal();
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    showCustomAlert("err_invalid");
-                    pendingRewardCoins = 0;
-                    return;
-                }
-
-                if (countdownTime <= 0) {
-                    clearInterval(offerTimer);
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+            iframeNode.src = targetDestinationUrl;
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
+        // 💰 REWARD SYNC API & UNIVERSAL HISTORY PUSH
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
@@ -489,13 +513,28 @@
 
             if (pendingRewardCoins > 0 && typeof uid !== 'undefined' && uid) {
                 let nameDisplay = pendingTaskKey.toUpperCase();
+                let todayDateString = new Date().toLocaleDateString("en-CA");
                 
                 // Add Coins securely via Transaction
                 db.ref(`users/${uid}/coins`).transaction((current) => {
                     return (current || 0) + pendingRewardCoins;
                 }).then(() => {
                     
-                    // Mark Daily Task 't5' as Complete
+                    // 1. 🔥 ANTI-BAN LOGIC: Register Today's Date so user can't click this article again today
+                    db.ref(`users/${uid}/daily_article_clicks/${pendingTaskKey}`).set(todayDateString);
+
+                    // 2. 🔥 UNIVERSAL HISTORY PUSH
+                    db.ref(`users/${uid}/history`).push({
+                        title: `Read Article (${nameDisplay})`,
+                        amount: pendingRewardCoins,
+                        type: "credit",
+                        txn_type: "read_article",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    // 3. Mark Daily Task 't5' as Complete
                     db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                         let tasks = snap.val() || [];
                         if (!tasks.includes("t5")) {

@@ -23,12 +23,11 @@
             --accent-gold: #facc15;
             --accent-pink: #f43f5e;
             --accent-purple: #a855f7;
-            --accent-orange: #f97316;
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); background-image: radial-gradient(circle at 10% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
         
         /* Premium Sync Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--primary-blue); backdrop-filter: blur(10px); }
@@ -43,15 +42,18 @@
         .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
         .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
-        .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
+        .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; position: relative; }
 
         /* PLAY STORE SAFE: Only show Coins */
         .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--primary-blue); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); backdrop-filter: blur(10px); }
         .balance-card span { font-size: 18px; font-weight: 900; }
-        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+        .coin-txt { color: var(--accent-gold); display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 20px; font-weight: 900; }
+
+        /* 🔥 DAILY LIMIT COUNTER */
+        .daily-limit-badge { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; color: var(--text-sub); text-align: right; width: fit-content; margin-left: auto; }
 
         /* Banner Ads Slots */
-        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(59, 130, 246, 0.4); box-sizing: border-box; margin: 5px 0; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: none; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(59, 130, 246, 0.4); margin: 5px 0; box-sizing: border-box; }
 
         /* Section Headlines */
         .section-headline { font-size: 15px; font-weight: 900; color: var(--primary-blue); text-transform: uppercase; letter-spacing: 0.8px; margin: 10px 0 5px 0; text-align: left; border-left: 4px solid var(--primary-blue); padding-left: 8px; }
@@ -98,9 +100,9 @@
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 10000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
-        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
         .custom-alert button:active { transform: scale(0.95); }
-        .custom-alert.success-border button { background: var(--accent-green); }
+        .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 9999; backdrop-filter: blur(5px); }
 
         /* 🔥 IN-APP AD VIEWER CSS 🔥 */
@@ -109,6 +111,8 @@
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+        
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -119,6 +123,14 @@
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
+    </div>
+
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
@@ -126,7 +138,6 @@
             <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 15s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
-        <!-- Sandbox mode for extreme safety -->
         <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
@@ -162,10 +173,14 @@
 
     <div class="main-container">
         
-        <!-- PLAY STORE SAFE: Only show Coins -->
         <div class="balance-card">
             <span data-i18n="wallet_bal">Wallet Balance</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
+        </div>
+        
+        <!-- 🔥 DAILY LIMIT COUNTER -->
+        <div class="daily-limit-badge">
+            <span id="todayVideoDone">0</span> / <span id="totalVideoLimit">20</span> Today
         </div>
         
         <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
@@ -238,41 +253,43 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
-        let globalAdTimerSeconds = 15; // Default time
+        // 🔥 ADMIN CONTROLLED DYNAMIC LIMITS 🔥
+        let globalDailyLimit = 20; // Default max limit
+        let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+        let userTodayClaimsCount = 0;
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
             "en": { 
-                "watch_ads": "Video Zone", "wallet_bal": "Wallet Balance", "watch_earn_networks": "Media Networks", "unlimited_desc": "Unlimited Videos", "premium_video_desc": "Premium Videos", "short_ads_desc": "Short 10s Clips", "high_paying_desc": "High Yield Media", "select_channel": "Select a video channel to stream and earn points", "verifying": "Verifying stream...", "btn_stream": "Stream & Claim", "st_security": "Tracking protocols are active. Do not minimize the app or close the video early to ensure successful point verification.", "err_early": "❌ Verification Incomplete! You closed the stream early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "err_success": "🎉 Task Verified! Points credited via "
+                "watch_ads": "Video Zone", "wallet_bal": "Wallet Balance", "watch_earn_networks": "Media Networks", "unlimited_desc": "Unlimited Videos", "premium_video_desc": "Premium Videos", "short_ads_desc": "Short 10s Clips", "high_paying_desc": "High Yield Media", "select_channel": "Select a video channel to stream and earn points", "verifying": "Verifying stream...", "btn_stream": "Stream & Claim", "st_security": "Tracking protocols are active. Do not minimize the app or close the video early to ensure successful point verification.", "err_early": "❌ Verification Incomplete! You closed the stream early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "err_limit": "⏳ Daily Limit Reached! You have watched all videos for today. Come back tomorrow.", "err_success": "🎉 Task Verified! Points credited via "
             },
             "hi": { 
-                "watch_ads": "वीडियो ज़ोन", "wallet_bal": "वॉलेट बैलेंस", "watch_earn_networks": "मीडिया नेटवर्क", "unlimited_desc": "असीमित वीडियो", "premium_video_desc": "प्रीमियम वीडियो", "short_ads_desc": "छोटे 10s क्लिप्स", "high_paying_desc": "प्रीमियम मीडिया", "select_channel": "पॉइंट्स कमाने के लिए एक वीडियो चैनल चुनें", "verifying": "सत्यापन चल रहा है...", "btn_stream": "वीडियो देखें", "st_security": "सत्यापन प्रोटोकॉल सक्रिय हैं। पॉइंट्स प्राप्त करने के लिए वीडियो को जल्दी बंद न करें या ऐप को मिनीमाइज न करें।", "err_early": "❌ सत्यापन अधूरा! आपने वीडियो जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें।", "err_success": "🎉 सत्यापित! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: "
+                "watch_ads": "वीडियो ज़ोन", "wallet_bal": "वॉलेट बैलेंस", "watch_earn_networks": "मीडिया नेटवर्क", "unlimited_desc": "असीमित वीडियो", "premium_video_desc": "प्रीमियम वीडियो", "short_ads_desc": "छोटे 10s क्लिप्स", "high_paying_desc": "प्रीमियम मीडिया", "select_channel": "पॉइंट्स कमाने के लिए एक वीडियो चैनल चुनें", "verifying": "सत्यापन चल रहा है...", "btn_stream": "वीडियो देखें", "st_security": "सत्यापन प्रोटोकॉल सक्रिय हैं। पॉइंट्स प्राप्त करने के लिए वीडियो को जल्दी बंद न करें या ऐप को मिनीमाइज न करें।", "err_early": "❌ सत्यापन अधूरा! आपने वीडियो जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें।", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज के सभी वीडियो देख लिए हैं। कल फिर आएं।", "err_success": "🎉 सत्यापित! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: "
             },
-            "bn": { "watch_ads": "ভিডিও জোন", "select_channel": "ভিডিও চ্যানেল নির্বাচন করুন", "btn_stream": "ভিডিও দেখুন", "err_early": "❌ অসম্পূর্ণ! তাড়াতাড়ি বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ মিনিমাইজ করবেন না।", "err_success": "🎉 ভেরিফাইড! পয়েন্ট যোগ হয়েছে: " },
-            "te": { "watch_ads": "వీడియో జోన్", "select_channel": "వీడియో ఛానెల్‌ని ఎంచుకోండి", "btn_stream": "చూడండి", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: " },
-            "mr": { "watch_ads": "व्हिडिओ झोन", "select_channel": "व्हिडिओ चॅनेल निवडा", "btn_stream": "पहा", "err_success": "🎉 सत्यापित! पॉइंट्स जोडले गेले: " },
-            "ta": { "watch_ads": "வீடியோ மண்டலம்", "select_channel": "வீடியோ சேனலைத் தேர்ந்தெடுக்கவும்", "btn_stream": "பார்க்கவும்", "err_success": "🎉 சரிபார்க்கப்பட்டது! " },
-            "ur": { "watch_ads": "ویڈیو زون", "select_channel": "ویڈیو چینل منتخب کریں", "btn_stream": "دیکھیں", "err_success": "🎉 تصدیق ہو گئی! " },
-            "gu": { "watch_ads": "વિડિઓ ઝોન", "select_channel": "વિડિઓ ચેનલ પસંદ કરો", "btn_stream": "જુઓ", "err_success": "🎉 ચકાસાયેલ! " },
-            "es": { "watch_ads": "Zona de Video", "select_channel": "Selecciona un canal para ganar", "btn_stream": "Ver Video", "err_success": "🎉 ¡Verificado! " },
-            "fr": { "watch_ads": "Zone Vidéo", "select_channel": "Sélectionnez une chaîne pour gagner", "btn_stream": "Regarder", "err_success": "🎉 Vérifié ! " },
-            "ar": { "watch_ads": "منطقة الفيديو", "select_channel": "اختر قناة لكسب النقاط", "btn_stream": "شاهد", "err_success": "🎉 تم التحقق! " },
-            "pt": { "watch_ads": "Zona de Vídeo", "select_channel": "Selecione um canal para ganhar", "btn_stream": "Assistir", "err_success": "🎉 Verificado! " },
-            "ru": { "watch_ads": "Видео Зона", "select_channel": "Выберите канал для заработка", "btn_stream": "Смотреть", "err_success": "🎉 Проверено! " }
+            "bn": { "watch_ads": "ভিডিও জোন", "select_channel": "ভিডিও চ্যানেল নির্বাচন করুন", "btn_stream": "ভিডিও দেখুন", "err_early": "❌ অসম্পূর্ণ! তাড়াতাড়ি বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ মিনিমাইজ করবেন না।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "err_success": "🎉 ভেরিফাইড! পয়েন্ট যোগ হয়েছে: " },
+            "te": { "watch_ads": "వీడియో జోన్", "select_channel": "వీడియో ఛానెల్‌ని ఎంచుకోండి", "btn_stream": "చూడండి", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "err_success": "🎉 ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: " },
+            "mr": { "watch_ads": "व्हिडिओ झोन", "select_channel": "व्हिडिओ चॅनेल निवडा", "btn_stream": "पहा", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "err_success": "🎉 सत्यापित! पॉइंट्स जोडले गेले: " },
+            "ta": { "watch_ads": "வீடியோ மண்டலம்", "select_channel": "வீடியோ சேனலைத் தேர்ந்தெடுக்கவும்", "btn_stream": "பார்க்கவும்", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "err_success": "🎉 சரிபார்க்கப்பட்டது! " },
+            "ur": { "watch_ads": "ویڈیو زون", "select_channel": "ویڈیو چینل منتخب کریں", "btn_stream": "دیکھیں", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی!", "err_success": "🎉 تصدیق ہو گئی! " },
+            "gu": { "watch_ads": "વિડિઓ ઝોન", "select_channel": "વિડિઓ ચેનલ પસંદ કરો", "btn_stream": "જુઓ", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ!", "err_success": "🎉 ચકાસાયેલ! " },
+            "es": { "watch_ads": "Zona de Video", "select_channel": "Selecciona un canal para ganar", "btn_stream": "Ver Video", "err_limit": "⏳ ¡Límite Diario Alcanzado!", "err_success": "🎉 ¡Verificado! " },
+            "fr": { "watch_ads": "Zone Vidéo", "select_channel": "Sélectionnez une chaîne pour gagner", "btn_stream": "Regarder", "err_limit": "⏳ Limite quotidienne atteinte !", "err_success": "🎉 Vérifié ! " },
+            "ar": { "watch_ads": "منطقة الفيديو", "select_channel": "اختر قناة لكسب النقاط", "btn_stream": "شاهد", "err_limit": "⏳ تم الوصول للحد اليومي!", "err_success": "🎉 تم التحقق! " },
+            "pt": { "watch_ads": "Zona de Vídeo", "select_channel": "Selecione um canal para ganhar", "btn_stream": "Assistir", "err_limit": "⏳ Limite diário atingido!", "err_success": "🎉 Verificado! " },
+            "ru": { "watch_ads": "Видео Зона", "select_channel": "Выберите канал для заработка", "btn_stream": "Смотреть", "err_limit": "⏳ Дневной лимит исчерпан!", "err_success": "🎉 Проверено! " }
         };
 
         function changeLanguage(langCode) {
@@ -283,18 +300,47 @@
                 if(transObj[key]) elem.innerText = transObj[key];
             });
             document.getElementById("appLanguage").value = langCode;
+            
+            // Re-render modal buttons if open
+            if(document.getElementById("videoOptionsModal").style.display === "flex") {
+                document.querySelectorAll(".option-sub").forEach(el => el.innerText = transObj["btn_stream"] || "Stream & Claim");
+            }
         }
 
         const uid = localStorage.getItem("userId");
 
-        // 🔥 DYNAMIC LINKS MAPPING (Fetched from Admin)
+        // 🔥 DYNAMIC LINKS MAPPING (18 SERVERS - Fetched from Admin)
         let videoAdminLinksConfig = {
-            adscend: { srv1: "", srv2: "", srv3: "" },
-            lootably: { srv1: "", srv2: "", srv3: "" },
-            hideout: { srv1: "", srv2: "", srv3: "" },
-            timewall: { srv1: "", srv2: "", srv3: "" },
-            notik: { srv1: "", srv2: "", srv3: "" },
-            monlix: { srv1: "", srv2: "", srv3: "" },
+            adscend: { 
+                srv1: { link: "", timer: 15, reward: 15 },
+                srv2: { link: "", timer: 15, reward: 12 },
+                srv3: { link: "", timer: 15, reward: 10 }
+            },
+            lootably: { 
+                srv1: { link: "", timer: 15, reward: 15 },
+                srv2: { link: "", timer: 15, reward: 12 },
+                srv3: { link: "", timer: 15, reward: 10 }
+            },
+            hideout: { 
+                srv1: { link: "", timer: 15, reward: 15 },
+                srv2: { link: "", timer: 15, reward: 12 },
+                srv3: { link: "", timer: 15, reward: 10 }
+            },
+            timewall: { 
+                srv1: { link: "", timer: 15, reward: 15 },
+                srv2: { link: "", timer: 15, reward: 12 },
+                srv3: { link: "", timer: 15, reward: 10 }
+            },
+            notik: { 
+                srv1: { link: "", timer: 15, reward: 15 },
+                srv2: { link: "", timer: 15, reward: 12 },
+                srv3: { link: "", timer: 15, reward: 10 }
+            },
+            monlix: { 
+                srv1: { link: "", timer: 15, reward: 15 },
+                srv2: { link: "", timer: 15, reward: 12 },
+                srv3: { link: "", timer: 15, reward: 10 }
+            },
             default_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
         };
 
@@ -311,13 +357,21 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    // 1. Live Balance Sync & Daily Anti-Ban Fetch
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
                             
-                            // Smart Avatar Sync (Matches ho.html)
+                            // Load Anti-Ban Click Data
+                            if(data.daily_video_zone_claims && data.daily_video_zone_claims.date === todayDateString) {
+                                userTodayClaimsCount = data.daily_video_zone_claims.count || 0;
+                            } else {
+                                userTodayClaimsCount = 0;
+                            }
+                            document.getElementById("todayVideoDone").innerText = userTodayClaimsCount;
+
+                            // Smart Avatar Sync
                             let userName = data.name || "Player";
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
@@ -330,7 +384,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Time & All 18 Links)
+                    // 2. Fetch Admin Configurations (Banners, Limits & All 18 Servers Data)
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -338,29 +392,45 @@
                             let vzConfig = adminData.video_zone_configs;
                             if(vzConfig) {
                                 
-                                // 🔥 GET ADMIN CONTROLLED TIME
-                                if (vzConfig.ad_timer) { globalAdTimerSeconds = parseInt(vzConfig.ad_timer); }
+                                // 🔥 GET ADMIN CONTROLLED DAILY LIMIT
+                                if (vzConfig.daily_limit) { 
+                                    globalDailyLimit = parseInt(vzConfig.daily_limit); 
+                                    document.getElementById("totalVideoLimit").innerText = globalDailyLimit;
+                                }
 
-                                // Load Banners
-                                if(vzConfig.slot1_code) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), vzConfig.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                                if(vzConfig.slot2_code) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), vzConfig.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                                if(vzConfig.slot3_code) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), vzConfig.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                                if(vzConfig.slot4_code) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), vzConfig.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                                // Load Banners safely with setTimeout
+                                if(vzConfig.slot1_code && vzConfig.active !== false) { 
+                                    document.getElementById("adminBannerSlot1").style.display = "flex"; 
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), vzConfig.slot1_code), 400); 
+                                } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                                
+                                if(vzConfig.slot2_code && vzConfig.active !== false) { 
+                                    document.getElementById("adminBannerSlot2").style.display = "flex"; 
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), vzConfig.slot2_code), 800); 
+                                } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                                
+                                if(vzConfig.slot3_code && vzConfig.active !== false) { 
+                                    document.getElementById("adminBannerSlot3").style.display = "flex"; 
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), vzConfig.slot3_code), 1200); 
+                                } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                                
+                                if(vzConfig.slot4_code && vzConfig.active !== false) { 
+                                    document.getElementById("adminBannerSlot4").style.display = "flex"; 
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), vzConfig.slot4_code), 1600); 
+                                } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
 
-                                // Load Server Links
+                                // 🔥 LOAD ALL 18 SERVERS DYNAMICALLY 🔥
                                 const networks = ['adscend', 'lootably', 'hideout', 'timewall', 'notik', 'monlix'];
                                 networks.forEach(net => {
-                                    if(vzConfig[`link_${net}_s1`]) videoAdminLinksConfig[net].srv1 = vzConfig[`link_${net}_s1`];
-                                    if(vzConfig[`link_${net}_s2`]) videoAdminLinksConfig[net].srv2 = vzConfig[`link_${net}_s2`];
-                                    if(vzConfig[`link_${net}_s3`]) videoAdminLinksConfig[net].srv3 = vzConfig[`link_${net}_s3`];
+                                    for(let i=1; i<=3; i++) {
+                                        if(vzConfig[`link_${net}_s${i}`]) videoAdminLinksConfig[net][`srv${i}`].link = vzConfig[`link_${net}_s${i}`];
+                                        if(vzConfig[`timer_${net}_s${i}`]) videoAdminLinksConfig[net][`srv${i}`].timer = parseInt(vzConfig[`timer_${net}_s${i}`]);
+                                        if(vzConfig[`reward_${net}_s${i}`]) videoAdminLinksConfig[net][`srv${i}`].reward = parseInt(vzConfig[`reward_${net}_s${i}`]);
+                                    }
                                 });
-                            } else if (adminData.banner_ads) { // Fallback to global banners
-                                if(adminData.banner_ads.slot1 && adminData.banner_ads.slot1.active) setAdHTML(document.getElementById("adminBannerSlot1"), adminData.banner_ads.slot1.code);
-                                if(adminData.banner_ads.slot2 && adminData.banner_ads.slot2.active) setAdHTML(document.getElementById("adminBannerSlot2"), adminData.banner_ads.slot2.code);
-                                if(adminData.banner_ads.slot3 && adminData.banner_ads.slot3.active) setAdHTML(document.getElementById("adminBannerSlot3"), adminData.banner_ads.slot3.code);
-                            }
-
-                            if (adminData.globalSmartlink) {
+                            } 
+                            // Global Fallback
+                            else if (adminData.globalSmartlink) {
                                 videoAdminLinksConfig.default_link = adminData.globalSmartlink;
                             }
                         }
@@ -413,8 +483,14 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 3 SERVER MODAL GENERATOR
+        // 3 SERVER MODAL GENERATOR (Pulls from Dynamic Config)
         function openVideoOptions(networkName, icon) {
+            // 🔥 ANTI-BAN: Custom Limit Check
+            if(userTodayClaimsCount >= globalDailyLimit) {
+                showCustomAlert("err_limit");
+                return;
+            }
+
             let prettyName = networkName.charAt(0).toUpperCase() + networkName.slice(1) + " Media";
             if(networkName === 'notik') prettyName = "Notik Me";
             if(networkName === 'hideout') prettyName = "Hideout.tv";
@@ -428,10 +504,12 @@
             let currentLang = localStorage.getItem("selectedLang") || "en";
             let streamTxt = langData[currentLang]["btn_stream"] || "Stream & Claim";
 
+            const netConf = videoAdminLinksConfig[networkName];
+            
             const serverOptions = [
-                { id: "srv1", title: "Server 1: Premium Stream", reward: 15 },
-                { id: "srv2", title: "Server 2: Flash High-Yield", reward: 12 },
-                { id: "srv3", title: "Server 3: Booster Feed", reward: 10 }
+                { id: "srv1", title: "Server 1: Premium Stream", reward: netConf.srv1.reward, timer: netConf.srv1.timer },
+                { id: "srv2", title: "Server 2: Flash High-Yield", reward: netConf.srv2.reward, timer: netConf.srv2.timer },
+                { id: "srv3", title: "Server 3: Booster Feed", reward: netConf.srv3.reward, timer: netConf.srv3.timer }
             ];
 
             serverOptions.forEach(opt => {
@@ -441,12 +519,12 @@
                 btn.innerHTML = `
                     <div class="option-meta">
                         <span class="option-title">${opt.title}</span>
-                        <span class="option-sub" id="sub_${opt.id}">${streamTxt}</span>
+                        <span class="option-sub" id="sub_${opt.id}">${streamTxt} (${opt.timer}s)</span>
                     </div>
                     <span class="option-reward">+${opt.reward} 🪙</span>
                 `;
                 btn.onclick = () => {
-                    triggerSecureAdStream(networkName, opt.id, opt.title, opt.reward);
+                    triggerSecureAdStream(networkName, opt.id, opt.title, opt.reward, opt.timer);
                 };
                 container.appendChild(btn);
             });
@@ -461,7 +539,7 @@
         }
 
         // 🚀 PLAY STORE SAFE VALIDATION ENGINE (IN-APP VIEWER)
-        function triggerSecureAdStream(network, serverId, serverTitle, rewardAmt) {
+        function triggerSecureAdStream(network, serverId, serverTitle, rewardAmt, timerSecs) {
             if(isValidationActive) return;
             isValidationActive = true;
 
@@ -476,40 +554,51 @@
             // Disable all buttons in modal
             document.querySelectorAll(".video-option-btn").forEach(b => b.disabled = true);
 
-            let countdown = globalAdTimerSeconds;
+            let countdown = timerSecs;
             window.hasMainTabHidden = false; // Reset Tracker
 
-            let finalTargetAdUrl = videoAdminLinksConfig[network][serverId] || videoAdminLinksConfig.default_link;
+            let finalTargetAdUrl = videoAdminLinksConfig[network][serverId].link || videoAdminLinksConfig.default_link;
             
             // HIDE MODAL & SHOW IN-APP VIEWER
             document.getElementById("videoOptionsModal").style.display = "none";
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdown}s`;
             
-            document.getElementById("adIframe").src = finalTargetAdUrl;
+            // 🔥 Wait for Ad to Load fully before countdown
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+            
+            let iframeNode = document.getElementById("adIframe");
 
-            platformTimer = setInterval(() => {
-                countdown--;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdown}s`;
+            iframeNode.onload = function() {
+                if(platformTimer) clearInterval(platformTimer);
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdown}s`;
 
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if (document.hidden) { 
-                    clearInterval(platformTimer);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    resetModalUI();
-                    showCustomAlert("err_invalid");
-                    return;
-                }
+                platformTimer = setInterval(() => {
+                    countdown--;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdown}s`;
 
-                if (countdown <= 0) {
-                    clearInterval(platformTimer);
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if (document.hidden) { 
+                        clearInterval(platformTimer);
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        resetModalUI();
+                        showCustomAlert("err_invalid");
+                        return;
+                    }
+
+                    if (countdown <= 0) {
+                        clearInterval(platformTimer);
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                    }
+                }, 1000);
+            };
+
+            // Load Ad URL into iframe
+            iframeNode.src = finalTargetAdUrl;
         }
 
         function resetModalUI() {
@@ -517,7 +606,7 @@
             activeWatchSession = null;
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t14) VIA PURE FIREBASE
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t14/t15) VIA PURE FIREBASE + HISTORY
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
@@ -535,7 +624,38 @@
                 return (current || 0) + finalCoinsReward;
             }).then(() => {
                 
-                // 2. Mark Daily Task 't14' as Complete
+                // 2. 🔥 ANTI-BAN LOGIC: Register limits
+                db.ref(`users/${uid}/daily_video_zone_claims`).set({
+                    date: todayDateString,
+                    count: userTodayClaimsCount + 1
+                });
+
+                // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
+                db.ref(`users/${uid}/history`).push({
+                    title: `Video Ad Reward (${netName})`,
+                    amount: finalCoinsReward,
+                    type: "credit",
+                    txn_type: "video_zone",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // 4. Update TOTAL TASK EARNINGS SYNC (For Referral Verification)
+                db.ref(`users/${uid}/history`).once('value', snap => {
+                    let totalTaskEarn = 0;
+                    if(snap.exists()) {
+                        snap.forEach(child => {
+                            let item = child.val();
+                            if(item.type === "credit" && item.txn_type !== "admin_bonus" && item.txn_type !== "referral_bonus") {
+                                totalTaskEarn += parseFloat(item.amount || 0);
+                            }
+                        });
+                        db.ref(`users/${uid}/total_task_earnings`).set(totalTaskEarn);
+                    }
+                });
+
+                // 5. Mark Daily Task as Complete (Using t14 logic)
                 db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                     let tasks = snap.val() || [];
                     if (!tasks.includes("t14")) {

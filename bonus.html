@@ -61,7 +61,7 @@
 
         /* Double Ad Banners */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 18px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); box-sizing: border-box; display: none; }
 
         /* Fun & Earn Grid */
         .section-label { width: 92%; max-width: 440px; font-size: 14.5px; font-weight: 900; color: var(--accent-purple); text-transform: uppercase; letter-spacing: 0.8px; margin: 15px 0 12px 0; text-align: left; border-left: 4px solid var(--accent-purple); padding-left: 10px; }
@@ -141,7 +141,7 @@
         <div class="ad-slot-banner" id="adminBannerSlot2"></div>
     </div>
 
-    <div class="section-label" data-i18n="eb_zone_title">Fun & coins Zone</div>
+    <div class="section-label" data-i18n="eb_zone_title">Fun & Earn Zone</div>
 
     <div class="grid-container">
         
@@ -183,15 +183,15 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -220,7 +220,7 @@
                 const key = elem.getAttribute("data-i18n");
                 if(transObj[key]) { 
                     if(elem.tagName === "BUTTON") {
-                        if(!elem.disabled) elem.innerText = transObj[key];
+                        if(!elem.disabled && !elem.innerText.includes("APPLYING")) elem.innerText = transObj[key];
                     } else {
                         elem.innerText = transObj[key]; 
                     }
@@ -266,20 +266,54 @@
                             // Smart Avatar Sync
                             let userName = data.name || "Player";
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
-                            document.getElementById("headerProfileIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            
+                            function createEmojiURI(emoji) {
+                                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+                                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+                            }
+
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
                         }
                     });
 
-                    // 2. Fetch Admin Banners (Specifically for Extra Bonus Page)
+                    // 2. Fetch Admin Banners with Safe loading
                     db.ref('global_system_runtime_configurations/extra_bonus').on('value', (snap) => {
                         if(snap.exists()) {
                             const bData = snap.val();
                             
-                            // Load Banners
-                            if(bData.slot1_code && bData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), bData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(bData.slot2_code && bData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), bData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(bData.slot3_code && bData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), bData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            if(bData.slot4_code && bData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), bData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            // 🔥 FIXED BANNER LOADING WITH SETTIMEOUT 🔥
+                            let s1Code = (bData.slot1 && bData.slot1.code) ? bData.slot1.code : bData.slot1_code;
+                            let s1Active = (bData.slot1 && bData.slot1.active !== undefined) ? bData.slot1.active : bData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (bData.slot2 && bData.slot2.code) ? bData.slot2.code : bData.slot2_code;
+                            let s2Active = (bData.slot2 && bData.slot2.active !== undefined) ? bData.slot2.active : bData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (bData.slot3 && bData.slot3.code) ? bData.slot3.code : bData.slot3_code;
+                            let s3Active = (bData.slot3 && bData.slot3.active !== undefined) ? bData.slot3.active : bData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            
+                            let s4Code = (bData.slot4 && bData.slot4.code) ? bData.slot4.code : bData.slot4_code;
+                            let s4Active = (bData.slot4 && bData.slot4.active !== undefined) ? bData.slot4.active : bData.active;
+                            if (s4Code && s4Active !== false) {
+                                document.getElementById("adminBannerSlot4").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
+                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
                         }
                     });
 
@@ -307,7 +341,7 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🚀 SECURE PROMO CODE SUBMISSION (100% ADMIN PANEL SYNCED)
+        // 🚀 SECURE PROMO CODE SUBMISSION (100% ADMIN PANEL SYNCED & HISTORY ATTACHED)
         function applyFirebasePromoCode() {
             const inputField = document.getElementById("promoCodeInput");
             const code = inputField.value.trim().toUpperCase();
@@ -365,13 +399,24 @@
                             .then(() => {
                                 userUsedCodesRef.child(code).set(Date.now()); // Mark as used for this user
                                 
-                                // 🔥 Add to User History (Ledger)
+                                // 🔥 Add to Old Transactions Ledger (for compatibility)
                                 db.ref(`users/${uid}/transactions`).push({
                                     action: "promo_code_claim",
                                     amount: rewardCoins,
                                     status: "SUCCESSFUL",
                                     details: `Promo Code: ${code}`,
                                     timestamp: Date.now()
+                                });
+
+                                // 🔥 UNIVERSAL HISTORY PUSH (For Account Health & Referral Tracking) 🔥
+                                db.ref(`users/${uid}/history`).push({
+                                    title: `Promo Code (${code})`,
+                                    amount: rewardCoins,
+                                    type: "credit",
+                                    txn_type: "promo",
+                                    status: "SUCCESSFUL",
+                                    date: new Date().toLocaleDateString(),
+                                    timestamp: firebase.database.ServerValue.TIMESTAMP
                                 });
                                 
                                 inputField.value = "";

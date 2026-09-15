@@ -50,7 +50,7 @@
         .coin-txt { color: var(--accent-gold) !important; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 18px !important; }
 
         /* Banner Ads Slots */
-        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); margin: 5px 0; box-sizing: border-box; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: none; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); margin: 5px 0; box-sizing: border-box; }
 
         /* 🔥 UPGRADED: Main Module Card */
         .main-card { background: var(--card-bg); border-radius: 24px; padding: 35px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative; backdrop-filter: blur(10px); margin-bottom: 10px; }
@@ -89,6 +89,8 @@
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+        
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -97,6 +99,14 @@
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
@@ -139,6 +149,9 @@
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
         <div class="main-card">
+            <!-- 🔥 DAILY LIMIT COUNTER -->
+            <div id="dailyClaimsCounterBox" style="position: absolute; top: 15px; right: 15px; font-size:11px; font-weight:800; color:var(--text-sub); text-align:right; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);"><span id="todayWebTaskDone">0</span> / <span id="totalWebTaskLimit">15</span> Today</div>
+
             <div class="bolt-icon"><i class="fa-solid fa-bolt"></i></div>
             <h3 data-i18n="ce_subtitle">Sponsor Visit</h3>
             <p data-i18n="ce_desc">Click the button below, visit our sponsor website for the required time, and earn rewards instantly!</p>
@@ -151,7 +164,7 @@
                 </div>
             </div>
 
-            <button class="visit-btn" id="startTaskBtn" onclick="executeClickTask()"><i class="fa-solid fa-earth-americas"></i> <span data-i18n="ce_btn">VISIT & EARN</span></button>
+            <button class="visit-btn" id="startTaskBtn" onclick="executeClickTask()"><i class="fa-solid fa-earth-americas"></i> <span>VISIT & EARN</span></button>
         </div>
 
         <!-- 📢 ADMIN CONNECTED BOTTOM BANNERS -->
@@ -169,37 +182,42 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME, COINS & LIMITS 🔥
         let globalAdTimerSeconds = 15; // Default time
+        let globalRewardCoins = 5;     // Default reward
+        let globalDailyLimit = 15;     // Default Limit
+        
+        let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+        let userTodayClaimsCount = 0;
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH PLAY STORE SAFE RULES
         const langData = {
-            "en": { "ce_title": "Web Tasks", "wallet_bal": "🌐 Web Tasks", "ce_subtitle": "Sponsor Visit", "ce_desc": "Visit our sponsor website for the required time and earn rewards instantly!", "ce_rules_title": "How to Earn?", "ce_rules_desc": "Tap the button and stay fully active on the opened page. Do not minimize the app. Points will be credited securely.", "ce_btn": "VISIT & EARN", "ce_security": "Verification protocols are active. Closing the page early or switching apps will pause the timer and cancel your reward calculation.", "err_early": "❌ Task Incomplete! You closed the sponsor website early.", "err_invalid": "❌ Tracking Interrupted! App minimized. You must stay active on the page.", "err_success": "🎉 Success! Points successfully added to your account.", "wait_txt": "Verifying... " },
-            "hi": { "ce_title": "वेब टास्क", "wallet_bal": "🌐 वेब टास्क", "ce_subtitle": "स्पॉन्सर विजिट", "ce_desc": "आवश्यक समय के लिए हमारे स्पॉन्सर की वेबसाइट देखें और तुरंत रिवॉर्ड्स कमाएं!", "ce_rules_title": "कैसे कमाएं?", "ce_rules_desc": "बटन पर टैप करें और खोले गए पृष्ठ पर सक्रिय रहें। ऐप को मिनीमाइज न करें। आपकी वापसी पर पॉइंट्स सुरक्षित रूप से जोड़ दिए जाएंगे।", "ce_btn": "विजिट करें और कमाएं", "ce_security": "सत्यापन प्रोटोकॉल सक्रिय हैं। पेज को जल्दी बंद करने या ऐप बदलने से रिवॉर्ड रद्द हो जाएगा।", "err_early": "❌ टास्क अधूरा! आपने स्पॉन्सर पेज को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! ऐप बंद करना मना है। आपको पेज पर सक्रिय रहना होगा।", "err_success": "🎉 सफलता! पॉइंट्स आपके खाते में सफलतापूर्वक जोड़ दिए गए हैं।", "wait_txt": "सत्यापन... " },
-            "bn": { "ce_title": "ওয়েব টাস্ক", "ce_subtitle": "স্পনসর ভিজিট", "ce_btn": "ভিজিট করুন", "ce_rules_title": "কিভাবে আয় করবেন?", "err_early": "❌ টাস্ক অসম্পূর্ণ!", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ মিনিমাইজ করবেন না।", "err_success": "🎉 সফল! পয়েন্ট যোগ হয়েছে।", "wait_txt": "যাচাই... " },
-            "te": { "ce_title": "వెబ్ టాస్క్స్", "ce_btn": "సందర్శించండి", "ce_rules_title": "ఎలా సంపాదించాలి?", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి.", "wait_txt": "ధృవీకరిస్తోంది... " },
-            "mr": { "ce_title": "वेब टास्क", "ce_btn": "भेट द्या आणि कमवा", "ce_rules_title": "कसे कमवावे?", "err_success": "🎉 यशस्वी! पॉइंट्स जमा झाले.", "wait_txt": "तपासत आहे... " },
-            "ta": { "ce_title": "வலைப் பணிகள்", "ce_btn": "பார்வையிடவும்", "err_success": "🎉 வெற்றி! சேர்க்கப்பட்டது.", "wait_txt": "சரிபார்க்கிறது... " },
-            "ur": { "ce_title": "ویب ٹاسک", "ce_btn": "وزٹ کریں", "err_success": "🎉 کامیابی! شامل کر دیے گئے۔", "wait_txt": "تصدیق ہو رہی ہے... " },
-            "gu": { "ce_title": "વેબ ટાસ્ક", "ce_btn": "મુલાકાત લો", "err_success": "🎉 સફળતા! ઉમેરાયા.", "wait_txt": "ચકાસણી... " },
-            "es": { "ce_title": "Tareas Web", "ce_btn": "VISITAR Y GANAR", "err_success": "🎉 ¡Éxito! Puntos añadidos.", "wait_txt": "Verificando... " },
-            "fr": { "ce_title": "Tâches Web", "ce_btn": "VISITER ET GAGNER", "err_success": "🎉 Succès ! Points ajoutés.", "wait_txt": "Vérification... " },
-            "ar": { "ce_title": "مهام الويب", "ce_btn": "قم بالزيارة", "err_success": "🎉 نجاح! أُضيفت النقاط.", "wait_txt": "التحقق... " },
-            "pt": { "ce_title": "Tarefas Web", "ce_btn": "VISITAR E GANAR", "err_success": "🎉 Sucesso! Pontos adicionados.", "wait_txt": "Verificando... " },
-            "ru": { "ce_title": "Веб-задания", "ce_btn": "ПОСЕТИТЬ", "err_success": "🎉 Успех! Очки добавлены.", "wait_txt": "Проверка... " }
+            "en": { "ce_title": "Web Tasks", "wallet_bal": "🌐 Web Tasks", "ce_subtitle": "Sponsor Visit", "ce_desc": "Visit our sponsor website for the required time and earn rewards instantly!", "ce_rules_title": "How to Earn?", "ce_rules_desc": "Tap the button and stay fully active on the opened page. Do not minimize the app. Points will be credited securely.", "ce_btn": "VISIT & EARN", "ce_security": "Verification protocols are active. Closing the page early or switching apps will pause the timer and cancel your reward calculation.", "err_early": "❌ Task Incomplete! You closed the sponsor website early.", "err_invalid": "❌ Tracking Interrupted! App minimized. You must stay active on the page.", "err_limit": "⏳ Daily Limit Reached! You have completed all Web Tasks for today. Come back tomorrow.", "err_success": "🎉 Success! Points successfully added to your account.", "wait_txt": "Verifying... ", "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection" },
+            "hi": { "ce_title": "वेब टास्क", "wallet_bal": "🌐 वेब टास्क", "ce_subtitle": "स्पॉन्सर विजिट", "ce_desc": "आवश्यक समय के लिए हमारे स्पॉन्सर की वेबसाइट देखें और तुरंत रिवॉर्ड्स कमाएं!", "ce_rules_title": "कैसे कमाएं?", "ce_rules_desc": "बटन पर टैप करें और खोले गए पृष्ठ पर सक्रिय रहें। ऐप को मिनीमाइज न करें। आपकी वापसी पर पॉइंट्स सुरक्षित रूप से जोड़ दिए जाएंगे।", "ce_btn": "विजिट करें और कमाएं", "ce_security": "सत्यापन प्रोटोकॉल सक्रिय हैं। पेज को जल्दी बंद करने या ऐप बदलने से रिवॉर्ड रद्द हो जाएगा।", "err_early": "❌ टास्क अधूरा! आपने स्पॉन्सर पेज को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! ऐप बंद करना मना है। आपको पेज पर सक्रिय रहना होगा।", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज के सभी वेब टास्क पूरे कर लिए हैं। कल फिर आएं।", "err_success": "🎉 सफलता! पॉइंट्स आपके खाते में सफलतापूर्वक जोड़ दिए गए हैं।", "wait_txt": "सत्यापन... ", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें" },
+            "bn": { "ce_title": "ওয়েব টাস্ক", "ce_subtitle": "স্পনসর ভিজিট", "ce_btn": "ভিজিট করুন", "ce_rules_title": "কিভাবে আয় করবেন?", "err_early": "❌ টাস্ক অসম্পূর্ণ!", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ মিনিমাইজ করবেন না।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "err_success": "🎉 সফল! পয়েন্ট যোগ হয়েছে।", "wait_txt": "যাচাই... ", "mod_no_net": "ইন্টারনেট নেই", "mod_no_net_d": "দয়া করে ডেটা বা ওয়াই-ফাই চালু করুন।", "mod_retry": "পুনরায় চেষ্টা করুন" },
+            "te": { "ce_title": "వెబ్ టాస్క్స్", "ce_btn": "సందర్శించండి", "ce_rules_title": "ఎలా సంపాదించాలి?", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "err_success": "🎉 విజయం! పాయింట్లు జోడించబడ్డాయి.", "wait_txt": "ధృవీకరిస్తోంది... ", "mod_no_net": "ఇంటర్నెట్ లేదు", "mod_retry": "మళ్లీ ప్రయత్నించండి" },
+            "mr": { "ce_title": "वेब टास्क", "ce_btn": "भेट द्या आणि कमवा", "ce_rules_title": "कसे कमवावे?", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "err_success": "🎉 यशस्वी! पॉइंट्स जमा झाले.", "wait_txt": "तपासत आहे... ", "mod_no_net": "इंटरनेट नाही", "mod_retry": "पुन्हा प्रयत्न करा" },
+            "ta": { "ce_title": "வலைப் பணிகள்", "ce_btn": "பார்வையிடவும்", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "err_success": "🎉 வெற்றி! சேர்க்கப்பட்டது.", "wait_txt": "சரிபார்க்கிறது... ", "mod_no_net": "இணையம் இல்லை", "mod_retry": "மீண்டும் முயற்சி செய்" },
+            "ur": { "ce_title": "ویب ٹاسک", "ce_btn": "وزٹ کریں", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی!", "err_success": "🎉 کامیابی! شامل کر دیے گئے۔", "wait_txt": "تصدیق ہو رہی ہے... ", "mod_no_net": "انٹرنیٹ نہیں ہے", "mod_retry": "دوبارہ کوشش کریں" },
+            "gu": { "ce_title": "વેબ ટાસ્ક", "ce_btn": "મુલાકાત લો", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ!", "err_success": "🎉 સફળતા! ઉમેરાયા.", "wait_txt": "ચકાસણી... ", "mod_no_net": "ઈન્ટરનેટ નથી", "mod_retry": "ફરી પ્રયાસ કરો" },
+            "es": { "ce_title": "Tareas Web", "ce_btn": "VISITAR Y GANAR", "err_limit": "⏳ ¡Límite Diario Alcanzado! Vuelve mañana.", "err_success": "🎉 ¡Éxito! Puntos añadidos.", "wait_txt": "Verificando... ", "mod_no_net": "Sin Internet", "mod_retry": "Reintentar" },
+            "fr": { "ce_title": "Tâches Web", "ce_btn": "VISITER ET GAGNER", "err_limit": "⏳ Limite quotidienne atteinte !", "err_success": "🎉 Succès ! Points ajoutés.", "wait_txt": "Vérification... ", "mod_no_net": "Pas d'Internet", "mod_retry": "Réessayer" },
+            "ar": { "ce_title": "مهام الويب", "ce_btn": "قم بالزيارة", "err_limit": "⏳ تم الوصول للحد اليومي!", "err_success": "🎉 نجاح! أُضيفت النقاط.", "wait_txt": "التحقق... ", "mod_no_net": "لا يوجد إنترنت", "mod_retry": "إعادة المحاولة" },
+            "pt": { "ce_title": "Tarefas Web", "ce_btn": "VISITAR E GANAR", "err_limit": "⏳ Limite diário atingido!", "err_success": "🎉 Sucesso! Pontos adicionados.", "wait_txt": "Verificando... ", "mod_no_net": "Sem Internet", "mod_retry": "Tentar novamente" },
+            "ru": { "ce_title": "Веб-задания", "ce_btn": "ПОСЕТИТЬ", "err_limit": "⏳ Дневной лимит исчерпан!", "err_success": "🎉 Успех! Очки добавлены.", "wait_txt": "Проверка... ", "mod_no_net": "Нет интернета", "mod_retry": "Повторить" }
         };
 
         function changeLanguage(langCode) {
@@ -226,22 +244,35 @@
 
         const uid = localStorage.getItem("userId");
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback
-        const taskRewardCoinsInt = 5; // Reward is fixed to 5 as per old code
+
+        // Network Monitor
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
+            
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Live Balance Sync (Only Coins) & Avatar Sync
+                    // 1. Live Balance Sync (Only Coins) & Daily Anti-Ban Fetch
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
                             
-                            // Smart Avatar Sync (Matches ho.html)
+                            // Load Anti-Ban Click Data
+                            if(data.daily_web_tasks_claims && data.daily_web_tasks_claims.date === todayDateString) {
+                                userTodayClaimsCount = data.daily_web_tasks_claims.count || 0;
+                            } else {
+                                userTodayClaimsCount = 0;
+                            }
+                            document.getElementById("todayWebTaskDone").innerText = userTodayClaimsCount;
+
+                            // Smart Avatar Sync
                             let userName = data.name || "Player";
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
@@ -254,7 +285,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Link & Time)
+                    // 2. Fetch Admin Configurations (Banners, Link, Time, Reward & Limits)
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -263,12 +294,29 @@
                             if (adminData.web_tasks_configs) {
                                 let c = adminData.web_tasks_configs;
                                 
-                                // 🔥 GET ADMIN CONTROLLED TIME
+                                // 🔥 GET ADMIN CONTROLLED SETTINGS
                                 if (c.ad_timer) { globalAdTimerSeconds = parseInt(c.ad_timer); }
+                                if (c.reward_coins) { globalRewardCoins = parseInt(c.reward_coins); }
+                                if (c.daily_limit) { 
+                                    globalDailyLimit = parseInt(c.daily_limit); 
+                                    document.getElementById("totalWebTaskLimit").innerText = globalDailyLimit;
+                                }
 
-                                if(c.slot1_code) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), c.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                                if(c.slot2_code) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), c.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                                if(c.slot3_code) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), c.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                                // Load Banners with setTimeout
+                                if(c.slot1_code && c.active !== false) { 
+                                    document.getElementById("adminBannerSlot1").style.display = "flex"; 
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), c.slot1_code), 400); 
+                                } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                                
+                                if(c.slot2_code && c.active !== false) { 
+                                    document.getElementById("adminBannerSlot2").style.display = "flex"; 
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), c.slot2_code), 800); 
+                                } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                                
+                                if(c.slot3_code && c.active !== false) { 
+                                    document.getElementById("adminBannerSlot3").style.display = "flex"; 
+                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), c.slot3_code), 1200); 
+                                } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
                                 
                                 if (c.task_ad_link) activeAdminSmartlinkUrl = c.task_ad_link;
                             } 
@@ -306,7 +354,7 @@
             if (document.hidden) { window.hasMainTabHidden = true; }
         });
 
-        function showCustomAlert(msgKey, isSuccess = false) {
+        function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
             let msgStr = langData[currentLang] && langData[currentLang][msgKey] ? langData[currentLang][msgKey] : langData["en"][msgKey];
 
@@ -314,7 +362,7 @@
             if(isSuccess) alertBox.classList.add("success-border");
             else alertBox.classList.remove("success-border");
 
-            document.getElementById("alertMessage").innerText = msgStr;
+            document.getElementById("alertMessage").innerText = msgStr + appendText;
             document.getElementById("alertOverlay").style.display = "block";
             alertBox.style.display = "block";
         }
@@ -326,6 +374,12 @@
 
         // 🚀 PLAY STORE SAFE VALIDATION LOGIC (WITH IN-APP VIEWER)
         function executeClickTask() {
+            // 🔥 ANTI-BAN: Custom Limit Check
+            if(userTodayClaimsCount >= globalDailyLimit) {
+                showCustomAlert("err_limit");
+                return;
+            }
+
             if(isValidationActive) return;
             isValidationActive = true;
 
@@ -343,35 +397,46 @@
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
             
-            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
+            // 🔥 Wait for Ad to Load fully before countdown
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Site...`;
+            
+            let iframeNode = document.getElementById("adIframe");
 
-            taskTimer = setInterval(() => {
-                countdownTime--;
-                btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${verifyTxt}(${countdownTime}s)</span>`;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+            iframeNode.onload = function() {
+                if(taskTimer) clearInterval(taskTimer);
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
 
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if (document.hidden) { 
-                    clearInterval(taskTimer);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    resetTaskButton();
-                    showCustomAlert("err_invalid");
-                    return;
-                }
+                taskTimer = setInterval(() => {
+                    countdownTime--;
+                    btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${verifyTxt}(${countdownTime}s)</span>`;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
 
-                if (countdownTime <= 0) {
-                    clearInterval(taskTimer);
-                    btn.innerText = "PROCESSING...";
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if (document.hidden) { 
+                        clearInterval(taskTimer);
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        resetTaskButton();
+                        showCustomAlert("err_invalid");
+                        return;
+                    }
+
+                    if (countdownTime <= 0) {
+                        clearInterval(taskTimer);
+                        btn.innerText = "PROCESSING...";
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                    }
+                }, 1000);
+            };
+
+            // Load Ad URL into iframe
+            iframeNode.src = activeAdminSmartlinkUrl;
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t12) via PURE FIREBASE
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t12) via PURE FIREBASE + HISTORY
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
@@ -381,10 +446,27 @@
         function executeRewardSyncWithFirebase() {
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
-                return (current || 0) + taskRewardCoinsInt;
+                return (current || 0) + globalRewardCoins;
             }).then(() => {
                 
-                // 2. Mark Daily Task 't12' as Complete
+                // 2. 🔥 ANTI-BAN LOGIC: Register limits
+                db.ref(`users/${uid}/daily_web_tasks_claims`).set({
+                    date: todayDateString,
+                    count: userTodayClaimsCount + 1
+                });
+
+                // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
+                db.ref(`users/${uid}/history`).push({
+                    title: `Web Task Reward`,
+                    amount: globalRewardCoins,
+                    type: "credit",
+                    txn_type: "web_task",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // 4. Mark Daily Task 't12' as Complete
                 db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                     let tasks = snap.val() || [];
                     if (!tasks.includes("t12")) {
@@ -393,7 +475,7 @@
                     }
                 });
 
-                showCustomAlert("err_success", true);
+                showCustomAlert("err_success", ` (+${globalRewardCoins} 🪙)`, true);
                 
             }).catch(() => {
                 alert("Task Verified but couldn't sync with server. Try again.");

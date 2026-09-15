@@ -45,7 +45,7 @@
         .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
 
         /* 📢 AD INCOME SOURCE SLOTS */
-        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); margin: 5px 0; box-sizing: border-box; }
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); margin: 5px 0; box-sizing: border-box; display: none; }
 
         /* 📊 Dynamic Metric Target Ring Indicator Ribbon */
         .user-metric-card { background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(124, 58, 237, 0.9)); border-radius: 20px; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
@@ -181,16 +181,16 @@
     <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
         // 1. Firebase Config
-       const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -258,10 +258,27 @@
                             const adminData = snap.val();
                             globalMilestoneGoals = adminData;
                             
-                            // Load Banners
-                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            // Load Banners (Safely with setTimeout to prevent crash)
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
+                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
                             
                             // Re-render cards if user data is already loaded
                             if(userMasterCoinsCounter !== null && lastKnownClaimedLogs !== null) {
@@ -286,7 +303,18 @@
                             // Smart Avatar Sync
                             let userName = d.name || "Player";
                             let finalAvatar = d.profile_pic ? d.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
-                            document.getElementById("headerProfileIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            
+                            function createEmojiURI(emoji) {
+                                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+                                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+                            }
+
+                            let avatarContainer = document.getElementById("headerProfileIcon");
+                            if (finalAvatar.startsWith("http") || finalAvatar.startsWith("data:")) {
+                                avatarContainer.innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            } else {
+                                avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            }
                         }
                     });
 
@@ -296,7 +324,7 @@
             });
         });
 
-        // 🔥 LEVEL 1 vs LEVEL 2 CONFIGURATIONS AUTOMATION ROUTER (Now Admin Controlled)
+        // 🔥 LEVEL 1 vs LEVEL 2 CONFIGURATIONS AUTOMATION ROUTER
         function renderAllMilestoneCards(coins, logs, adminConfig) {
             
             // 1. Bronze Processing
@@ -321,7 +349,7 @@
             let silverGoal = (logs.silver_l1 === true) ? s_l2_goal : s_l1_goal;
             let silverReward = (silverGoal === s_l2_goal) ? s_l2_reward : s_l1_reward;
             let silverKey = (silverGoal === s_l2_goal) ? 'silver_l2' : 'silver_l1';
-            let silverTitle = (silverGoal === s_l2_goal) ? "Silver Legend [LVL 2]" : "Silver Elite Pass";
+            let silverTitle = (silverGoal === s_l2_goal) ? "Silver Elite Pass [LVL 2]" : "Silver Elite Pass";
             
             setupDynamicCardModule(coins, silverGoal, silverReward, silverKey, silverTitle, logs[silverKey], "barSilver", "btnSilver", "title_silver", "desc_silver", "cardBox_silver");
 
@@ -366,7 +394,7 @@
             bar.style.width = percentage + "%";
 
             // Clean click router override assignment
-            btn.onclick = () => executeClaimMilestoneCoins(stateDbKey, targetGoal, rewardCoins, btn);
+            btn.onclick = () => executeClaimMilestoneCoins(stateDbKey, targetGoal, rewardCoins, btn, titleText);
 
             if (currentCoins >= targetGoal) {
                 btn.className = "milestone-action-btn btn-claimable";
@@ -379,8 +407,8 @@
             }
         }
 
-        // 💰 TRANSACTION DISPATCH ROUTER: Pure Firebase Updates
-        function executeClaimMilestoneCoins(stateDbKey, goalLimitCheck, rewardBonusCoins, btnObj) {
+        // 💰 TRANSACTION DISPATCH ROUTER: Pure Firebase Updates with Universal History
+        function executeClaimMilestoneCoins(stateDbKey, goalLimitCheck, rewardBonusCoins, btnObj, milestoneName) {
             if(userMasterCoinsCounter < goalLimitCheck) return;
 
             btnObj.disabled = true;
@@ -395,7 +423,20 @@
             }).then(() => {
                 
                 // 2. Mark this specific milestone key as claimed
-                return db.ref(`users/${uid}/claimed_milestones/${stateDbKey}`).set(true);
+                let p1 = db.ref(`users/${uid}/claimed_milestones/${stateDbKey}`).set(true);
+
+                // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health & Referral Unlocks)
+                let p2 = db.ref(`users/${uid}/history`).push({
+                    title: `Milestone Achieved (${milestoneName})`,
+                    amount: rewardBonusCoins,
+                    type: "credit",
+                    txn_type: "milestone",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                return Promise.all([p1, p2]);
 
             }).then(() => {
                 let successMsg = langData[currentLang]["err_success"] || "Level-Up Bonus! Points credited straight inside your wallet.";

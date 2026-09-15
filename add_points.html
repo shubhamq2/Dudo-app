@@ -163,10 +163,10 @@
                 <div class="method-icon">📱</div>
                 <div>UPI Transfer</div>
             </div>
-           <div class="method-tab" onclick="openCardPaymentLink()">
-    <div class="method-icon">💳</div>
-    <div>Card / Crypto</div>
-</div>
+            <div class="method-tab" onclick="openCardPaymentLink()">
+                <div class="method-icon">💳</div>
+                <div>Card / Crypto</div>
+            </div>
         </div>
 
         <div class="form-container">
@@ -197,7 +197,7 @@
             <div class="input-group">
                 <label data-i18n="lbl_amount">Amount Transferred (₹)</label>
                 <input type="number" id="inputAmount" class="form-input" placeholder="e.g. 50" oninput="generateDynamicQRCode(); updateCoinPreview();">
-                <!-- 🔥 NEW: LIVE COIN CONVERSION PREVIEW -->
+                <!-- 🔥 LIVE COIN CONVERSION PREVIEW -->
                 <div id="coinPreviewTxt" style="color: var(--accent-gold); font-size: 12px; font-weight: 800; margin-top: 6px; letter-spacing: 0.5px;">You will get: 0 🪙</div>
             </div>
 
@@ -227,15 +227,15 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -254,25 +254,137 @@
                 "ps_safe_title": "System Maintenance", "ps_safe_desc": "This feature is temporarily unavailable due to scheduled server upgrades. Please continue enjoying our free games and tasks!"
             },
             "hi": {
-                "add_pts_title": "पॉइंट्स जोड़ें", "curr_bal": "आपका बैलेंस", "sel_method": "पेमेंट तरीका चुनें",
-                "step1": "⚡ स्टेप 1: पैसे ट्रांसफर करें", "btn_copy": "UPI कॉपी करें", "step2": "📝 स्टेप 2: जानकारी भरें",
-                "lbl_amount": "भेजी गई राशि (₹)", "lbl_utr": "12-अंकों का UTR नंबर डालें", "btn_submit": "वेरीफाई और पॉइंट्स जोड़ें",
-                "rules_title": "जरूरी नियम:", "rule_1": "कम से कम राशि ₹50 है।", "rule_2": "पेमेंट ऐप से सही 12-अंकों का UTR डालें।",
-                "rule_3": "अमान्य UTR डालने पर अकाउंट प्रतिबंधित हो जाएगा।", "rule_4": "वेरिफिकेशन के 5-15 मिनट में पॉइंट्स मिल जाएंगे।",
-                "err_method": "❌ यह पेमेंट गेटवे अभी बंद है। कृपया UPI का उपयोग करें।", "err_empty": "❌ कृपया सही राशि दर्ज करें।",
-                "err_min": "❌ न्यूनतम राशि ₹50 होनी चाहिए।", "err_utr": "❌ कृपया सही 12-अंकों का UTR नंबर डालें।",
-                "success_msg": "✅ आपकी रिक्वेस्ट सबमिट हो गई है! वेरीफाई होने के बाद पॉइंट्स मिल जाएंगे।",
-                "ps_safe_title": "सिस्टम मेंटेनेंस", "ps_safe_desc": "सर्वर अपग्रेड के कारण यह फीचर अभी उपलब्ध नहीं है। कृपया हमारे फ्री गेम्स का आनंद लें!"
+                "add_pts_title": "पॉइंट्स जोड़ें", "curr_bal": "वर्तमान बैलेंस", "sel_method": "पेमेंट का तरीका चुनें",
+                "step1": "⚡ स्टेप 1: पैसे ट्रांसफर करें", "btn_copy": "UPI ID कॉपी करें", "step2": "📝 स्टेप 2: जानकारी भरें",
+                "lbl_amount": "भेजी गई राशि (₹)", "lbl_utr": "12-अंकों का UTR / संदर्भ संख्या दर्ज करें", "btn_submit": "वेरीफाई और पॉइंट्स जोड़ें",
+                "rules_title": "महत्वपूर्ण नियम:", "rule_1": "कम से कम राशि ₹50 है।", "rule_2": "सटीक 12-अंकों का UTR/Ref No. सबमिट करें।",
+                "rule_3": "अमान्य UTR डालने पर अकाउंट प्रतिबंधित हो जाएगा।", "rule_4": "पॉइंट्स 5-15 मिनट के अंदर मिल जाएंगे।",
+                "err_method": "❌ यह पेमेंट गेटवे अभी बंद है। कृपया UPI का उपयोग करें।", "err_empty": "❌ कृपया आपके द्वारा ट्रांसफर की गई सही राशि दर्ज करें।",
+                "err_min": "❌ कम से कम सीमा ₹50 है।", "err_utr": "❌ कृपया सटीक 12-अंकों का UTR / संदर्भ संख्या दर्ज करें।",
+                "success_msg": "✅ आपकी रिक्वेस्ट सबमिट हो गई है! एजेंट जल्द ही UTR वेरीफाई करके पॉइंट्स जोड़ देंगे।",
+                "ps_safe_title": "सिस्टम मेंटेनेंस", "ps_safe_desc": "सर्वर अपग्रेड के कारण यह फीचर अभी उपलब्ध नहीं है। कृपया हमारे फ्री गेम्स और टास्क का आनंद लेते रहें!"
             },
-            "bn": { "add_pts_title": "পয়েন্ট যোগ করুন", "curr_bal": "আপনার ব্যালেন্স" },
-            "te": { "add_pts_title": "పాయింట్లను జోడించండి", "curr_bal": "ప్రస్తుత బ్యాలెన్స్" },
-            "mr": { "add_pts_title": "पॉइंट्स जोडा", "curr_bal": "सध्याची शिल्लक" },
-            "ta": { "add_pts_title": "புள்ளிகளைச் சேர்", "curr_bal": "தற்போதைய இருப்பு" },
-            "ur": { "add_pts_title": "پوائنٹس شامل کریں", "curr_bal": "موجودہ بیلنس" },
-            "gu": { "add_pts_title": "પોઈન્ટ્સ ઉમેરો", "curr_bal": "મારું બેલેન્સ" },
-            "es": { "add_pts_title": "Añadir Puntos", "curr_bal": "Saldo Actual" },
-            "fr": { "add_pts_title": "Ajouter Points", "curr_bal": "Solde Actuel" },
-            "ru": { "add_pts_title": "Добавить очки", "curr_bal": "Текущий баланс" }
+            "bn": {
+                "add_pts_title": "পয়েন্ট যোগ করুন", "curr_bal": "বর্তমান ব্যালেন্স", "sel_method": "পেমেন্ট পদ্ধতি নির্বাচন করুন",
+                "step1": "⚡ ধাপ ১: ফান্ড ট্রান্সফার করুন", "btn_copy": "UPI ID কপি করুন", "step2": "📝 ধাপ ২: বিবরণ জমা দিন",
+                "lbl_amount": "ট্রান্সফার করা পরিমাণ (₹)", "lbl_utr": "১২-অঙ্কের UTR / রেফ নম্বর লিখুন", "btn_submit": "যাচাই করুন এবং পয়েন্ট যোগ করুন",
+                "rules_title": "গুরুত্বপূর্ণ নিয়ম:", "rule_1": "সর্বনিম্ন যোগ করার পরিমাণ ₹৫০।", "rule_2": "সঠিক ১২-অঙ্কের UTR/Ref নম্বর জমা দিন।",
+                "rule_3": "ভুল UTR জমা দিলে অ্যাকাউন্ট স্থগিত করা হতে পারে।", "rule_4": "পয়েন্ট ৫-১৫ মিনিটের মধ্যে যোগ করা হয়।",
+                "err_method": "❌ এই পেমেন্ট গেটওয়ে বর্তমানে রক্ষণাবেক্ষণের অধীনে আছে। দয়া করে UPI ব্যবহার করুন।", "err_empty": "❌ দয়া করে আপনার ট্রান্সফার করা একটি বৈধ পরিমাণ লিখুন।",
+                "err_min": "❌ ন্যূনতম সীমা ₹৫০।", "err_utr": "❌ দয়া করে সঠিক ১২-অঙ্কের UTR / রেফারেন্স নম্বর লিখুন।",
+                "success_msg": "✅ আপনার অনুরোধ জমা দেওয়া হয়েছে! এজেন্টরা শীঘ্রই UTR যাচাই করে পয়েন্ট যোগ করবে।",
+                "ps_safe_title": "সিস্টেম রক্ষণাবেক্ষণ", "ps_safe_desc": "সার্ভার আপগ্রেডের কারণে এই বৈশিষ্ট্যটি সাময়িকভাবে বন্ধ আছে। দয়া করে আমাদের বিনামূল্যের গেম এবং কাজগুলি উপভোগ করতে থাকুন!"
+            },
+            "te": {
+                "add_pts_title": "పాయింట్లను జోడించండి", "curr_bal": "ప్రస్తుత బ్యాలెన్స్", "sel_method": "చెల్లింపు విధానాన్ని ఎంచుకోండి",
+                "step1": "⚡ దశ 1: ఫండ్స్ బదిలీ చేయండి", "btn_copy": "UPI ID ని కాపీ చేయండి", "step2": "📝 దశ 2: వివరాలను సమర్పించండి",
+                "lbl_amount": "బదిలీ చేసిన మొత్తం (₹)", "lbl_utr": "12-అంకెల UTR / Ref నంబర్‌ను నమోదు చేయండి", "btn_submit": "ధృవీకరించండి & పాయింట్లను జోడించండి",
+                "rules_title": "ముఖ్యమైన నిబంధనలు:", "rule_1": "కనీస జోడింపు మొత్తం ₹50.", "rule_2": "ఖచ్చితమైన 12-అంకెల UTR/Ref No. ని సమర్పించండి.",
+                "rule_3": "చెల్లని UTR సమర్పిస్తే ఖాతా పరిమితం చేయబడుతుంది.", "rule_4": "పాయింట్లు 5-15 నిమిషాల్లో జోడించబడతాయి.",
+                "err_method": "❌ ఈ పేమెంట్ గేట్‌వే ప్రస్తుతం నిర్వహణలో ఉంది. దయచేసి UPI ఉపయోగించండి.", "err_empty": "❌ దయచేసి మీరు బదిలీ చేసిన చెల్లుబాటయ్యే మొత్తాన్ని నమోదు చేయండి.",
+                "err_min": "❌ కనీస పరిమితి ₹50.", "err_utr": "❌ దయచేసి ఖచ్చితమైన 12-అంకెల UTR / రిఫరెన్స్ నంబర్‌ను నమోదు చేయండి.",
+                "success_msg": "✅ మీ అభ్యర్థన సమర్పించబడింది! ఏజెంట్లు త్వరలో UTR ధృవీకరించి పాయింట్లను జమ చేస్తారు.",
+                "ps_safe_title": "సిస్టమ్ నిర్వహణ", "ps_safe_desc": "సర్వర్ అప్‌గ్రేడ్‌ల కారణంగా ఈ ఫీచర్ తాత్కాలికంగా అందుబాటులో లేదు. దయచేసి మా ఉచిత ఆటలు మరియు పనులను ఆస్వాదించండి!"
+            },
+            "mr": {
+                "add_pts_title": "पॉइंट्स जोडा", "curr_bal": "सध्याची शिल्लक", "sel_method": "पेमेंट पद्धत निवडा",
+                "step1": "⚡ पायरी 1: पैसे ट्रान्सफर करा", "btn_copy": "UPI ID कॉपी करा", "step2": "📝 पायरी 2: माहिती सबमिट करा",
+                "lbl_amount": "ट्रान्सफर केलेली रक्कम (₹)", "lbl_utr": "12-अंकी UTR / Ref नंबर प्रविष्ट करा", "btn_submit": "सत्यापित करा आणि पॉइंट्स जोडा",
+                "rules_title": "महत्त्वाचे नियम:", "rule_1": "किमान जोडण्याची रक्कम ₹50 आहे.", "rule_2": "अचूक 12-अंकी UTR/Ref क्रमांक सबमिट करा.",
+                "rule_3": "अवैध UTR सबमिट केल्यास खाते प्रतिबंधित केले जाईल.", "rule_4": "पॉइंट्स 5-15 मिनिटांत जोडले जातात.",
+                "err_method": "❌ हे पेमेंट गेटवे सध्या देखभालीखाली आहे. कृपया UPI वापरा.", "err_empty": "❌ कृपया तुम्ही ट्रान्सफर केलेली वैध रक्कम प्रविष्ट करा.",
+                "err_min": "❌ किमान मर्यादा ₹50 आहे.", "err_utr": "❌ कृपया अचूक 12-अंकी UTR / संदर्भ क्रमांक प्रविष्ट करा.",
+                "success_msg": "✅ तुमची विनंती सबमिट केली आहे! एजंट लवकरच UTR पडताळणी करतील आणि पॉइंट्स जमा करतील.",
+                "ps_safe_title": "सिस्टम देखभाल", "ps_safe_desc": "नियोजित सर्व्हर अपग्रेडमुळे हे वैशिष्ट्य तात्पुरते अनुपलब्ध आहे. कृपया आमच्या विनामूल्य गेम आणि टास्कचा आनंद घेणे सुरू ठेवा!"
+            },
+            "ta": {
+                "add_pts_title": "புள்ளிகளைச் சேர்", "curr_bal": "தற்போதைய இருப்பு", "sel_method": "கட்டண முறையைத் தேர்ந்தெடுக்கவும்",
+                "step1": "⚡ படி 1: பணத்தை அனுப்புங்கள்", "btn_copy": "UPI ID ஐ நகலெடு", "step2": "📝 படி 2: விவரங்களைச் சமர்ப்பிக்கவும்",
+                "lbl_amount": "மாற்றப்பட்ட தொகை (₹)", "lbl_utr": "12-இலக்க UTR / Ref எண்ணை உள்ளிடவும்", "btn_submit": "சரிபார்த்து புள்ளிகளைச் சேர்",
+                "rules_title": "முக்கிய விதிகள்:", "rule_1": "குறைந்தபட்ச தொகை ₹50 ஆகும்.", "rule_2": "சரியான 12-இலக்க UTR/Ref எண்ணை உள்ளிடவும்.",
+                "rule_3": "தவறான UTR கணக்கு தடையை ஏற்படுத்தும்.", "rule_4": "புள்ளிகள் 5-15 நிமிடங்களுக்குள் சேர்க்கப்படும்.",
+                "err_method": "❌ இந்த கட்டண நுழைவாயில் தற்போது பராமரிப்பில் உள்ளது. UPI ஐப் பயன்படுத்தவும்.", "err_empty": "❌ நீங்கள் அனுப்பிய சரியான தொகையை உள்ளிடவும்.",
+                "err_min": "❌ குறைந்தபட்ச வரம்பு ₹50.", "err_utr": "❌ சரியான 12-இலக்க UTR / குறிப்பு எண்ணை உள்ளிடவும்.",
+                "success_msg": "✅ உங்கள் கோரிக்கை சமர்ப்பிக்கப்பட்டது! UTR சரிபார்க்கப்பட்டு விரைவில் புள்ளிகள் சேர்க்கப்படும்.",
+                "ps_safe_title": "கணினி பராமரிப்பு", "ps_safe_desc": "சேவையக மேம்படுத்தல்களால் இந்த அம்சம் தற்காலிகமாக கிடைக்கவில்லை. எங்கள் இலவச விளையாட்டுகள் மற்றும் பணிகளைத் தொடர்ந்து அனுபவிக்கவும்!"
+            },
+            "ur": {
+                "add_pts_title": "پوائنٹس شامل کریں", "curr_bal": "موجودہ بیلنس", "sel_method": "ادائیگی کا طریقہ منتخب کریں",
+                "step1": "⚡ مرحلہ 1: فنڈز ٹرانسفر کریں", "btn_copy": "UPI ID کاپی کریں", "step2": "📝 مرحلہ 2: تفصیلات جمع کریں",
+                "lbl_amount": "منتقل کردہ رقم (₹)", "lbl_utr": "12 ہندسوں کا UTR / Ref نمبر درج کریں", "btn_submit": "تصدیق کریں اور پوائنٹس شامل کریں",
+                "rules_title": "اہم اصول:", "rule_1": "کم از کم شامل کرنے کی رقم ₹50 ہے۔", "rule_2": "درست 12 ہندسوں کا UTR/Ref نمبر جمع کریں۔",
+                "rule_3": "غلط UTR جمع کرنے پر اکاؤنٹ پر پابندی لگ سکتی ہے۔", "rule_4": "پوائنٹس 5-15 منٹ میں شامل کر دیے جاتے ہیں۔",
+                "err_method": "❌ یہ پیمنٹ گیٹ وے فی الحال دیکھ بھال کے تحت ہے۔ براہ کرم UPI استعمال کریں۔", "err_empty": "❌ براہ کرم ایک درست رقم درج کریں جو آپ نے منتقل کی ہے۔",
+                "err_min": "❌ کم از کم حد ₹50 ہے۔", "err_utr": "❌ براہ کرم درست 12 ہندسوں کا UTR / حوالہ نمبر درج کریں۔",
+                "success_msg": "✅ آپ کی درخواست جمع کر دی گئی ہے! ایجنٹ جلد ہی UTR کی تصدیق کر کے پوائنٹس جمع کر دیں گے۔",
+                "ps_safe_title": "سسٹم کی دیکھ بھال", "ps_safe_desc": "سرور اپ گریڈ کی وجہ سے یہ خصوصیت عارضی طور پر دستیاب نہیں ہے۔ براہ کرم ہمارے مفت گیمز اور ٹاسکس سے لطف اندوز ہوتے رہیں!"
+            },
+            "gu": {
+                "add_pts_title": "પોઇન્ટ્સ ઉમેરો", "curr_bal": "વર્તમાન બેલેન્સ", "sel_method": "ચુકવણી પદ્ધતિ પસંદ કરો",
+                "step1": "⚡ સ્ટેપ 1: ફંડ ટ્રાન્સફર કરો", "btn_copy": "UPI ID કૉપિ કરો", "step2": "📝 સ્ટેપ 2: વિગતો સબમિટ કરો",
+                "lbl_amount": "ટ્રાન્સફર કરેલી રકમ (₹)", "lbl_utr": "12-અંકનો UTR / Ref નંબર દાખલ કરો", "btn_submit": "ચકાસો અને પોઇન્ટ્સ ઉમેરો",
+                "rules_title": "મહત્વપૂર્ણ નિયમો:", "rule_1": "ન્યૂનતમ રકમ ₹50 છે.", "rule_2": "ચોક્કસ 12-અંકનો UTR/Ref નંબર સબમિટ કરો.",
+                "rule_3": "અમાન્ય UTR સબમિટ કરવાથી એકાઉન્ટ પ્રતિબંધિત થશે.", "rule_4": "પોઇન્ટ્સ 5-15 મિનિટમાં ઉમેરવામાં આવે છે.",
+                "err_method": "❌ આ પેમેન્ટ ગેટવે હાલમાં મેન્ટેનન્સ હેઠળ છે. કૃપા કરીને UPI નો ઉપયોગ કરો.", "err_empty": "❌ કૃપા કરીને તમે ટ્રાન્સફર કરેલી માન્ય રકમ દાખલ કરો.",
+                "err_min": "❌ ન્યૂનતમ મર્યાદા ₹50 છે.", "err_utr": "❌ કૃપા કરીને ચોક્કસ 12-અંકનો UTR / સંદર્ભ નંબર દાખલ કરો.",
+                "success_msg": "✅ તમારી વિનંતી સબમિટ કરવામાં આવી છે! એજન્ટો ટૂંક સમયમાં UTR ચકાસશે અને પોઇન્ટ ઉમેરશે.",
+                "ps_safe_title": "સિસ્ટમ મેન્ટેનન્સ", "ps_safe_desc": "સર્વર અપગ્રેડ્સને કારણે આ સુવિધા અસ્થાયી રૂપે અનુપલબ્ધ છે. કૃપા કરીને અમારી મફત રમતો અને કાર્યોનો આનંદ માણતા રહો!"
+            },
+            "es": {
+                "add_pts_title": "Añadir Puntos", "curr_bal": "Saldo Actual", "sel_method": "Seleccionar Método de Pago",
+                "step1": "⚡ Paso 1: Transferir Fondos", "btn_copy": "Copiar ID UPI", "step2": "📝 Paso 2: Enviar Detalles",
+                "lbl_amount": "Cantidad Transferida (₹)", "lbl_utr": "Introduce el UTR/Ref de 12 dígitos", "btn_submit": "VERIFICAR Y AÑADIR PUNTOS",
+                "rules_title": "REGLAS IMPORTANTES:", "rule_1": "La cantidad mínima es ₹50.", "rule_2": "Envía el UTR/Ref exacto de 12 dígitos.",
+                "rule_3": "Enviar un UTR inválido resultará en la restricción de la cuenta.", "rule_4": "Los puntos se añaden en 5-15 minutos.",
+                "err_method": "❌ Esta pasarela de pago está en mantenimiento. Por favor usa UPI.", "err_empty": "❌ Por favor introduce una cantidad válida que hayas transferido.",
+                "err_min": "❌ El límite mínimo es ₹50.", "err_utr": "❌ Por favor introduce el número de referencia/UTR exacto de 12 dígitos.",
+                "success_msg": "✅ ¡Tu solicitud ha sido enviada! Los agentes verificarán el UTR y acreditarán los puntos pronto.",
+                "ps_safe_title": "Mantenimiento del Sistema", "ps_safe_desc": "Esta función no está disponible temporalmente debido a actualizaciones del servidor. ¡Sigue disfrutando de nuestros juegos gratis y tareas!"
+            },
+            "fr": {
+                "add_pts_title": "Ajouter des Points", "curr_bal": "Solde Actuel", "sel_method": "Sélectionner le mode de paiement",
+                "step1": "⚡ Étape 1 : Transférer des Fonds", "btn_copy": "Copier l'ID UPI", "step2": "📝 Étape 2 : Soumettre les Détails",
+                "lbl_amount": "Montant Transféré (₹)", "lbl_utr": "Entrez le numéro UTR/Ref à 12 chiffres", "btn_submit": "VÉRIFIER ET AJOUTER DES POINTS",
+                "rules_title": "RÈGLES IMPORTANTES :", "rule_1": "Le montant minimum est de ₹50.", "rule_2": "Soumettez le numéro UTR/Ref exact à 12 chiffres.",
+                "rule_3": "La soumission d'un UTR invalide entraînera une restriction du compte.", "rule_4": "Les points sont ajoutés dans un délai de 5 à 15 minutes.",
+                "err_method": "❌ Cette passerelle de paiement est en maintenance. Veuillez utiliser UPI.", "err_empty": "❌ Veuillez entrer un montant valide que vous avez transféré.",
+                "err_min": "❌ La limite minimale est de ₹50.", "err_utr": "❌ Veuillez entrer le numéro UTR / Référence exact à 12 chiffres.",
+                "success_msg": "✅ Votre demande est soumise ! Les agents vérifieront l'UTR et créditeront les points bientôt.",
+                "ps_safe_title": "Maintenance du Système", "ps_safe_desc": "Cette fonctionnalité est temporairement indisponible en raison de mises à jour du serveur. Continuez à profiter de nos jeux gratuits !"
+            },
+            "ar": {
+                "add_pts_title": "إضافة نقاط", "curr_bal": "الرصيد الحالي", "sel_method": "اختر طريقة الدفع",
+                "step1": "⚡ الخطوة 1: تحويل الأموال", "btn_copy": "نسخ معرف UPI", "step2": "📝 الخطوة 2: تقديم التفاصيل",
+                "lbl_amount": "المبلغ المحول (₹)", "lbl_utr": "أدخل رقم UTR المكون من 12 رقمًا", "btn_submit": "التحقق وإضافة النقاط",
+                "rules_title": "قواعد مهمة:", "rule_1": "الحد الأدنى للإضافة هو ₹50.", "rule_2": "قم بتقديم رقم UTR/Ref المكون من 12 رقمًا بدقة.",
+                "rule_3": "تقديم رقم UTR غير صالح سيؤدي إلى تقييد الحساب.", "rule_4": "تتم إضافة النقاط في غضون 5-15 دقيقة.",
+                "err_method": "❌ بوابة الدفع هذه قيد الصيانة حاليًا. يرجى استخدام UPI.", "err_empty": "❌ يرجى إدخال مبلغ صالح قمت بتحويله.",
+                "err_min": "❌ الحد الأدنى هو ₹50.", "err_utr": "❌ يرجى إدخال رقم UTR / المرجع المكون من 12 رقمًا بدقة.",
+                "success_msg": "✅ تم إرسال طلبك! سيتحقق الوكلاء من UTR وسيتم إضافة النقاط قريبًا.",
+                "ps_safe_title": "صيانة النظام", "ps_safe_desc": "هذه الميزة غير متوفرة مؤقتًا بسبب ترقيات الخادم. يرجى الاستمرار في الاستمتاع بألعابنا ومهامنا المجانية!"
+            },
+            "pt": {
+                "add_pts_title": "Adicionar Pontos", "curr_bal": "Saldo Atual", "sel_method": "Selecione o Método de Pagamento",
+                "step1": "⚡ Passo 1: Transferir Fundos", "btn_copy": "Copiar ID UPI", "step2": "📝 Passo 2: Enviar Detalhes",
+                "lbl_amount": "Valor Transferido (₹)", "lbl_utr": "Insira o UTR/Ref de 12 dígitos", "btn_submit": "VERIFICAR E ADICIONAR PONTOS",
+                "rules_title": "REGRAS IMPORTANTES:", "rule_1": "O valor mínimo é ₹50.", "rule_2": "Envie o UTR/Ref exato de 12 dígitos.",
+                "rule_3": "Enviar um UTR inválido resultará em restrição de conta.", "rule_4": "Os pontos são adicionados em 5-15 minutos.",
+                "err_method": "❌ Este gateway de pagamento está em manutenção. Por favor, use UPI.", "err_empty": "❌ Por favor, insira um valor válido que você transferiu.",
+                "err_min": "❌ O limite mínimo é ₹50.", "err_utr": "❌ Por favor, insira o UTR / Número de Referência exato de 12 dígitos.",
+                "success_msg": "✅ Sua solicitação foi enviada! Os agentes verificarão o UTR e creditarão os pontos em breve.",
+                "ps_safe_title": "Manutenção do Sistema", "ps_safe_desc": "Este recurso está temporariamente indisponível devido a atualizações do servidor. Continue aproveitando nossos jogos grátis!"
+            },
+            "ru": {
+                "add_pts_title": "Добавить очки", "curr_bal": "Текущий баланс", "sel_method": "Выберите способ оплаты",
+                "step1": "⚡ Шаг 1: Перевод средств", "btn_copy": "Копировать UPI ID", "step2": "📝 Шаг 2: Отправить данные",
+                "lbl_amount": "Переведенная сумма (₹)", "lbl_utr": "Введите 12-значный номер UTR/Ref", "btn_submit": "ПРОВЕРИТЬ И ДОБАВИТЬ ОЧКИ",
+                "rules_title": "ВАЖНЫЕ ПРАВИЛА:", "rule_1": "Минимальная сумма — ₹50.", "rule_2": "Отправьте точный 12-значный UTR/Ref.",
+                "rule_3": "Отправка недействительного UTR приведет к блокировке.", "rule_4": "Очки зачисляются в течение 5-15 минут.",
+                "err_method": "❌ Этот шлюз на обслуживании. Используйте UPI.", "err_empty": "❌ Введите действительную переведенную сумму.",
+                "err_min": "❌ Минимальный лимит — ₹50.", "err_utr": "❌ Введите точный 12-значный UTR/номер ссылки.",
+                "success_msg": "✅ Запрос отправлен! Агенты скоро проверят UTR и начислят очки.",
+                "ps_safe_title": "Обслуживание системы", "ps_safe_desc": "Эта функция временно недоступна из-за обновления серверов. Продолжайте наслаждаться нашими играми!"
+            }
         };
 
         function changeLanguage(langCode) {
@@ -284,13 +396,15 @@
             });
             document.getElementById("appLanguage").value = langCode;
         }
-function openCardPaymentLink() {
-    if (systemCardLink && systemCardLink.startsWith("http")) {
-        window.location.href = systemCardLink; // Redirects to Admin's Card/Crypto Link
-    } else {
-        showDepositAlert("err_method"); // Shows error if Admin left the link blank
-    }
-}
+
+        function openCardPaymentLink() {
+            if (systemCardLink && systemCardLink.startsWith("http")) {
+                window.location.href = systemCardLink; 
+            } else {
+                showDepositAlert("err_method"); 
+            }
+        }
+
         // Script Injector for Admin Banners
         function setAdHTML(container, html) {
             container.innerHTML = html;
@@ -306,7 +420,7 @@ function openCardPaymentLink() {
         let currentActiveUpiName = "";
         let systemCardLink = "";
         const uid = localStorage.getItem("userId");
-        let systemCoinRate = 100; // 🔥 Default Conversion Rate (Can be changed in Admin Panel)
+        let systemCoinRate = 100; // 🔥 Default Conversion Rate
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
@@ -361,44 +475,49 @@ function openCardPaymentLink() {
                             }
 
                             // Setup Banners (Fetching from add_points node specifically)
-db.ref('global_system_runtime_configurations/add_points').once('value').then(bannerSnap => {
-    if (bannerSnap.exists()) {
-        let bData = bannerSnap.val();
-        
-        // Load Banner Slot 1
-        if (bData.slot1_code && bData.active !== false) {
-            document.getElementById("adminBannerSlot1").style.display = "flex";
-            setAdHTML(document.getElementById("adminBannerSlot1"), bData.slot1_code);
-        } else {
-            document.getElementById("adminBannerSlot1").style.display = "none";
-        }
-        
-        // Load Banner Slot 2
-        if (bData.slot2_code && bData.active !== false) {
-            document.getElementById("adminBannerSlot2").style.display = "flex";
-            setAdHTML(document.getElementById("adminBannerSlot2"), bData.slot2_code);
-        } else {
-            document.getElementById("adminBannerSlot2").style.display = "none";
-        }
-    }
-});
-// 🔥 Setup UPI Data & Smart Rotator (Load Balancing) 🔥
-if (adminData.paymentData && adminData.paymentData.upi_ids && adminData.paymentData.upi_ids.length > 0) {
-    
-    // Randomly select 1 UPI ID from the array provided by Admin
-    let upiArray = adminData.paymentData.upi_ids;
-    let randomIndex = Math.floor(Math.random() * upiArray.length);
-    
-    currentActiveUpiId = upiArray[randomIndex];
-    currentActiveUpiName = adminData.paymentData.name || "Verified Merchant";
-    systemCardLink = adminData.paymentData.card_link || "";
-    
-    document.getElementById("displayUpiId").innerText = currentActiveUpiId;
-    document.getElementById("displayUpiName").innerText = currentActiveUpiName;
-    generateDynamicQRCode();
-} else {
-    setUpiUnavailable();
-}
+                            db.ref('global_system_runtime_configurations/add_points').on('value', (bannerSnap) => {
+                                if (bannerSnap.exists()) {
+                                    let bData = bannerSnap.val();
+                                    
+                                    // Load Banner Slot 1
+                                    let s1Code = (bData.slot1 && bData.slot1.code) ? bData.slot1.code : bData.slot1_code;
+                                    let s1Active = (bData.slot1 && bData.slot1.active !== undefined) ? bData.slot1.active : bData.active;
+                                    if (s1Code && s1Active !== false) {
+                                        document.getElementById("adminBannerSlot1").style.display = "flex";
+                                        setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                                    } else {
+                                        document.getElementById("adminBannerSlot1").style.display = "none";
+                                    }
+                                    
+                                    // Load Banner Slot 2
+                                    let s2Code = (bData.slot2 && bData.slot2.code) ? bData.slot2.code : bData.slot2_code;
+                                    let s2Active = (bData.slot2 && bData.slot2.active !== undefined) ? bData.slot2.active : bData.active;
+                                    if (s2Code && s2Active !== false) {
+                                        document.getElementById("adminBannerSlot2").style.display = "flex";
+                                        setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                                    } else {
+                                        document.getElementById("adminBannerSlot2").style.display = "none";
+                                    }
+                                }
+                            });
+
+                            // 🔥 Setup UPI Data & Smart Rotator (Load Balancing) 🔥
+                            if (adminData.paymentData && adminData.paymentData.upi_ids && adminData.paymentData.upi_ids.length > 0) {
+                                
+                                // Randomly select 1 UPI ID from the array
+                                let upiArray = adminData.paymentData.upi_ids;
+                                let randomIndex = Math.floor(Math.random() * upiArray.length);
+                                
+                                currentActiveUpiId = upiArray[randomIndex];
+                                currentActiveUpiName = adminData.paymentData.name || "Verified Merchant";
+                                systemCardLink = adminData.paymentData.card_link || "";
+                                
+                                document.getElementById("displayUpiId").innerText = currentActiveUpiId;
+                                document.getElementById("displayUpiName").innerText = currentActiveUpiName;
+                                generateDynamicQRCode();
+                            } else {
+                                setUpiUnavailable();
+                            }
                         } else {
                             // FALLBACK
                             document.getElementById("masterPaymentContainer").style.display = "flex";
@@ -483,35 +602,45 @@ if (adminData.paymentData && adminData.paymentData.upi_ids && adminData.paymentD
             btn.disabled = true;
             btn.innerText = "SUBMITTING...";
 
-            // Create a unique transaction ID
             const txnId = "DEP-" + new Date().getTime();
             
-            // 🔥 CONVERT ₹ TO COINS using Admin's coin_rate (₹50 = 5000 Coins)
+            // 🔥 CONVERT ₹ TO COINS using Admin's coin_rate
             const finalCoinsToCredit = Math.floor(amountVal * systemCoinRate);
 
-            // Structure data EXACTLY as Admin Panel (`system_core_99.html`) expects for Deposits
+            // Structure data EXACTLY as Admin Panel
             const requestData = {
-                uid: uid,                     // Admin panel uses 'uid' not 'userId'
-                amount: finalCoinsToCredit,   // Send the CONVERTED COINS to admin
+                uid: uid,                     
+                amount: finalCoinsToCredit,   
                 utr: utrVal,
                 target_upi: currentActiveUpiId,
-                status: "pending",            // Lowercase pending
+                status: "pending",            
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
-            // Push to Firebase 'deposits' node (Admin Panel listens to 'deposits', NOT 'deposit_requests')
+            // Push to Firebase 'deposits' node
             let pushToAdmin = db.ref('deposits/' + txnId).set(requestData);
             
             // Push to User's transaction history so it shows as pending in history.html
             let pushToHistory = db.ref(`users/${uid}/transactions/${Date.now()}`).set({
                 action: "deposit_upi",
-                amount: finalCoinsToCredit,  // Positive value
+                amount: finalCoinsToCredit,  
                 status: "PENDING",
                 details: `Credit Request (UTR: ${utrVal})`,
                 timestamp: Date.now()
             });
 
-            Promise.all([pushToAdmin, pushToHistory])
+            // 🔥 UNIVERSAL HISTORY PUSH (For Account Health & Real-time Tracking) 🔥
+            let pushToUniversalHistory = db.ref(`users/${uid}/history`).push({
+                title: `Point Deposit (₹${amountVal})`,
+                amount: finalCoinsToCredit,
+                type: "credit",
+                txn_type: "deposit",
+                status: "PENDING",
+                date: new Date().toLocaleDateString(),
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            Promise.all([pushToAdmin, pushToHistory, pushToUniversalHistory])
             .then(() => {
                 document.getElementById("inputAmount").value = "";
                 document.getElementById("inputUtr").value = "";

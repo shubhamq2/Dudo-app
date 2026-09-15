@@ -107,7 +107,7 @@
 <body>
 
     <div class="header">
-        <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <h2>Ledger History</h2>
     </div>
 
@@ -150,15 +150,15 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -183,39 +183,43 @@
             });
         });
 
-        // 📡 FETCH BOTH TRANSACTIONS & ADMIN REQUESTS DATA
+        // 📡 FETCH FROM ALL 3 SOURCES: TRANSACTIONS, HISTORY, AND REQUESTS
         function triggerLoadAndNormalizeFirebaseHistory() {
-            const txnsRef = db.ref(`users/${uid}/transactions`);
-            const reqsRef = db.ref(`requests`); // For connecting directly with Admin Panel
+            const txnsRef = db.ref(`users/${uid}/transactions`); // Old format
+            const histRef = db.ref(`users/${uid}/history`);      // New universal format
+            const reqsRef = db.ref(`requests`);                  // Admin withdrawals
 
             let txnsData = [];
+            let histData = [];
             let reqsData = [];
-            let dataLoaded = { txns: false, reqs: false };
+            let dataLoaded = { txns: false, hist: false, reqs: false };
 
             function mergeAndRender() {
-                if(!dataLoaded.txns || !dataLoaded.reqs) return; // Wait until both are loaded
+                // Wait until all 3 paths are checked
+                if(!dataLoaded.txns || !dataLoaded.hist || !dataLoaded.reqs) return; 
 
                 localHistoryMasterCacheArray = [];
                 totalPromoClaimed = 0;
                 totalTasksCompleted = 0;
 
-                // 1. Process regular task/bonus transactions
+                // 1. Process Old Transactions
                 txnsData.forEach(node => {
                     let rawAction = (node.action || "").toString().toLowerCase();
-                    // IGNORE old pending redeems from transactions node to avoid duplicates
                     if (rawAction.includes("redeem_") || rawAction.includes("withdraw") || rawAction.includes("payout")) return; 
-
-                    let processedTxn = executeTranslateNodeMetadata(node.key, node, false);
-                    localHistoryMasterCacheArray.push(processedTxn);
+                    localHistoryMasterCacheArray.push(executeTranslateNodeMetadata(node.key, node, false));
                 });
 
-                // 2. Process Admin Withdraw Requests (This gets the Real-Time Admin Status & Reject Notes!)
+                // 2. Process New Universal History (Welcome Bonus, Referral, Tasks)
+                histData.forEach(node => {
+                    localHistoryMasterCacheArray.push(executeTranslateNodeMetadata(node.key, node, false));
+                });
+
+                // 3. Process Admin Withdraw Requests
                 reqsData.forEach(node => {
-                    let processedTxn = executeTranslateNodeMetadata(node.key, node, true);
-                    localHistoryMasterCacheArray.push(processedTxn);
+                    localHistoryMasterCacheArray.push(executeTranslateNodeMetadata(node.key, node, true));
                 });
 
-                // Sort by Latest First
+                // Sort by Latest Timestamp
                 localHistoryMasterCacheArray.sort((a, b) => b.rawTimestamp - a.rawTimestamp);
                 
                 updateAccountHealthUI();
@@ -230,48 +234,47 @@
                 }
             }
 
-            // Fetch Transactions
+            // Fetch Transactions (Old format)
             txnsRef.on('value', (snapshot) => {
                 txnsData = [];
                 if (snapshot.exists()) {
-                    snapshot.forEach(childSnap => {
-                        let txn = childSnap.val();
-                        txn.key = childSnap.key;
-                        txnsData.push(txn);
-                    });
+                    snapshot.forEach(childSnap => { let txn = childSnap.val(); txn.key = childSnap.key; txnsData.push(txn); });
                 }
-                dataLoaded.txns = true;
-                mergeAndRender();
+                dataLoaded.txns = true; mergeAndRender();
             }, () => { dataLoaded.txns = true; mergeAndRender(); });
 
-            // Fetch Requests (Filter by User)
+            // Fetch History (New Universal Format)
+            histRef.on('value', (snapshot) => {
+                histData = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnap => { let txn = childSnap.val(); txn.key = childSnap.key; histData.push(txn); });
+                }
+                dataLoaded.hist = true; mergeAndRender();
+            }, () => { dataLoaded.hist = true; mergeAndRender(); });
+
+            // Fetch Requests
             reqsRef.on('value', (snapshot) => {
                 reqsData = [];
                 if (snapshot.exists()) {
                     snapshot.forEach(childSnap => {
                         let r = childSnap.val();
-                        r.key = childSnap.key;
-                        // ONLY add if it belongs to this user
-                        if (r.uid === uid || r.userId === uid) {
-                            reqsData.push(r);
-                        }
+                        if (r.uid === uid || r.userId === uid) { r.key = childSnap.key; reqsData.push(r); }
                     });
                 }
-                dataLoaded.reqs = true;
-                mergeAndRender();
+                dataLoaded.reqs = true; mergeAndRender();
             }, () => { dataLoaded.reqs = true; mergeAndRender(); });
         }
 
-        // 🧠 DEEP TRACKING TRANSLATOR ENGINE (Connects Admin Status & Notes)
+        // 🧠 DEEP TRACKING TRANSLATOR ENGINE (Supports Both Action & Title)
         function executeTranslateNodeMetadata(txnKey, node, isRequestNode) {
-            // Force action to withdraw if it's coming from requests node
-            let rawAction = isRequestNode ? "withdraw" : (node.action || node.type || "unknown").toString().toLowerCase();
+            
+            // 🔥 FIX: Check both 'action' AND 'title' to support the new Universal History format
+            let rawAction = isRequestNode ? "withdraw" : (node.action || node.title || node.type || "unknown").toString().toLowerCase();
             let rawStatus = (node.status || "completed").toString().toUpperCase();
             
-            // Amount can be named differently in different tables
             let rawAmount = parseFloat(node.amount || node.points || node.coins || node.cost || 0);
             
-            let displayTitle = "Task Reward";
+            let displayTitle = node.title || "Task Reward"; // Use real title if provided
             let displayCategory = "bonus";
             let displayBadgeClass = "badge-bonus";
             let amountPrefixSign = "+ ";
@@ -281,11 +284,10 @@
             let sourceIcon = "⚡";
             let rewardType = "Coins";
 
-            // Determine if it is a deduction or a Withdraw Request
-            if (isRequestNode || rawAmount < 0 || rawAction.includes("redeem") || rawAction.includes("withdraw") || rawAction.includes("payout") || rawAction.includes("my_point1") || rawAction.includes("pass")) {
+            if (isRequestNode || rawAmount < 0 || rawAction.includes("redeem") || rawAction.includes("withdraw") || rawAction.includes("payout") || rawAction.includes("pass")) {
                 amountPrefixSign = "- ";
-                deltaStyleClass = "delta-negative"; // Dark color for negative
-                displayCategory = "withdrawal";     // Puts it in "Redeemed" tab
+                deltaStyleClass = "delta-negative"; 
+                displayCategory = "withdrawal";     
                 displayBadgeClass = "badge-withdrawal";
                 if(rawAmount < 0) rawAmount = Math.abs(rawAmount);
 
@@ -303,105 +305,50 @@
                 }
             } 
             else if (rawAction.includes("deposit") || rawAction.includes("topup") || rawAction.includes("add")) {
-                displayCategory = "deposit";
-                displayBadgeClass = "badge-deposit";
-                sourceOriginName = "Account Top-up";
-                sourceIcon = "💳";
+                displayCategory = "deposit"; displayBadgeClass = "badge-deposit"; sourceOriginName = "Account Top-up"; sourceIcon = "💳";
             }
-            // Other Categories
             else if (rawAction.includes("promo") || rawAction.includes("code") || rawAction.includes("coupon")) {
-                displayTitle = "Promo Code Claim";
-                displayBadgeClass = "badge-promo";
-                deltaStyleClass = "delta-promo";
-                sourceOriginName = "Promotional Code System";
-                sourceIcon = "🎟️";
-                totalPromoClaimed++;
+                displayTitle = node.title || "Promo Code Claim"; displayBadgeClass = "badge-promo"; deltaStyleClass = "delta-promo";
+                sourceOriginName = "Promotional Code System"; sourceIcon = "🎟️"; totalPromoClaimed++;
             }
             else if (rawAction.includes("admin")) {
-                displayTitle = "Admin Special Bonus";
-                displayBadgeClass = "badge-admin";
-                deltaStyleClass = "delta-admin";
-                sourceOriginName = "System Administrator";
-                sourceIcon = "👨‍💻";
-                rewardType = "Direct Account Credit";
+                displayTitle = node.title || "Admin Special Bonus"; displayBadgeClass = "badge-admin"; deltaStyleClass = "delta-admin";
+                sourceOriginName = "System Administrator"; sourceIcon = "👨‍💻"; rewardType = "Direct Account Credit";
             } 
             else if (rawAction.includes("signup") || rawAction.includes("register") || rawAction.includes("welcome")) {
-                displayTitle = "Welcome Registration Bonus";
-                sourceOriginName = "Account Setup";
-                sourceIcon = "🎉";
+                displayTitle = node.title || "Welcome Registration Bonus"; sourceOriginName = "Account Setup"; sourceIcon = "🎉";
             }
-            else if (rawAction.includes("referral")) {
-                displayTitle = "Referral Bonus";
-                sourceOriginName = "Network Team Activity";
-                sourceIcon = "👥";
+            else if (rawAction.includes("referral") || rawAction.includes("friend")) {
+                displayTitle = node.title || "Referral Bonus"; sourceOriginName = "Network Team Activity"; sourceIcon = "👥";
             }
             else if (rawAction.includes("scratch")) {
-                displayTitle = "Lucky Scratch Card";
-                sourceOriginName = "Scratch & Win Module";
-                sourceIcon = "✨";
-                totalTasksCompleted++;
+                displayTitle = node.title || "Lucky Scratch Card"; sourceOriginName = "Scratch & Win Module"; sourceIcon = "✨"; totalTasksCompleted++;
             } 
             else if (rawAction.includes("spin")) {
-                displayTitle = "Lucky Spin Wheel";
-                sourceOriginName = "Spin & Win Game";
-                sourceIcon = "🎡";
-                totalTasksCompleted++;
+                displayTitle = node.title || "Lucky Spin Wheel"; sourceOriginName = "Spin & Win Game"; sourceIcon = "🎡"; totalTasksCompleted++;
             } 
-            else if (rawAction.includes("video")) {
-                displayTitle = "Video Stream Reward";
-                sourceOriginName = "Media Monetization Network";
-                sourceIcon = "📺";
-                if(rawAction.includes("adscend")) sourceOriginName = "Adscend Media Video";
-                if(rawAction.includes("lootably")) sourceOriginName = "Lootably Video Stream";
-                if(rawAction.includes("hideout")) sourceOriginName = "Hideout.tv Premium";
-                totalTasksCompleted++;
+            else if (rawAction.includes("video") || rawAction.includes("watch")) {
+                displayTitle = node.title || "Video Stream Reward"; sourceOriginName = "Media Monetization Network"; sourceIcon = "📺"; totalTasksCompleted++;
             } 
-            else if (rawAction.includes("social")) {
-                displayTitle = "Social Engagement";
-                sourceOriginName = "Social Following Task";
-                sourceIcon = "👍";
-                totalTasksCompleted++;
-            } 
-            else if (rawAction.includes("web_stream") || rawAction.includes("smart_task") || rawAction.includes("web_visit")) {
-                displayTitle = "Premium Web Interaction";
-                sourceOriginName = "Smart Task Wall / Sponsor Visit";
-                sourceIcon = "🌐";
-                totalTasksCompleted++;
-            } 
-            else if (rawAction.includes("secure_server") || rawAction.includes("cloud")) {
-                displayTitle = "Secure Cloud Validation";
-                sourceOriginName = "High-Speed Mirror Access";
-                sourceIcon = "🛡️";
-                totalTasksCompleted++;
-            } 
-            else if (rawAction.includes("mega_drop") || rawAction.includes("jackpot")) {
-                displayTitle = "Mega Drop Jackpot";
-                sourceOriginName = "Weekly Drop Event";
-                sourceIcon = "👑";
+            else if (rawAction.includes("task") || rawAction.includes("offer")) {
+                displayTitle = node.title || "Offerwall Task"; sourceOriginName = "App Offerwall"; sourceIcon = "🎯"; totalTasksCompleted++;
             }
             else if (node.details) {
-                // If it's just a generic details string
-                displayTitle = node.details; 
+                displayTitle = node.title || node.details; 
             } else {
-                displayTitle = "System Credit / Reward";
-                if (rawAmount == 25) displayTitle = "Welcome / Referral Bonus"; 
-                sourceOriginName = "System Balance Update";
-                sourceIcon = "⚙️";
+                if(!node.title) displayTitle = "System Credit / Reward";
+                sourceOriginName = "System Balance Update"; sourceIcon = "⚙️";
             }
 
-            let displayDateString = node.timestamp ? new Date(node.timestamp).toLocaleString() : "Recent Sync Process";
-            
-            // 🔥 CRITICAL FIX: Extract Admin Note correctly from Firebase Request Payload
+            let displayDateString = node.date || (node.timestamp ? new Date(node.timestamp).toLocaleString() : "Recent Sync Process");
             let dynamicAdminNote = node.admin_note || node.adminNote || node.message || null;
             
-            // Normalize Display Status
-let normalizedDisplayStatus = "PENDING";
-// 🔥 FIX: Added SUCCESSFUL to the exact match list 🔥
-if (rawStatus === "APPROVED" || rawStatus === "SUCCESS" || rawStatus === "COMPLETED" || rawStatus === "SUCCESSFUL") {
-    normalizedDisplayStatus = "SUCCESSFUL";
-} else if (rawStatus === "REJECTED" || rawStatus === "FAILED" || rawStatus === "DECLINED") {
-    normalizedDisplayStatus = "DECLINED";
-}
+            let normalizedDisplayStatus = "PENDING";
+            if (rawStatus === "APPROVED" || rawStatus === "SUCCESS" || rawStatus === "COMPLETED" || rawStatus === "SUCCESSFUL") {
+                normalizedDisplayStatus = "SUCCESSFUL";
+            } else if (rawStatus === "REJECTED" || rawStatus === "FAILED" || rawStatus === "DECLINED") {
+                normalizedDisplayStatus = "DECLINED";
+            }
 
             return {
                 title: displayTitle,
@@ -414,7 +361,7 @@ if (rawStatus === "APPROVED" || rawStatus === "SUCCESS" || rawStatus === "COMPLE
                 status: normalizedDisplayStatus,
                 adminCode: txnKey || "TXN-AUTO-LEDGER",
                 extraDetails: node.details || node.user_input || node.userInputDetails || node.code || "Verified Activity Payload",
-                rawTimestamp: node.timestamp || 0,
+                rawTimestamp: node.timestamp || Date.now(),
                 adminNote: dynamicAdminNote,
                 sourceOrigin: sourceOriginName,
                 sourceIcon: sourceIcon,
@@ -471,21 +418,11 @@ if (rawStatus === "APPROVED" || rawStatus === "SUCCESS" || rawStatus === "COMPLE
                 if (item.status === 'DECLINED') { statusColor = "#ef4444"; statusIcon = "<i class='fa-solid fa-circle-xmark'></i>"; } 
 
                 let noteHtml = "";
-                // Render Rejection Note
                 if (item.status === 'DECLINED' && item.adminNote) {
-                    noteHtml = `
-                        <div class="rejection-note-box">
-                            ⚠️ <strong>Declined Reason:</strong> ${item.adminNote}
-                        </div>
-                    `;
+                    noteHtml = `<div class="rejection-note-box">⚠️ <strong>Declined Reason:</strong> ${item.adminNote}</div>`;
                 } 
-                // Render Generic Admin Note
                 else if (item.badgeClass === 'badge-admin' && item.adminNote) {
-                    noteHtml = `
-                        <div class="admin-note-box">
-                            💬 <strong>Message from Admin:</strong> ${item.adminNote}
-                        </div>
-                    `;
+                    noteHtml = `<div class="admin-note-box">💬 <strong>Message from Admin:</strong> ${item.adminNote}</div>`;
                 }
 
                 let safeCategoryName = item.category;
@@ -498,13 +435,8 @@ if (rawStatus === "APPROVED" || rawStatus === "SUCCESS" || rawStatus === "COMPLE
                 }
 
                 card.innerHTML = `
-                    <div class="badge-tag ${item.badgeClass}">
-                        ${safeCategoryName}
-                    </div>
-                    <div class="amount-delta-ticker ${item.deltaClass}">
-                        ${item.amountSign}${item.amountValue} 🪙
-                    </div>
-                    
+                    <div class="badge-tag ${item.badgeClass}">${safeCategoryName}</div>
+                    <div class="amount-delta-ticker ${item.deltaClass}">${item.amountSign}${item.amountValue} 🪙</div>
                     <h4 style="margin: 0 0 12px 0; font-size:16px; font-weight:900; color:#0f172a; max-width:75%; line-height:1.4;">${item.title}</h4>
                     
                     <div class="source-detail-box">
@@ -543,9 +475,7 @@ if (rawStatus === "APPROVED" || rawStatus === "SUCCESS" || rawStatus === "COMPLE
 
                     ${noteHtml}
 
-                    <div class="nested-code-box">
-                        🔑 Ref: <strong>${item.adminCode}</strong>
-                    </div>
+                    <div class="nested-code-box">🔑 Ref: <strong>${item.adminCode}</strong></div>
                 `;
                 container.appendChild(card);
             });

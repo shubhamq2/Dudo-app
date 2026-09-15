@@ -49,7 +49,7 @@
 
         /* Banner Ads Slots */
         .ad-container-block { width: 92%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
-        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(16, 185, 129, 0.4); box-sizing: border-box; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(16, 185, 129, 0.4); box-sizing: border-box; display: none; }
 
         /* Main Check-in Container */
         .daily-container { width: 92%; max-width: 440px; background: var(--card-bg); border-radius: 20px; padding: 25px 20px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); text-align: center; backdrop-filter: blur(10px); }
@@ -209,37 +209,38 @@
     <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
-        let globalAdTimerSeconds = 10; // Default 10s for Check-in
+        // 🔥 ADMIN CONTROLLED DYNAMIC VARIABLES 🔥
+        let globalAdTimerSeconds = 10; 
+        let rewardScale = [10, 20, 30, 40, 50, 60, 100]; // Default rewards
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
-            "en": { "dc_title": "Daily Check-in", "wallet_bal": "Wallet Balance", "total_coins": "Total Coins", "claim_rewards": "Claim Rewards", "btn_claim": "Claim Reward", "already_btn": "Already Claimed", "dc_instruction": "Check-in every day to grow your streak. Rewards get bigger up to Day 7, and remain at a maximum premium amount thereafter!", "d1":"Day 1","d2":"Day 2","d3":"Day 3","d4":"Day 4","d5":"Day 5","d6":"Day 6","d7":"Day 7+ 🔥", "alert_success": "🎉 Success! You claimed your daily reward of", "alert_tomorrow": "Come back tomorrow for more coins!", "err_early": "❌ Verification Incomplete! Please spend the required time on the page.", "err_invalid": "❌ Tracking Interrupted: Task minimized. Please stay on the page.", "err_server": "⚠️ Server Error. Please try again later." },
-            "hi": { "dc_title": "रोजाना चेक-इन", "wallet_bal": "वॉलेट बैलेंस", "total_coins": "कुल पॉइंट्स", "claim_rewards": "इनाम प्राप्त करें", "btn_claim": "क्लेम करें", "already_btn": "आज का क्लेम हो गया", "dc_instruction": "अपनी स्ट्रीक बढ़ाने के लिए हर दिन चेक-इन करें। दिन 7 तक पुरस्कार बड़े होते जाते हैं, और उसके बाद अधिकतम राशि पर स्थिर रहते हैं!", "d1":"दिन 1","d2":"दिन 2","d3":"दिन 3","d4":"दिन 4","d5":"दिन 5","d6":"दिन 6","d7":"दिन 7+ 🔥", "alert_success": "🎉 बधाई हो! आपने प्राप्त किए", "alert_tomorrow": "और अधिक सिक्कों के लिए कल वापस आएं!", "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: ऐप बंद करना मना है। कृपया पेज पर ही रहें।", "err_server": "⚠️ सर्वर एरर। बाद में प्रयास करें।" },
+            "en": { "dc_title": "Daily Check-in", "wallet_bal": "Wallet Balance", "total_coins": "Total Coins", "claim_rewards": "Claim Rewards", "btn_claim": "Claim Reward", "already_btn": "Already Claimed", "dc_instruction": "Check-in every day to grow your streak. Rewards get bigger up to Day 7, and remain at a maximum premium amount thereafter!", "d1":"Day 1","d2":"Day 2","d3":"Day 3","d4":"Day 4","d5":"Day 5","d6":"Day 6","d7":"Day 7+ 🔥", "alert_success": "🎉 Success! You claimed your daily reward of", "alert_tomorrow": "Come back tomorrow for more points!", "err_early": "❌ Verification Incomplete! Please spend the required time on the page.", "err_invalid": "❌ Tracking Interrupted: Task minimized. Please stay on the page.", "err_server": "⚠️ Server Error. Please try again later." },
+            "hi": { "dc_title": "रोजाना चेक-इन", "wallet_bal": "वॉलेट बैलेंस", "total_coins": "कुल पॉइंट्स", "claim_rewards": "इनाम प्राप्त करें", "btn_claim": "क्लेम करें", "already_btn": "आज का क्लेम हो गया", "dc_instruction": "अपनी स्ट्रीक बढ़ाने के लिए हर दिन चेक-इन करें। दिन 7 तक पुरस्कार बड़े होते जाते हैं, और उसके बाद अधिकतम राशि पर स्थिर रहते हैं!", "d1":"दिन 1","d2":"दिन 2","d3":"दिन 3","d4":"दिन 4","d5":"दिन 5","d6":"दिन 6","d7":"दिन 7+ 🔥", "alert_success": "🎉 बधाई हो! आपने प्राप्त किए", "alert_tomorrow": "और अधिक पॉइंट्स के लिए कल वापस आएं!", "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: ऐप बंद करना मना है। कृपया पेज पर ही रहें।", "err_server": "⚠️ सर्वर एरर। बाद में प्रयास करें।" },
             "bn": { "dc_title": "দৈনিক চেক-ইন", "wallet_bal": "ব্যালেন্স", "total_coins": "মোট কয়েন", "claim_rewards": "পুরস্কার দাবি করুন", "btn_claim": "দাবি করুন", "already_btn": "আজকের দাবি শেষ", "dc_instruction": "আপনার স্ট্রিক বাড়ানোর জন্য প্রতিদিন চেক-ইন করুন।", "d1":"দিন ১","d2":"দিন ২","d3":"দিন ৩","d4":"দিন ৪","d5":"দিন ৫","d6":"দিন ৬","d7":"দিন ৭+ 🔥", "alert_success": "🎉 সফল হয়েছে! আপনি পেয়েছেন", "alert_tomorrow": "আগামীকাল আবার আসুন!", "err_early": "❌ যাচাই অসম্পূর্ণ! পেজটি আরও কিছুক্ষণ খোলা রাখুন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত হয়েছে: পেজেই থাকুন।", "err_server": "⚠️ সার্ভার ত্রুটি।" },
-            "te": { "dc_title": "డైలీ చెక్-ఇన్", "wallet_bal": "బ్యాలెన్స్", "total_coins": "మొత్తం నాణేలు", "claim_rewards": "రివార్డులు పొందండి", "btn_claim": "క్లెయిమ్ రివార్డ్", "already_btn": "ఇప్పటికే క్లెయిమ్ చేయబడింది", "dc_instruction": "మీ స్ట్రీక్‌ను పెంచుకోవడానికి ప్రతిరోజూ చెక్-ఇన్ చేయండి.", "d1":"డే 1","d2":"డే 2","d3":"డే 3","d4":"డే 4","d5":"డే 5","d6":"డే 6","d7":"డే 7+ 🔥", "alert_success": "🎉 విజయం! మీరు క్లెయిమ్ చేసారు", "alert_tomorrow": "రేపు తిరిగి రండి!", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని కొద్దిసేపు తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి పేజీలోనే ఉండండి.", "err_server": "⚠️ సర్వర్ లోపం." },
-            "mr": { "dc_title": "डेली चेक-इन", "wallet_bal": "शिल्लक", "total_coins": "एकूण नाणी", "claim_rewards": "बक्षिसे मिळवा", "btn_claim": "बक्षीस मिळवा", "already_btn": "आजचे बक्षीस घेतले", "dc_instruction": "तुमची streak वाढवण्यासाठी दररोज चेक-इन करा.", "d1":"दिवस १","d2":"दिवस २","d3":"दिवस ३","d4":"दिवस ४","d5":"दिवस ५","d6":"दिवस ६","d7":"दिवस ७+ 🔥", "alert_success": "🎉 यशस्वी! आपण मिळवले", "alert_tomorrow": "अधिक नाण्यांसाठी उद्या परत या!", "err_early": "❌ अपूर्ण! कृपया टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया पेजवरच थांबा.", "err_server": "⚠️ सर्व्हर त्रुटी." },
-            "ta": { "dc_title": "தினசரி செக்-இன்", "wallet_bal": "வாலட் இருப்பு", "total_coins": "மொத்த நாணயங்கள்", "claim_rewards": "ரிவார்டு பெறு", "btn_claim": "ரிவார்டு பெறு", "already_btn": "ஏற்கனவே பெறப்பட்டது", "dc_instruction": "உங்கள் தொடர்ச்சியை அதிகரிக்க தினமும் செக்-இன் செய்யுங்கள்.", "d1":"நாள் 1","d2":"நாள் 2","d3":"நாள் 3","d4":"நாள் 4","d5":"நாள் 5","d6":"நாள் 6","d7":"நாள் 7+ 🔥", "alert_success": "🎉 வெற்றி! நீங்கள் பெற்றுள்ளீர்கள்", "alert_tomorrow": "நாளை மீண்டும் வாருங்கள்!", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ பக்கத்திலேயே இருக்கவும்.", "err_server": "⚠️ சர்வர் பிழை." },
-            "ur": { "dc_title": "روزانہ چیک ان", "wallet_bal": "بیلنس", "total_coins": "کل سکے", "claim_rewards": "انعام حاصل کریں", "btn_claim": "کلیم کریں", "already_btn": "پہلے ہی کلیم شدہ", "dc_instruction": "اسٹریک بڑھانے کے لیے روزانہ چیک ان کریں۔", "d1":"دن 1","d2":"دن 2","d3":"دن 3","d4":"دن 4","d5":"دن 5","d6":"دن 6","d7":"دن 7+ 🔥", "alert_success": "🎉 کامیابی! آپ نے حاصل کیا", "alert_tomorrow": "کل دوبارہ آئیں!", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم پیج پر رہیں۔", "err_server": "⚠️ سرور کا مسئلہ۔" },
-            "gu": { "dc_title": "દૈનિક ચેક-ઇન", "wallet_bal": "બેલેન્સ", "total_coins": "કુલ સિક્કા", "claim_rewards": "ઇનામ મેળવો", "btn_claim": "ક્લેમ કરો", "already_btn": "આજે ક્લેમ થઈ ગયું", "dc_instruction": "તમારી સ્ટ્રીક વધારવા માટે દરરોજ ચેક-ઇન કરો.", "d1":"દિવસ ૧","d2":"દિવસ ૨","d3":"દિવસ ૩","d4":"દિવસ ૪","d5":"દિવસ ૫","d6":"દિવસ ૬","d7":"દિવસ ૭+ 🔥", "alert_success": "🎉 સફળતા! તમે મેળવ્યું છે", "alert_tomorrow": "આવતીકાલે પાછા આવો!", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને પેજ પર રહો.", "err_server": "⚠️ સર્વર સમસ્યા." },
-            "es": { "dc_title": "Control Diario", "wallet_bal": "Saldo", "total_coins": "Monedas", "claim_rewards": "Reclamar Premios", "btn_claim": "Reclamar", "already_btn": "Ya Reclamado", "dc_instruction": "Regístrate todos los días para aumentar tu racha.", "d1":"Día 1","d2":"Día 2","d3":"Día 3","d4":"Día 4","d5":"Día 5","d6":"Día 6","d7":"Día 7+ 🔥", "alert_success": "🎉 ¡Éxito! Reclamaste", "alert_tomorrow": "¡Vuelve mañana!", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página.", "err_server": "⚠️ Error de servidor." },
-            "fr": { "dc_title": "Check-in Quotidien", "wallet_bal": "Solde", "total_coins": "Pièces", "claim_rewards": "Récupérer Prix", "btn_claim": "Réclamer", "already_btn": "Déjà Réclamé", "dc_instruction": "Connectez-vous chaque jour pour augmenter votre série.", "d1":"Jour 1","d2":"Jour 2","d3":"Jour 3","d4":"Jour 4","d5":"Jour 5","d6":"Jour 6","d7":"Jour 7+ 🔥", "alert_success": "🎉 Succès! Vous avez réclamé", "alert_tomorrow": "Revenez demain !", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page.", "err_server": "⚠️ Erreur serveur." },
-            "ar": { "dc_title": "تسجيل الدخول اليومي", "wallet_bal": "الرصيد", "total_coins": "العملات", "claim_rewards": "المطالبة بالمكافآت", "btn_claim": "مطالبة", "already_btn": "تم المطالبة", "dc_instruction": "سجل دخولك كل يوم لزيادة تتابعك.", "d1":"اليوم 1","d2":"اليوم 2","d3":"اليوم 3","d4":"اليوم 4","d5":"اليوم 5","d6":"اليوم 6","d7":"اليوم 7+ 🔥", "alert_success": "🎉 نجاح! لقد حصلت على", "alert_tomorrow": "عد غدًا!", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في الصفحة.", "err_server": "⚠️ خطأ خادم." },
-            "pt": { "dc_title": "Check-in Diário", "wallet_bal": "Saldo", "total_coins": "Moedas", "claim_rewards": "Reivindicar Prêmios", "btn_claim": "Reivindicar", "already_btn": "Já Reivindicado", "dc_instruction": "Faça check-in todos os dias para aumentar sua sequência.", "d1":"Dia 1","d2":"Dia 2","d3":"Dia 3","d4":"Dia 4","d5":"Dia 5","d6":"Dia 6","d7":"Dia 7+ 🔥", "alert_success": "🎉 Sucesso! Você reivindicou", "alert_tomorrow": "Volte amanhã!", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página.", "err_server": "⚠️ Erro no servidor." },
-            "ru": { "dc_title": "Ежедневный вход", "wallet_bal": "Баланс", "total_coins": "Монеты", "claim_rewards": "Забрать награды", "btn_claim": "Получить", "already_btn": "Получено", "dc_instruction": "Отмечайтесь каждый день, чтобы увеличить серию.", "d1":"День 1","d2":"День 2","d3":"День 3","d4":"День 4","d5":"День 5","d6":"День 6","d7":"День 7+ 🔥", "alert_success": "🎉 Успех! Вы получили", "alert_tomorrow": "Возвращайтесь завтра!", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице.", "err_server": "⚠️ Ошибка сервера." }
+            "te": { "dc_title": "డైలీ చెక్-ఇన్", "wallet_bal": "బ్యాలెన్స్", "total_coins": "మొత్తం పాయింట్లు", "claim_rewards": "రివార్డులు పొందండి", "btn_claim": "క్లెయిమ్ రివార్డ్", "already_btn": "ఇప్పటికే క్లెయిమ్ చేయబడింది", "dc_instruction": "మీ స్ట్రీక్‌ను పెంచుకోవడానికి ప్రతిరోజూ చెక్-ఇన్ చేయండి.", "d1":"డే 1","d2":"డే 2","d3":"డే 3","d4":"డే 4","d5":"డే 5","d6":"డే 6","d7":"డే 7+ 🔥", "alert_success": "🎉 విజయం! మీరు క్లెయిమ్ చేసారు", "alert_tomorrow": "రేపు తిరిగి రండి!", "err_early": "❌ అసంపూర్ణం! దయచేసి పేజీని కొద్దిసేపు తెరిచి ఉంచండి.", "err_invalid": "❌ దయచేసి పేజీలోనే ఉండండి.", "err_server": "⚠️ సర్వర్ లోపం." },
+            "mr": { "dc_title": "डेली चेक-इन", "wallet_bal": "शिल्लक", "total_coins": "एकूण पॉइंट्स", "claim_rewards": "बक्षिसे मिळवा", "btn_claim": "बक्षीस मिळवा", "already_btn": "आजचे बक्षीस घेतले", "dc_instruction": "तुमची streak वाढवण्यासाठी दररोज चेक-इन करा.", "d1":"दिवस १","d2":"दिवस २","d3":"दिवस ३","d4":"दिवस ४","d5":"दिवस ५","d6":"दिवस ६","d7":"दिवस ७+ 🔥", "alert_success": "🎉 यशस्वी! आपण मिळवले", "alert_tomorrow": "अधिक पॉइंट्ससाठी उद्या परत या!", "err_early": "❌ अपूर्ण! कृपया टॅब उघडा ठेवा.", "err_invalid": "❌ कृपया पेजवरच थांबा.", "err_server": "⚠️ सर्व्हर त्रुटी." },
+            "ta": { "dc_title": "தினசரி செக்-இன்", "wallet_bal": "வாலட் இருப்பு", "total_coins": "மொத்த புள்ளிகள்", "claim_rewards": "ரிவார்டு பெறு", "btn_claim": "ரிவார்டு பெறு", "already_btn": "ஏற்கனவே பெறப்பட்டது", "dc_instruction": "உங்கள் தொடர்ச்சியை அதிகரிக்க தினமும் செக்-இன் செய்யுங்கள்.", "d1":"நாள் 1","d2":"நாள் 2","d3":"நாள் 3","d4":"நாள் 4","d5":"நாள் 5","d6":"நாள் 6","d7":"நாள் 7+ 🔥", "alert_success": "🎉 வெற்றி! நீங்கள் பெற்றுள்ளீர்கள்", "alert_tomorrow": "நாளை மீண்டும் வாருங்கள்!", "err_early": "❌ முற்றுபெறவில்லை! பக்கத்தை திறந்து வைக்கவும்.", "err_invalid": "❌ பக்கத்திலேயே இருக்கவும்.", "err_server": "⚠️ சர்வர் பிழை." },
+            "ur": { "dc_title": "روزانہ چیک ان", "wallet_bal": "بیلنس", "total_coins": "کل پوائنٹس", "claim_rewards": "انعام حاصل کریں", "btn_claim": "کلیم کریں", "already_btn": "پہلے ہی کلیم شدہ", "dc_instruction": "اسٹریک بڑھانے کے لیے روزانہ چیک ان کریں۔", "d1":"دن 1","d2":"دن 2","d3":"دن 3","d4":"دن 4","d5":"دن 5","d6":"دن 6","d7":"دن 7+ 🔥", "alert_success": "🎉 کامیابی! آپ نے حاصل کیا", "alert_tomorrow": "کل دوبارہ آئیں!", "err_early": "❌ نامکمل! براہ کرم ٹیب کھلا رکھیں۔", "err_invalid": "❌ براہ کرم پیج پر رہیں۔", "err_server": "⚠️ سرور کا مسئلہ۔" },
+            "gu": { "dc_title": "દૈનિક ચેક-ઇન", "wallet_bal": "બેલેન્સ", "total_coins": "કુલ પોઇન્ટ્સ", "claim_rewards": "ઇનામ મેળવો", "btn_claim": "ક્લેમ કરો", "already_btn": "આજે ક્લેમ થઈ ગયું", "dc_instruction": "તમારી સ્ટ્રીક વધારવા માટે દરરોજ ચેક-ઇન કરો.", "d1":"દિવસ ૧","d2":"દિવસ ૨","d3":"દિવસ ૩","d4":"દિવસ ૪","d5":"દિવસ ૫","d6":"દિવસ ૬","d7":"દિવસ ૭+ 🔥", "alert_success": "🎉 સફળતા! તમે મેળવ્યું છે", "alert_tomorrow": "આવતીકાલે પાછા આવો!", "err_early": "❌ અધૂરું! કૃપા કરીને ટેબ ખુલ્લું રાખો.", "err_invalid": "❌ કૃપા કરીને પેજ પર રહો.", "err_server": "⚠️ સર્વર સમસ્યા." },
+            "es": { "dc_title": "Control Diario", "wallet_bal": "Saldo", "total_coins": "Puntos", "claim_rewards": "Reclamar Premios", "btn_claim": "Reclamar", "already_btn": "Ya Reclamado", "dc_instruction": "Regístrate todos los días para aumentar tu racha.", "d1":"Día 1","d2":"Día 2","d3":"Día 3","d4":"Día 4","d5":"Día 5","d6":"Día 6","d7":"Día 7+ 🔥", "alert_success": "🎉 ¡Éxito! Reclamaste", "alert_tomorrow": "¡Vuelve mañana!", "err_early": "❌ ¡Incompleto! Mantén la pestaña abierta.", "err_invalid": "❌ Quédate en la página.", "err_server": "⚠️ Error de servidor." },
+            "fr": { "dc_title": "Check-in Quotidien", "wallet_bal": "Solde", "total_coins": "Points", "claim_rewards": "Récupérer Prix", "btn_claim": "Réclamer", "already_btn": "Déjà Réclamé", "dc_instruction": "Connectez-vous chaque jour pour augmenter votre série.", "d1":"Jour 1","d2":"Jour 2","d3":"Jour 3","d4":"Jour 4","d5":"Jour 5","d6":"Jour 6","d7":"Jour 7+ 🔥", "alert_success": "🎉 Succès! Vous avez réclamé", "alert_tomorrow": "Revenez demain !", "err_early": "❌ Incomplet ! Gardez l'onglet ouvert.", "err_invalid": "❌ Restez sur la page.", "err_server": "⚠️ Erreur serveur." },
+            "ar": { "dc_title": "تسجيل الدخول اليومي", "wallet_bal": "الرصيد", "total_coins": "النقاط", "claim_rewards": "المطالبة بالمكافآت", "btn_claim": "مطالبة", "already_btn": "تم المطالبة", "dc_instruction": "سجل دخولك كل يوم لزيادة تتابعك.", "d1":"اليوم 1","d2":"اليوم 2","d3":"اليوم 3","d4":"اليوم 4","d5":"اليوم 5","d6":"اليوم 6","d7":"اليوم 7+ 🔥", "alert_success": "🎉 نجاح! لقد حصلت على", "alert_tomorrow": "عد غدًا!", "err_early": "❌ غير مكتمل! أبقِ علامة التبويب مفتوحة.", "err_invalid": "❌ يرجى البقاء في الصفحة.", "err_server": "⚠️ خطأ خادم." },
+            "pt": { "dc_title": "Check-in Diário", "wallet_bal": "Saldo", "total_coins": "Pontos", "claim_rewards": "Reivindicar Prêmios", "btn_claim": "Reivindicar", "already_btn": "Já Reivindicado", "dc_instruction": "Faça check-in todos os dias para aumentar sua sequência.", "d1":"Dia 1","d2":"Dia 2","d3":"Dia 3","d4":"Dia 4","d5":"Dia 5","d6":"Dia 6","d7":"Dia 7+ 🔥", "alert_success": "🎉 Sucesso! Você reivindicou", "alert_tomorrow": "Volte amanhã!", "err_early": "❌ Incompleto! Mantenha a guia aberta.", "err_invalid": "❌ Fique na página.", "err_server": "⚠️ Erro no servidor." },
+            "ru": { "dc_title": "Ежедневный вход", "wallet_bal": "Баланс", "total_coins": "Очки", "claim_rewards": "Забрать награды", "btn_claim": "Получить", "already_btn": "Получено", "dc_instruction": "Отмечайтесь каждый день, чтобы увеличить серию.", "d1":"День 1","d2":"День 2","d3":"День 3","d4":"День 4","d5":"День 5","d6":"День 6","d7":"День 7+ 🔥", "alert_success": "🎉 Успех! Вы получили", "alert_tomorrow": "Возвращайтесь завтра!", "err_early": "❌ Не завершено! Держите вкладку открытой.", "err_invalid": "❌ Оставайтесь на странице.", "err_server": "⚠️ Ошибка сервера." }
         };
 
         function changeLanguage(langCode) {
@@ -271,7 +272,6 @@
         }
 
         const uid = localStorage.getItem("userId");
-        const rewardScale = [10, 20, 30, 40, 50, 60, 100];
         let currentStreak = 0;
         let lastCheckInTimestamp = 0;
 
@@ -317,29 +317,61 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Check-in Link, Timer)
+                    // 2. Fetch Admin Configurations (Banners, Check-in Link, Timer, and 7 Days Coins)
                     db.ref('global_system_runtime_configurations/checkin_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME
-                            if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            // 🔥 GET ADMIN CONTROLLED TIME & DAY 1-7 COINS
+                            if (adminData.ad_timer) globalAdTimerSeconds = parseInt(adminData.ad_timer);
                             
-                            // Banners
-                            if(adminData.slot1_code && adminData.active !== false) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            if(adminData.slot2_code && adminData.active !== false) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            if(adminData.slot3_code && adminData.active !== false) { document.getElementById("adminBannerSlot3").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot3"), adminData.slot3_code); } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            if(adminData.slot4_code && adminData.active !== false) { document.getElementById("adminBannerSlot4").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot4"), adminData.slot4_code); } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            if (adminData.reward_d1) rewardScale[0] = parseInt(adminData.reward_d1);
+                            if (adminData.reward_d2) rewardScale[1] = parseInt(adminData.reward_d2);
+                            if (adminData.reward_d3) rewardScale[2] = parseInt(adminData.reward_d3);
+                            if (adminData.reward_d4) rewardScale[3] = parseInt(adminData.reward_d4);
+                            if (adminData.reward_d5) rewardScale[4] = parseInt(adminData.reward_d5);
+                            if (adminData.reward_d6) rewardScale[5] = parseInt(adminData.reward_d6);
+                            if (adminData.reward_d7) rewardScale[6] = parseInt(adminData.reward_d7);
+
+                            // Update UI HTML with Admin Coins Live
+                            for (let i = 1; i <= 7; i++) {
+                                let box = document.getElementById(`dayBox${i}`);
+                                if(box) box.querySelector('.day-coins').innerText = rewardScale[i-1] + " 🪙";
+                            }
+                            
+                            // Banners Load Safely
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
+                                document.getElementById("adminBannerSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
+                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
+                            
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
+                                document.getElementById("adminBannerSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
+                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            
+                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
+                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
+                            if (s3Code && s3Active !== false) {
+                                document.getElementById("adminBannerSlot3").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
+                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
+                            
+                            let s4Code = (adminData.slot4 && adminData.slot4.code) ? adminData.slot4.code : adminData.slot4_code;
+                            let s4Active = (adminData.slot4 && adminData.slot4.active !== undefined) ? adminData.slot4.active : adminData.active;
+                            if (s4Code && s4Active !== false) {
+                                document.getElementById("adminBannerSlot4").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
+                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
 
                             // Link
                             if (adminData.checkin_link) {
                                 activeAdminSmartlinkUrl = adminData.checkin_link;
                             }
-                        } else {
-                            // Fallback
-                            db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
-                                if(globalSnap.exists()) activeAdminSmartlinkUrl = globalSnap.val();
-                            });
                         }
                     });
 
@@ -428,7 +460,7 @@
         let systemValidationTimer = null;
         let verificationSecondsLeft = 10;
 
-        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH IN-APP VIEWER
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH SMART TIMER
         function processDailyCheckIn() {
             verificationSecondsLeft = globalAdTimerSeconds;
 
@@ -440,36 +472,44 @@
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${verificationSecondsLeft}s`;
             
-            // Load Ad URL into iframe
-            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
+            // 🔥 Wait for Ad to Load fully before countdown
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+            
+            let iframeNode = document.getElementById("adIframe");
 
-            if (systemValidationTimer) clearInterval(systemValidationTimer);
-
-            systemValidationTimer = setInterval(() => {
-                verificationSecondsLeft--;
+            iframeNode.onload = function() {
+                if (systemValidationTimer) clearInterval(systemValidationTimer);
                 
-                document.getElementById("verificationTimerClock").innerText = `${verificationSecondsLeft}s`;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${verificationSecondsLeft}s`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${verificationSecondsLeft}s`;
+                
+                systemValidationTimer = setInterval(() => {
+                    verificationSecondsLeft--;
+                    
+                    document.getElementById("verificationTimerClock").innerText = `${verificationSecondsLeft}s`;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${verificationSecondsLeft}s`;
 
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if (document.hidden) { 
-                    clearInterval(systemValidationTimer);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    executeResetVerificationUI();
-                    showCustomAlert("err_invalid");
-                    return;
-                }
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if (document.hidden) { 
+                        clearInterval(systemValidationTimer);
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        executeResetVerificationUI();
+                        showCustomAlert("err_invalid");
+                        return;
+                    }
 
-                if (verificationSecondsLeft <= 0) {
-                    clearInterval(systemValidationTimer);
-                    document.getElementById("verificationTimerClock").innerText = "0s";
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+                    if (verificationSecondsLeft <= 0) {
+                        clearInterval(systemValidationTimer);
+                        document.getElementById("verificationTimerClock").innerText = "0s";
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
+                    }
+                }, 1000);
+            };
+
+            // Load Ad URL into iframe
+            iframeNode.src = activeAdminSmartlinkUrl;
         }
 
         function closeInAppAdAndClaim() {
@@ -483,7 +523,7 @@
             document.getElementById("systemVerificationPanel").style.display = "none";
         }
 
-        // 💰 REWARD SYNC API DIRECT TO FIREBASE
+        // 💰 REWARD SYNC API DIRECT TO FIREBASE + UNIVERSAL HISTORY
         function executeFinalizeCheckInDatabaseUpdate() {
             executeResetVerificationUI();
             
@@ -531,6 +571,18 @@
                 // Apply all updates simultaneously
                 return db.ref(`users/${uid}`).update(updates);
             }).then(() => {
+                
+                // 🔥 UNIVERSAL HISTORY PUSH (For Account Health & Referral)
+                db.ref(`users/${uid}/history`).push({
+                    title: `Daily Check-in (Day ${newStreak > 7 ? '7+' : newStreak})`,
+                    amount: rewardCoins,
+                    type: "credit",
+                    txn_type: "daily_checkin",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
                 let lang = localStorage.getItem("selectedLang") || "en";
                 let appendStr = ` ${rewardCoins} 🪙\n\n${langData[lang]["alert_tomorrow"]}`;
                 showCustomAlert("alert_success", appendStr, true);

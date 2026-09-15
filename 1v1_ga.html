@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdGem Games - Dudo</title>
+    <title>Rock Paper Scissors - Dudo</title>
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -112,9 +112,9 @@
     <!-- 🌐 OFFLINE SCREEN -->
     <div id="globalOfflineWarningOverlay">
         <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
-        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;">No Internet Connection</h2>
-        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;">Please enable Mobile Data or Wi-Fi to continue.</p>
-        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;">Retry Connection</button>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
@@ -223,7 +223,7 @@
             </div>
         </div>
 
-        <!-- Admin Dynamic Banner Slot 2 -->
+        <!-- Admin Dynamic Promo Banner Slot 2 -->
         <div class="ad-banner-slot" id="adminBannerSlot2" style="margin-top: 15px;"></div>
 
     </div>
@@ -242,15 +242,15 @@
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -264,9 +264,215 @@
 
         // Translations Dictionary
         const langData = {
-            "en": { "arena_title": "Arena", "rps_title": "Rock Paper Scissors", "rps_desc": "Play 1v1 tactical matches against live challengers. Win rewards instantly!", "tier_starter": "Starter Battle", "tier_pro": "Pro Arena", "tier_high": "High Roller", "participation": "Participation:", "reward": "Reward:", "btn_play": "Play", "rules_title": "Game Rules", "rules_desc": "Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.", "matching_text": "Matching with Challenger...", "matching_warn": "Please keep the app open during matchmaking.", "btn_return": "Return to Arena" },
-            "hi": { "arena_title": "एरिना", "rps_title": "रॉक पेपर सीज़र्स", "rps_desc": "लाइव चैलेंजर्स के खिलाफ 1v1 मैच खेलें। तुरंत इनाम जीतें!", "tier_starter": "स्टार्टर बैटल", "tier_pro": "प्रो एरिना", "tier_high": "हाई रोलर", "participation": "प्रवेश:", "reward": "इनाम:", "btn_play": "खेलें", "rules_title": "खेल के नियम", "rules_desc": "समय खत्म होने से पहले रॉक ✊, पेपर ✋, या सीज़र्स ✌️ चुनें।", "matching_text": "चैलेंजर खोज रहे हैं...", "matching_warn": "कृपया मैचमेकिंग के दौरान ऐप को खुला रखें।", "btn_return": "वापस जाएँ" }
-        };
+    "en": {
+        "arena_title": "Arena",
+        "rps_title": "Rock Paper Scissors",
+        "rps_desc": "Play 1v1 tactical matches against live challengers. Win rewards instantly!",
+        "tier_starter": "Starter Battle",
+        "tier_pro": "Pro Arena",
+        "tier_high": "High Roller",
+        "participation": "Participation:",
+        "reward": "Reward:",
+        "btn_play": "Play",
+        "rules_title": "Game Rules",
+        "rules_desc": "Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.",
+        "matching_text": "Matching with Challenger...",
+        "matching_warn": "Please keep the app open during matchmaking.",
+        "btn_return": "Return to Arena"
+    },
+    "hi": {
+        "arena_title": "एरिना",
+        "rps_title": "रॉक पेपर सीज़र्स",
+        "rps_desc": "लाइव चैलेंजर्स के खिलाफ 1v1 मैच खेलें। तुरंत इनाम जीतें!",
+        "tier_starter": "स्टार्टर बैटल",
+        "tier_pro": "प्रो एरिना",
+        "tier_high": "हाई रोलर",
+        "participation": "प्रवेश:",
+        "reward": "इनाम:",
+        "btn_play": "खेलें",
+        "rules_title": "खेल के नियम",
+        "rules_desc": "समय खत्म होने से पहले रॉक ✊, पेपर ✋, या सीज़र्स ✌️ चुनें। रॉक सीज़र्स को तोड़ता है, सीज़र्स पेपर को काटता है, पेपर रॉक को ढकता है।",
+        "matching_text": "चैलेंजर खोज रहे हैं...",
+        "matching_warn": "कृपया मैचमेकिंग के दौरान ऐप को खुला रखें।",
+        "btn_return": "वापस जाएँ"
+    },
+    "bn": {
+        "arena_title": "অ্যারিনা",
+        "rps_title": "রক পেপার সিজারস",
+        "rps_desc": "লাইভ চ্যালেঞ্জারদের বিপক্ষে 1v1 ম্যাচ খেলুন। সাথে সাথে পুরস্কার জিতুন!",
+        "tier_starter": "স্টার্টার ব্যাটল",
+        "tier_pro": "প্রো অ্যারিনা",
+        "tier_high": "হাই রোলার",
+        "participation": "অংশগ্রহণ:",
+        "reward": "পুরস্কার:",
+        "btn_play": "খেলুন",
+        "rules_title": "খেলার নিয়ম",
+        "rules_desc": "সময় শেষ হওয়ার আগে রক ✊, পেপার ✋, বা সিজারস ✌️ বেছে নিন। রক সিজারসকে ভাঙে, সিজারস পেপার কাটে, পেপার রককে ঢেকে দেয়।",
+        "matching_text": "চ্যালেঞ্জার খোঁজা হচ্ছে...",
+        "matching_warn": "ম্যাচমেকিং এর সময় দয়া করে অ্যাপটি খোলা রাখুন।",
+        "btn_return": "ফিরে যান"
+    },
+    "te": {
+        "arena_title": "అరేనా",
+        "rps_title": "రాక్ పేపర్ సిజర్స్",
+        "rps_desc": "లైవ్ ఛాలెంజర్స్‌తో 1v1 మ్యాచ్‌లు ఆడండి. తక్షణమే బహుమతులు గెలుచుకోండి!",
+        "tier_starter": "స్టార్టర్ బ్యాటిల్",
+        "tier_pro": "ప్రో అరేనా",
+        "tier_high": "హై రోలర్",
+        "participation": "ప్రవేశం:",
+        "reward": "బహుమతి:",
+        "btn_play": "ఆడండి",
+        "rules_title": "ఆట నియమాలు",
+        "rules_desc": "సమయం ముగిసేలోపు రాక్ ✊, పేపర్ ✋, లేదా సిజర్స్ ✌️ ఎంచుకోండి. రాక్ సిజర్స్‌ను పగలగొడుతుంది, సిజర్స్ పేపర్‌ను కత్తిరిస్తుంది, పేపర్ రాక్‌ను కప్పేస్తుంది.",
+        "matching_text": "ఛాలెంజర్‌ను వెతుకుతోంది...",
+        "matching_warn": "మ్యాచ్‌మేకింగ్ సమయంలో దయచేసి యాప్‌ను తెరిచి ఉంచండి.",
+        "btn_return": "వెనక్కి వెళ్ళండి"
+    },
+    "mr": {
+        "arena_title": "अरीना",
+        "rps_title": "रॉक पेपर सिझर्स",
+        "rps_desc": "लाईव्ह चॅलेंजर्सविरुद्ध 1v1 मॅच खेळा. लगेच बक्षिसे जिंका!",
+        "tier_starter": "स्टार्टर बॅटल",
+        "tier_pro": "प्रो अरीना",
+        "tier_high": "हाय रोलर",
+        "participation": "प्रवेश:",
+        "reward": "बक्षीस:",
+        "btn_play": "खेळा",
+        "rules_title": "खेळाचे नियम",
+        "rules_desc": "वेळ संपण्यापूर्वी रॉक ✊, पेपर ✋, किंवा सिझर्स ✌️ निवडा. रॉक सिझर्सला तोडतो, सिझर्स पेपर कापतो, पेपर रॉकला झाकतो.",
+        "matching_text": "चॅलेंजर शोधत आहे...",
+        "matching_warn": "कृपया मॅचमेकिंग दरम्यान ॲप उघडे ठेवा.",
+        "btn_return": "परत जा"
+    },
+    "ur": {
+        "arena_title": "ارینا",
+        "rps_title": "راک پیپر سیزرز",
+        "rps_desc": "لائیو چیلنجرز کے خلاف 1v1 میچ کھیلیں۔ فوری انعام جیتیں!",
+        "tier_starter": "اسٹارٹر بیٹل",
+        "tier_pro": "پرو ارینا",
+        "tier_high": "ہائی رولر",
+        "participation": "شمولیت:",
+        "reward": "انعام:",
+        "btn_play": "کھیلیں",
+        "rules_title": "کھیل کے اصول",
+        "rules_desc": "وقت ختم ہونے سے پہلے راک ✊، پیپر ✋، یا سیزرز ✌️ کا انتخاب کریں۔",
+        "matching_text": "چیلنجر تلاش کر رہا ہے...",
+        "matching_warn": "براہ کرم میچ میکنگ کے دوران ایپ کو کھلا رکھیں۔",
+        "btn_return": "واپس جائیں"
+    },
+    "ta": {
+        "arena_title": "அரங்கம்",
+        "rps_title": "ராக் பேப்பர் சிசர்ஸ்",
+        "rps_desc": "நேரடி சவாலாளர்களுக்கு எதிராக 1v1 விளையாடுங்கள். உடனடியாக வெகுமதிகளை வெல்லுங்கள்!",
+        "tier_starter": "ஸ்டார்டர் போர்",
+        "tier_pro": "ப்ரோ அரங்கம்",
+        "tier_high": "ஹை ரோலர்",
+        "participation": "பங்கேற்பு:",
+        "reward": "வெகுமதி:",
+        "btn_play": "விளையாடு",
+        "rules_title": "விளையாட்டு விதிகள்",
+        "rules_desc": "நேரம் முடிவதற்குள் ராக் ✊, பேப்பர் ✋, அல்லது சிசர்ஸ் ✌️ தேர்ந்தெடுக்கவும்.",
+        "matching_text": "சவாலாளரைத் தேடுகிறது...",
+        "matching_warn": "போட்டி தேடும் போது ஆப்பை திறந்து வைக்கவும்.",
+        "btn_return": "திரும்பிச் செல்"
+    },
+    "gu": {
+        "arena_title": "અરેના",
+        "rps_title": "રોક પેપર સિઝર્સ",
+        "rps_desc": "લાઇવ ચેલેન્જર્સ સામે 1v1 મેચ રમો. તરત જ ઇનામો જીતો!",
+        "tier_starter": "સ્ટાર્ટર બેટલ",
+        "tier_pro": "પ્રો અરેના",
+        "tier_high": "હાઈ રોલર",
+        "participation": "પ્રવેશ:",
+        "reward": "ઇનામ:",
+        "btn_play": "રમો",
+        "rules_title": "રમત ના નિયમો",
+        "rules_desc": "સમય પૂરો થાય તે પહેલાં રોક ✊, પેપર ✋, અથવા સિઝર્સ ✌️ પસંદ કરો.",
+        "matching_text": "ચેલેન્જર શોધી રહ્યા છે...",
+        "matching_warn": "કૃપા કરીને મેચમેકિંગ દરમિયાન એપ ખુલ્લી રાખો.",
+        "btn_return": "પાછા જાઓ"
+    },
+    "es": {
+        "arena_title": "Arena",
+        "rps_title": "Piedra Papel Tijera",
+        "rps_desc": "Juega partidas 1v1 contra retadores en vivo. ¡Gana recompensas al instante!",
+        "tier_starter": "Batalla Inicial",
+        "tier_pro": "Arena Pro",
+        "tier_high": "Alto Riesgo",
+        "participation": "Participación:",
+        "reward": "Recompensa:",
+        "btn_play": "Jugar",
+        "rules_title": "Reglas del Juego",
+        "rules_desc": "Elige Piedra ✊, Papel ✋ o Tijera ✌️ antes de que termine el tiempo. Piedra aplasta Tijera, Tijera corta Papel, Papel envuelve Piedra.",
+        "matching_text": "Buscando retador...",
+        "matching_warn": "Por favor, mantén la aplicación abierta.",
+        "btn_return": "Volver a la Arena"
+    },
+    "fr": {
+        "arena_title": "Arène",
+        "rps_title": "Pierre Papier Ciseaux",
+        "rps_desc": "Jouez des matchs 1v1 contre des joueurs en direct. Gagnez des récompenses instantanément !",
+        "tier_starter": "Bataille de Départ",
+        "tier_pro": "Arène Pro",
+        "tier_high": "Gros Pari",
+        "participation": "Participation :",
+        "reward": "Récompense :",
+        "btn_play": "Jouer",
+        "rules_title": "Règles du jeu",
+        "rules_desc": "Choisissez Pierre ✊, Papier ✋ ou Ciseaux ✌️ avant la fin du temps.",
+        "matching_text": "Recherche d'un adversaire...",
+        "matching_warn": "Veuillez garder l'application ouverte.",
+        "btn_return": "Retour à l'Arène"
+    },
+    "ar": {
+        "arena_title": "الساحة",
+        "rps_title": "حجر ورقة مقص",
+        "rps_desc": "العب مباريات 1 ضد 1 ضد لاعبين حقيقيين. اربح المكافآت فوراً!",
+        "tier_starter": "معركة البداية",
+        "tier_pro": "الساحة الاحترافية",
+        "tier_high": "رهان عالي",
+        "participation": "الدخول:",
+        "reward": "المكافأة:",
+        "btn_play": "العب",
+        "rules_title": "قواعد اللعبة",
+        "rules_desc": "اختر حجر ✊، ورقة ✋، أو مقص ✌️ قبل انتهاء الوقت.",
+        "matching_text": "جاري البحث عن منافس...",
+        "matching_warn": "يرجى إبقاء التطبيق مفتوحًا أثناء البحث.",
+        "btn_return": "العودة للساحة"
+    },
+    "pt": {
+        "arena_title": "Arena",
+        "rps_title": "Pedra Papel Tesoura",
+        "rps_desc": "Jogue partidas 1v1 contra desafiantes ao vivo. Ganhe recompensas na hora!",
+        "tier_starter": "Batalha Inicial",
+        "tier_pro": "Arena Pro",
+        "tier_high": "Aposta Alta",
+        "participation": "Participação:",
+        "reward": "Recompensa:",
+        "btn_play": "Jogar",
+        "rules_title": "Regras do Jogo",
+        "rules_desc": "Escolha Pedra ✊, Papel ✋ ou Tesoura ✌️ antes que o tempo acabe.",
+        "matching_text": "Procurando desafiante...",
+        "matching_warn": "Mantenha o aplicativo aberto durante a busca.",
+        "btn_return": "Voltar para a Arena"
+    },
+    "ru": {
+        "arena_title": "Арена",
+        "rps_title": "Камень Ножницы Бумага",
+        "rps_desc": "Играйте матчи 1 на 1 против реальных игроков. Выигрывайте награды мгновенно!",
+        "tier_starter": "Начальная битва",
+        "tier_pro": "Про Арена",
+        "tier_high": "Крупная ставка",
+        "participation": "Взнос:",
+        "reward": "Награда:",
+        "btn_play": "Играть",
+        "rules_title": "Правила игры",
+        "rules_desc": "Выберите Камень ✊, Бумагу ✋ или Ножницы ✌️ до окончания времени.",
+        "matching_text": "Поиск соперника...",
+        "matching_warn": "Пожалуйста, не закрывайте приложение.",
+        "btn_return": "Вернуться на Арену"
+    }
+};
 
         function changeLanguage(langCode) {
             localStorage.setItem("selectedLang", langCode);
@@ -309,7 +515,6 @@
         document.addEventListener("DOMContentLoaded", () => {
             if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
             
-            // Sync Language
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
@@ -327,7 +532,6 @@
                             let userName = data.name || "Player";
                             document.getElementById("myName").innerText = userName.split(" ")[0];
 
-                            // Smart Avatar Sync
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
                             document.getElementById("headerProfileIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
@@ -335,33 +539,34 @@
                         }
                     });
 
-                    // 📡 2. FETCH ADMIN BANNERS, REWARD LINK & TIMER (Direct from rps_game Node)
+                    // 📡 2. FETCH ADMIN BANNERS, REWARD LINK & TIMER 
                     db.ref('global_system_runtime_configurations/rps_game').on('value', (snap) => {
                         if (snap.exists()) {
                             const adminData = snap.val();
                             
-                            // Load Post Match Ad Link
                             if (adminData.battle_link && adminData.battle_link.trim() !== "") {
                                 adPartnerLink = adminData.battle_link;
                             }
                             
-                            // 🔥 Fetch Ad Timer from Admin Panel
                             if (adminData.ad_timer) {
                                 globalAdTimerSeconds = parseInt(adminData.ad_timer);
                             }
                             
-                            // Load Banner Slot 1
-                            if (adminData.slot1_code && adminData.active !== false) {
+                            // 🔥 FIXED Banner Ad Clash & Visibility 🔥
+                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
+                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
+                            if (s1Code && s1Active !== false) {
                                 document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code);
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
                             } else {
                                 document.getElementById("adminBannerSlot1").style.display = "none";
                             }
                             
-                            // Load Banner Slot 2
-                            if (adminData.slot2_code && adminData.active !== false) {
+                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
+                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
+                            if (s2Code && s2Active !== false) {
                                 document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code);
+                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
                             } else {
                                 document.getElementById("adminBannerSlot2").style.display = "none";
                             }
@@ -449,7 +654,7 @@
             });
         }
 
-        // 🛡️ ANTI-CHEAT: AUTO CANCEL ON MINIMIZE (Safe with In-App Ad because Ad is an Overlay, not background)
+        // 🛡️ ANTI-CHEAT: AUTO CANCEL ON MINIMIZE
         document.addEventListener("visibilitychange", () => {
             if (document.hidden && isMatchmakingActive) {
                 clearInterval(countdownInterval);
@@ -515,8 +720,27 @@
                 resTitle.style.color = "var(--success)";
                 resMsg.innerText = `Awesome! You won ${activeWinPrize} Points.`;
                 
-                // Add Winning via Firebase Transaction
-                db.ref(`users/${uid}/coins`).transaction(current => (current || 0) + activeWinPrize);
+                // Add Winning via Firebase Transaction & Push History
+                db.ref(`users/${uid}/coins`).transaction(current => (current || 0) + activeWinPrize).then(() => {
+                    db.ref(`users/${uid}/history`).push({
+                        title: "RPS Game Win",
+                        amount: activeWinPrize,
+                        type: "credit",
+                        txn_type: "credit",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    
+                    // Update Daily Tasks
+                    db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                        let tasks = snap.val() || [];
+                        if (!tasks.includes("rps_game")) { 
+                            tasks.push("rps_game"); 
+                            db.ref(`users/${uid}/completed_daily_tasks`).set(tasks); 
+                        }
+                    });
+                });
 
             } else if (result === "LOSS") {
                 resBox.style.borderColor = "var(--danger)";
@@ -541,7 +765,7 @@
             modal.style.display = "flex";
         }
 
-        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC 🔥
+        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC WITH SMART TIMER 🔥
         let adTimerInterval = null;
 
         function openInAppAdViewer(adUrl, rewardCoinsAmount, timerSeconds, taskName = "ad_task") {
@@ -550,20 +774,32 @@
             document.getElementById("inAppAdViewer").style.display = "flex";
             document.getElementById("adTimerDisplay").style.display = "flex";
             document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
             
-            document.getElementById("adIframe").src = adUrl;
+            // 🔥 जब तक ऐड लोड होगा, टाइमर नहीं घटेगा
+            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+            
+            let iframeNode = document.getElementById("adIframe");
+            
+            // 🔥 iframe.onload का मतलब है "जब ऐड 100% स्क्रीन पर आ जाए, तभी टाइमर शुरू करो"
+            iframeNode.onload = function() {
+                if(adTimerInterval) clearInterval(adTimerInterval);
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+                
+                adTimerInterval = setInterval(() => {
+                    countdownTime--;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
 
-            adTimerInterval = setInterval(() => {
-                countdownTime--;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+                    if(countdownTime <= 0) {
+                        clearInterval(adTimerInterval);
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; 
+                    }
+                }, 1000);
+            };
 
-                if(countdownTime <= 0) {
-                    clearInterval(adTimerInterval);
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block";
-                }
-            }, 1000);
+            // अब ऐड को लोड करना शुरू करो
+            iframeNode.src = adUrl;
         }
 
         // 🔥 MODIFIED RETURN LOGIC: SHOWS IN-APP AD INSTEAD OF CHROME 🔥

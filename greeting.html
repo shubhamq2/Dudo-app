@@ -18,7 +18,7 @@
     <style>
         :root {
             --theme-accent: #facc15; 
-            --bg-overlay: rgba(15, 23, 42, 0.6); /* Lighter background overlay */
+            --bg-overlay: rgba(15, 23, 42, 0.65); /* Lighter background overlay for better visibility */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,17 +63,37 @@
         }
         @keyframes fallAnimation { to { transform: translateY(110vh) rotate(360deg); } }
 
-        /* 🎁 MAGIC UNBOXING OVERLAY */
+        /* 🎁 UPGRADED MAGIC UNBOXING OVERLAY */
         #unboxingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(11, 15, 25, 0.95); z-index: 99999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            backdrop-filter: blur(12px); cursor: pointer;
+            background: radial-gradient(circle at center, rgba(30, 27, 75, 0.95) 0%, rgba(11, 15, 25, 1) 100%);
+            z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(15px); cursor: pointer; transition: 0.5s;
         }
-        .gift-box-anim { font-size: 110px; animation: giftBounce 1s infinite alternate ease-in-out; filter: drop-shadow(0 0 40px var(--theme-accent)); }
-        @keyframes giftBounce { 0% { transform: scale(1) rotate(-5deg); } 100% { transform: scale(1.15) rotate(5deg); } }
-        .tap-open-txt { margin-top: 30px; font-size: 22px; font-weight: 900; color: var(--theme-accent); text-transform: uppercase; letter-spacing: 2px; animation: pulseText 1s infinite alternate; text-shadow: 0 0 15px rgba(250, 204, 21, 0.6); }
-        @keyframes pulseText { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+        .magic-glow-circle {
+            position: absolute; width: 250px; height: 250px; background: var(--theme-accent);
+            border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: pulseGlow 2s infinite alternate;
+        }
+        @keyframes pulseGlow { 0% { transform: scale(0.8); opacity: 0.2; } 100% { transform: scale(1.2); opacity: 0.5; } }
+        
+        .gift-box-anim {
+            font-size: 120px; z-index: 2; position: relative;
+            animation: giftBounce 1.5s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6));
+        }
+        @keyframes giftBounce {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(1.15) translateY(-20px); }
+        }
+        
+        .tap-open-txt {
+            margin-top: 40px; font-size: 24px; font-weight: 900; z-index: 2;
+            background: linear-gradient(90deg, #fff, var(--theme-accent), #fff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-transform: uppercase; letter-spacing: 2px; animation: pulseText 1.5s infinite alternate;
+            text-shadow: 0 4px 15px rgba(250, 204, 21, 0.4);
+        }
+        @keyframes pulseText { 0% { opacity: 0.6; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1.05); } }
 
         /* BANNER AD SLOTS */
         .ad-banner-slot {
@@ -85,20 +105,18 @@
 
         /* 👑 MAIN CARD WRAPPER */
         .card-emoji-wrapper {
-            position: relative; z-index: 10;
-            padding: 15px; border-radius: 30px; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px; width: 100%; max-width: 440px;
+            position: relative; z-index: 10; padding: 15px; border-radius: 30px; 
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5); margin-bottom: 20px; width: 100%; max-width: 440px;
             display: none; animation: cardAppear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .main-card {
-            background-color: rgba(0, 0, 0, 0.55); /* 🔥 Lightened Card Background */
-            border-radius: 20px;
-            padding: 30px 20px; width: 100%; box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
+            background-color: rgba(0, 0, 0, 0.65); border-radius: 20px;
+            padding: 35px 20px; width: 100%; box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1);
         }
         @keyframes cardAppear { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        .festival-icon { font-size: 70px; margin-bottom: 10px; filter: drop-shadow(0 0 25px var(--theme-accent)); animation: floatIcon 2s infinite alternate; }
+        .festival-icon { font-size: 75px; margin-bottom: 10px; filter: drop-shadow(0 0 25px var(--theme-accent)); animation: floatIcon 2s infinite alternate; }
         @keyframes floatIcon { 0% { transform: translateY(0); } 100% { transform: translateY(-12px); } }
 
         .sender-tag { font-size: 14px; color: #e2e8f0; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
@@ -115,12 +133,12 @@
 
         /* 🔥 DYNAMIC WISHING MESSAGE (Font Style Applied Here) */
         .wishing-msg { font-size: 22px; line-height: 1.6; color: #f8fafc; font-weight: 700; margin-bottom: 25px; text-shadow: 0 3px 6px rgba(0,0,0,0.9); padding: 0 10px; }
-        .festival-highlight { color: #fff; font-size: 34px; font-weight: 900; display: inline-block; text-shadow: 0 0 20px var(--theme-accent), 0 3px 5px #000; background: var(--theme-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .festival-highlight { color: #fff; font-size: 36px; font-weight: 900; display: inline-block; text-shadow: 0 0 20px var(--theme-accent), 0 3px 5px #000; background: var(--theme-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .firework-btn { background: linear-gradient(135deg, var(--theme-accent), #ea580c); color: #000; border: none; padding: 16px 35px; border-radius: 50px; font-weight: 900; font-size: 16px; cursor: pointer; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); margin-bottom: 10px; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px; }
         .firework-btn:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(245, 158, 11, 0.5); }
 
-        /* 🚀 DUDO PROMO BOX (Lightened Background) */
+        /* 🚀 DUDO PROMO BOX */
         .DUDO-promo-box { background: linear-gradient(135deg, rgba(15,23,42,0.85), rgba(67,20,7,0.85)); border: 2px solid var(--theme-accent); border-radius: 20px; padding: 22px; margin: 25px 0 15px 0; text-align: left; box-shadow: 0 0 25px rgba(250, 204, 21, 0.3); display: block; position: relative; overflow: hidden; }
         .promo-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; position: relative; z-index: 2; }
         .promo-logo { width: 50px; height: 50px; background: linear-gradient(135deg, var(--theme-accent), #ea580c); border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 26px; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5); }
@@ -157,9 +175,10 @@
     <div class="bg-dark-tint" id="bgTint"></div>
     <div id="fallingEmojisContainer"></div>
 
-    <!-- 🎁 MAGIC UNBOXING SCREEN -->
+    <!-- 🎁 PREMIUM MAGIC UNBOXING SCREEN -->
     <div id="unboxingOverlay" onclick="openSurpriseEnvelope()">
-        <div class="gift-box-anim" id="envIcon">🧧</div>
+        <div class="magic-glow-circle"></div>
+        <div class="gift-box-anim" id="envIcon">🎁</div>
         <div class="tap-open-txt">✨ Tap To Open Surprise ✨</div>
     </div>
 
@@ -239,16 +258,16 @@
     <!-- 🔥 PURE FIREBASE READ-ONLY LOGIC -->
     <script>
         // 1. Firebase Config
-       const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -412,7 +431,7 @@
                     }
                     if(c.fest_icon) {
                         document.getElementById("festIcon").innerText = c.fest_icon;
-                        document.getElementById("envIcon").innerText = c.fest_icon;
+                        // Keep the Gift box 🎁 as default for unboxing, unless admin overrides specifically
                     }
 
                     // Setup App Promo Box
@@ -420,9 +439,20 @@
                     if(c.promo_desc) document.getElementById("dynPromoDesc").innerText = c.promo_desc;
                     if(c.app_link) document.getElementById("dynDownloadBtn").href = c.app_link;
 
-                    // Setup Banners
-                    if(c.slot1_code) { document.getElementById("adminBannerSlot1").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot1"), c.slot1_code); } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                    if(c.slot2_code) { document.getElementById("adminBannerSlot2").style.display = "flex"; setAdHTML(document.getElementById("adminBannerSlot2"), c.slot2_code); } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                    // Setup Banners (🔥 Fixed with setTimeout)
+                    if(c.slot1_code) { 
+                        document.getElementById("adminBannerSlot1").style.display = "flex"; 
+                        setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), c.slot1_code), 400); 
+                    } else { 
+                        document.getElementById("adminBannerSlot1").style.display = "none"; 
+                    }
+                    
+                    if(c.slot2_code) { 
+                        document.getElementById("adminBannerSlot2").style.display = "flex"; 
+                        setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), c.slot2_code), 800); 
+                    } else { 
+                        document.getElementById("adminBannerSlot2").style.display = "none"; 
+                    }
 
                 } else {
                     fallbackSetup();
