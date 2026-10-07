@@ -92,8 +92,10 @@
         .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
         .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-green); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 153, 0.5); }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+        
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -183,7 +185,7 @@
 
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -200,9 +202,12 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & LIMITS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 20; // Default time
         let globalDailyLimit = 15;     // Default limits
+        
+        let globalSdkName = "";
+        let globalSdkId = "";
         
         let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         let userTodayClaimsCount = 0;
@@ -305,7 +310,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Time & Dynamic Servers)
+                    // 2. Fetch Admin Configurations (Banners, Time, SDK & Dynamic Servers)
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -317,6 +322,10 @@
                                     globalDailyLimit = parseInt(adminData.secure_cloud_configs.daily_limit); 
                                     document.getElementById("totalServerLimit").innerText = globalDailyLimit;
                                 }
+
+                                // 🔥 SDK CONFIGS 🔥
+                                if(adminData.secure_cloud_configs.sdk_name) { globalSdkName = adminData.secure_cloud_configs.sdk_name.trim(); }
+                                if(adminData.secure_cloud_configs.sdk_id) { globalSdkId = adminData.secure_cloud_configs.sdk_id.trim(); }
 
                                 // Load Banners
                                 let s1Code = (adminData.secure_cloud_configs.slot1 && adminData.secure_cloud_configs.slot1.code) ? adminData.secure_cloud_configs.slot1.code : adminData.secure_cloud_configs.slot1_code;
@@ -445,7 +454,7 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🚀 PLAY STORE SAFE VALIDATION LOGIC WITH IN-APP VIEWER
+        // 🚀 PLAY STORE SAFE VALIDATION LOGIC WITH HYBRID SDK
         function executeStartValidationSequence(linkArg, rewardAmt) {
             // 🔥 ANTI-BAN: Custom Limit Check
             if(userTodayClaimsCount >= globalDailyLimit) {
@@ -460,73 +469,92 @@
             currentTaskRewardCoinsInt = rewardAmt || 30;
 
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            
-            let countdownTime = globalAdTimerSeconds;
             window.hasMainTabHidden = false;
 
             document.getElementById("serversListWrapper").style.display = "none";
             document.getElementById("verificationMaskCard").style.display = "block";
-            document.getElementById("validationCountdownClock").style.display = "block";
-            document.getElementById("claimValidationRewardBtn").style.display = "none";
-
+            
             let verifyTxt = langData[currentLang]["sb_decrypt"] || "Verifying Connection...";
             document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${verifyTxt}`;
             document.getElementById("maskLabelTxt").style.color = "var(--accent-pink)";
             document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-pink)";
 
-            document.getElementById("validationCountdownClock").innerText = `${countdownTime}s`;
-
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Link...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if(activeValidationInterval) clearInterval(activeValidationInterval);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                activeValidationInterval = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("validationCountdownClock").innerText = `${countdownTime}s`;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if(document.hidden) {
-                        clearInterval(activeValidationInterval);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        resetValidationDashboardLayout();
-                        showCustomAlert("err_invalid");
-                        isValidationActive = false;
-                        return;
-                    }
-
-                    if(countdownTime <= 0) {
-                        clearInterval(activeValidationInterval);
-
-                        let successTxt = langData[currentLang]["msg_success"] || "🔒 CONNECTION SECURED!";
-                        document.getElementById("validationCountdownClock").style.display = "none";
-                        document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-lock"></i> ${successTxt}`;
-                        document.getElementById("maskLabelTxt").style.color = "var(--accent-green)";
-                        document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-green)";
-                        
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = currentTaskLinkString;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, currentTaskRewardCoinsInt, "secure_cloud");
+                    document.getElementById("validationCountdownClock").innerText = "Connecting...";
+                    document.getElementById("validationCountdownClock").style.display = "block";
+                } else {
+                    openHTMLIframeViewer();
+                }
+            } else {
+                openHTMLIframeViewer();
+            }
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t10) via PURE FIREBASE + HISTORY
+        function openHTMLIframeViewer() {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                let countdownTime = globalAdTimerSeconds;
+                document.getElementById("validationCountdownClock").style.display = "block";
+                document.getElementById("claimValidationRewardBtn").style.display = "none";
+                document.getElementById("validationCountdownClock").innerText = `${countdownTime}s`;
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Link...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if(activeValidationInterval) clearInterval(activeValidationInterval);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    activeValidationInterval = setInterval(() => {
+                        countdownTime--;
+                        document.getElementById("validationCountdownClock").innerText = `${countdownTime}s`;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if(document.hidden) {
+                            clearInterval(activeValidationInterval);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            resetValidationDashboardLayout();
+                            showCustomAlert("err_invalid");
+                            isValidationActive = false;
+                            return;
+                        }
+
+                        if(countdownTime <= 0) {
+                            clearInterval(activeValidationInterval);
+
+                            let currentLang = localStorage.getItem("selectedLang") || "en";
+                            let successTxt = langData[currentLang]["msg_success"] || "🔒 CONNECTION SECURED!";
+                            document.getElementById("validationCountdownClock").style.display = "none";
+                            document.getElementById("maskLabelTxt").innerHTML = `<i class="fa-solid fa-lock"></i> ${successTxt}`;
+                            document.getElementById("maskLabelTxt").style.color = "var(--accent-green)";
+                            document.getElementById("verificationMaskCard").style.borderColor = "var(--accent-green)";
+                            
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = currentTaskLinkString;
+            }, 600); // 600ms gap
+        }
+
+        // HTML Close Button Handler
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
@@ -534,13 +562,25 @@
             let claimBtn = document.getElementById("claimValidationRewardBtn");
             claimBtn.innerHTML = `<i class="fa-solid fa-gift"></i> Claim ${currentTaskRewardCoinsInt} Tokens`;
             claimBtn.style.display = "block";
-            executeCreditValidationTokens();
+            
+            // Execute HTML claim logic
+            executeCreditValidationTokens(false);
         }
 
-        function executeCreditValidationTokens() {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // Re-sync correct reward from parameter just in case
+            currentTaskRewardCoinsInt = parseInt(rewardCoins);
+            executeCreditValidationTokens(true);
+        }
+
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t10) via PURE FIREBASE + HISTORY
+        function executeCreditValidationTokens(isSdk) {
             const btn = document.getElementById("claimValidationRewardBtn");
             btn.disabled = true;
             btn.innerText = "SAVING...";
+
+            let sdkTag = isSdk ? " [SDK]" : "";
 
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
@@ -555,7 +595,7 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Premium Server Token`,
+                    title: `Premium Server Token${sdkTag}`,
                     amount: currentTaskRewardCoinsInt,
                     type: "credit",
                     txn_type: "premium_ad",

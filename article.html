@@ -109,10 +109,10 @@
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
             <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-book-open-reader" style="color:var(--accent-cyan);"></i> Premium Blog</div>
-            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 60s</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
-        <!-- Sandbox mode is ON for extreme safety -->
+        <!-- Sandbox mode for extreme safety -->
         <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
@@ -215,7 +215,7 @@
         <span data-i18n="art_security">Scroll and read the article completely. Quick closing will result in zero points. Genuine reading helps you earn more!</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -261,7 +261,7 @@
                 "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. ब्लॉग पोस्ट खोलने के लिए नीचे क्लिक करें।<br>2. धीरे-धीरे नीचे स्क्रॉल करें और लेख को पढ़ें।<br>3. टाइमर खत्म होने तक पेज पर रुकें।<br><br>⚠️ <i>ध्यान दें: पेज को समय से पहले बंद न करें।</i>"
             },
             "bn": { "art_title": "আর্টিকেল পড়ুন", "art_label1": "প্রিমিয়াম ব্লগ", "art_label2": "আরও ক্যাটাগরি", "art_tech": "টেক নিউজ", "art_tech_desc": "গ্যাজেটের খবর", "art_crypto": "ক্রিপ্টো আপডেট", "art_crypto_desc": "মার্কেট ট্রেন্ডস", "art_health": "হেলথ টিপস", "art_health_desc": "ফিটনেস ও লাইফস্টাইল", "art_gaming": "গেমিং ওয়ার্ল্ড", "art_gaming_desc": "ইস্পোর্টস নিউজ", "art_finance": "ফাইন্যান্স গাইড", "art_finance_desc": "মানি ম্যানেজমেন্ট", "art_sports": "স্পোর্টস নিউজ", "art_sports_desc": "খেলার খবর", "art_top": "টপ", "art_pop": "হট", "art_new": "নতুন", "art_security": "আর্টিকেলটি পড়ুন। আগে বন্ধ করলে পয়েন্ট পাবেন না।", "err_early": "❌ টাস্ক অসম্পূর্ণ! আপনাকে পুরো সময় পড়তে হবে।", "err_invalid": "❌ সিস্টেম অ্যালার্ট: ব্লগ পেজেই থাকুন।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "err_success": "🎉 টাস্ক ভেরিফাইড! পয়েন্ট যোগ করা হয়েছে: ", "verifying": "পড়ছেন... ", "start_task": "পড়ুন এবং আয় করুন", "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. ব্লগ খুলতে নিচে ক্লিক করুন।<br>২. ধীরে ধীরে স্ক্রোল করে পড়ুন।<br>৩. টাইম শেষ হওয়া পর্যন্ত পেজে থাকুন।" },
-            "te": { "art_title": "వ్యాసాలు చదవండి", "art_label1": "ప్రీమియం బ్లాగులు", "art_label2": "మరిన్ని విభాగాలు", "art_tech": "టెక్ న్యూస్", "art_tech_desc": "గ్యాడ్జెట్ సమాచారం", "art_crypto": "క్రిప్టో అప్‌డేట్‌లు", "art_crypto_desc": "మార్కెట్ ట్రెండ్స్", "art_health": "ఆరోగ్య చిట్కాలు", "art_health_desc": "ఫిట్‌నెస్", "art_gaming": "గేమింగ్ వరల్డ్", "art_gaming_desc": "ఈస్పోర్ట్స్ వార్తలు", "art_finance": "ఫైనాన్స్ గైడ్", "art_finance_desc": "డబ్బు నిర్వహణ", "art_sports": "క్రీడా వార్తలు", "art_sports_desc": "క్రికెట్ స్కోర్లు", "art_security": "వ్యాసాన్ని పూర్తిగా చదవండి.", "err_early": "❌ చదవడం పూర్తికాలేదు!", "err_invalid": "❌ దయచేసి బ్లాగ్ పేజీలోనే ఉండండి.", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "err_success": "🎉 టాస్క్ ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "verifying": "చదువుతున్నారు... ", "start_task": "చదవండి & సంపాదించండి", "inst_generic": "👉 <b>నియమాలు:</b><br>1. బ్లాగ్ తెరవడానికి క్లిక్ చేయండి.<br>2. చదవండి." },
+            "te": { "art_title": "వ్యాసాలు చదవండి", "art_label1": "ప్రీమియం బ్లాగులు", "art_label2": "మరిన్ని విభాగాలు", "art_tech": "టెక్ న్యూస్", "art_tech_desc": "గ్యాడ్జెట్ సమాచారం", "art_crypto": "క్రిప్టో అప్‌డేట్‌లు", "art_crypto_desc": "మార్కెట్ ట్రెండ్స్", "art_health": "ఆరోగ్య చిట్కాలు", "art_health_desc": "ఫిట్‌నెస్", "art_gaming": "గేమింగ్ వరల్డ్", "art_gaming_desc": "ఈస్పోర్ట్స్ వార్తలు", "art_finance": "ఫైనాన్స్ గাইড", "art_finance_desc": "డబ్బు నిర్వహణ", "art_sports": "క్రీడా వార్తలు", "art_sports_desc": "క్రికెట్ స్కోర్లు", "art_security": "వ్యాసాన్ని పూర్తిగా చదవండి.", "err_early": "❌ చదవడం పూర్తికాలేదు!", "err_invalid": "❌ దయచేసి బ్లాగ్ పేజీలోనే ఉండండి.", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది!", "err_success": "🎉 టాస్క్ ధృవీకరించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "verifying": "చదువుతున్నారు... ", "start_task": "చదవండి & సంపాదించండి", "inst_generic": "👉 <b>నియమాలు:</b><br>1. బ్లాగ్ తెరవడానికి క్లిక్ చేయండి.<br>2. చదవండి." },
             "mr": { "art_title": "लेख वाचा", "art_label1": "प्रीमियम ब्लॉग्स", "art_label2": "अधिक श्रेणी", "art_tech": "टेक न्यूज", "art_tech_desc": "गॅजेट्सची माहिती", "art_crypto": "क्रिप्टो अपडेट्स", "art_crypto_desc": "मार्केट ट्रेंड्स", "art_health": "आरोग्य टिप्स", "art_health_desc": "फिटनेस", "art_gaming": "गेमिंग वर्ल्ड", "art_gaming_desc": "ईस्पोर्ट्स बातम्या", "art_finance": "फायनान्स गाईड", "art_finance_desc": "मनी मॅनेजमेंट", "art_sports": "क्रीडा बातम्या", "art_sports_desc": "क्रिकेट स्कोअर", "art_security": "लेख वाचा. लवकर बंद केल्यास पॉइंट्स मिळणार नाहीत.", "err_early": "❌ अपूर्ण! तुम्हाला पूर्ण वेळ लेख वाचावा लागेल.", "err_invalid": "❌ कृपया ब्लॉग पेजवरच राहा.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "err_success": "🎉 टास्क यशस्वी! पॉइंट्स जोडले गेले: ", "verifying": "वाचत आहे... ", "start_task": "वाचा आणि कमवा", "inst_generic": "👉 <b>नियम:</b><br>1. ब्लॉग उघडण्यासाठी खाली क्लिक करा.<br>2. पूर्ण वेळ थांबा." },
             "ur": { "art_title": "مضامین پڑھیں", "art_label1": "پریمیم بلاگز", "art_label2": "مزید کیٹیگریز", "art_security": "مضمون مکمل پڑھیں۔ جلدی بند کرنے پر پوائنٹس نہیں ملیں گے۔", "err_early": "❌ نامکمل!", "err_invalid": "❌ بلاگ پیج پر رہیں۔", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی! کل دوبارہ آئیں۔", "err_success": "🎉 ٹاسک تصدیق شدہ! پوائنٹس شامل ہو گئے: ", "verifying": "پڑھ رہے ہیں... ", "start_task": "پڑھیں اور کمائیں", "inst_generic": "👉 <b>قواعد:</b><br>1. بلاگ کھولنے کے لیے نیچے کلک کریں۔" },
             "ta": { "art_title": "கட்டுரைகள் படிக்க", "art_label1": "பிரீமியம் வலைப்பதிவுகள்", "art_label2": "மேலும் வகைகள்", "art_security": "கட்டுரையை முழுமையாகப் படிக்கவும்.", "err_early": "❌ முற்றுபெறவில்லை!", "err_invalid": "❌ வலைப்பதிவுப் பக்கத்திலேயே இருக்கவும்.", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது!", "err_success": "🎉 பணி சரிபார்க்கப்பட்டது! புள்ளிகள் சேர்க்கப்பட்டன: ", "verifying": "படிக்கிறது... ", "start_task": "படித்து சம்பாதி", "inst_generic": "👉 <b>விதிகள்:</b><br>1. வலைப்பதிவைத் திறக்க கிளிக் செய்யவும்." },
@@ -301,14 +301,14 @@
 
         const uid = localStorage.getItem("userId");
 
-        // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMER & REWARD FOR ALL 6 ARTICLES 🔥
+        // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMER, REWARD & SDK CONFIG FOR ALL 6 ARTICLES 🔥
         let articleLinksAdminConfig = {
-            tech: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
-            crypto: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
-            health: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
-            gaming: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
-            finance: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 },
-            sports: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25 }
+            tech: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
+            crypto: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
+            health: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
+            gaming: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
+            finance: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
+            sports: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" }
         };
 
         let userDailyClicksData = {};
@@ -346,7 +346,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners & 6 Specific Links/Timers/Rewards)
+                    // 2. Fetch Admin Configurations (Banners & 6 Specific Links/Timers/Rewards/SDK)
                     db.ref('global_system_runtime_configurations/read_articles').on('value', (snap) => {
                         if(snap.exists()) {
                             const aData = snap.val();
@@ -356,6 +356,10 @@
                                 if(aData['link_' + cat]) articleLinksAdminConfig[cat].url = aData['link_' + cat];
                                 if(aData['timer_' + cat]) articleLinksAdminConfig[cat].timer = parseInt(aData['timer_' + cat]);
                                 if(aData['reward_' + cat]) articleLinksAdminConfig[cat].reward = parseInt(aData['reward_' + cat]);
+                                
+                                // Load SDK Configs
+                                if(aData['sdk_name_' + cat]) articleLinksAdminConfig[cat].sdk_name = aData['sdk_name_' + cat].trim();
+                                if(aData['sdk_id_' + cat]) articleLinksAdminConfig[cat].sdk_id = aData['sdk_id_' + cat].trim();
                             });
 
                             // 🔥 FIXED BANNER LOADING WITH SETTIMEOUT 🔥
@@ -449,84 +453,112 @@
             document.getElementById("articleInstructionModal").style.display = "none";
         }
 
-        // 🚀 SMART TIMER LOGIC WITH IN-APP VIEWER
+        // 🚀 SMART TIMER LOGIC WITH HYBRID SDK ROUTING 🔥
         function executeArticleTaskRedirection() {
             let taskKey = currentActiveTaskKey;
             pendingTaskKey = taskKey;
-            
             let config = articleLinksAdminConfig[taskKey];
-            pendingRewardCoins = config.reward;
-
+            
             const startBtn = document.getElementById("btnStartArticleTask");
             startBtn.disabled = true;
 
-            let targetDestinationUrl = config.url;
-            let countdownTime = config.timer;
-            
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Blog...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if(offerTimer) clearInterval(offerTimer);
-
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-                
-                offerTimer = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if (document.hidden) { 
-                        clearInterval(offerTimer);
-                        closeArticleInstructionModal();
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        showCustomAlert("err_invalid");
-                        pendingRewardCoins = 0;
-                        return;
-                    }
-
-                    if (countdownTime <= 0) {
-                        clearInterval(offerTimer);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = targetDestinationUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (config.sdk_id && config.sdk_id !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(config.sdk_name, config.sdk_id, config.reward, "article_" + taskKey);
+                    closeArticleInstructionModal();
+                } else {
+                    openInAppAdViewerHTML(config.url, config.reward, config.timer);
+                }
+            } else {
+                openInAppAdViewerHTML(config.url, config.reward, config.timer);
+            }
         }
 
-        // 💰 REWARD SYNC API & UNIVERSAL HISTORY PUSH
+        function openInAppAdViewerHTML(targetDestinationUrl, rewardCoinsAmount, timerSeconds) {
+            // Anti-clash buffer
+            setTimeout(() => {
+                pendingRewardCoins = rewardCoinsAmount;
+                let countdownTime = timerSeconds;
+                
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Blog...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if(offerTimer) clearInterval(offerTimer);
+
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    offerTimer = setInterval(() => {
+                        countdownTime--;
+                        let spanNode = document.getElementById("adSecondsSpan");
+                        if(spanNode) spanNode.innerText = countdownTime;
+
+                        if (document.hidden) { 
+                            clearInterval(offerTimer);
+                            closeArticleInstructionModal();
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            showCustomAlert("err_invalid");
+                            pendingRewardCoins = 0;
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(offerTimer);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                iframeNode.src = targetDestinationUrl;
+            }, 600); // 600ms anti-clash gap
+        }
+
+        // HTML Close Button Handler
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
-            document.getElementById("adIframe").src = ""; // Stop video/ad
+            document.getElementById("adIframe").src = ""; // Stop video
             closeArticleInstructionModal();
+            grantArticleReward(pendingRewardCoins, pendingTaskKey, false);
+            pendingRewardCoins = 0;
+        }
 
-            if (pendingRewardCoins > 0 && typeof uid !== 'undefined' && uid) {
-                let nameDisplay = pendingTaskKey.toUpperCase();
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // taskName format: article_tech
+            let parts = taskName.split('_');
+            if(parts.length >= 2) {
+                let cat = parts[1]; // e.g. 'tech'
+                grantArticleReward(parseInt(rewardCoins), cat, true);
+            }
+        }
+
+        // 🛡️ UNIVERSAL REWARD GIVER FUNCTION (Firebase Transaction + History)
+        function grantArticleReward(rewardToGive, categoryKey, isSdk) {
+            if (rewardToGive > 0 && typeof uid !== 'undefined' && uid) {
+                let nameDisplay = categoryKey.toUpperCase();
+                let sdkTag = isSdk ? " [SDK]" : "";
                 let todayDateString = new Date().toLocaleDateString("en-CA");
                 
                 // Add Coins securely via Transaction
                 db.ref(`users/${uid}/coins`).transaction((current) => {
-                    return (current || 0) + pendingRewardCoins;
+                    return (current || 0) + rewardToGive;
                 }).then(() => {
                     
-                    // 1. 🔥 ANTI-BAN LOGIC: Register Today's Date so user can't click this article again today
-                    db.ref(`users/${uid}/daily_article_clicks/${pendingTaskKey}`).set(todayDateString);
+                    // 1. 🔥 ANTI-BAN LOGIC
+                    db.ref(`users/${uid}/daily_article_clicks/${categoryKey}`).set(todayDateString);
 
                     // 2. 🔥 UNIVERSAL HISTORY PUSH
                     db.ref(`users/${uid}/history`).push({
-                        title: `Read Article (${nameDisplay})`,
-                        amount: pendingRewardCoins,
+                        title: `Read Article (${nameDisplay})${sdkTag}`,
+                        amount: rewardToGive,
                         type: "credit",
                         txn_type: "read_article",
                         status: "SUCCESSFUL",
@@ -543,8 +575,7 @@
                         }
                     });
 
-                    showCustomAlert("err_success", `${nameDisplay} Blog - ${pendingRewardCoins} Points`, true);
-                    pendingRewardCoins = 0; // reset
+                    showCustomAlert("err_success", `${nameDisplay} Blog - ${rewardToGive} Points`, true);
                     
                 }).catch(() => {
                     alert("Task Verified but couldn't sync with server. Try again.");

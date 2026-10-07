@@ -224,7 +224,7 @@
         </div>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -265,7 +265,7 @@
                 "mt_top": "प्रीमियम", "mt_pop": "लोकप्रिय", "mt_new": "आसान", 
                 "mt_security": "अपनी गतिविधि दर्ज करने के लिए विज्ञापन पूरा देखें। विज्ञापन पर क्लिक करने से सत्यापन जल्दी पूरा होता है।", 
                 "err_limit": "⏳ दैनिक सीमा पूरी हुई! आप आज इस विज्ञापन को देख चुके हैं। कल फिर आएं।",
-                "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए विज्ञापन पेज खुला रखें。", "err_invalid": "❌ ट्रैकिंग रद्द: ऐप मिनीमाइज करना मना है। कृपया टैब बदलने से बचें।", "err_success": "🎉 टास्क पूरा हुआ! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "चेक हो रहा है... ", "start_task": "देखें और कमाएं",
+                "err_early": "❌ सत्यापन अधूरा! कृपया आवश्यक समय के लिए विज्ञापन पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द: ऐप मिनीमाइज करना मना है। कृपया टैब बदलने से बचें।", "err_success": "🎉 टास्क पूरा हुआ! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं: ", "verifying": "चेक हो रहा है... ", "start_task": "देखें और कमाएं",
                 "inst_smartlink": "👉 <b>पूरा करने के नियम:</b><br>1. स्मार्टलिंक एड खोलने के लिए बटन दबाएं।<br>2. पेज पर रुकें और कंटेंट को देखें।<br>3. टाइमर खत्म होने से पहले विंडो बंद न करें।",
                 "inst_popunder": "👉 <b>पूरा करने के नियम:</b><br>1. लिंक खोलें (यह एक बैकग्राउंड टैब खोल सकता है)।<br>2. पूरी वेबसाइट को लोड होने दें और देखें।<br>3. अपने पॉइंट्स क्रेडिट होने के लिए इंतज़ार करें।",
                 "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. विज्ञापन लोड करने के लिए नीचे क्लिक करें।<br>2. अगर पूछा जाए, तो नोटिफिकेशन Allow करें या Next दबाएं।<br>3. टाइमर खत्म होने तक सक्रिय रहें।",
@@ -308,14 +308,14 @@
         const uid = localStorage.getItem("userId");
         let userDailyClicksData = {};
 
-        // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMERS & REWARDS FOR ALL 6 CATEGORIES
+        // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMERS, REWARDS & SDK FOR ALL 6 CATEGORIES
         let monetagLinksAdminConfig = {
-            smartlink: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30 },
-            popunder: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30 },
-            push: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30 },
-            interstitial: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30 },
-            inpage: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30 },
-            reward: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30 }
+            smartlink: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30, sdk_name: "", sdk_id: "" },
+            popunder: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30, sdk_name: "", sdk_id: "" },
+            push: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30, sdk_name: "", sdk_id: "" },
+            interstitial: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30, sdk_name: "", sdk_id: "" },
+            inpage: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30, sdk_name: "", sdk_id: "" },
+            reward: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 30, sdk_name: "", sdk_id: "" }
         };
 
         // Network Monitor
@@ -357,16 +357,20 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Timers, Coins & Specific Links for 6 categories)
+                    // 2. Fetch Admin Configurations (Banners, Timers, Coins, SDK & Specific Links for 6 categories)
                     db.ref('global_system_runtime_configurations/premium_ads_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
 
-                            // 🔥 EXTRACT 6 INDIVIDUAL SETTINGS 🔥
+                            // 🔥 EXTRACT 6 INDIVIDUAL SETTINGS WITH SDK 🔥
                             ['smartlink', 'popunder', 'push', 'interstitial', 'inpage', 'reward'].forEach(cat => {
                                 if(adminData['link_' + cat]) monetagLinksAdminConfig[cat].url = adminData['link_' + cat];
                                 if(adminData['timer_' + cat]) monetagLinksAdminConfig[cat].timer = parseInt(adminData['timer_' + cat]);
                                 if(adminData['reward_' + cat]) monetagLinksAdminConfig[cat].reward = parseInt(adminData['reward_' + cat]);
+                                
+                                // SDK Logics
+                                if(adminData['sdk_name_' + cat]) monetagLinksAdminConfig[cat].sdk_name = adminData['sdk_name_' + cat].trim();
+                                if(adminData['sdk_id_' + cat]) monetagLinksAdminConfig[cat].sdk_id = adminData['sdk_id_' + cat].trim();
                             });
 
                             // Load Banners Safely
@@ -475,7 +479,7 @@
             isValidationActive = false;
         }
 
-        // 🚀 PLAY STORE SAFE IN-APP SYSTEM VALIDATION LOGIC
+        // 🚀 PLAY STORE SAFE IN-APP SYSTEM VALIDATION LOGIC WITH HYBRID SDK ROUTING
         function executeTaskRedirection() {
             if(isValidationActive) return;
             isValidationActive = true;
@@ -488,68 +492,94 @@
             let verifyText = langData[lang] && langData[lang]["verifying"] ? langData[lang]["verifying"] : "Verifying tracking... ";
 
             startBtn.disabled = true;
+            startBtn.innerText = verifyText;
 
-            let targetDestinationUrl = config.url;
-            let countdownTime = config.timer;
-
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if(offerTimer) clearInterval(offerTimer);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                offerTimer = setInterval(() => {
-                    countdownTime--;
-                    startBtn.innerText = `${verifyText}(${countdownTime}s)`;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if (document.hidden) { 
-                        clearInterval(offerTimer);
-                        closeTaskInstructionModal();
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if (countdownTime <= 0) {
-                        clearInterval(offerTimer);
-                        startBtn.innerText = "SAVING...";
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = targetDestinationUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (config.sdk_id && config.sdk_id !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(config.sdk_name, config.sdk_id, config.reward, taskKey);
+                    closeTaskInstructionModal();
+                } else {
+                    openHTMLIframeViewer(config, verifyText);
+                }
+            } else {
+                openHTMLIframeViewer(config, verifyText);
+            }
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
+        function openHTMLIframeViewer(config, verifyText) {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                const startBtn = document.getElementById("btnStartTask");
+                let targetDestinationUrl = config.url;
+                let countdownTime = config.timer;
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if(offerTimer) clearInterval(offerTimer);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    offerTimer = setInterval(() => {
+                        countdownTime--;
+                        if(startBtn) startBtn.innerText = `${verifyText}(${countdownTime}s)`;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if (document.hidden) { 
+                            clearInterval(offerTimer);
+                            closeTaskInstructionModal();
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(offerTimer);
+                            if(startBtn) startBtn.innerText = "SAVING...";
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = targetDestinationUrl;
+            }, 600); // 600ms gap
+        }
+
+        // HTML Close Button Handler
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
-            evaluateTaskRewardViaFirebase(currentActiveTaskKey);
+            evaluateTaskRewardViaFirebase(currentActiveTaskKey, false);
         }
 
-        function evaluateTaskRewardViaFirebase(taskKey) {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // SDK gives back taskName
+            evaluateTaskRewardViaFirebase(taskName, true);
+        }
+
+        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION
+        function evaluateTaskRewardViaFirebase(taskKey, isSdk) {
             document.getElementById("taskInstructionModal").style.display = "none";
-            if (!isValidationActive) { 
-                return; 
-            }
+            if (!isValidationActive) return; 
 
             let nameDisplay = taskKey.toUpperCase();
             let rewardToGive = monetagLinksAdminConfig[taskKey].reward;
+            let sdkTag = isSdk ? " [SDK]" : "";
             let todayDateString = new Date().toLocaleDateString("en-CA");
 
             // 1. Add Coins securely via Transaction
@@ -562,7 +592,7 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Premium Ad (${nameDisplay})`,
+                    title: `Premium Ad (${nameDisplay})${sdkTag}`,
                     amount: rewardToGive,
                     type: "credit",
                     txn_type: "premium_ad",

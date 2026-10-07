@@ -110,7 +110,7 @@
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
             <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Ad Task</div>
-            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
         <!-- Sandbox mode for extreme safety -->
@@ -213,7 +213,7 @@
         <span data-i18n="at_security">Explore apps, complete required steps, and get coins credited instantly! Stay genuine to keep earning!</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -290,37 +290,37 @@
 
         const uid = localStorage.getItem("userId");
 
-        // 🔥 DYNAMIC ROUTING MAP FOR ALL 18 BUTTONS (Fetched from Firebase) 🔥
+        // 🔥 DYNAMIC ROUTING MAP FOR ALL 18 BUTTONS WITH SDK LOGIC 🔥
         let appLinksAdminConfig = {
             torox: {
-                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 }
+                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" }
             },
             hangmyads: {
-                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 }
+                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" }
             },
             adgate: {
-                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 }
+                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" }
             },
             pubscale: {
-                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 }
+                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" }
             },
             revlum: {
-                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 }
+                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" }
             },
             ayetstudios: {
-                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 }
+                srv1: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv2: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+                srv3: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" }
             }
         };
 
@@ -360,17 +360,21 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners & 18 Individual Links/Timers/Rewards)
+                    // 2. Fetch Admin Configurations (18 Servers + Banners + Hybrid SDK)
                     db.ref('global_system_runtime_configurations/app_offers').on('value', (snap) => {
                         if(snap.exists()) {
                             const aData = snap.val();
                             
-                            // 🔥 EXTRACT 18 INDIVIDUAL SETTINGS 🔥
+                            // 🔥 EXTRACT 18 INDIVIDUAL SETTINGS & SDK LOGIC 🔥
                             ['torox', 'hangmyads', 'adgate', 'pubscale', 'revlum', 'ayetstudios'].forEach(net => {
                                 ['srv1', 'srv2', 'srv3'].forEach(srv => {
                                     if(aData[net] && aData[net][srv]) appLinksAdminConfig[net][srv].url = aData[net][srv];
                                     if(aData['timer_' + net + '_' + srv]) appLinksAdminConfig[net][srv].timer = parseInt(aData['timer_' + net + '_' + srv]);
                                     if(aData['reward_' + net + '_' + srv]) appLinksAdminConfig[net][srv].reward = parseInt(aData['reward_' + net + '_' + srv]);
+                                    
+                                    // SDK Logic Extraction
+                                    if(aData['sdk_name_' + net + '_' + srv]) appLinksAdminConfig[net][srv].sdk_name = aData['sdk_name_' + net + '_' + srv].trim();
+                                    if(aData['sdk_id_' + net + '_' + srv]) appLinksAdminConfig[net][srv].sdk_id = aData['sdk_id_' + net + '_' + srv].trim();
                                 });
                             });
 
@@ -455,7 +459,6 @@
             let subText = langData[lang] && langData[lang]["verifying"] ? "Explore & Claim" : "Explore & Claim";
 
             serverOptions.forEach(opt => {
-                // Get individual reward for this specific server
                 let srvReward = appLinksAdminConfig[networkKey][opt.id].reward;
 
                 const btn = document.createElement("button");
@@ -479,117 +482,152 @@
             document.getElementById("appOptionsModal").style.display = "none";
         }
 
-        // 🔥 LAUNCH SPECIFIC TASK SERVER WITH DAILY LIMIT LOGIC 🔥
+        // 🔥 LAUNCH SPECIFIC TASK SERVER WITH HYBRID SDK & DAILY LIMIT LOGIC 🔥
         function triggerSecureAppTask(network, serverId, serverTitle) {
-            // 🔥 ANTI-BAN: 1 CLICK PER DAY PER SERVER LOGIC 🔥
-            let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+            let todayDateString = new Date().toLocaleDateString("en-CA"); 
             let clickKey = network + "_" + serverId;
 
             if(userDailyClicksData[clickKey] === todayDateString) {
                 document.getElementById("appOptionsModal").style.display = "none";
                 showCustomAlert("err_limit");
-                return; // Block opening the task
+                return; 
             }
 
             document.getElementById("appOptionsModal").style.display = "none"; 
             
-            // Gets link, timer, and reward from Admin config specific to this server
             let srvConfig = appLinksAdminConfig[network][serverId];
             
-            // Launch the secure In-App Ad Viewer
-            openInAppAdViewer(srvConfig.url, srvConfig.reward, srvConfig.timer, network, serverId, serverTitle);
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (srvConfig.sdk_id && srvConfig.sdk_id !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send unique taskName to identify exactly which server was completed
+                    window.AndroidBridge.showNativeAd(srvConfig.sdk_name, srvConfig.sdk_id, srvConfig.reward, network + "_" + serverId);
+                } else {
+                    openInAppAdViewerHTML(srvConfig.url, srvConfig.reward, srvConfig.timer, network, serverId, serverTitle);
+                }
+            } else {
+                openInAppAdViewerHTML(srvConfig.url, srvConfig.reward, srvConfig.timer, network, serverId, serverTitle);
+            }
         }
 
-        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC 🔥
+        // 🔥 ADVANCED HTML IN-APP AD VIEWER LOGIC (WITH 600MS DELAY) 🔥
         let adTimerInterval = null;
         let pendingRewardCoins = 0;
         let pendingNetworkName = "";
         let pendingServerId = "";
         let pendingServerTitle = "";
 
-        function openInAppAdViewer(adUrl, rewardCoinsAmount, timerSeconds, networkName, serverId, serverTitle) {
-            pendingRewardCoins = rewardCoinsAmount;
-            pendingNetworkName = networkName;
-            pendingServerId = serverId;
-            pendingServerTitle = serverTitle;
-            
-            let countdownTime = timerSeconds;
-            
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if(adTimerInterval) clearInterval(adTimerInterval);
+        function openInAppAdViewerHTML(adUrl, rewardCoinsAmount, timerSeconds, networkName, serverId, serverTitle) {
+            // Anti-clash buffer
+            setTimeout(() => {
+                pendingRewardCoins = rewardCoinsAmount;
+                pendingNetworkName = networkName;
+                pendingServerId = serverId;
+                pendingServerTitle = serverTitle;
                 
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+                let countdownTime = timerSeconds;
                 
-                adTimerInterval = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
 
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire Dudo app is minimized
-                    if (document.hidden) { 
-                        clearInterval(adTimerInterval);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        showCustomAlert("err_invalid");
-                        pendingRewardCoins = 0;
-                        return;
-                    }
+                iframeNode.onload = function() {
+                    if(adTimerInterval) clearInterval(adTimerInterval);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    adTimerInterval = setInterval(() => {
+                        countdownTime--;
+                        let spanNode = document.getElementById("adSecondsSpan");
+                        if(spanNode) spanNode.innerText = countdownTime;
 
-                    if (countdownTime <= 0) {
-                        clearInterval(adTimerInterval);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
+                        if (document.hidden) { 
+                            clearInterval(adTimerInterval);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            showCustomAlert("err_invalid");
+                            pendingRewardCoins = 0;
+                            return;
+                        }
 
-            iframeNode.src = adUrl;
+                        if (countdownTime <= 0) {
+                            clearInterval(adTimerInterval);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; 
+                        }
+                    }, 1000);
+                };
+
+                iframeNode.src = adUrl;
+            }, 600); // 600ms anti-clash gap
         }
 
-        // 💰 REWARD SYNC API & HISTORY PUSH
+        // HTML Close Button Handler
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
-            document.getElementById("adIframe").src = ""; // Stop video/ad
+            document.getElementById("adIframe").src = ""; // Stop video
+            grantAppTaskReward(pendingRewardCoins, pendingNetworkName, pendingServerId, pendingServerTitle, false);
+            pendingRewardCoins = 0;
+        }
 
-            if (pendingRewardCoins > 0 && typeof uid !== 'undefined' && uid) {
-                let nameDisplay = pendingNetworkName.toUpperCase();
-                let todayDateString = new Date().toLocaleDateString("en-CA");
-                let clickKey = pendingNetworkName + "_" + pendingServerId;
-                
-                // Add Coins securely via Transaction
-                db.ref(`users/${uid}/coins`).transaction((current) => {
-                    return (current || 0) + pendingRewardCoins;
-                }).then(() => {
-                    
-                    // 1. 🔥 ANTI-BAN LOGIC: Register Today's Date so user can't click this server again today
-                    db.ref(`users/${uid}/daily_app_clicks/${clickKey}`).set(todayDateString);
-
-                    // 2. 🔥 UNIVERSAL HISTORY PUSH
-                    db.ref(`users/${uid}/history`).push({
-                        title: `App Offer (${nameDisplay} - ${pendingServerId})`,
-                        amount: pendingRewardCoins,
-                        type: "credit",
-                        txn_type: "offerwall",
-                        status: "SUCCESSFUL",
-                        date: new Date().toLocaleDateString(),
-                        timestamp: firebase.database.ServerValue.TIMESTAMP
-                    });
-
-                    showCustomAlert("err_success", `${nameDisplay} (${pendingServerTitle}) - ${pendingRewardCoins} Points`, true);
-                    pendingRewardCoins = 0;
-                    
-                }).catch(() => {
-                    alert("Task Verified but couldn't sync with server. Try again.");
-                });
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // taskName format: network_serverId (e.g. torox_srv1)
+            let parts = taskName.split('_');
+            if(parts.length >= 2) {
+                let net = parts[0];
+                let srv = parts[1];
+                let title = (srv === 'srv1') ? "Server 1: Premium Offers" : (srv === 'srv2') ? "Server 2: High Payout Matrix" : "Server 3: Flash Speed Yield";
+                grantAppTaskReward(parseInt(rewardCoins), net, srv, title, true);
             }
+        }
+
+        // 🛡️ UNIVERSAL REWARD GIVER FUNCTION (Firebase Transaction + History)
+        function grantAppTaskReward(rewardToGive, networkName, serverId, serverTitle, isSdk) {
+            if(rewardToGive <= 0 || !uid) return;
+
+            let nameDisplay = networkName.toUpperCase();
+            let sdkTag = isSdk ? " [SDK]" : "";
+            let todayDateString = new Date().toLocaleDateString("en-CA");
+            let clickKey = networkName + "_" + serverId;
+
+            // 1. Add Coins securely via Transaction
+            db.ref(`users/${uid}/coins`).transaction((current) => {
+                return (current || 0) + rewardToGive;
+            }).then(() => {
+                
+                // 2. 🔥 ANTI-BAN LOGIC: Register Click Date
+                db.ref(`users/${uid}/daily_app_clicks/${clickKey}`).set(todayDateString);
+
+                // 3. 🔥 UNIVERSAL HISTORY PUSH
+                db.ref(`users/${uid}/history`).push({
+                    title: `App Offer (${nameDisplay} - ${serverId})${sdkTag}`,
+                    amount: rewardToGive,
+                    type: "credit",
+                    txn_type: "offerwall",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // 4. Mark Daily Task as Complete
+                db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                    let tasks = snap.val() || [];
+                    if (!tasks.includes(networkName)) {
+                        tasks.push(networkName);
+                        db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                    }
+                });
+
+                showCustomAlert("err_success", `${nameDisplay} (${serverTitle}) - ${rewardToGive} Points`, true);
+                
+            }).catch(() => {
+                alert("Task Verified but couldn't sync with server. Try again.");
+            });
         }
     </script>
 </body>

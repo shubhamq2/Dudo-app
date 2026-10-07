@@ -110,7 +110,7 @@
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
             <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Captcha Task</div>
-            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
         <!-- Sandbox mode for extreme safety -->
@@ -171,7 +171,7 @@
         <span data-i18n="cc_security">Please type the words accurately. Stay on the sponsor page to successfully claim your reward points.</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE (WITH HYBRID SDK LOGIC) -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -188,10 +188,14 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & COINS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 25; // Default time
         let globalRewardCoins = 5;     // Default coins
         let globalDailyLimit = 10;     // Default daily max claims
+        
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; 
+        let globalSdkName = "";
+        let globalSdkId = "";
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
@@ -255,7 +259,6 @@
 
         const uid = localStorage.getItem("userId");
         let currentActiveCaptchaCode = "";
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; 
         
         let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         let userTodayClaimsCount = 0;
@@ -307,7 +310,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Captcha Link, Limit, Coins/Time)
+                    // 2. Fetch Admin Configurations (Banners, Captcha Link, Limit, Coins/Time, & SDK Data)
                     db.ref('global_system_runtime_configurations/captcha_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -319,6 +322,11 @@
                                 globalDailyLimit = parseInt(adminData.daily_limit); 
                                 document.getElementById("totalCaptchaLimit").innerText = globalDailyLimit;
                             }
+                            
+                            // 🔥 FETCH SDK LOGIC 🔥
+                            if (adminData.sdk_name) { globalSdkName = adminData.sdk_name.trim(); }
+                            if (adminData.sdk_id) { globalSdkId = adminData.sdk_id.trim(); }
+                            if (adminData.captcha_link) { activeAdminSmartlinkUrl = adminData.captcha_link; }
 
                             // Load Banners (Fixed with setTimeout)
                             let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
@@ -348,11 +356,6 @@
                                 document.getElementById("adminBannerSlot4").style.display = "flex";
                                 setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
                             } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
-
-                            // Setup Captcha Link
-                            if (adminData.captcha_link) {
-                                activeAdminSmartlinkUrl = adminData.captcha_link;
-                            }
                         }
                     });
 
@@ -397,7 +400,7 @@
         let platformTimer = null;
         let isValidationActive = false;
 
-        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH SMART TIMER & IN-APP VIEWER
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH HYBRID SDK ROUTING
         function verifyCaptchaCodeSubmit() {
             // 🔥 ANTI-BAN: Custom Limit Check
             if(userTodayClaimsCount >= globalDailyLimit) {
@@ -420,63 +423,96 @@
                 return;
             }
 
-            // Step 2: Trigger secure In-App Viewer
+            // Step 2: Proceed to SDK or HTML
             isValidationActive = true;
-            let countdownTime = globalAdTimerSeconds;
             btn.disabled = true;
-
+            
             let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
             btn.innerText = baseWaitTxt;
 
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if (platformTimer) clearInterval(platformTimer);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-                
-                platformTimer = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if (document.hidden) { 
-                        clearInterval(platformTimer);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        resetCaptchaSubmitButton();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if (countdownTime <= 0) {
-                        clearInterval(platformTimer);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = activeAdminSmartlinkUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, globalRewardCoins, "captcha_task");
+                } else {
+                    // Fallback to HTML
+                    openHTMLIframeViewer();
+                }
+            } else {
+                openHTMLIframeViewer();
+            }
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION (PURE FIREBASE)
+        function openHTMLIframeViewer() {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                let countdownTime = globalAdTimerSeconds;
+                
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if (platformTimer) clearInterval(platformTimer);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    platformTimer = setInterval(() => {
+                        countdownTime--;
+                        let s = document.getElementById("adSecondsSpan");
+                        if(s) s.innerText = countdownTime;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if (document.hidden) { 
+                            clearInterval(platformTimer);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            resetCaptchaSubmitButton();
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(platformTimer);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = activeAdminSmartlinkUrl;
+            }, 600);
+        }
+
+        // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
+            grantCaptchaReward(globalRewardCoins, false);
+        }
+
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            grantCaptchaReward(parseInt(rewardCoins), true);
+        }
+
+        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION (PURE FIREBASE)
+        function grantCaptchaReward(rewardToGive, isSdk) {
+            if(rewardToGive <= 0 || !uid) return;
+            
+            let sdkTag = isSdk ? " [SDK]" : "";
 
             // Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
-                return (current || 0) + globalRewardCoins;
+                return (current || 0) + rewardToGive;
             }).then(() => {
                 
                 // 1. 🔥 ANTI-BAN LOGIC: Register limits
@@ -487,8 +523,8 @@
 
                 // 2. 🔥 UNIVERSAL HISTORY PUSH
                 db.ref(`users/${uid}/history`).push({
-                    title: `Captcha Reward`,
-                    amount: globalRewardCoins,
+                    title: `Captcha Reward${sdkTag}`,
+                    amount: rewardToGive,
                     type: "credit",
                     txn_type: "captcha",
                     status: "SUCCESSFUL",
@@ -508,7 +544,7 @@
                 resetCaptchaSubmitButton();
                 generateNewCaptchaCode();
                 
-                showCustomAlert("err_success", true, globalRewardCoins);
+                showCustomAlert("err_success", true, rewardToGive);
                 
             }).catch(() => {
                 resetCaptchaSubmitButton();

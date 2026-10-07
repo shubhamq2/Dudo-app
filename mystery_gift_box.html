@@ -117,7 +117,6 @@
             <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 15s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
-        <!-- Sandbox mode for extreme safety -->
         <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
@@ -177,7 +176,7 @@
 
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -194,16 +193,20 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME, COINS & LIMITS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 15; // Default time
         let globalMinReward = 20;      // Default min coins
         let globalMaxReward = 60;      // Default max coins
         let globalDailyLimit = 10;     // Default limit
+        
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
+        let globalSdkName = "";
+        let globalSdkId = "";
 
         let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         let userTodayClaimsCount = 0;
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
+        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
             "en": { "mb_title": "Surprise Rewards", "mb_status_ready": "Status: Box Ready", "mb_box_title": "Surprise Reward Box", "mb_box_desc": "Tap the magical box above or click unlock down below to start verification. Eligible users will unlock random bonus points instantly!", "mb_btn_unlock": "Unlock Reward Box", "mb_verify": "Verifying Activity...", "mb_wait": "Please keep the partner page open to complete the process.", "mb_btn_claim": "Claim Random Reward", "mb_security": "Verification protocols are active. Closing the app prematurely will interrupt the process and reset the lock.", "err_early": "❌ Verification Incomplete! Please keep the partner page open.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "err_limit": "⏳ Daily Limit Reached! You have opened all boxes for today. Come back tomorrow.", "err_success": "🎉 Reward Unlocked! Added to your balance: ", "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection" },
             "hi": { "mb_title": "सरप्राइज रिवॉर्ड्स", "mb_status_ready": "स्थिति: बॉक्स तैयार है", "mb_box_title": "सरप्राइज रिवॉर्ड बॉक्स", "mb_box_desc": "जादुई बॉक्स पर टैप करें या सत्यापन शुरू करने के लिए नीचे अनलॉक पर क्लिक करें। सफल उपयोगकर्ताओं को तुरंत रैंडम बोनस पॉइंट्स मिलेंगे!", "mb_btn_unlock": "रिवॉर्ड बॉक्स खोलें", "mb_verify": "सत्यापन जारी है...", "mb_wait": "प्रक्रिया पूरी करने के लिए कृपया पेज खुला रखें।", "mb_btn_claim": "रैंडम इनाम लें", "mb_security": "सत्यापन प्रोटोकॉल सक्रिय हैं। ऐप को मिनीमाइज करने से प्रक्रिया रुक जाएगी।", "err_early": "❌ सत्यापन अधूरा! कृपया पार्टनर पेज खुला रखें।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें।", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज के सभी बॉक्स खोल लिए हैं। कल फिर आएं।", "err_success": "🎉 इनाम अनलॉक! आपके बैलेंस में जोड़ा गया: ", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें" },
@@ -239,8 +242,16 @@
             executeValidateHourlyMysteryCooldown(); 
         }
 
-        const uid = localStorage.getItem("userId");
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
+        // Script Injector for Admin Banners
+        function setAdHTML(container, html) {
+            container.innerHTML = html;
+            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
 
         // Network Monitor
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
@@ -287,7 +298,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Link, Time, Limits)
+                    // 2. Fetch Admin Configurations (Banners, Link, Time, SDK, Limits)
                     db.ref('global_system_runtime_configurations/mystery_box_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -300,6 +311,10 @@
                                 globalDailyLimit = parseInt(adminData.daily_limit); 
                                 document.getElementById("totalMysteryLimit").innerText = globalDailyLimit;
                             }
+                            
+                            // 🔥 GET SDK CONFIGS 🔥
+                            if (adminData.sdk_name) { globalSdkName = adminData.sdk_name.trim(); }
+                            if (adminData.sdk_id) { globalSdkId = adminData.sdk_id.trim(); }
 
                             // Load Banners (Fixed with setTimeout)
                             let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
@@ -334,17 +349,6 @@
 
             executeValidateHourlyMysteryCooldown();
         });
-
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
-        }
 
         let verificationTickerInt = 15; 
         let countdownTrackingInterval = null;
@@ -422,7 +426,7 @@
             cooldownClockInterval = setInterval(updateSealedClock, 1000);
         }
 
-        // 🔒 AD SYSTEM VALIDATION ENGINE WITH IN-APP VIEWER
+        // 🔒 AD SYSTEM VALIDATION ENGINE WITH HYBRID SDK
         function executeTriggerAdVideoUnlocker() {
             // 🔥 ANTI-BAN: Custom Limit Check
             if(userTodayClaimsCount >= globalDailyLimit) {
@@ -432,68 +436,98 @@
 
             if(document.getElementById("vaultActionTriggerBtn").disabled === true) return;
 
-            let countdownTime = globalAdTimerSeconds;
-            verificationTickerInt = countdownTime;
-
             document.getElementById("vaultActionTriggerBtn").style.display = "none";
             document.getElementById("videoAdVerificationPanel").style.display = "block";
-            document.getElementById("verificationCountdownTicker").style.display = "block";
-
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
             
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
+            // Compute Random Reward Before Ad
+            calculatedLootDropCoinsValue = Math.floor(globalMinReward + Math.random() * (globalMaxReward - globalMinReward + 1));
 
-            iframeNode.onload = function() {
-                if (countdownTrackingInterval) clearInterval(countdownTrackingInterval);
-
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                countdownTrackingInterval = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("verificationCountdownTicker").innerText = `${countdownTime}s`;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if(document.hidden) {
-                        clearInterval(countdownTrackingInterval);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        executeRollbackDashboardUI();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if(countdownTime <= 0) {
-                        clearInterval(countdownTrackingInterval);
-                        document.getElementById("verificationCountdownTicker").style.display = "none";
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = activeAdminSmartlinkUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, calculatedLootDropCoinsValue, "surprise_box");
+                    document.getElementById("verificationCountdownTicker").innerText = "Displaying Ad...";
+                } else {
+                    openHTMLIframeViewer();
+                }
+            } else {
+                openHTMLIframeViewer();
+            }
         }
 
-        // 💰 REWARD ENGINE MODULE: Direct Firebase Transaction + Universal History
+        function openHTMLIframeViewer() {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                let countdownTime = globalAdTimerSeconds;
+                verificationTickerInt = countdownTime;
+                
+                document.getElementById("verificationCountdownTicker").style.display = "block";
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if (countdownTrackingInterval) clearInterval(countdownTrackingInterval);
+
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    countdownTrackingInterval = setInterval(() => {
+                        countdownTime--;
+                        document.getElementById("verificationCountdownTicker").innerText = `${countdownTime}s`;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if(document.hidden) {
+                            clearInterval(countdownTrackingInterval);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            executeRollbackDashboardUI();
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if(countdownTime <= 0) {
+                            clearInterval(countdownTrackingInterval);
+                            document.getElementById("verificationCountdownTicker").style.display = "none";
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = activeAdminSmartlinkUrl;
+            }, 600);
+        }
+
+        // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
-            
             document.getElementById("lootBoxEmojiState").innerText = "💥"; 
-            executeCreditLootLedgerPool();
+            
+            executeCreditLootLedgerPool(false);
         }
 
-        function executeCreditLootLedgerPool() {
-            // Compute the randomized reward locally (Between Admin's Min and Max)
-            calculatedLootDropCoinsValue = Math.floor(globalMinReward + Math.random() * (globalMaxReward - globalMinReward + 1));
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            document.getElementById("lootBoxEmojiState").innerText = "💥"; 
+            // We use parsed rewardCoins from SDK or calculatedLootDropCoinsValue
+            calculatedLootDropCoinsValue = parseInt(rewardCoins);
+            executeCreditLootLedgerPool(true);
+        }
+
+        // 💰 REWARD ENGINE MODULE: Direct Firebase Transaction + Universal History
+        function executeCreditLootLedgerPool(isSdk) {
+            let sdkTag = isSdk ? " [SDK]" : "";
 
             // 1. Add Random Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
@@ -508,7 +542,7 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Surprise Box Reward`,
+                    title: `Surprise Box Reward${sdkTag}`,
                     amount: calculatedLootDropCoinsValue,
                     type: "credit",
                     txn_type: "mystery_box",

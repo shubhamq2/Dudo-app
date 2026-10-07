@@ -179,7 +179,7 @@
 
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -196,11 +196,14 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME, COINS & LIMITS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME, COINS, LIMITS & SDK 🔥
         let globalAdTimerSeconds = 15; // Default time
         let globalRewardCoins = 5;     // Default reward
         let globalDailyLimit = 15;     // Default Limit
         
+        let globalSdkName = "";
+        let globalSdkId = "";
+
         let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         let userTodayClaimsCount = 0;
 
@@ -286,14 +289,14 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Link, Time, Reward & Limits)
+                    // 2. Fetch Admin Configurations (Banners, Link, SDK, Time, Reward & Limits)
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // Load Configs from our new node: sponsor_visits_configs
-                            if (adminData.sponsor_visits_configs) {
-                                let c = adminData.sponsor_visits_configs;
+                            // Load Configs from our new node: sponsor_visit_configs
+                            if (adminData.sponsor_visit_configs) {
+                                let c = adminData.sponsor_visit_configs;
                                 
                                 // 🔥 GET ADMIN CONTROLLED SETTINGS
                                 if (c.ad_timer) { globalAdTimerSeconds = parseInt(c.ad_timer); }
@@ -302,6 +305,10 @@
                                     globalDailyLimit = parseInt(c.daily_limit); 
                                     document.getElementById("totalSponsorVisitLimit").innerText = globalDailyLimit;
                                 }
+
+                                // 🔥 SDK LOGIC
+                                if (c.sdk_name) { globalSdkName = c.sdk_name.trim(); }
+                                if (c.sdk_id) { globalSdkId = c.sdk_id.trim(); }
 
                                 // Load Banners with setTimeout
                                 if(c.slot1_code && c.active !== false) { 
@@ -373,7 +380,7 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🚀 PLAY STORE SAFE VALIDATION LOGIC (WITH IN-APP VIEWER)
+        // 🚀 PLAY STORE SAFE VALIDATION LOGIC WITH HYBRID SDK ROUTING
         function executeClickTask() {
             // 🔥 ANTI-BAN: Custom Limit Check
             if(userTodayClaimsCount >= globalDailyLimit) {
@@ -394,57 +401,82 @@
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${verifyTxt}(${countdownTime}s)</span>`;
 
-            // IN-APP VIEWER DISPLAY
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Site...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if(taskTimer) clearInterval(taskTimer);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                taskTimer = setInterval(() => {
-                    countdownTime--;
-                    btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${verifyTxt}(${countdownTime}s)</span>`;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if (document.hidden) { 
-                        clearInterval(taskTimer);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        resetTaskButton();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if (countdownTime <= 0) {
-                        clearInterval(taskTimer);
-                        btn.innerText = "PROCESSING...";
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = activeAdminSmartlinkUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, globalRewardCoins, "sponsor_visit");
+                } else {
+                    openHTMLIframeViewer(btn, verifyTxt);
+                }
+            } else {
+                openHTMLIframeViewer(btn, verifyTxt);
+            }
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t12) via PURE FIREBASE + HISTORY
+        function openHTMLIframeViewer(btn, verifyTxt) {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                // IN-APP VIEWER DISPLAY
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Site...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if(taskTimer) clearInterval(taskTimer);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    taskTimer = setInterval(() => {
+                        countdownTime--;
+                        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${verifyTxt}(${countdownTime}s)</span>`;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if (document.hidden) { 
+                            clearInterval(taskTimer);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            resetTaskButton();
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(taskTimer);
+                            btn.innerText = "PROCESSING...";
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = activeAdminSmartlinkUrl;
+            }, 600); // 600ms gap
+        }
+
+        // HTML Ad Close Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
-            executeRewardSyncWithFirebase();
+            executeRewardSyncWithFirebase(false);
         }
 
-        function executeRewardSyncWithFirebase() {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            executeRewardSyncWithFirebase(true);
+        }
+
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t12) via PURE FIREBASE + HISTORY
+        function executeRewardSyncWithFirebase(isSdk) {
+            let sdkTag = isSdk ? " [SDK]" : "";
+
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
                 return (current || 0) + globalRewardCoins;
@@ -458,10 +490,10 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Sponsor Visit Reward`,
+                    title: `Sponsor Visit Reward${sdkTag}`,
                     amount: globalRewardCoins,
                     type: "credit",
-                    txn_type: "web_task",
+                    txn_type: "web_task", // Kept logic same to sync perfectly with other systems
                     status: "SUCCESSFUL",
                     date: new Date().toLocaleDateString(),
                     timestamp: firebase.database.ServerValue.TIMESTAMP

@@ -103,7 +103,7 @@
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
             <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Ad Task</div>
-            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
         <!-- Sandbox mode is ON for extreme safety -->
@@ -204,7 +204,7 @@
         <span data-i18n="ag_security">AdGem uses advanced tracking to verify tasks. Please complete the offers honestly. Using emulators, VPNs, or skipping steps will void your reward.</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -221,7 +221,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT (With Limit Message Added)
+        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
             "en": { 
                 "ag_title": "AdGem Games", "ag_label1": "High Paying Game Offers", "ag_label2": "Extra Micro Offers", 
@@ -262,7 +262,8 @@
             "fr": { "ag_title": "Jeux AdGem", "ag_label1": "Hautes Récompenses", "ag_label2": "Micro Offres", "ag_games": "Jouer", "ag_games_desc": "Atteindre le niveau", "ag_apps": "Apps Rapides", "ag_apps_desc": "Télécharger", "ag_survey": "Sondages", "ag_survey_desc": "Votre avis", "ag_web": "Tâches Web", "ag_web_desc": "S'inscrire", "ag_quizzes": "Quiz", "ag_quizzes_desc": "Score 100%", "ag_premium": "Exclusif", "ag_premium_desc": "Offres VIP", "ag_top": "Top", "ag_pop": "Populaire", "ag_new": "Facile", "ag_security": "Complétez honnêtement.", "err_early": "❌ Incomplet !", "err_invalid": "❌ Restez sur la page.", "err_limit": "⏳ Limite quotidienne atteinte ! Revenez demain.", "err_success": "🎉 Offre lancée ! Points ajoutés: ", "verifying": "Vérification... ", "start_task": "Commencer", "inst_games": "👉 <b>ÉTAPES:</b><br>1. Ouvrez le mur de jeux.", "inst_apps": "👉 <b>ÉTAPES:</b><br>1. Installez l'application.", "inst_generic": "👉 <b>ÉTAPES:</b><br>1. Ouvrez l'offre." },
             "ar": { "ag_title": "ألعاب AdGem", "ag_label1": "ألعاب ذات دفع عالي", "ag_label2": "عروض صغيرة", "ag_games": "العب الألعاب", "ag_games_desc": "الوصول إلى المستوى", "ag_apps": "تطبيقات سريعة", "ag_apps_desc": "تحميل", "ag_survey": "استطلاعات", "ag_survey_desc": "رأيك", "ag_web": "مهام الويب", "ag_web_desc": "سجل لتربح", "ag_quizzes": "اختبارات", "ag_quizzes_desc": "درجة 100%", "ag_premium": "حصري", "ag_premium_desc": "عروض VIP", "ag_top": "الأعلى", "ag_pop": "شائع", "ag_new": "سهل", "ag_security": "أكمل المهام بصدق.", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ ابق في الصفحة.", "err_limit": "⏳ تم الوصول للحد اليومي! عد غداً.", "err_success": "🎉 بدأت العرض! تم إضافة النقاط: ", "verifying": "جارِ التحقق... ", "start_task": "ابدأ", "inst_games": "👉 <b>الخطوات:</b><br>1. افتح الجدار.", "inst_apps": "👉 <b>الخطوات:</b><br>1. ثبت التطبيق.", "inst_generic": "👉 <b>الخطوات:</b><br>1. افتح العرض." },
             "pt": { "ag_title": "Jogos AdGem", "ag_label1": "Altas Recompensas", "ag_label2": "Micro Ofertas", "ag_games": "Jogar", "ag_games_desc": "Alcance o nível", "ag_apps": "Apps Rápidos", "ag_apps_desc": "Baixar", "ag_survey": "Pesquisas", "ag_survey_desc": "Sua opinião", "ag_web": "Tarefas Web", "ag_web_desc": "Registrar", "ag_quizzes": "Quizzes", "ag_quizzes_desc": "100% Pontuação", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP", "ag_top": "Topo", "ag_pop": "Popular", "ag_new": "Fácil", "ag_security": "Complete honestamente.", "err_early": "❌ Incompleto!", "err_invalid": "❌ Fique na página.", "err_limit": "⏳ Limite diário atingido! Volte amanhã.", "err_success": "🎉 Oferta iniciada! Pontos adicionados: ", "verifying": "Verificando... ", "start_task": "Começar", "inst_games": "👉 <b>PASSOS:</b><br>1. Abra a parede.", "inst_apps": "👉 <b>PASSOS:</b><br>1. Instale o app.", "inst_generic": "👉 <b>PASSOS:</b><br>1. Abra a oferta." },
-            "ru": { "ag_title": "Игры AdGem", "ag_label1": "Высокая оплата", "ag_label2": "Микро офферы", "ag_games": "Играть", "ag_games_desc": "Достигни уровня", "ag_apps": "Приложения", "ag_apps_desc": "Скачать", "ag_survey": "Опросы", "ag_survey_desc": "Ваше мнение", "ag_web": "Веб задания", "ag_web_desc": "Регистрация", "ag_quizzes": "Викторины", "ag_quizzes_desc": "100% Счет", "ag_premium": "Эксклюзив", "ag_premium_desc": "VIP офферы", "ag_top": "Топ", "ag_pop": "Популярно", "ag_new": "Легко", "ag_security": "Выполняйте задания честно.", "err_early": "❌ Не завершено!", "err_invalid": "❌ Оставайтесь на странице.", "err_limit": "⏳ Дневной лимит исчерпан! Возвращайтесь завтра.", "err_success": "🎉 Оффер начат! Добавлено очков: ", "verifying": "Проверка... ", "start_task": "Начать", "inst_games": "👉 <b>ШАГИ:</b><br>1. Откройте стену.", "inst_apps": "👉 <b>ШАГИ:</b><br>1. Установите.", "inst_generic": "👉 <b>ШАГИ:</b><br>1. Откройте." }
+            "ru": { "ag_title": "Игры AdGem", "ag_label1": "Высокая оплата", "ag_label2": "Микро офферы", "ag_games": "Играть", "ag_games_desc": "Достигни уровня", "ag_apps": "Приложения", "ag_apps_desc": "Скачать", "ag_survey": "Опросы", "ag_survey_desc": "Ваше мнение", "ag_web": "Веб задания", "ag_web_desc": "Регистрация", "ag_quizzes": "Викторины", "ag_quizzes_desc": "100% Счет", "ag_premium": "Эксклюзив", "ag_premium_desc": "VIP офферы", "ag_top": "Топ", "ag_pop": "Популярно", "ag_new": "Легко", "ag_security": "Выполняйте задания честно.", "err_early": "❌ Не завершено!", "err_invalid": "❌ Оставайтесь на странице.", "err_limit": "⏳ Дневной лимит исчерпан! Возвращайтесь завтра.", "err_success": "🎉 Оффер начат! Добавлено очков: ", "verifying": "Проверка... ", "start_task": "Начать", "inst_games": "👉 <b>ШАГИ:</b><br>1. Откройте стену.", "inst_apps": "👉 <b>ШАГИ:</b><br>1. Установите.", "inst_generic": "👉 <b>ШАГИ:</b><br>1. Откройте." },
+            "es": { "ag_title": "Juegos AdGem", "ag_label1": "Alta Recompensa", "ag_label2": "Micro Ofertas", "ag_games": "Jugar Juegos", "ag_games_desc": "Alcanza el nivel", "ag_apps": "Aplicaciones Rápidas", "ag_apps_desc": "Descargar y abrir", "ag_survey": "Encuestas", "ag_survey_desc": "Comparte tu opinión", "ag_web": "Tareas Web", "ag_web_desc": "Regístrate para ganar", "ag_quizzes": "Cuestionarios", "ag_quizzes_desc": "100% Puntaje", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP secretas", "ag_top": "Mayor Pago", "ag_pop": "Popular", "ag_new": "Fácil", "ag_security": "AdGem usa rastreo avanzado. Completa honestamente.", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ Interrumpido: Quédese en la página.", "err_limit": "⏳ ¡Límite diario! Vuelve mañana.", "err_success": "🎉 ¡Iniciado! Puntos añadidos: ", "verifying": "Verificando... ", "start_task": "Empezar a Jugar", "inst_games": "👉 <b>PASOS:</b><br>1. Haz clic abajo.", "inst_apps": "👉 <b>PASOS:</b><br>1. Instala la app.", "inst_generic": "👉 <b>PASOS:</b><br>1. Carga la oferta." }
         };
 
         function changeLanguage(langCode) {
@@ -293,14 +294,14 @@
             });
         }
 
-        // 🔥 DYNAMIC INDIVIDUAL SETTINGS FOR EACH BUTTON 🔥
+        // 🔥 DYNAMIC INDIVIDUAL SETTINGS FOR EACH BUTTON (WITH HYBRID SDK) 🔥
         let adgemLinksAdminConfig = {
-            games: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40 },
-            apps: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40 },
-            surveys: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40 },
-            weboffers: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40 },
-            quizzes: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40 },
-            premium: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40 }
+            games: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
+            apps: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
+            surveys: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
+            weboffers: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
+            quizzes: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
+            premium: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" }
         };
 
         const uid = localStorage.getItem("userId");
@@ -328,12 +329,16 @@
                         if(snap.exists()) {
                             const aData = snap.val();
                             
-                            // Load Individual Links, Timers, and Rewards
+                            // Load Individual Links, Timers, Rewards, and SDK Data
                             let keys = ['games', 'apps', 'surveys', 'weboffers', 'quizzes', 'premium'];
                             keys.forEach(key => {
                                 if(aData['link_' + key]) adgemLinksAdminConfig[key].url = aData['link_' + key];
                                 if(aData['timer_' + key]) adgemLinksAdminConfig[key].timer = parseInt(aData['timer_' + key]);
                                 if(aData['reward_' + key]) adgemLinksAdminConfig[key].reward = parseInt(aData['reward_' + key]);
+                                
+                                // Fetch Hybrid SDK details for each button
+                                if(aData['sdk_name_' + key]) adgemLinksAdminConfig[key].sdk_name = aData['sdk_name_' + key].trim();
+                                if(aData['sdk_id_' + key]) adgemLinksAdminConfig[key].sdk_id = aData['sdk_id_' + key].trim();
                             });
 
                             // Load Banners safely
@@ -429,77 +434,111 @@
             document.getElementById("adgemInstructionModal").style.display = "none";
         }
 
-        // 🚀 SMART TIMER LOGIC WITH IN-APP VIEWER
+        // 🚀 SMART TIMER LOGIC WITH HYBRID IN-APP VIEWER & SDK
         function executeAdgemTaskRedirection() {
             let taskKey = currentActiveTaskKey;
             const startBtn = document.getElementById("btnStartAdgemTask");
             startBtn.disabled = true;
 
             let config = adgemLinksAdminConfig[taskKey];
-            let targetDestinationUrl = config.url;
-            let countdownTime = config.timer;
             
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-            
-            iframeNode.onload = function() {
-                if(offerTimer) clearInterval(offerTimer);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-                
-                offerTimer = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    if (document.hidden) { 
-                        clearInterval(offerTimer);
-                        closeAdgemInstructionModal();
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if (countdownTime <= 0) {
-                        clearInterval(offerTimer);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
-                    }
-                }, 1000);
-            };
-
-            iframeNode.src = targetDestinationUrl;
+            // 🔥 HYBRID LOGIC TRIGGER 🔥
+            if (config.sdk_id && config.sdk_id !== "") {
+                // SDK Ad (Native Android)
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(config.sdk_name, config.sdk_id, config.reward, taskKey);
+                    closeAdgemInstructionModal();
+                } else {
+                    // Fallback to HTML if bridge is missing
+                    openInAppAdViewerHTML(config);
+                }
+            } else {
+                // HTML Ad (Web/Iframe)
+                openInAppAdViewerHTML(config);
+            }
         }
 
-        // 💰 REWARD SYNC API (FIREBASE TRANSACTION + HISTORY + ANTI-BAN LOCK)
+        function openInAppAdViewerHTML(config) {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                let targetDestinationUrl = config.url;
+                let countdownTime = config.timer;
+                
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+                
+                iframeNode.onload = function() {
+                    if(offerTimer) clearInterval(offerTimer);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    offerTimer = setInterval(() => {
+                        countdownTime--;
+                        let spanNode = document.getElementById("adSecondsSpan");
+                        if(spanNode) spanNode.innerText = countdownTime;
+
+                        if (document.hidden) { 
+                            clearInterval(offerTimer);
+                            closeAdgemInstructionModal();
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(offerTimer);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
+                        }
+                    }, 1000);
+                };
+
+                iframeNode.src = targetDestinationUrl;
+            }, 600);
+        }
+
+        // 💰 REWARD SYNC API FOR HTML ADS
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; 
             closeAdgemInstructionModal();
             
             let taskKey = currentActiveTaskKey;
-            let nameDisplay = taskKey.toUpperCase();
             let config = adgemLinksAdminConfig[taskKey];
-            let rewardToGive = config.reward;
-            let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+            grantTaskReward(config.reward, taskKey, false);
+        }
+
+        // 🔥 FUNCTION FOR ANDROID TO CALL AFTER SDK AD IS WATCHED 🔥
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // Android passes rewardCoins as string or int, ensure it's int
+            grantTaskReward(parseInt(rewardCoins), taskName, true);
+        }
+
+        // 🛡️ UNIVERSAL REWARD GIVER FUNCTION
+        function grantTaskReward(rewardToGive, taskKey, isSdk) {
+            if(rewardToGive <= 0 || !uid) return;
+
+            let nameDisplay = taskKey.toUpperCase();
+            let sdkTag = isSdk ? " [SDK]" : "";
+            let todayDateString = new Date().toLocaleDateString("en-CA");
 
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
                 return (current || 0) + rewardToGive;
             }).then(() => {
                 
-                // 2. 🔥 ANTI-BAN LOGIC: Register Today's Date so user can't click again
+                // 2. 🔥 ANTI-BAN LOGIC
                 db.ref(`users/${uid}/daily_adgem_clicks/${taskKey}`).set(todayDateString);
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH
                 db.ref(`users/${uid}/history`).push({
-                    title: `AdGem (${nameDisplay})`,
+                    title: `AdGem (${nameDisplay})${sdkTag}`,
                     amount: rewardToGive,
                     type: "credit",
                     txn_type: "offerwall",

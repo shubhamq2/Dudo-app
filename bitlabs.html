@@ -103,7 +103,7 @@
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
             <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Survey Task</div>
-            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
         <!-- Sandbox mode for extreme safety -->
@@ -167,7 +167,7 @@
         <span data-i18n="bl_security">Warning: Do not close the survey page early. Genuine opinions help you earn more rewards without restrictions.</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -184,9 +184,12 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & COINS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 25; // Default time
         let globalRewardCoins = 50;    // Default coins
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback HTML Link
+        let globalSdkName = "";
+        let globalSdkId = "";
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH ANTI-BAN ALERT
         const langData = {
@@ -233,7 +236,6 @@
         }
 
         const uid = localStorage.getItem("userId");
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
         let userDailyClicksData = "";
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -271,14 +273,18 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners & Survey Link & Time & Coins)
+                    // 2. Fetch Admin Configurations (Banners, Timers, SDK Configs)
                     db.ref('global_system_runtime_configurations/bitlabs_offers').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME AND COINS
+                            // 🔥 GET ADMIN CONTROLLED TIME, COINS & SDK LOGIC
                             if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
                             if (adminData.reward_coins) { globalRewardCoins = parseInt(adminData.reward_coins); }
+                            
+                            if (adminData.sdk_name) { globalSdkName = adminData.sdk_name.trim(); }
+                            if (adminData.sdk_id) { globalSdkId = adminData.sdk_id.trim(); }
+                            if (adminData.bitlabs_link) { activeAdminSmartlinkUrl = adminData.bitlabs_link; }
                             
                             // 🔥 FIXED BANNER LOADING WITH SETTIMEOUT 🔥
                             let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
@@ -309,10 +315,6 @@
                                 setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
                             } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
 
-                            // Setup Survey Link
-                            if (adminData.bitlabs_link) {
-                                activeAdminSmartlinkUrl = adminData.bitlabs_link;
-                            }
                         } else {
                             // Fallback to Global Smartlink if bitlabs_offers node doesn't exist yet
                             db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
@@ -353,7 +355,7 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🚀 TIMED SECURE IN-APP SURVEY VIEWER CONTROLLER WITH SMART TIMER & ANTI-BAN
+        // 🚀 TIMED SECURE VIEWER CONTROLLER WITH HYBRID SDK ROUTING
         let surveyTimer = null;
 
         function launchBitlabsTask() {
@@ -371,69 +373,100 @@
             btn.style.background = "#475569";
             btn.innerText = `Connecting...`;
 
-            let countdownTime = globalAdTimerSeconds;
-            
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Survey...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if(surveyTimer) clearInterval(surveyTimer);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-                
-                surveyTimer = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if (document.hidden) { 
-                        clearInterval(surveyTimer);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        showCustomAlert("err_invalid");
-                        resetSurveyButton();
-                        return;
-                    }
-
-                    if (countdownTime <= 0) {
-                        clearInterval(surveyTimer);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = activeAdminSmartlinkUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, globalRewardCoins, "premium_survey");
+                    // Reset Button instantly because Native Ad handles the rest
+                    resetSurveyButton(); 
+                } else {
+                    // Fallback to HTML
+                    openHTMLSurveyIframe();
+                }
+            } else {
+                openHTMLSurveyIframe();
+            }
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION (PURE FIREBASE)
+        function openHTMLSurveyIframe() {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                let countdownTime = globalAdTimerSeconds;
+                
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Survey...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if(surveyTimer) clearInterval(surveyTimer);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    surveyTimer = setInterval(() => {
+                        countdownTime--;
+                        let s = document.getElementById("adSecondsSpan");
+                        if(s) s.innerText = countdownTime;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if (document.hidden) { 
+                            clearInterval(surveyTimer);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            showCustomAlert("err_invalid");
+                            resetSurveyButton();
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(surveyTimer);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = activeAdminSmartlinkUrl;
+            }, 600);
+        }
+
+        // HTML Close Button Click
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
+            grantSurveyReward(globalRewardCoins, false);
+        }
 
-            if (typeof uid !== 'undefined' && uid) {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            grantSurveyReward(parseInt(rewardCoins), true);
+        }
+
+        // 💰 UNIVERSAL REWARD SYNC API & HISTORY
+        function grantSurveyReward(rewardToGive, isSdk) {
+            if (rewardToGive > 0 && typeof uid !== 'undefined' && uid) {
+                let sdkTag = isSdk ? " [SDK]" : "";
                 let todayDateString = new Date().toLocaleDateString("en-CA");
                 
                 // Add Coins securely via Transaction
                 db.ref(`users/${uid}/coins`).transaction((current) => {
-                    return (current || 0) + globalRewardCoins;
+                    return (current || 0) + rewardToGive;
                 }).then(() => {
                     
-                    // 1. 🔥 ANTI-BAN LOGIC: Register Today's Date so user can't click again today
+                    // 1. 🔥 ANTI-BAN LOGIC
                     db.ref(`users/${uid}/daily_survey_clicks`).set(todayDateString);
 
                     // 2. 🔥 UNIVERSAL HISTORY PUSH
                     db.ref(`users/${uid}/history`).push({
-                        title: `Premium Survey`,
-                        amount: globalRewardCoins,
+                        title: `Premium Survey${sdkTag}`,
+                        amount: rewardToGive,
                         type: "credit",
                         txn_type: "offerwall",
                         status: "SUCCESSFUL",
@@ -457,6 +490,8 @@
                     resetSurveyButton();
                     alert("Task Verified but couldn't sync with server. Try again.");
                 });
+            } else {
+                resetSurveyButton();
             }
         }
 

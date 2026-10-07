@@ -101,9 +101,9 @@
 
         /* 🔥 IN-APP AD VIEWER CSS 🔥 */
         .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
-        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-cyan); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid #06b6d4; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: #facc15; font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--danger); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
@@ -121,7 +121,7 @@
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
             <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Secure Ad Task</div>
-            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & RETURN</button>
         </div>
         <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
@@ -256,7 +256,11 @@
         const db = firebase.database();
 
         let adPartnerLink = ""; 
-        let globalAdTimerSeconds = 25; // 🔥 Admin Controlled Ad Timer Default
+        let globalAdTimerSeconds = 25; 
+        
+        // 🔥 HYBRID AD CONTROL VARIABLES 🔥
+        let globalNativeSdkName = ""; 
+        let globalNativeSdkId = "";   
 
         // Check Network Status
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
@@ -265,212 +269,95 @@
         // Translations Dictionary
         const langData = {
     "en": {
-        "arena_title": "Arena",
-        "rps_title": "Rock Paper Scissors",
-        "rps_desc": "Play 1v1 tactical matches against live challengers. Win rewards instantly!",
-        "tier_starter": "Starter Battle",
-        "tier_pro": "Pro Arena",
-        "tier_high": "High Roller",
-        "participation": "Participation:",
-        "reward": "Reward:",
-        "btn_play": "Play",
-        "rules_title": "Game Rules",
-        "rules_desc": "Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.",
-        "matching_text": "Matching with Challenger...",
-        "matching_warn": "Please keep the app open during matchmaking.",
-        "btn_return": "Return to Arena"
+        "arena_title": "Arena", "rps_title": "Rock Paper Scissors", "rps_desc": "Play 1v1 tactical matches against live challengers. Win rewards instantly!",
+        "tier_starter": "Starter Battle", "tier_pro": "Pro Arena", "tier_high": "High Roller",
+        "participation": "Participation:", "reward": "Reward:", "btn_play": "Play",
+        "rules_title": "Game Rules", "rules_desc": "Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.",
+        "matching_text": "Matching with Challenger...", "matching_warn": "Please keep the app open during matchmaking.", "btn_return": "Return to Arena"
     },
     "hi": {
-        "arena_title": "एरिना",
-        "rps_title": "रॉक पेपर सीज़र्स",
-        "rps_desc": "लाइव चैलेंजर्स के खिलाफ 1v1 मैच खेलें। तुरंत इनाम जीतें!",
-        "tier_starter": "स्टार्टर बैटल",
-        "tier_pro": "प्रो एरिना",
-        "tier_high": "हाई रोलर",
-        "participation": "प्रवेश:",
-        "reward": "इनाम:",
-        "btn_play": "खेलें",
-        "rules_title": "खेल के नियम",
-        "rules_desc": "समय खत्म होने से पहले रॉक ✊, पेपर ✋, या सीज़र्स ✌️ चुनें। रॉक सीज़र्स को तोड़ता है, सीज़र्स पेपर को काटता है, पेपर रॉक को ढकता है।",
-        "matching_text": "चैलेंजर खोज रहे हैं...",
-        "matching_warn": "कृपया मैचमेकिंग के दौरान ऐप को खुला रखें।",
-        "btn_return": "वापस जाएँ"
+        "arena_title": "एरिना", "rps_title": "रॉक पेपर सीज़र्स", "rps_desc": "लाइव चैलेंजर्स के खिलाफ 1v1 मैच खेलें। तुरंत इनाम जीतें!",
+        "tier_starter": "स्टार्टर बैटल", "tier_pro": "प्रो एरिना", "tier_high": "हाई रोलर",
+        "participation": "प्रवेश:", "reward": "इनाम:", "btn_play": "खेलें",
+        "rules_title": "खेल के नियम", "rules_desc": "समय खत्म होने से पहले रॉक ✊, पेपर ✋, या सीज़र्स ✌️ चुनें। रॉक सीज़र्स को तोड़ता है, सीज़र्स पेपर को काटता है, पेपर रॉक को ढकता है।",
+        "matching_text": "चैलेंजर खोज रहे हैं...", "matching_warn": "कृपया मैचमेकिंग के दौरान ऐप को खुला रखें।", "btn_return": "वापस जाएँ"
     },
     "bn": {
-        "arena_title": "অ্যারিনা",
-        "rps_title": "রক পেপার সিজারস",
-        "rps_desc": "লাইভ চ্যালেঞ্জারদের বিপক্ষে 1v1 ম্যাচ খেলুন। সাথে সাথে পুরস্কার জিতুন!",
-        "tier_starter": "স্টার্টার ব্যাটল",
-        "tier_pro": "প্রো অ্যারিনা",
-        "tier_high": "হাই রোলার",
-        "participation": "অংশগ্রহণ:",
-        "reward": "পুরস্কার:",
-        "btn_play": "খেলুন",
-        "rules_title": "খেলার নিয়ম",
-        "rules_desc": "সময় শেষ হওয়ার আগে রক ✊, পেপার ✋, বা সিজারস ✌️ বেছে নিন। রক সিজারসকে ভাঙে, সিজারস পেপার কাটে, পেপার রককে ঢেকে দেয়।",
-        "matching_text": "চ্যালেঞ্জার খোঁজা হচ্ছে...",
-        "matching_warn": "ম্যাচমেকিং এর সময় দয়া করে অ্যাপটি খোলা রাখুন।",
-        "btn_return": "ফিরে যান"
+        "arena_title": "অ্যারিনা", "rps_title": "রক পেপার সিজারস", "rps_desc": "লাইভ চ্যালেঞ্জারদের বিপক্ষে 1v1 ম্যাচ খেলুন। সাথে সাথে পুরস্কার জিতুন!",
+        "tier_starter": "স্টার্টার ব্যাটল", "tier_pro": "প্রো অ্যারিনা", "tier_high": "হাই রোলার",
+        "participation": "অংশগ্রহণ:", "reward": "পুরস্কার:", "btn_play": "খেলুন",
+        "rules_title": "খেলার নিয়ম", "rules_desc": "সময় শেষ হওয়ার আগে রক ✊, পেপার ✋, বা সিজারস ✌️ বেছে নিন।",
+        "matching_text": "চ্যালেঞ্জার খোঁজা হচ্ছে...", "matching_warn": "ম্যাচমেকিং এর সময় দয়া করে অ্যাপটি খোলা রাখুন।", "btn_return": "ফিরে যান"
     },
     "te": {
-        "arena_title": "అరేనా",
-        "rps_title": "రాక్ పేపర్ సిజర్స్",
-        "rps_desc": "లైవ్ ఛాలెంజర్స్‌తో 1v1 మ్యాచ్‌లు ఆడండి. తక్షణమే బహుమతులు గెలుచుకోండి!",
-        "tier_starter": "స్టార్టర్ బ్యాటిల్",
-        "tier_pro": "ప్రో అరేనా",
-        "tier_high": "హై రోలర్",
-        "participation": "ప్రవేశం:",
-        "reward": "బహుమతి:",
-        "btn_play": "ఆడండి",
-        "rules_title": "ఆట నియమాలు",
-        "rules_desc": "సమయం ముగిసేలోపు రాక్ ✊, పేపర్ ✋, లేదా సిజర్స్ ✌️ ఎంచుకోండి. రాక్ సిజర్స్‌ను పగలగొడుతుంది, సిజర్స్ పేపర్‌ను కత్తిరిస్తుంది, పేపర్ రాక్‌ను కప్పేస్తుంది.",
-        "matching_text": "ఛాలెంజర్‌ను వెతుకుతోంది...",
-        "matching_warn": "మ్యాచ్‌మేకింగ్ సమయంలో దయచేసి యాప్‌ను తెరిచి ఉంచండి.",
-        "btn_return": "వెనక్కి వెళ్ళండి"
+        "arena_title": "అరేనా", "rps_title": "రాక్ పేపర్ సిజర్స్", "rps_desc": "లైవ్ ఛాలెంజర్స్‌తో 1v1 మ్యాచ్‌లు ఆడండి. తక్షణమే బహుమతులు గెలుచుకోండి!",
+        "tier_starter": "స్టార్టర్ బ్యాటిల్", "tier_pro": "ప్రో అరేనా", "tier_high": "హై రోలర్",
+        "participation": "ప్రవేశం:", "reward": "బహుమతి:", "btn_play": "ఆడండి",
+        "rules_title": "ఆట నియమాలు", "rules_desc": "సమయం ముగిసేలోపు రాక్ ✊, పేపర్ ✋, లేదా సిజర్స్ ✌️ ఎంచుకోండి.",
+        "matching_text": "ఛాలెంజర్‌ను వెతుకుతోంది...", "matching_warn": "మ్యాచ్‌మేకింగ్ సమయంలో దయచేసి యాప్‌ను తెరిచి ఉంచండి.", "btn_return": "వెనక్కి వెళ్ళండి"
     },
     "mr": {
-        "arena_title": "अरीना",
-        "rps_title": "रॉक पेपर सिझर्स",
-        "rps_desc": "लाईव्ह चॅलेंजर्सविरुद्ध 1v1 मॅच खेळा. लगेच बक्षिसे जिंका!",
-        "tier_starter": "स्टार्टर बॅटल",
-        "tier_pro": "प्रो अरीना",
-        "tier_high": "हाय रोलर",
-        "participation": "प्रवेश:",
-        "reward": "बक्षीस:",
-        "btn_play": "खेळा",
-        "rules_title": "खेळाचे नियम",
-        "rules_desc": "वेळ संपण्यापूर्वी रॉक ✊, पेपर ✋, किंवा सिझर्स ✌️ निवडा. रॉक सिझर्सला तोडतो, सिझर्स पेपर कापतो, पेपर रॉकला झाकतो.",
-        "matching_text": "चॅलेंजर शोधत आहे...",
-        "matching_warn": "कृपया मॅचमेकिंग दरम्यान ॲप उघडे ठेवा.",
-        "btn_return": "परत जा"
+        "arena_title": "अरीना", "rps_title": "रॉक पेपर सिझर्स", "rps_desc": "लाईव्ह चॅलेंजर्सविरुद्ध 1v1 मॅच खेळा. लगेच बक्षिसे जिंका!",
+        "tier_starter": "स्टार्टर बॅटल", "tier_pro": "प्रो अरीना", "tier_high": "हाय रोलर",
+        "participation": "प्रवेश:", "reward": "बक्षीस:", "btn_play": "खेळा",
+        "rules_title": "खेळाचे नियम", "rules_desc": "वेळ संपण्यापूर्वी रॉक ✊, पेपर ✋, किंवा सिझर्स ✌️ निवडा.",
+        "matching_text": "चॅलेंजर शोधत आहे...", "matching_warn": "कृपया मॅचमेकिंग दरम्यान ॲप उघडे ठेवा.", "btn_return": "परत जा"
     },
     "ur": {
-        "arena_title": "ارینا",
-        "rps_title": "راک پیپر سیزرز",
-        "rps_desc": "لائیو چیلنجرز کے خلاف 1v1 میچ کھیلیں۔ فوری انعام جیتیں!",
-        "tier_starter": "اسٹارٹر بیٹل",
-        "tier_pro": "پرو ارینا",
-        "tier_high": "ہائی رولر",
-        "participation": "شمولیت:",
-        "reward": "انعام:",
-        "btn_play": "کھیلیں",
-        "rules_title": "کھیل کے اصول",
-        "rules_desc": "وقت ختم ہونے سے پہلے راک ✊، پیپر ✋، یا سیزرز ✌️ کا انتخاب کریں۔",
-        "matching_text": "چیلنجر تلاش کر رہا ہے...",
-        "matching_warn": "براہ کرم میچ میکنگ کے دوران ایپ کو کھلا رکھیں۔",
-        "btn_return": "واپس جائیں"
+        "arena_title": "ارینا", "rps_title": "راک پیپر سیزرز", "rps_desc": "لائیو چیلنجرز کے خلاف 1v1 میچ کھیلیں۔ فوری انعام جیتیں!",
+        "tier_starter": "اسٹارٹر بیٹل", "tier_pro": "پرو ارینا", "tier_high": "ہائی رولر",
+        "participation": "شمولیت:", "reward": "انعام:", "btn_play": "کھیلیں",
+        "rules_title": "کھیل کے اصول", "rules_desc": "وقت ختم ہونے سے پہلے راک ✊، پیپر ✋، یا سیزرز ✌️ کا انتخاب کریں۔",
+        "matching_text": "چیلنجر تلاش کر رہا ہے...", "matching_warn": "براہ کرم میچ میکنگ کے دوران ایپ کو کھلا رکھیں۔", "btn_return": "واپس جائیں"
     },
     "ta": {
-        "arena_title": "அரங்கம்",
-        "rps_title": "ராக் பேப்பர் சிசர்ஸ்",
-        "rps_desc": "நேரடி சவாலாளர்களுக்கு எதிராக 1v1 விளையாடுங்கள். உடனடியாக வெகுமதிகளை வெல்லுங்கள்!",
-        "tier_starter": "ஸ்டார்டர் போர்",
-        "tier_pro": "ப்ரோ அரங்கம்",
-        "tier_high": "ஹை ரோலர்",
-        "participation": "பங்கேற்பு:",
-        "reward": "வெகுமதி:",
-        "btn_play": "விளையாடு",
-        "rules_title": "விளையாட்டு விதிகள்",
-        "rules_desc": "நேரம் முடிவதற்குள் ராக் ✊, பேப்பர் ✋, அல்லது சிசர்ஸ் ✌️ தேர்ந்தெடுக்கவும்.",
-        "matching_text": "சவாலாளரைத் தேடுகிறது...",
-        "matching_warn": "போட்டி தேடும் போது ஆப்பை திறந்து வைக்கவும்.",
-        "btn_return": "திரும்பிச் செல்"
+        "arena_title": "அரங்கம்", "rps_title": "ராக் பேப்பர் சிசர்ஸ்", "rps_desc": "நேரடி சவாலாளர்களுக்கு எதிராக 1v1 விளையாடுங்கள். உடனடியாக வெகுமதிகளை வெல்லுங்கள்!",
+        "tier_starter": "ஸ்டார்டர் போர்", "tier_pro": "ப்ரோ அரங்கம்", "tier_high": "ஹை ரோலர்",
+        "participation": "பங்கேற்பு:", "reward": "வெகுமதி:", "btn_play": "விளையாடு",
+        "rules_title": "விளையாட்டு விதிகள்", "rules_desc": "நேரம் முடிவதற்குள் ராக் ✊, பேப்பர் ✋, அல்லது சிசர்ஸ் ✌️ தேர்ந்தெடுக்கவும்.",
+        "matching_text": "சவாலாளரைத் தேடுகிறது...", "matching_warn": "போட்டி தேடும் போது ஆப்பை திறந்து வைக்கவும்.", "btn_return": "திரும்பிச் செல்"
     },
     "gu": {
-        "arena_title": "અરેના",
-        "rps_title": "રોક પેપર સિઝર્સ",
-        "rps_desc": "લાઇવ ચેલેન્જર્સ સામે 1v1 મેચ રમો. તરત જ ઇનામો જીતો!",
-        "tier_starter": "સ્ટાર્ટર બેટલ",
-        "tier_pro": "પ્રો અરેના",
-        "tier_high": "હાઈ રોલર",
-        "participation": "પ્રવેશ:",
-        "reward": "ઇનામ:",
-        "btn_play": "રમો",
-        "rules_title": "રમત ના નિયમો",
-        "rules_desc": "સમય પૂરો થાય તે પહેલાં રોક ✊, પેપર ✋, અથવા સિઝર્સ ✌️ પસંદ કરો.",
-        "matching_text": "ચેલેન્જર શોધી રહ્યા છે...",
-        "matching_warn": "કૃપા કરીને મેચમેકિંગ દરમિયાન એપ ખુલ્લી રાખો.",
-        "btn_return": "પાછા જાઓ"
+        "arena_title": "અરેના", "rps_title": "રોક પેપર સિઝર્સ", "rps_desc": "લાઇવ ચેલેન્જર્સ સામે 1v1 મેચ રમો. તરત જ ઇનામો જીતો!",
+        "tier_starter": "સ્ટાર્ટર બેટલ", "tier_pro": "પ્રો અરેના", "tier_high": "હાઈ રોલર",
+        "participation": "પ્રવેશ:", "reward": "ઇનામ:", "btn_play": "રમો",
+        "rules_title": "રમત ના નિયમો", "rules_desc": "સમય પૂરો થાય તે પહેલાં રોક ✊, પેપર ✋, અથવા સિઝર્સ ✌️ પસંદ કરો.",
+        "matching_text": "ચેલેન્જર શોધી રહ્યા છે...", "matching_warn": "કૃપા કરીને મેચમેકિંગ દરમિયાન એપ ખુલ્લી રાખો.", "btn_return": "પાછા જાઓ"
     },
     "es": {
-        "arena_title": "Arena",
-        "rps_title": "Piedra Papel Tijera",
-        "rps_desc": "Juega partidas 1v1 contra retadores en vivo. ¡Gana recompensas al instante!",
-        "tier_starter": "Batalla Inicial",
-        "tier_pro": "Arena Pro",
-        "tier_high": "Alto Riesgo",
-        "participation": "Participación:",
-        "reward": "Recompensa:",
-        "btn_play": "Jugar",
-        "rules_title": "Reglas del Juego",
-        "rules_desc": "Elige Piedra ✊, Papel ✋ o Tijera ✌️ antes de que termine el tiempo. Piedra aplasta Tijera, Tijera corta Papel, Papel envuelve Piedra.",
-        "matching_text": "Buscando retador...",
-        "matching_warn": "Por favor, mantén la aplicación abierta.",
-        "btn_return": "Volver a la Arena"
+        "arena_title": "Arena", "rps_title": "Piedra Papel Tijera", "rps_desc": "Juega partidas 1v1 contra retadores en vivo. ¡Gana recompensas al instante!",
+        "tier_starter": "Batalla Inicial", "tier_pro": "Arena Pro", "tier_high": "Alto Riesgo",
+        "participation": "Participación:", "reward": "Recompensa:", "btn_play": "Jugar",
+        "rules_title": "Reglas del Juego", "rules_desc": "Elige Piedra ✊, Papel ✋ o Tijera ✌️ antes de que termine el tiempo.",
+        "matching_text": "Buscando retador...", "matching_warn": "Por favor, mantén la aplicación abierta.", "btn_return": "Volver a la Arena"
     },
     "fr": {
-        "arena_title": "Arène",
-        "rps_title": "Pierre Papier Ciseaux",
-        "rps_desc": "Jouez des matchs 1v1 contre des joueurs en direct. Gagnez des récompenses instantanément !",
-        "tier_starter": "Bataille de Départ",
-        "tier_pro": "Arène Pro",
-        "tier_high": "Gros Pari",
-        "participation": "Participation :",
-        "reward": "Récompense :",
-        "btn_play": "Jouer",
-        "rules_title": "Règles du jeu",
-        "rules_desc": "Choisissez Pierre ✊, Papier ✋ ou Ciseaux ✌️ avant la fin du temps.",
-        "matching_text": "Recherche d'un adversaire...",
-        "matching_warn": "Veuillez garder l'application ouverte.",
-        "btn_return": "Retour à l'Arène"
+        "arena_title": "Arène", "rps_title": "Pierre Papier Ciseaux", "rps_desc": "Jouez des matchs 1v1 contre des joueurs en direct. Gagnez des récompenses instantanément !",
+        "tier_starter": "Bataille de Départ", "tier_pro": "Arène Pro", "tier_high": "Gros Pari",
+        "participation": "Participation :", "reward": "Récompense :", "btn_play": "Jouer",
+        "rules_title": "Règles du jeu", "rules_desc": "Choisissez Pierre ✊, Papier ✋ ou Ciseaux ✌️ avant la fin du temps.",
+        "matching_text": "Recherche d'un adversaire...", "matching_warn": "Veuillez garder l'application ouverte.", "btn_return": "Retour à l'Arène"
     },
     "ar": {
-        "arena_title": "الساحة",
-        "rps_title": "حجر ورقة مقص",
-        "rps_desc": "العب مباريات 1 ضد 1 ضد لاعبين حقيقيين. اربح المكافآت فوراً!",
-        "tier_starter": "معركة البداية",
-        "tier_pro": "الساحة الاحترافية",
-        "tier_high": "رهان عالي",
-        "participation": "الدخول:",
-        "reward": "المكافأة:",
-        "btn_play": "العب",
-        "rules_title": "قواعد اللعبة",
-        "rules_desc": "اختر حجر ✊، ورقة ✋، أو مقص ✌️ قبل انتهاء الوقت.",
-        "matching_text": "جاري البحث عن منافس...",
-        "matching_warn": "يرجى إبقاء التطبيق مفتوحًا أثناء البحث.",
-        "btn_return": "العودة للساحة"
+        "arena_title": "الساحة", "rps_title": "حجر ورقة مقص", "rps_desc": "العب مباريات 1 ضد 1 ضد لاعبين حقيقيين. اربح المكافآت فوراً!",
+        "tier_starter": "معركة البداية", "tier_pro": "الساحة الاحترافية", "tier_high": "رهان عالي",
+        "participation": "الدخول:", "reward": "المكافأة:", "btn_play": "العب",
+        "rules_title": "قواعد اللعبة", "rules_desc": "اختر حجر ✊، ورقة ✋، أو مقص ✌️ قبل انتهاء الوقت.",
+        "matching_text": "جاري البحث عن منافس...", "matching_warn": "يرجى إبقاء التطبيق مفتوحًا أثناء البحث.", "btn_return": "العودة للساحة"
     },
     "pt": {
-        "arena_title": "Arena",
-        "rps_title": "Pedra Papel Tesoura",
-        "rps_desc": "Jogue partidas 1v1 contra desafiantes ao vivo. Ganhe recompensas na hora!",
-        "tier_starter": "Batalha Inicial",
-        "tier_pro": "Arena Pro",
-        "tier_high": "Aposta Alta",
-        "participation": "Participação:",
-        "reward": "Recompensa:",
-        "btn_play": "Jogar",
-        "rules_title": "Regras do Jogo",
-        "rules_desc": "Escolha Pedra ✊, Papel ✋ ou Tesoura ✌️ antes que o tempo acabe.",
-        "matching_text": "Procurando desafiante...",
-        "matching_warn": "Mantenha o aplicativo aberto durante a busca.",
-        "btn_return": "Voltar para a Arena"
+        "arena_title": "Arena", "rps_title": "Pedra Papel Tesoura", "rps_desc": "Jogue partidas 1v1 contra desafiantes ao vivo. Ganhe recompensas na hora!",
+        "tier_starter": "Batalha Inicial", "tier_pro": "Arena Pro", "tier_high": "Aposta Alta",
+        "participation": "Participação:", "reward": "Recompensa:", "btn_play": "Jogar",
+        "rules_title": "Regras do Jogo", "rules_desc": "Escolha Pedra ✊, Papel ✋ ou Tesoura ✌️ antes que o tempo acabe.",
+        "matching_text": "Procurando desafiante...", "matching_warn": "Mantenha o aplicativo aberto durante a busca.", "btn_return": "Voltar para a Arena"
     },
     "ru": {
-        "arena_title": "Арена",
-        "rps_title": "Камень Ножницы Бумага",
-        "rps_desc": "Играйте матчи 1 на 1 против реальных игроков. Выигрывайте награды мгновенно!",
-        "tier_starter": "Начальная битва",
-        "tier_pro": "Про Арена",
-        "tier_high": "Крупная ставка",
-        "participation": "Взнос:",
-        "reward": "Награда:",
-        "btn_play": "Играть",
-        "rules_title": "Правила игры",
-        "rules_desc": "Выберите Камень ✊, Бумагу ✋ или Ножницы ✌️ до окончания времени.",
-        "matching_text": "Поиск соперника...",
-        "matching_warn": "Пожалуйста, не закрывайте приложение.",
-        "btn_return": "Вернуться на Арену"
+        "arena_title": "Арена", "rps_title": "Камень Ножницы Бумага", "rps_desc": "Играйте матчи 1 на 1 против реальных игроков. Выигрывайте награды мгновенно!",
+        "tier_starter": "Начальная битва", "tier_pro": "Про Арена", "tier_high": "Крупная ставка",
+        "participation": "Взнос:", "reward": "Награда:", "btn_play": "Играть",
+        "rules_title": "Правила игры", "rules_desc": "Выберите Камень ✊, Бумагу ✋ или Ножницы ✌️ до окончания времени.",
+        "matching_text": "Поиск соперника...", "matching_warn": "Пожалуйста, не закрывайте приложение.", "btn_return": "Вернуться на Арену"
     }
 };
 
@@ -539,7 +426,7 @@
                         }
                     });
 
-                    // 📡 2. FETCH ADMIN BANNERS, REWARD LINK & TIMER 
+                    // 📡 2. FETCH ADMIN BANNERS, REWARD LINK & HYBRID SDK DATA
                     db.ref('global_system_runtime_configurations/rps_game').on('value', (snap) => {
                         if (snap.exists()) {
                             const adminData = snap.val();
@@ -551,6 +438,10 @@
                             if (adminData.ad_timer) {
                                 globalAdTimerSeconds = parseInt(adminData.ad_timer);
                             }
+
+                            // 🔥 Fetch SDK Logic 🔥
+                            if (adminData.sdk_name) globalNativeSdkName = adminData.sdk_name.trim();
+                            if (adminData.sdk_id) globalNativeSdkId = adminData.sdk_id.trim();
                             
                             // 🔥 FIXED Banner Ad Clash & Visibility 🔥
                             let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
@@ -765,59 +656,78 @@
             modal.style.display = "flex";
         }
 
-        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC WITH SMART TIMER 🔥
+        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC WITH SMART TIMER & 600MS GAP 🔥
         let adTimerInterval = null;
 
         function openInAppAdViewer(adUrl, rewardCoinsAmount, timerSeconds, taskName = "ad_task") {
-            let countdownTime = timerSeconds;
-            
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 जब तक ऐड लोड होगा, टाइमर नहीं घटेगा
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-            
-            // 🔥 iframe.onload का मतलब है "जब ऐड 100% स्क्रीन पर आ जाए, तभी टाइमर शुरू करो"
-            iframeNode.onload = function() {
-                if(adTimerInterval) clearInterval(adTimerInterval);
+            setTimeout(() => {
+                let countdownTime = timerSeconds;
                 
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
                 
-                adTimerInterval = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+                
+                iframeNode.onload = function() {
+                    if(adTimerInterval) clearInterval(adTimerInterval);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    adTimerInterval = setInterval(() => {
+                        countdownTime--;
+                        let span = document.getElementById("adSecondsSpan");
+                        if(span) span.innerText = countdownTime;
 
-                    if(countdownTime <= 0) {
-                        clearInterval(adTimerInterval);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; 
-                    }
-                }, 1000);
-            };
+                        if(countdownTime <= 0) {
+                            clearInterval(adTimerInterval);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; 
+                        }
+                    }, 1000);
+                };
 
-            // अब ऐड को लोड करना शुरू करो
-            iframeNode.src = adUrl;
+                iframeNode.src = adUrl;
+            }, 600); // Anti-Clash 600ms Timer
         }
 
-        // 🔥 MODIFIED RETURN LOGIC: SHOWS IN-APP AD INSTEAD OF CHROME 🔥
+        // 🔥 MODIFIED RETURN LOGIC: HYBRID SDK TRIGGER 🔥
         function returnToLobby() {
             document.getElementById("resultModal").style.display = "none";
             
-            if (adPartnerLink && adPartnerLink.trim() !== "") {
-                // Open Ad inside App (Reward is 0 because coins were already given in Result Modal)
+            if (globalNativeSdkId && globalNativeSdkId !== "") {
+                // SDK Ad (Native Android)
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Reward is 0 because the resultModal already gave the coins. We just want to show the Ad.
+                    window.AndroidBridge.showNativeAd(globalNativeSdkName, globalNativeSdkId, 0, "rps_post_match_ad");
+                    executeReturnToLobbyUI();
+                } else if (adPartnerLink && adPartnerLink.trim() !== "") {
+                    // Fallback to HTML Ad
+                    openInAppAdViewer(adPartnerLink, 0, globalAdTimerSeconds, 'rps_post_match_ad');
+                } else {
+                    executeReturnToLobbyUI();
+                }
+            } else if (adPartnerLink && adPartnerLink.trim() !== "") {
+                // HTML Ad
                 openInAppAdViewer(adPartnerLink, 0, globalAdTimerSeconds, 'rps_post_match_ad');
             } else {
                 executeReturnToLobbyUI();
             }
         }
 
-        // Jab user X button dabayega tab usko wapas lobby me bhej diya jayega
+        // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
+            executeReturnToLobbyUI();
+        }
+
+        // Complete SDK Task Callback (If Android Bridge Returns it)
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // Since reward is already given before the ad in this specific game, 
+            // we just safely return the user to the lobby.
             executeReturnToLobbyUI();
         }
 

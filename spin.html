@@ -208,7 +208,7 @@
         <span data-i18n="sec_msg">Verification protocols are active. Do not minimize the app during the ad view to ensure you receive your extra spin.</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -225,17 +225,20 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & LIMITS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 25; // Default time
         let globalDailyAdLimit = 10;   // Default max ad spins per day
         
+        let globalSdkName = "";
+        let globalSdkId = "";
+
         let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         let userTodayAdSpinsCount = 0;
 
         // 🌐 FULL MULTILINGUAL SUPPORT WITH POLITE ERRORS
         const langData = {
             "en": { "spin_title": "Spin & Win", "total_coins": "Total Coins", "spins_left": "Spins Left Today:", "btn_spin": "SPIN NOW", "btn_watch_ad": "WATCH AD FOR 1 SPIN", "err_early": "❌ Verification Incomplete! You closed the sponsor page early.", "err_invalid": "❌ Tracking Interrupted! App minimized. Please stay on the page.", "err_limit": "⏳ Daily Limit Reached! You have watched the maximum ads for spins today. Come back tomorrow.", "spin_added": "🎉 1 Extra Spin Added successfully!", "won_msg": "🎉 Congratulations! You won ", "lost_msg": "😢 Oops! Better luck next time.", "sec_msg": "Verification protocols are active. Do not minimize the app during the ad view to ensure you receive your extra spin.", "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection" },
-            "hi": { "spin_title": "स्पिन और विन", "total_coins": "कुल सिक्के", "spins_left": "आज बचे हुए स्पिन:", "btn_spin": "अभी घुमाएं", "btn_watch_ad": "1 स्पिन के लिए विज्ञापन देखें", "err_early": "❌ सत्यापन अधूरा! आपने स्पॉन्सर पेज को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें。", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज स्पिन के लिए अधिकतम विज्ञापन देख लिए हैं। कल फिर आएं।", "spin_added": "🎉 1 अतिरिक्त स्पिन सफलतापूर्वक जुड़ गया!", "won_msg": "🎉 बधाई हो! आपने जीते हैं ", "lost_msg": "😢 ऊप्स! अगली बार बेहतर किस्मत।", "sec_msg": "सत्यापन प्रक्रिया सक्रिय है। अतिरिक्त स्पिन प्राप्त करने के लिए विज्ञापन देखते समय ऐप बंद न करें।", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें" },
+            "hi": { "spin_title": "स्पिन और विन", "total_coins": "कुल सिक्के", "spins_left": "आज बचे हुए स्पिन:", "btn_spin": "अभी घुमाएं", "btn_watch_ad": "1 स्पिन के लिए विज्ञापन देखें", "err_early": "❌ सत्यापन अधूरा! आपने स्पॉन्सर पेज को जल्दी बंद कर दिया।", "err_invalid": "❌ ट्रैकिंग रद्द! कृपया ऐप को बंद न करें और पेज पर बने रहें।", "err_limit": "⏳ दैनिक सीमा पूरी हुई! आपने आज स्पिन के लिए अधिकतम विज्ञापन देख लिए हैं। कल फिर आएं।", "spin_added": "🎉 1 अतिरिक्त स्पिन सफलतापूर्वक जुड़ गया!", "won_msg": "🎉 बधाई हो! आपने जीते हैं ", "lost_msg": "😢 ऊप्स! अगली बार बेहतर किस्मत।", "sec_msg": "सत्यापन प्रक्रिया सक्रिय है। अतिरिक्त स्पिन प्राप्त करने के लिए विज्ञापन देखते समय ऐप बंद न करें।", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें" },
             "bn": { "spin_title": "স্পিন এবং জয়", "total_coins": "মোট কয়েন", "spins_left": "বাকি স্পিন:", "btn_spin": "এখন ঘুরান", "btn_watch_ad": "অ্যাড দেখুন (১ স্পিন)", "err_early": "❌ যাচাই অসম্পূর্ণ! আপনি স্পনসর পেজ আগে বন্ধ করেছেন।", "err_invalid": "❌ ট্র্যাকিং বাধাগ্রস্ত! অ্যাপ বন্ধ করবেন না।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "spin_added": "🎉 ১টি স্পিন যোগ হয়েছে!", "won_msg": "🎉 আপনি জিতেছেন ", "lost_msg": "😢 পরের বার আরও ভালো ভাগ্য।", "sec_msg": "অ্যাপ বন্ধ করলে স্পিন বাতিল হবে।", "mod_no_net": "ইন্টারনেট নেই", "mod_no_net_d": "দয়া করে ডেটা বা ওয়াই-ফাই চালু করুন।", "mod_retry": "পুনরায় চেষ্টা করুন" },
             "mr": { "spin_title": "स्पिन आणि जिंका", "total_coins": "एकूण नाणी", "spins_left": "उर्वरित स्पिन:", "btn_spin": "आता फिरवा", "btn_watch_ad": "१ स्पिनसाठी जाहिरात पहा", "err_early": "❌ अपूर्ण! आपण जाहिरात लवकर बंद केली.", "err_invalid": "❌ ट्रॅकिंग थांबले! ॲप मिनिमाईज करू नका.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "spin_added": "🎉 1 स्पिन जोडले!", "won_msg": "🎉 तुम्ही जिंकलात ", "lost_msg": "😢 पुढच्या वेळी चांगले नशीब.", "sec_msg": "जाहिरात पाहताना ॲप बंद करू नका.", "mod_no_net": "इंटरनेट नाही", "mod_no_net_d": "कृपया डेटा चालू करा.", "mod_retry": "पुन्हा प्रयत्न करा" },
             "te": { "spin_title": "స్పిన్ & విన్", "btn_spin": "స్పిన్ చేయండి", "btn_watch_ad": "యాడ్ చూడండి", "err_limit": "⏳ పరిమితి ముగిసింది!", "err_success": "🎉 గెలిచారు: ", "lost_msg": "😢 మళ్లీ ప్రయత్నించండి.", "mod_no_net": "ఇంటర్నెట్ లేదు", "mod_retry": "మళ్లీ ప్రయత్నించండి" },
@@ -328,7 +331,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Time, Limits & Link)
+                    // 2. Fetch Admin Configurations (Banners, Time, Limits, Link & SDK)
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -342,6 +345,10 @@
                                     globalDailyAdLimit = parseInt(swConfig.daily_limit); 
                                     document.getElementById("totalAdSpinLimit").innerText = globalDailyAdLimit;
                                 }
+
+                                // 🔥 SDK LOGIC
+                                if (swConfig.sdk_name) { globalSdkName = swConfig.sdk_name.trim(); }
+                                if (swConfig.sdk_id) { globalSdkId = swConfig.sdk_id.trim(); }
                                 
                                 // Load Banners with setTimeout
                                 if (swConfig.slot1_code) {
@@ -525,7 +532,7 @@
             });
         }
 
-        // 📺 SECURE AD VERIFICATION WITH IN-APP VIEWER
+        // 📺 SECURE AD VERIFICATION WITH HYBRID SDK ROUTING
         let platformTimer = null;
         let countdownTime = 25;
 
@@ -538,49 +545,75 @@
 
             const btn = document.getElementById("adBtn");
             btn.disabled = true;
+            btn.innerText = `Verifying...`;
 
-            countdownTime = globalAdTimerSeconds;
-            
-            btn.innerText = `Verifying... (${countdownTime}s)`;
-
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-            
-            // Load Ad URL into iframe
-            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
-
-            platformTimer = setInterval(() => {
-                countdownTime--;
-                btn.innerText = `Verifying... (${countdownTime}s)`;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if(document.hidden) {
-                    clearInterval(platformTimer);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    resetAdBtn();
-                    showCustomAlert("err_invalid");
-                    return;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, 1, "spin_win");
+                } else {
+                    openHTMLIframeViewer(btn);
                 }
-
-                if(countdownTime <= 0) {
-                    clearInterval(platformTimer);
-                    btn.innerText = "SAVING...";
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+            } else {
+                openHTMLIframeViewer(btn);
+            }
         }
 
-        // 💰 REWARD SYNC API
+        function openHTMLIframeViewer(btn) {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                countdownTime = globalAdTimerSeconds;
+                btn.innerText = `Verifying... (${countdownTime}s)`;
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+                
+                // Load Ad URL into iframe
+                document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
+
+                platformTimer = setInterval(() => {
+                    countdownTime--;
+                    btn.innerText = `Verifying... (${countdownTime}s)`;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if(document.hidden) {
+                        clearInterval(platformTimer);
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        resetAdBtn();
+                        showCustomAlert("err_invalid");
+                        return;
+                    }
+
+                    if(countdownTime <= 0) {
+                        clearInterval(platformTimer);
+                        btn.innerText = "SAVING...";
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                    }
+                }, 1000);
+            }, 600); // 600ms gap
+        }
+
+        // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
+            grantAdSpinReward(false);
+        }
 
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            grantAdSpinReward(true);
+        }
+
+        // 💰 REWARD SYNC API
+        function grantAdSpinReward(isSdk) {
             // 🔥 ANTI-BAN LOGIC: Register Daily Limit
             db.ref(`users/${uid}/daily_spin_ad_claims`).set({
                 date: todayDateString,

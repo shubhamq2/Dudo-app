@@ -125,12 +125,12 @@
 
         /* Custom Modern Alert Modal Popup style */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
-        .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
+        .custom-alert.success-border { border-color: var(--accent-green); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
-        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .custom-alert button { background: var(--primary-blue); border: none; color: white; padding: 12px 30px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); transition: 0.2s; }
         .custom-alert button:active { transform: scale(0.95); }
-        .custom-alert.success-border button { background: var(--accent-green); }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
+        .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+        .overlay-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 1999; backdrop-filter: blur(5px); }
 
         /* 🔥 IN-APP AD VIEWER CSS 🔥 */
         .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
@@ -160,7 +160,7 @@
 </head>
 <body>
 
-    <div class="overlay" id="alertOverlay"></div>
+    <div class="overlay-mask" id="alertOverlayMask"></div>
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
         <button onclick="closeCustomAlert()">OK</button>
@@ -307,7 +307,7 @@
         <div class="ad-banner-slot" id="adminBannerSlot4"></div>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -324,12 +324,16 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME, LIMITS & REWARDS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 25; // Default time
         let globalMinReward = 10;      // Default Min
         let globalMaxReward = 30;      // Default Max
         let globalDailyLimit = 15;     // Default Daily Limit
         
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+        let globalSdkName = "";
+        let globalSdkId = "";
+
         let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         let userTodayClaimsCount = 0;
         let currentJackpotWinAmount = 0;
@@ -399,7 +403,6 @@
         let randomCoinsReward = 0; 
         let isScratchedPassed = false;
         let userCurrentCoinsMaster = 0;
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
         
         let isLotterySystemActive = false; 
         let isMarketplaceActive = false;   
@@ -428,7 +431,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Toggles, Banners & Time
+                    // 2. Fetch Admin Toggles, Banners & SDK Time
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if (snap.exists()) {
                             const adminData = snap.val();
@@ -442,6 +445,10 @@
                                     globalDailyLimit = parseInt(adminData.scratch_pass_configs.daily_limit); 
                                     document.getElementById("totalScratchLimit").innerText = globalDailyLimit;
                                 }
+
+                                // SDK LOGIC
+                                if (adminData.scratch_pass_configs.sdk_name) { globalSdkName = adminData.scratch_pass_configs.sdk_name.trim(); }
+                                if (adminData.scratch_pass_configs.sdk_id) { globalSdkId = adminData.scratch_pass_configs.sdk_id.trim(); }
 
                                 // Load Banners with setTimeout
                                 if (adminData.scratch_pass_configs.slot1_code && adminData.scratch_pass_configs.active !== false) {
@@ -566,13 +573,13 @@
             else alertBox.classList.remove("success-border");
 
             document.getElementById("alertMessage").innerText = msgStr + appendText;
-            document.getElementById("alertOverlay").style.display = "block";
+            document.getElementById("alertOverlayMask").style.display = "block";
             alertBox.style.display = "block";
         }
 
         function closeCustomAlert() {
             document.getElementById("customAlertBox").style.display = "none";
-            document.getElementById("alertOverlay").style.display = "none";
+            document.getElementById("alertOverlayMask").style.display = "none";
         }
 
         // 🎨 SCRATCH CANVAS LOGIC
@@ -666,7 +673,7 @@
             initScratchCanvas();
         }
 
-        // 🚀 PLAY STORE SAFE VALIDATION (WITH IN-APP VIEWER)
+        // 🚀 PLAY STORE SAFE VALIDATION WITH HYBRID SDK ROUTING
         let platformTimer = null;
         let countdownTime = 25;
         let isValidationActive = false;
@@ -685,50 +692,80 @@
             btn.disabled = true; 
             let currentLang = localStorage.getItem("selectedLang") || "en";
 
-            countdownTime = globalAdTimerSeconds;
-            
             let initialWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
-            btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
+            btn.innerText = initialWaitTxt;
 
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-            
-            // Load Ad URL into iframe
-            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
-
-            platformTimer = setInterval(() => {
-                countdownTime--;
-                btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if(document.hidden) {
-                    clearInterval(platformTimer);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    randomCoinsReward = 0; // Reset reward
-                    resetScratchModuleLocally();
-                    showCustomAlert("err_invalid");
-                    isValidationActive = false;
-                    return;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, randomCoinsReward, "scratch_card");
+                } else {
+                    openHTMLIframeViewer(initialWaitTxt, btn);
                 }
-
-                if(countdownTime <= 0) {
-                    clearInterval(platformTimer);
-                    btn.innerText = "PROCESSING...";
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+            } else {
+                openHTMLIframeViewer(initialWaitTxt, btn);
+            }
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5) via PURE FIREBASE + UNIVERSAL HISTORY
+        function openHTMLIframeViewer(initialWaitTxt, btn) {
+            // Anti-clash buffer
+            setTimeout(() => {
+                countdownTime = globalAdTimerSeconds;
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+                
+                // Load Ad URL into iframe
+                document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
+
+                platformTimer = setInterval(() => {
+                    countdownTime--;
+                    btn.innerText = initialWaitTxt + `(${countdownTime}s)`;
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
+
+                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                    if(document.hidden) {
+                        clearInterval(platformTimer);
+                        document.getElementById("inAppAdViewer").style.display = "none";
+                        document.getElementById("adIframe").src = "";
+                        randomCoinsReward = 0; // Reset reward
+                        resetScratchModuleLocally();
+                        showCustomAlert("err_invalid");
+                        isValidationActive = false;
+                        return;
+                    }
+
+                    if(countdownTime <= 0) {
+                        clearInterval(platformTimer);
+                        btn.innerText = "PROCESSING...";
+                        document.getElementById("adTimerDisplay").style.display = "none";
+                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                    }
+                }, 1000);
+            }, 600);
+        }
+
+        // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
+            evaluateScratchReward(false);
+        }
+
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // Overwrite randomCoinsReward with SDK's given value just in case
+            randomCoinsReward = parseInt(rewardCoins);
+            evaluateScratchReward(true);
+        }
+
+        // 💰 REWARD SYNC API & DAILY CHECKLIST (t5) via PURE FIREBASE + UNIVERSAL HISTORY
+        function evaluateScratchReward(isSdk) {
+            let sdkTag = isSdk ? " [SDK]" : "";
 
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
@@ -743,7 +780,7 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Scratch Card Reward`,
+                    title: `Scratch Card Reward${sdkTag}`,
                     amount: randomCoinsReward,
                     type: "credit",
                     txn_type: "scratch_card",

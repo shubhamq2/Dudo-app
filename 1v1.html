@@ -24,6 +24,10 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-glow: rgba(59, 130, 246, 0.18);
+            /* 🔥 Fixed Missing CSS Variables Here 🔥 */
+            --accent-cyan: #06b6d4;
+            --accent-gold: #facc15;
+            --accent-pink: #f43f5e;
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 60%); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -150,11 +154,11 @@
         <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
-    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <!-- 🔥 IN-APP AD VIEWER HTML (ONLY FOR WEB ADS) 🔥 -->
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
             <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Secure Ad Task</div>
-            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
         <!-- Sandbox mode is ON for extreme safety -->
@@ -231,7 +235,7 @@
 
     </div>
 
-    <!-- 🟢 PURE FIREBASE ENGINE (With Avatar Sync & Admin Ads) -->
+    <!-- 🟢 PURE FIREBASE ENGINE (With Avatar Sync & Hybrid Ads Logic) -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -250,144 +254,34 @@
         
         let adPartnerLink = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
         
-        // 🔥 ADMIN CONTROLS VARIABLES 🔥
+        // 🔥 HYBRID AD CONTROL VARIABLES 🔥
         let globalAdTimerSeconds = 25; 
         let globalWinMultiplier = 2;   
+        let globalNativeSdkName = ""; // e.g. 'admob', 'unity', 'startio'
+        let globalNativeSdkId = "";   // e.g. 'ca-app-pub-xxx/yyy'
 
-        // PLAY STORE COMPLIANT TRANSLATIONS
+        // 🔥 FULLY RESTORED LANGUAGE DATA 🔥
         const langData = {
-            
-    "en": {
-        "arena_title": "Arena",
-        "cb_wallet": "Available Points",
-        "cb_desc": "Set your Entry Fee. Fast tap the highest number block to beat your opponent. Minimizing app cancels the match!",
-        "cb_searching": "Searching...",
-        "cb_btn_find": "Find Challenger ⚔️",
-        "cb_question": "WHICH NUMBER IS HIGHEST?",
-        "cb_connecting": "Connecting Matchmaking...",
-        "cb_active": "Battle Active! 🎯"
-    },
-    "hi": {
-        "arena_title": "अरीना",
-        "cb_wallet": "उपलब्ध पॉइंट्स",
-        "cb_desc": "एंट्री फीस सेट करें। विरोधी को हराने के लिए सबसे बड़े नंबर पर जल्दी टैप करें। ऐप मिनिमाइज़ करने पर मैच रद्द हो जाएगा!",
-        "cb_searching": "खोज रहे हैं...",
-        "cb_btn_find": "चैलेंजर खोजें ⚔️",
-        "cb_question": "कौन सा नंबर बड़ा है?",
-        "cb_connecting": "कनेक्ट हो रहा है...",
-        "cb_active": "बैटल शुरू! 🎯"
-    },
-    "bn": {
-        "arena_title": "অ্যারিনা",
-        "cb_wallet": "উপলব্ধ পয়েন্ট",
-        "cb_desc": "আপনার এন্ট্রি ফি সেট করুন। প্রতিপক্ষকে হারাতে সবচেয়ে বড় নম্বরে দ্রুত ট্যাপ করুন। অ্যাপ মিনিমাইজ করলে ম্যাচ বাতিল হয়ে যাবে!",
-        "cb_searching": "খুঁজছে...",
-        "cb_btn_find": "চ্যালেঞ্জার খুঁজুন ⚔️",
-        "cb_question": "কোন নম্বরটি বড়?",
-        "cb_connecting": "কানেক্ট হচ্ছে...",
-        "cb_active": "ব্যাটল শুরু! 🎯"
-    },
-    "te": {
-        "arena_title": "అరేనా",
-        "cb_wallet": "అందుబాటులో ఉన్న పాయింట్లు",
-        "cb_desc": "మీ ఎంట్రీ ఫీజు సెట్ చేయండి. ప్రత్యర్థిని ఓడించడానికి పెద్ద సంఖ్యను వేగంగా నొక్కండి. యాప్ మినిమైజ్ చేస్తే మ్యాచ్ రద్దవుతుంది!",
-        "cb_searching": "వెతుకుతోంది...",
-        "cb_btn_find": "ఛాలెంజర్‌ను వెతకండి ⚔️",
-        "cb_question": "ఏ సంఖ్య పెద్దది?",
-        "cb_connecting": "కనెక్ట్ అవుతోంది...",
-        "cb_active": "బ్యాటిల్ మొదలైంది! 🎯"
-    },
-    "mr": {
-        "arena_title": "अरीना",
-        "cb_wallet": "उपलब्ध पॉईंट्स",
-        "cb_desc": "तुमची एंट्री फी सेट करा. प्रतिस्पर्ध्याला हरवण्यासाठी सर्वात मोठ्या नंबरवर जलद टॅप करा. ॲप मिनिमाईज केल्यास मॅच रद्द होईल!",
-        "cb_searching": "शोधत आहे...",
-        "cb_btn_find": "चॅलेंजर शोधा ⚔️",
-        "cb_question": "कोणता नंबर मोठा आहे?",
-        "cb_connecting": "कनेक्ट होत आहे...",
-        "cb_active": "बॅटल सुरू! 🎯"
-    },
-    "ur": {
-        "arena_title": "ارینا",
-        "cb_wallet": "دستیاب پوائنٹس",
-        "cb_desc": "اپنی انٹری فیس سیٹ کریں۔ مخالف کو ہرانے کے لیے سب سے بڑے نمبر پر جلدی ٹیپ کریں۔ ایپ کو منیمائز کرنے سے میچ کینسل ہو جائے گا!",
-        "cb_searching": "تلاش کر رہا ہے...",
-        "cb_btn_find": "چیلنجر تلاش کریں ⚔️",
-        "cb_question": "کون سا نمبر بڑا ہے؟",
-        "cb_connecting": "کنیکٹ ہو رہا ہے...",
-        "cb_active": "مقابلہ شروع! 🎯"
-    },
-    "ta": {
-        "arena_title": "அரங்கம்",
-        "cb_wallet": "கிடைக்கும் புள்ளிகள்",
-        "cb_desc": "நுழைவுக் கட்டணத்தை அமைக்கவும். எதிராளியை வெல்ல பெரிய எண்ணை வேகமாக அழுத்தவும். ஆப்பை சிறிதாக்கினால் போட்டி ரத்தாகும்!",
-        "cb_searching": "தேடுகிறது...",
-        "cb_btn_find": "சவாலாளரைத் தேடு ⚔️",
-        "cb_question": "எந்த எண் பெரியது?",
-        "cb_connecting": "இணைகிறது...",
-        "cb_active": "போட்டி ஆரம்பம்! 🎯"
-    },
-    "gu": {
-        "arena_title": "અરેના",
-        "cb_wallet": "ઉપલબ્ધ પોઈન્ટ્સ",
-        "cb_desc": "તમારી એન્ટ્રી ફી સેટ કરો. વિરોધીને હરાવવા માટે સૌથી મોટા નંબર પર ઝડપથી ટેપ કરો. એપ મિનિમાઇઝ કરવાથી મેચ રદ થશે!",
-        "cb_searching": "શોધી રહ્યા છે...",
-        "cb_btn_find": "ચેલેન્જર શોધો ⚔️",
-        "cb_question": "કયો નંબર મોટો છે?",
-        "cb_connecting": "કનેક્ટ થઈ રહ્યું છે...",
-        "cb_active": "બેટલ શરૂ! 🎯"
-    },
-    "es": {
-        "arena_title": "Arena",
-        "cb_wallet": "Puntos Disponibles",
-        "cb_desc": "Establece tu cuota de entrada. Toca rápido el número más alto para vencer. ¡Minimizar la app cancela la partida!",
-        "cb_searching": "Buscando...",
-        "cb_btn_find": "Buscar Retador ⚔️",
-        "cb_question": "¿QUÉ NÚMERO ES MAYOR?",
-        "cb_connecting": "Conectando Matchmaking...",
-        "cb_active": "¡Batalla Activa! 🎯"
-    },
-    "fr": {
-        "arena_title": "Arène",
-        "cb_wallet": "Points Disponibles",
-        "cb_desc": "Fixez votre frais d'entrée. Touchez rapidement le plus grand nombre pour gagner. Minimiser l'appli annule le match !",
-        "cb_searching": "Recherche...",
-        "cb_btn_find": "Trouver un adversaire ⚔️",
-        "cb_question": "QUEL EST LE PLUS GRAND NOMBRE ?",
-        "cb_connecting": "Connexion en cours...",
-        "cb_active": "Bataille Active ! 🎯"
-    },
-    "ar": {
-        "arena_title": "الساحة",
-        "cb_wallet": "النقاط المتاحة",
-        "cb_desc": "حدد رسوم الدخول. انقر بسرعة على الرقم الأكبر لتهزم خصمك. تصغير التطبيق يلغي المباراة!",
-        "cb_searching": "جاري البحث...",
-        "cb_btn_find": "البحث عن منافس ⚔️",
-        "cb_question": "أي رقم هو الأكبر؟",
-        "cb_connecting": "جاري الاتصال...",
-        "cb_active": "المعركة بدأت! 🎯"
-    },
-    "pt": {
-        "arena_title": "Arena",
-        "cb_wallet": "Pontos Disponíveis",
-        "cb_desc": "Defina sua taxa de entrada. Toque rápido no maior número para vencer. Minimizar o app cancela a partida!",
-        "cb_searching": "Procurando...",
-        "cb_btn_find": "Encontrar Desafiante ⚔️",
-        "cb_question": "QUAL NÚMERO É MAIOR?",
-        "cb_connecting": "Conectando...",
-        "cb_active": "Batalha Ativa! 🎯"
-    },
-    "ru": {
-        "arena_title": "Арена",
-        "cb_wallet": "Доступные Очки",
-        "cb_desc": "Установите взнос. Быстро нажмите на наибольшее число, чтобы победить. Сворачивание отменяет матч!",
-        "cb_searching": "Поиск...",
-        "cb_btn_find": "Найти Соперника ⚔️",
-        "cb_question": "КАКОЕ ЧИСЛО БОЛЬШЕ?",
-        "cb_connecting": "Подключение...",
-        "cb_active": "Битва началась! 🎯"
-    }
-};
+            "en": {
+                "arena_title": "Arena", "cb_wallet": "Available Points", "cb_desc": "Set your Entry Fee. Fast tap the highest number block to beat your opponent. Minimizing app cancels the match!",
+                "cb_searching": "Searching...", "cb_btn_find": "Find Challenger ⚔️", "cb_question": "WHICH NUMBER IS HIGHEST?", "cb_connecting": "Connecting Matchmaking...", "cb_active": "Battle Active! 🎯"
+            },
+            "hi": {
+                "arena_title": "अरीना", "cb_wallet": "उपलब्ध पॉइंट्स", "cb_desc": "एंट्री फीस सेट करें। विरोधी को हराने के लिए सबसे बड़े नंबर पर जल्दी टैप करें। ऐप मिनिमाइज़ करने पर मैच रद्द हो जाएगा!",
+                "cb_searching": "खोज रहे हैं...", "cb_btn_find": "चैलेंजर खोजें ⚔️", "cb_question": "कौन सा नंबर बड़ा है?", "cb_connecting": "कनेक्ट हो रहा है...", "cb_active": "बैटल शुरू! 🎯"
+            },
+            "bn": { "arena_title": "অ্যারিনা", "cb_wallet": "উপলব্ধ পয়েন্ট", "cb_desc": "আপনার এন্ট্রি ফি সেট করুন। প্রতিপক্ষকে হারাতে সবচেয়ে বড় নম্বরে দ্রুত ট্যাপ করুন। অ্যাপ মিনিমাইজ করলে ম্যাচ বাতিল হয়ে যাবে!", "cb_searching": "খুঁজছে...", "cb_btn_find": "চ্যালেঞ্জার খুঁজুন ⚔️", "cb_question": "কোন নম্বরটি বড়?", "cb_connecting": "কানেক্ট হচ্ছে...", "cb_active": "ব্যাটল শুরু! 🎯" },
+            "te": { "arena_title": "అరేనా", "cb_wallet": "అందుబాటులో ఉన్న పాయింట్లు", "cb_desc": "మీ ఎంట్రీ ఫీజు సెట్ చేయండి. ప్రత్యర్థిని ఓడించడానికి పెద్ద సంఖ్యను వేగంగా నొక్కండి. యాప్ మినిమైజ్ చేస్తే మ్యాచ్ రద్దవుతుంది!", "cb_searching": "వెతుకుతోంది...", "cb_btn_find": "ఛాలెంజర్‌ను వెతకండి ⚔️", "cb_question": "ఏ సంఖ్య పెద్దది?", "cb_connecting": "కనెక్ట్ అవుతోంది...", "cb_active": "బ్యాటిల్ మొదలైంది! 🎯" },
+            "mr": { "arena_title": "अरीना", "cb_wallet": "उपलब्ध पॉईंट्स", "cb_desc": "तुमची एंट्री फी सेट करा. प्रतिस्पर्ध्याला हरवण्यासाठी सर्वात मोठ्या नंबरवर जलद टॅप करा. ॲप मिनिमाईज केल्यास मॅच रद्द होईल!", "cb_searching": "शोधत आहे...", "cb_btn_find": "चॅलेंजर शोधा ⚔️", "cb_question": "कोणता नंबर मोठा आहे?", "cb_connecting": "कनेक्ट होत आहे...", "cb_active": "बॅटल सुरू! 🎯" },
+            "ur": { "arena_title": "ارینا", "cb_wallet": "دستیاب پوائنٹس", "cb_desc": "اپنی انٹری فیس سیٹ کریں۔ مخالف کو ہرانے کے لیے سب سے بڑے نمبر پر جلدی ٹیپ کریں۔ ایپ کو منیمائز کرنے سے میچ کینسل ہو جائے گا!", "cb_searching": "تلاش کر رہا ہے...", "cb_btn_find": "چیلنجر تلاش کریں ⚔️", "cb_question": "کون سا نمبر بڑا ہے؟", "cb_connecting": "کنیکٹ ہو رہا ہے...", "cb_active": "مقابلہ شروع! 🎯" },
+            "ta": { "arena_title": "அரங்கம்", "cb_wallet": "கிடைக்கும் புள்ளிகள்", "cb_desc": "நுழைவுக் கட்டணத்தை அமைக்கவும். எதிராளியை வெல்ல பெரிய எண்ணை வேகமாக அழுத்தவும். ஆப்பை சிறிதாக்கினால் போட்டி ரத்தாகும்!", "cb_searching": "தேடுகிறது...", "cb_btn_find": "சவாலாளரைத் தேடு ⚔️", "cb_question": "எந்த எண் பெரியது?", "cb_connecting": "இணைகிறது...", "cb_active": "போட்டி ஆரம்பம்! 🎯" },
+            "gu": { "arena_title": "અરેના", "cb_wallet": "ઉપલબ્ધ પોઈન્ટ્સ", "cb_desc": "તમારી એન્ટ્રી ફી સેટ કરો. વિરોધીને હરાવવા માટે સૌથી મોટા નંબર પર ઝડપથી ટેપ કરો. એપ મિનિમાઇઝ કરવાથી મેચ રદ થશે!", "cb_searching": "શોધી રહ્યા છે...", "cb_btn_find": "ચેલેન્જર શોધો ⚔️", "cb_question": "કયો નંબર મોટો છે?", "cb_connecting": "કનેક્ટ થઈ રહ્યું છે...", "cb_active": "બેટલ શરૂ! 🎯" },
+            "es": { "arena_title": "Arena", "cb_wallet": "Puntos Disponibles", "cb_desc": "Establece tu cuota de entrada. Toca rápido el número más alto para vencer. ¡Minimizar la app cancela la partida!", "cb_searching": "Buscando...", "cb_btn_find": "Buscar Retador ⚔️", "cb_question": "¿QUÉ NÚMERO ES MAYOR?", "cb_connecting": "Conectando Matchmaking...", "cb_active": "¡Batalla Activa! 🎯" },
+            "fr": { "arena_title": "Arène", "cb_wallet": "Points Disponibles", "cb_desc": "Fixez votre frais d'entrée. Touchez rapidement le plus grand nombre pour gagner. Minimiser l'appli annule le match !", "cb_searching": "Recherche...", "cb_btn_find": "Trouver un adversaire ⚔️", "cb_question": "QUEL EST LE PLUS GRAND NOMBRE ?", "cb_connecting": "Connexion en cours...", "cb_active": "Bataille Active ! 🎯" },
+            "ar": { "arena_title": "الساحة", "cb_wallet": "النقاط المتاحة", "cb_desc": "حدد رسوم الدخول. انقر بسرعة على الرقم الأكبر لتهزم خصمك. تصغير التطبيق يلغي المباراة!", "cb_searching": "جاري البحث...", "cb_btn_find": "البحث عن منافس ⚔️", "cb_question": "أي رقم هو الأكبر؟", "cb_connecting": "جاري الاتصال...", "cb_active": "المعركة بدأت! 🎯" },
+            "pt": { "arena_title": "Arena", "cb_wallet": "Pontos Disponíveis", "cb_desc": "Defina sua taxa de entrada. Toque rápido no maior número para vencer. Minimizar o app cancela a partida!", "cb_searching": "Procurando...", "cb_btn_find": "Encontrar Desafiante ⚔️", "cb_question": "QUAL NÚMERO É MAIOR?", "cb_connecting": "Conectando...", "cb_active": "Batalha Ativa! 🎯" },
+            "ru": { "arena_title": "Арена", "cb_wallet": "Доступные Очки", "cb_desc": "Установите взнос. Быстро нажмите на наибольшее число, чтобы победить. Сворачивание отменяет матч!", "cb_searching": "Поиск...", "cb_btn_find": "Найти Соперника ⚔️", "cb_question": "КАКОЕ ЧИСЛО БОЛЬШЕ?", "cb_connecting": "Подключение...", "cb_active": "Битва началась! 🎯" }
+        };
 
         function changeLanguage(langCode) {
             localStorage.setItem("selectedLang", langCode);
@@ -445,12 +339,17 @@
                             
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
+                            function createEmojiURI(emoji) {
+                                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
+                                return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+                            }
+
                             document.getElementById("headerProfileIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                             document.getElementById("myAvatar").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                         }
                     });
 
-                    // 📡 2. FETCH ADMIN BANNERS, REWARD LINK & DYNAMIC VARIABLES
+                    // 📡 2. FETCH ADMIN BANNERS & HYBRID AD LOGIC
                     db.ref('global_system_runtime_configurations/1v1').on('value', (snap) => {
                         if (snap.exists()) {
                             const adminData = snap.val();
@@ -459,29 +358,28 @@
                                 adPartnerLink = adminData.battle_link;
                             }
                             
-                            // 🔥 Fetch Admin Timer & Multiplier 🔥
-                            if (adminData.ad_timer) {
-                                globalAdTimerSeconds = parseInt(adminData.ad_timer);
-                            }
-                            if (adminData.win_multiplier) {
-                                globalWinMultiplier = parseFloat(adminData.win_multiplier);
-                            }
+                            // 🔥 Fetch Admin Timer & Multiplier & SDK Data 🔥
+                            if (adminData.ad_timer) globalAdTimerSeconds = parseInt(adminData.ad_timer);
+                            if (adminData.win_multiplier) globalWinMultiplier = parseFloat(adminData.win_multiplier);
+                            if (adminData.sdk_name) globalNativeSdkName = adminData.sdk_name.trim();
+                            if (adminData.sdk_id) globalNativeSdkId = adminData.sdk_id.trim();
+
                             adjustEntryFee(0);
                             
                             // 🔥 FIXED Banner Ad Clash & Visibility 🔥
-if (adminData.slot1 && adminData.slot1.code && adminData.slot1.active !== false) {
-    document.getElementById("battleAdSlot1").style.display = "flex";
-    setTimeout(() => setAdHTML(document.getElementById("battleAdSlot1"), adminData.slot1.code), 400);
-} else {
-    document.getElementById("battleAdSlot1").style.display = "none";
-}
+                            if (adminData.slot1 && adminData.slot1.code && adminData.slot1.active !== false) {
+                                document.getElementById("battleAdSlot1").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("battleAdSlot1"), adminData.slot1.code), 400);
+                            } else {
+                                document.getElementById("battleAdSlot1").style.display = "none";
+                            }
 
-if (adminData.slot2 && adminData.slot2.code && adminData.slot2.active !== false) {
-    document.getElementById("battleAdSlot2").style.display = "flex";
-    setTimeout(() => setAdHTML(document.getElementById("battleAdSlot2"), adminData.slot2.code), 800);
-} else {
-    document.getElementById("battleAdSlot2").style.display = "none";
-}
+                            if (adminData.slot2 && adminData.slot2.code && adminData.slot2.active !== false) {
+                                document.getElementById("battleAdSlot2").style.display = "flex";
+                                setTimeout(() => setAdHTML(document.getElementById("battleAdSlot2"), adminData.slot2.code), 800);
+                            } else {
+                                document.getElementById("battleAdSlot2").style.display = "none";
+                            }
                         }
                     });
 
@@ -599,7 +497,23 @@ if (adminData.slot2 && adminData.slot2.code && adminData.slot2.active !== false)
 
             if(selectedDirectionString === mathematicallyCorrectAnswerStr) {
                 alert(`🎉 Victory! Watch a quick ad to claim your ${rewardPool} Points.`);
-                openInAppAdViewer(adPartnerLink, rewardPool, globalAdTimerSeconds, '1v1_battle_win');
+                
+                // 🔥 HYBRID LOGIC TRIGGER 🔥
+                if (globalNativeSdkId && globalNativeSdkId !== "") {
+                    // SDK Ad (Native Android)
+                    if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                        // Pass data to Android
+                        window.AndroidBridge.showNativeAd(globalNativeSdkName, globalNativeSdkId, rewardPool, "1v1_battle_win");
+                        executeResetBattleTerminalState();
+                    } else {
+                        // Fallback if AndroidBridge is somehow not ready
+                        openInAppAdViewer(adPartnerLink, rewardPool, globalAdTimerSeconds, '1v1_battle_win');
+                    }
+                } else {
+                    // HTML Ad (Web/Iframe)
+                    openInAppAdViewer(adPartnerLink, rewardPool, globalAdTimerSeconds, '1v1_battle_win');
+                }
+
             } else {
                 alert(`❌ Defeat! Incorrect or too slow.`);
                 executeResetBattleTerminalState();
@@ -617,46 +531,47 @@ if (adminData.slot2 && adminData.slot2.code && adminData.slot2.active !== false)
             isBattleActive = false;
         }
 
-        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC WITH UNIVERSAL HISTORY 🔥
+        // 🔥 ADVANCED HTML IN-APP AD VIEWER LOGIC WITH UNIVERSAL HISTORY 🔥
         let adTimerInterval = null;
         let pendingRewardCoins = 0; 
         let pendingTaskName = "";   
 
         function openInAppAdViewer(adUrl, rewardCoinsAmount, timerSeconds, taskName = "ad_task") {
-    pendingRewardCoins = rewardCoinsAmount;
-    pendingTaskName = taskName;
-    let countdownTime = timerSeconds;
-    
-    document.getElementById("inAppAdViewer").style.display = "flex";
-    document.getElementById("adTimerDisplay").style.display = "flex";
-    document.getElementById("adCloseBtn").style.display = "none";
-    
-    // 🔥 जब तक ऐड लोड होगा, टाइमर नहीं घटेगा
-    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-    
-    let iframeNode = document.getElementById("adIframe");
-    
-    // 🔥 iframe.onload का मतलब है "जब ऐड 100% स्क्रीन पर आ जाए, तभी टाइमर शुरू करो"
-    iframeNode.onload = function() {
-        if (adTimerInterval) clearInterval(adTimerInterval);
-        
-        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-        
-        adTimerInterval = setInterval(() => {
-            countdownTime--;
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-            
-            if (countdownTime <= 0) {
-                clearInterval(adTimerInterval);
-                document.getElementById("adTimerDisplay").style.display = "none";
-                document.getElementById("adCloseBtn").style.display = "block";
-            }
-        }, 1000);
-    };
-    
-    // अब ऐड को लोड करना शुरू करो
-    iframeNode.src = adUrl;
-}
+            // Anti-clash buffer
+            setTimeout(() => {
+                pendingRewardCoins = rewardCoinsAmount;
+                pendingTaskName = taskName;
+                let countdownTime = timerSeconds;
+                
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+                
+                iframeNode.onload = function() {
+                    if (adTimerInterval) clearInterval(adTimerInterval);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    adTimerInterval = setInterval(() => {
+                        countdownTime--;
+                        let span = document.getElementById("adSecondsSpan");
+                        if(span) span.innerText = countdownTime;
+                        
+                        if (countdownTime <= 0) {
+                            clearInterval(adTimerInterval);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block";
+                        }
+                    }, 1000);
+                };
+                
+                iframeNode.src = adUrl;
+            }, 600); // 600ms gap
+        }
 
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
@@ -670,7 +585,7 @@ if (adminData.slot2 && adminData.slot2.code && adminData.slot2.active !== false)
                     return (current || 0) + pendingRewardCoins;
                 }).then(() => {
                     
-                    // 2. 🔥 Push to Universal History (For Account Health & Referral Unlock)
+                    // 2. 🔥 Push to Universal History
                     db.ref(`users/${uid}/history`).push({
                         title: "Point Battle Win",
                         amount: pendingRewardCoins,
@@ -699,6 +614,27 @@ if (adminData.slot2 && adminData.slot2.code && adminData.slot2.active !== false)
                 });
             } else {
                 executeResetBattleTerminalState();
+            }
+        }
+        
+        // 🔥 FUNCTION FOR ANDROID TO CALL AFTER SDK AD IS WATCHED 🔥
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            const uid = localStorage.getItem("userId");
+            if(rewardCoins > 0 && typeof uid !== 'undefined' && uid) {
+                db.ref(`users/${uid}/coins`).transaction((current) => {
+                    return (current || 0) + parseInt(rewardCoins);
+                }).then(() => {
+                    db.ref(`users/${uid}/history`).push({
+                        title: "Point Battle Win (SDK)",
+                        amount: parseInt(rewardCoins),
+                        type: "credit",
+                        txn_type: "credit",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    alert(`💰 SDK Reward Credited: +${rewardCoins} Points!`);
+                });
             }
         }
     </script>

@@ -110,6 +110,7 @@
             <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 20s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
+        <!-- Sandbox mode for extreme safety -->
         <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
@@ -146,7 +147,7 @@
 
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK LOGIC -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -163,9 +164,11 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & LIMITS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 20; // Default time
         let globalDailyLimit = 15;     // Default max limit
+        let globalSdkName = "";
+        let globalSdkId = "";
 
         let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         let userTodayClaimsCount = 0;
@@ -227,7 +230,6 @@
 
         // Engine State Variables
         let liveTickerCountdownValueInt = 20;
-        let totalActiveFocusSecondsInt = 0;
         let runningTaskEngineInterval = null;
         let activeProcessingTaskIdInt = null;
         let activeProcessingTaskCoinsRewardValueInt = 0;
@@ -298,15 +300,15 @@
                             
                             globalAdminDataConfig = adminData.smart_tasks_configs || null;
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME & LIMIT
+                            // 🔥 GET ADMIN CONTROLLED TIME, LIMIT & SDK
                             if (globalAdminDataConfig) {
-                                if (globalAdminDataConfig.ad_timer) {
-                                    globalAdTimerSeconds = parseInt(globalAdminDataConfig.ad_timer);
-                                }
-                                if (globalAdminDataConfig.daily_limit) {
+                                if (globalAdminDataConfig.ad_timer) { globalAdTimerSeconds = parseInt(globalAdminDataConfig.ad_timer); }
+                                if (globalAdminDataConfig.daily_limit) { 
                                     globalDailyLimit = parseInt(globalAdminDataConfig.daily_limit);
                                     document.getElementById("totalSmartTaskLimit").innerText = globalDailyLimit;
                                 }
+                                if (globalAdminDataConfig.sdk_name) { globalSdkName = globalAdminDataConfig.sdk_name.trim(); }
+                                if (globalAdminDataConfig.sdk_id) { globalSdkId = globalAdminDataConfig.sdk_id.trim(); }
                             }
 
                             executeDynamicEngineRenderer(globalAdminDataConfig);
@@ -468,7 +470,7 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🔒 SMART TASK INTERLOCK MODULE (WITH IN-APP VIEWER)
+        // 🔒 SMART TASK INTERLOCK MODULE WITH HYBRID SDK ROUTING
         function executeTriggerSmartTask(taskIdInt, rewardCoinsValueInt, targetUrlStr) {
             // 🔥 ANTI-BAN: Custom Limit Check
             if(userTodayClaimsCount >= globalDailyLimit) {
@@ -484,59 +486,86 @@
             activeProcessingTaskIdInt = taskIdInt;
             activeProcessingTaskCoinsRewardValueInt = rewardCoinsValueInt;
 
-            liveTickerCountdownValueInt = globalAdTimerSeconds;
-            totalActiveFocusSecondsInt = 0;
             window.hasMainTabHidden = false; // Reset Tracker
 
-            // IN-APP VIEWER DISPLAY
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Task...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if(runningTaskEngineInterval) clearInterval(runningTaskEngineInterval);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${liveTickerCountdownValueInt}s`;
-
-                runningTaskEngineInterval = setInterval(() => {
-                    liveTickerCountdownValueInt--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${liveTickerCountdownValueInt}s`;
-
-                    // Check: Background tab minimizing validation monitor
-                    if(document.hidden) {
-                        clearInterval(runningTaskEngineInterval);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        executeRollbackTaskWallHUD();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if(liveTickerCountdownValueInt <= 0) {
-                        clearInterval(runningTaskEngineInterval);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = targetUrlStr;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, rewardCoinsValueInt, "smart_task");
+                } else {
+                    openHTMLIframeViewer(targetUrlStr);
+                }
+            } else {
+                openHTMLIframeViewer(targetUrlStr);
+            }
         }
 
-        // 💰 DATA REWARD PIPELINE (PURE FIREBASE API & DAILY TASK SYNC 't13' & HISTORY)
+        function openHTMLIframeViewer(targetUrlStr) {
+            // Anti-clash buffer
+            setTimeout(() => {
+                liveTickerCountdownValueInt = globalAdTimerSeconds;
+                
+                // IN-APP VIEWER DISPLAY
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Task...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if(runningTaskEngineInterval) clearInterval(runningTaskEngineInterval);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${liveTickerCountdownValueInt}s`;
+
+                    runningTaskEngineInterval = setInterval(() => {
+                        liveTickerCountdownValueInt--;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${liveTickerCountdownValueInt}s`;
+
+                        // Check: Background tab minimizing validation monitor
+                        if(document.hidden) {
+                            clearInterval(runningTaskEngineInterval);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            executeRollbackTaskWallHUD();
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if(liveTickerCountdownValueInt <= 0) {
+                            clearInterval(runningTaskEngineInterval);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = targetUrlStr;
+            }, 600); // 600ms gap
+        }
+
+        // HTML Ad Close Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
-            executeCreditVerifiedTaskCoinsViaFirebase();
+            executeCreditVerifiedTaskCoinsViaFirebase(false);
         }
 
-        function executeCreditVerifiedTaskCoinsViaFirebase() {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // Re-sync reward just in case SDK passes it back
+            activeProcessingTaskCoinsRewardValueInt = parseInt(rewardCoins);
+            executeCreditVerifiedTaskCoinsViaFirebase(true);
+        }
+
+        // 💰 DATA REWARD PIPELINE (PURE FIREBASE API & DAILY TASK SYNC 't13' & HISTORY)
+        function executeCreditVerifiedTaskCoinsViaFirebase(isSdk) {
+            let sdkTag = isSdk ? " [SDK]" : "";
+
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
                 return (current || 0) + activeProcessingTaskCoinsRewardValueInt;
@@ -550,7 +579,7 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Smart Wall Task Reward`,
+                    title: `Smart Wall Task Reward${sdkTag}`,
                     amount: activeProcessingTaskCoinsRewardValueInt,
                     type: "credit",
                     txn_type: "smart_task",

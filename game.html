@@ -166,7 +166,7 @@
         <span data-i18n="gm_security">Authentic arcade engine verified by Play Store. Enjoy the game and collect your reward points securely.</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
@@ -182,8 +182,11 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 25; // Default time
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
+        let globalSdkName = "";
+        let globalSdkId = "";
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
@@ -235,7 +238,6 @@
         }
 
         const uid = localStorage.getItem("userId");
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
 
         // Network Monitor
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
@@ -274,13 +276,15 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Link & Time)
+                    // 2. Fetch Admin Configurations (Banners, Link & SDK Config)
                     db.ref('global_system_runtime_configurations/arcade_game_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME
+                            // 🔥 GET ADMIN CONTROLLED SETTINGS 🔥
                             if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            if (adminData.sdk_name) { globalSdkName = adminData.sdk_name.trim(); }
+                            if (adminData.sdk_id) { globalSdkId = adminData.sdk_id.trim(); }
                             
                             // Load Banners (Fixed with setTimeout)
                             let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
@@ -503,6 +507,7 @@
                 return;
             }
 
+            // Score > 0, Move to Ad Viewer
             triggerSecureEarningVerificationRoute();
         }
 
@@ -523,71 +528,99 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🚀 SYSTEM SECURE IN-APP AD VIEWER FOR ARCADE
+        // 🚀 SYSTEM SECURE IN-APP AD VIEWER FOR ARCADE WITH HYBRID SDK
         let platformTimer = null;
 
         function triggerSecureEarningVerificationRoute() {
             const btn = document.getElementById("overlayActionBtn");
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            
-            let countdownTime = globalAdTimerSeconds;
-
             let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying Score... ";
             btn.innerText = baseWaitTxt;
             btn.disabled = true;
 
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if (platformTimer) clearInterval(platformTimer);
-
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                platformTimer = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if(document.hidden) {
-                        clearInterval(platformTimer);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        resetGameMenuUIElements();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if(countdownTime <= 0) {
-                        clearInterval(platformTimer);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            iframeNode.src = activeAdminSmartlinkUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    // Score = Reward Coins
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, scoreCounter, "arcade_game");
+                } else {
+                    // Fallback to HTML
+                    openHTMLIframeViewer();
+                }
+            } else {
+                openHTMLIframeViewer();
+            }
         }
 
-        // 💰 REWARD SYNC API & UNIVERSAL HISTORY INTEGRATION
+        function openHTMLIframeViewer() {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                let countdownTime = globalAdTimerSeconds;
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if (platformTimer) clearInterval(platformTimer);
+
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    platformTimer = setInterval(() => {
+                        countdownTime--;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if(document.hidden) {
+                            clearInterval(platformTimer);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            resetGameMenuUIElements();
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if(countdownTime <= 0) {
+                            clearInterval(platformTimer);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = activeAdminSmartlinkUrl;
+            }, 600); // 600ms delay
+        }
+
+        // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
-
+            
             // Strict Reward: 1 Score = 1 Coin 
-            let rewardCoinsCalculatedValue = scoreCounter * 1; 
-            evaluateGameRewardViaFirebase(rewardCoinsCalculatedValue);
+            evaluateGameRewardViaFirebase(scoreCounter * 1, false);
         }
 
-        function evaluateGameRewardViaFirebase(rewardAmount) {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // SDK passes rewardCoins (which is actually the score sent from earlier)
+            evaluateGameRewardViaFirebase(parseInt(rewardCoins), true);
+        }
+
+        // 💰 REWARD SYNC API & UNIVERSAL HISTORY INTEGRATION
+        function evaluateGameRewardViaFirebase(rewardAmount, isSdk) {
+            if(rewardAmount <= 0) return;
             
+            let sdkTag = isSdk ? " [SDK]" : "";
+
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
                 return (current || 0) + rewardAmount;
@@ -595,7 +628,7 @@
                 
                 // 2. 🔥 UNIVERSAL HISTORY PUSH (For Account Health & Referral Tracking) 🔥
                 db.ref(`users/${uid}/history`).push({
-                    title: `Arcade Game Reward`,
+                    title: `Arcade Game Reward${sdkTag}`,
                     amount: rewardAmount,
                     type: "credit",
                     txn_type: "game_reward",

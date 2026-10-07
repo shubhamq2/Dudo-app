@@ -120,7 +120,7 @@
     <div class="overlay" id="alertOverlay"></div>
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
-        <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
+        <button onclick="closeCustomAlert()">OK</button>
     </div>
 
     <!-- 🌐 OFFLINE SCREEN -->
@@ -138,6 +138,7 @@
             <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 15s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
+        <!-- Sandbox mode for extreme safety -->
         <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
@@ -249,7 +250,7 @@
 
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -309,37 +310,37 @@
 
         const uid = localStorage.getItem("userId");
 
-        // 🔥 DYNAMIC LINKS MAPPING (18 SERVERS - Fetched from Admin)
+        // 🔥 DYNAMIC LINKS MAPPING WITH SDK DATA (18 SERVERS - Fetched from Admin)
         let videoAdminLinksConfig = {
             adscend: { 
-                srv1: { link: "", timer: 15, reward: 15 },
-                srv2: { link: "", timer: 15, reward: 12 },
-                srv3: { link: "", timer: 15, reward: 10 }
+                srv1: { link: "", timer: 15, reward: 15, sdk_name: "", sdk_id: "" },
+                srv2: { link: "", timer: 15, reward: 12, sdk_name: "", sdk_id: "" },
+                srv3: { link: "", timer: 15, reward: 10, sdk_name: "", sdk_id: "" }
             },
             lootably: { 
-                srv1: { link: "", timer: 15, reward: 15 },
-                srv2: { link: "", timer: 15, reward: 12 },
-                srv3: { link: "", timer: 15, reward: 10 }
+                srv1: { link: "", timer: 15, reward: 15, sdk_name: "", sdk_id: "" },
+                srv2: { link: "", timer: 15, reward: 12, sdk_name: "", sdk_id: "" },
+                srv3: { link: "", timer: 15, reward: 10, sdk_name: "", sdk_id: "" }
             },
             hideout: { 
-                srv1: { link: "", timer: 15, reward: 15 },
-                srv2: { link: "", timer: 15, reward: 12 },
-                srv3: { link: "", timer: 15, reward: 10 }
+                srv1: { link: "", timer: 15, reward: 15, sdk_name: "", sdk_id: "" },
+                srv2: { link: "", timer: 15, reward: 12, sdk_name: "", sdk_id: "" },
+                srv3: { link: "", timer: 15, reward: 10, sdk_name: "", sdk_id: "" }
             },
             timewall: { 
-                srv1: { link: "", timer: 15, reward: 15 },
-                srv2: { link: "", timer: 15, reward: 12 },
-                srv3: { link: "", timer: 15, reward: 10 }
+                srv1: { link: "", timer: 15, reward: 15, sdk_name: "", sdk_id: "" },
+                srv2: { link: "", timer: 15, reward: 12, sdk_name: "", sdk_id: "" },
+                srv3: { link: "", timer: 15, reward: 10, sdk_name: "", sdk_id: "" }
             },
             notik: { 
-                srv1: { link: "", timer: 15, reward: 15 },
-                srv2: { link: "", timer: 15, reward: 12 },
-                srv3: { link: "", timer: 15, reward: 10 }
+                srv1: { link: "", timer: 15, reward: 15, sdk_name: "", sdk_id: "" },
+                srv2: { link: "", timer: 15, reward: 12, sdk_name: "", sdk_id: "" },
+                srv3: { link: "", timer: 15, reward: 10, sdk_name: "", sdk_id: "" }
             },
             monlix: { 
-                srv1: { link: "", timer: 15, reward: 15 },
-                srv2: { link: "", timer: 15, reward: 12 },
-                srv3: { link: "", timer: 15, reward: 10 }
+                srv1: { link: "", timer: 15, reward: 15, sdk_name: "", sdk_id: "" },
+                srv2: { link: "", timer: 15, reward: 12, sdk_name: "", sdk_id: "" },
+                srv3: { link: "", timer: 15, reward: 10, sdk_name: "", sdk_id: "" }
             },
             default_link: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"
         };
@@ -384,7 +385,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Limits & All 18 Servers Data)
+                    // 2. Fetch Admin Configurations (Banners, Limits & All 18 Servers Data with SDK)
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -426,6 +427,10 @@
                                         if(vzConfig[`link_${net}_s${i}`]) videoAdminLinksConfig[net][`srv${i}`].link = vzConfig[`link_${net}_s${i}`];
                                         if(vzConfig[`timer_${net}_s${i}`]) videoAdminLinksConfig[net][`srv${i}`].timer = parseInt(vzConfig[`timer_${net}_s${i}`]);
                                         if(vzConfig[`reward_${net}_s${i}`]) videoAdminLinksConfig[net][`srv${i}`].reward = parseInt(vzConfig[`reward_${net}_s${i}`]);
+                                        
+                                        // SDK Logic
+                                        if(vzConfig[`sdk_name_${net}_s${i}`]) videoAdminLinksConfig[net][`srv${i}`].sdk_name = vzConfig[`sdk_name_${net}_s${i}`].trim();
+                                        if(vzConfig[`sdk_id_${net}_s${i}`]) videoAdminLinksConfig[net][`srv${i}`].sdk_id = vzConfig[`sdk_id_${net}_s${i}`].trim();
                                     }
                                 });
                             } 
@@ -538,7 +543,7 @@
             activeWatchSession = null;
         }
 
-        // 🚀 PLAY STORE SAFE VALIDATION ENGINE (IN-APP VIEWER)
+        // 🚀 PLAY STORE SAFE VALIDATION ENGINE WITH HYBRID SDK
         function triggerSecureAdStream(network, serverId, serverTitle, rewardAmt, timerSecs) {
             if(isValidationActive) return;
             isValidationActive = true;
@@ -554,51 +559,71 @@
             // Disable all buttons in modal
             document.querySelectorAll(".video-option-btn").forEach(b => b.disabled = true);
 
-            let countdown = timerSecs;
             window.hasMainTabHidden = false; // Reset Tracker
 
-            let finalTargetAdUrl = videoAdminLinksConfig[network][serverId].link || videoAdminLinksConfig.default_link;
+            let config = videoAdminLinksConfig[network][serverId];
+            let finalTargetAdUrl = config.link || videoAdminLinksConfig.default_link;
             
-            // HIDE MODAL & SHOW IN-APP VIEWER
-            document.getElementById("videoOptionsModal").style.display = "none";
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (config.sdk_id && config.sdk_id !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(config.sdk_name, config.sdk_id, rewardAmt, network);
+                    closeVideoOptionsModal();
+                } else {
+                    openHTMLIframeViewer(finalTargetAdUrl, timerSecs);
+                }
+            } else {
+                openHTMLIframeViewer(finalTargetAdUrl, timerSecs);
+            }
+        }
 
-            iframeNode.onload = function() {
-                if(platformTimer) clearInterval(platformTimer);
+        function openHTMLIframeViewer(finalTargetAdUrl, timerSecs) {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                let countdown = timerSecs;
                 
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdown}s`;
+                // HIDE MODAL & SHOW IN-APP VIEWER
+                document.getElementById("videoOptionsModal").style.display = "none";
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
 
-                platformTimer = setInterval(() => {
-                    countdown--;
+                iframeNode.onload = function() {
+                    if(platformTimer) clearInterval(platformTimer);
+                    
                     document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdown}s`;
 
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if (document.hidden) { 
-                        clearInterval(platformTimer);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        resetModalUI();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
+                    platformTimer = setInterval(() => {
+                        countdown--;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdown}s`;
 
-                    if (countdown <= 0) {
-                        clearInterval(platformTimer);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if (document.hidden) { 
+                            clearInterval(platformTimer);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            resetModalUI();
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
 
-            // Load Ad URL into iframe
-            iframeNode.src = finalTargetAdUrl;
+                        if (countdown <= 0) {
+                            clearInterval(platformTimer);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = finalTargetAdUrl;
+            }, 600); // 600ms gap
         }
 
         function resetModalUI() {
@@ -610,12 +635,18 @@
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
-            evaluateRewardValidationViaFirebase();
+            evaluateRewardValidationViaFirebase(false);
         }
 
-        function evaluateRewardValidationViaFirebase() {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            evaluateRewardValidationViaFirebase(true);
+        }
+
+        function evaluateRewardValidationViaFirebase(isSdk) {
             if (!activeWatchSession || !activeWatchSession.isValid) { resetModalUI(); return; }
 
+            let sdkTag = isSdk ? " [SDK]" : "";
             let finalCoinsReward = activeWatchSession.reward;
             let netName = activeWatchSession.network.toUpperCase();
 
@@ -632,7 +663,7 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Video Ad Reward (${netName})`,
+                    title: `Video Ad Reward (${netName})${sdkTag}`,
                     amount: finalCoinsReward,
                     type: "credit",
                     txn_type: "video_zone",

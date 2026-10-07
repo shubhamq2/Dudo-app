@@ -95,6 +95,8 @@
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+        
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -103,6 +105,14 @@
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
     <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
@@ -210,7 +220,7 @@
         </div>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -292,14 +302,14 @@
         const uid = localStorage.getItem("userId");
         let userDailyClicksData = {};
 
-        // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMERS & REWARDS FOR ALL 6 CATEGORIES
+        // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMERS, REWARDS & SDK FOR ALL 6 CATEGORIES
         let partnerLinksAdminConfig = {
-            surveys: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-            apps: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-            games: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-            signups: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-            quizzes: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 },
-            premium: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50 }
+            surveys: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+            apps: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+            games: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+            signups: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+            quizzes: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" },
+            premium: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "" }
         };
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -335,16 +345,20 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Timers, Coins & Specific Links for 6 categories)
+                    // 2. Fetch Admin Configurations (Banners, Timers, Coins, SDK & Specific Links for 6 categories)
                     db.ref('global_system_runtime_configurations/partner_offers_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 EXTRACT 6 INDIVIDUAL SETTINGS 🔥
+                            // 🔥 EXTRACT 6 INDIVIDUAL SETTINGS WITH SDK 🔥
                             ['surveys', 'apps', 'games', 'signups', 'quizzes', 'premium'].forEach(cat => {
                                 if(adminData['link_' + cat]) partnerLinksAdminConfig[cat].url = adminData['link_' + cat];
                                 if(adminData['timer_' + cat]) partnerLinksAdminConfig[cat].timer = parseInt(adminData['timer_' + cat]);
                                 if(adminData['reward_' + cat]) partnerLinksAdminConfig[cat].reward = parseInt(adminData['reward_' + cat]);
+                                
+                                // SDK Details
+                                if(adminData['sdk_name_' + cat]) partnerLinksAdminConfig[cat].sdk_name = adminData['sdk_name_' + cat].trim();
+                                if(adminData['sdk_id_' + cat]) partnerLinksAdminConfig[cat].sdk_id = adminData['sdk_id_' + cat].trim();
                             });
 
                             // Load Banners Safely
@@ -454,7 +468,7 @@
             isValidationActive = false;
         }
 
-        // 🚀 PLAY STORE SAFE IN-APP SYSTEM VALIDATION LOGIC (WITH SMART TIMER)
+        // 🚀 PLAY STORE SAFE IN-APP SYSTEM VALIDATION LOGIC WITH HYBRID SDK ROUTING
         function executeTaskRedirection() {
             if(isValidationActive) return;
             isValidationActive = true;
@@ -465,70 +479,96 @@
             const startBtn = document.getElementById("btnStartTask");
             let lang = localStorage.getItem("selectedLang") || "en";
             let verifyText = langData[lang] && langData[lang]["verifying"] ? langData[lang]["verifying"] : "Verifying tracking... ";
-
+            
             startBtn.disabled = true;
+            startBtn.innerText = verifyText;
 
-            let targetDestinationUrl = config.url;
-            let countdownTime = config.timer;
-
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Offer...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if(offerTimer) clearInterval(offerTimer);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                offerTimer = setInterval(() => {
-                    countdownTime--;
-                    startBtn.innerText = `${verifyText}(${countdownTime}s)`;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if (document.hidden) { 
-                        clearInterval(offerTimer);
-                        closeTaskInstructionModal();
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if (countdownTime <= 0) {
-                        clearInterval(offerTimer);
-                        startBtn.innerText = "SAVING...";
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            // Load Ad URL into iframe
-            iframeNode.src = targetDestinationUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (config.sdk_id && config.sdk_id !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(config.sdk_name, config.sdk_id, config.reward, taskKey);
+                    closeTaskInstructionModal();
+                } else {
+                    // Fallback to HTML
+                    openHTMLIframeViewer(config, verifyText);
+                }
+            } else {
+                openHTMLIframeViewer(config, verifyText);
+            }
         }
 
-        // 💰 REWARD SYNC API, UNIVERSAL HISTORY & DAILY CHECKLIST INTEGRATION
+        function openHTMLIframeViewer(config, verifyText) {
+            // Anti-clash buffer
+            setTimeout(() => {
+                const startBtn = document.getElementById("btnStartTask");
+                let targetDestinationUrl = config.url;
+                let countdownTime = config.timer;
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Offer...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if(offerTimer) clearInterval(offerTimer);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    offerTimer = setInterval(() => {
+                        countdownTime--;
+                        if(startBtn) startBtn.innerText = `${verifyText}(${countdownTime}s)`;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if (document.hidden) { 
+                            clearInterval(offerTimer);
+                            closeTaskInstructionModal();
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(offerTimer);
+                            if(startBtn) startBtn.innerText = "SAVING...";
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                iframeNode.src = targetDestinationUrl;
+            }, 600); // 600ms gap
+        }
+
+        // HTML Close Button Handler
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
-            evaluateTaskRewardViaFirebase(currentActiveTaskKey);
+            evaluateTaskRewardViaFirebase(currentActiveTaskKey, false);
         }
 
-        function evaluateTaskRewardViaFirebase(taskKey) {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // SDK gives back taskName (e.g., 'surveys', 'apps')
+            evaluateTaskRewardViaFirebase(taskName, true);
+        }
+
+        // 💰 REWARD SYNC API, UNIVERSAL HISTORY & DAILY CHECKLIST INTEGRATION
+        function evaluateTaskRewardViaFirebase(taskKey, isSdk) {
             document.getElementById("taskInstructionModal").style.display = "none";
-            if (!isValidationActive) { 
-                return; 
-            }
+            if (!isValidationActive) return; 
 
             let nameDisplay = taskKey.toUpperCase();
             let rewardToGive = partnerLinksAdminConfig[taskKey].reward;
+            let sdkTag = isSdk ? " [SDK]" : "";
             let todayDateString = new Date().toLocaleDateString("en-CA");
 
             // 1. Add Coins securely via Transaction
@@ -541,7 +581,7 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Partner Offer (${nameDisplay})`,
+                    title: `Partner Offer (${nameDisplay})${sdkTag}`,
                     amount: rewardToGive,
                     type: "credit",
                     txn_type: "offerwall",
@@ -550,7 +590,7 @@
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
 
-                // 4. Mark Daily Task 't14' as Complete (Using t14 as it relates to Partner Tasks)
+                // 4. Mark Daily Task 't14' as Complete
                 db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                     let tasks = snap.val() || [];
                     if (!tasks.includes("t14")) {

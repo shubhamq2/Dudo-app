@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="monetag" content="b88623ca38027a7a22385c8a711ee005">
     <title>Home - Dudo</title>
     
     <!-- Google Fonts & FontAwesome -->
@@ -164,7 +163,6 @@
             }
         } catch(e) {}
     </script>
-    
 </head>
 <body>
 
@@ -210,21 +208,33 @@
         </div>
     </div>
 
-    <!-- 🔔 5. ADMIN NOTIFICATION CENTER MODAL -->
+       <!-- 🔔 5. ADMIN NOTIFICATION CENTER MODAL (Categorized) -->
     <div class="system-modal-overlay" id="notificationCenterModal">
         <div class="notif-center-card">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:15px;">
-                <h3 style="margin:0; color:var(--accent-cyan); font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-bell"></i> <span data-i18n="mod_alerts">Alerts</span></h3>
+                <h3 style="margin:0; color:var(--accent-cyan); font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-bell"></i> <span data-i18n="mod_alerts">Inbox</span></h3>
                 <div style="display:flex; gap:12px; align-items:center;">
-                    <button onclick="document.getElementById('notifListContainer').innerHTML='<div style=\'text-align:center; color:var(--text-sub); margin-top:30px; font-weight:bold;\'>Cleared...</div>'" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;" data-i18n="mod_clear">Clear All</button>
+                    <button onclick="clearAllNotifications()" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;" data-i18n="mod_clear">Clear All</button>
+
                     <button onclick="document.getElementById('notificationCenterModal').style.display='none'" style="background:rgba(255,255,255,0.1); border:none; width:32px; height:32px; border-radius:50%; font-size:14px; font-weight:bold; color:#fff; cursor:pointer; transition:0.2s;">✕</button>
                 </div>
             </div>
+            
+            <!-- Category Tabs -->
+            <div class="notif-tabs-container">
+                <button class="notif-tab-btn active" onclick="filterNotifications('all')">All</button>
+                <button class="notif-tab-btn" onclick="filterNotifications('app')">📲 Apps</button>
+                <button class="notif-tab-btn" onclick="filterNotifications('video')">📺 Videos</button>
+                <button class="notif-tab-btn" onclick="filterNotifications('alert')">⚠️ Alerts</button>
+                <button class="notif-tab-btn" onclick="filterNotifications('general')">📢 General</button>
+            </div>
+
             <div id="notifListContainer" style="overflow-y:auto; flex-grow:1; display:flex; flex-direction:column; padding-right:5px;">
                 <div style="text-align:center; color:var(--text-sub); font-size:13.5px; margin-top:30px; font-weight:600;" data-i18n="mod_no_notif">No new updates...</div>
             </div>
         </div>
     </div>
+
 
     <!-- 👑 Header Bar -->
     <div class="header">
@@ -533,7 +543,18 @@
             <button id="urgentTaskCloseBtn" style="background:transparent; color:#94a3b8; border:none; margin-top:18px; font-size:13px; font-weight:bold; cursor:pointer; text-decoration:underline;" data-i18n="mod_skip">Close & Continue</button>
         </div>
     </div>
-    <style>@keyframes popIn { from {transform: scale(0.7); opacity: 0;} to {transform: scale(1); opacity: 1;} }</style>
+    
+    <style>
+            /* 🔔 Categorized Notification Tabs & Action Buttons */
+        .notif-tabs-container { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .notif-tabs-container::-webkit-scrollbar { height: 0px; }
+        .notif-tab-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-sub); padding: 8px 15px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; transition: 0.2s; text-transform: uppercase; }
+        .notif-tab-btn.active { background: rgba(59, 130, 246, 0.2); border-color: var(--primary-blue); color: #fff; }
+        .notif-action-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 8px; width: fit-content; text-decoration: none; display: inline-block; transition: 0.2s; }
+        .notif-action-btn.app { background: rgba(6, 182, 212, 0.2); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .notif-action-btn.video { background: rgba(239, 68, 68, 0.2); border-color: var(--accent-pink); color: #fca5a5; }
+        .notif-action-btn.alert { background: rgba(245, 158, 11, 0.2); border-color: var(--accent-gold); color: var(--accent-gold); }
+        @keyframes popIn { from {transform: scale(0.7); opacity: 0;} to {transform: scale(1); opacity: 1;} }</style>
 
     <!-- 🏆 HOME SCREEN WINNER POPUP -->
     <div class="overlay" id="homeWinnerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; backdrop-filter:blur(8px); justify-content:center; align-items:center;">
@@ -1038,35 +1059,59 @@ db.ref(`users/${uid}/admin_alert`).on('value', (snap) => {
                         }
                     });
 
-                    // 3. Admin Urgent Task
-                    db.ref('global_system_runtime_configurations/urgent_task').on('value', snap => {
+                                          // 3. Admin Urgent Task (One-Time Screen Pop-up Engine)
+                    let lastPopupTime = parseInt(localStorage.getItem("lastPopupTime") || "0");
+                    
+                    db.ref('notification_center').limitToLast(1).on('value', snap => {
                         if(snap.exists()) {
-                            let task = snap.val();
-                            if(task.active === "true" || task.active === true) {
-                                let cacheKey = "utask_" + encodeURIComponent(task.title);
-                                let lastSeen = localStorage.getItem(cacheKey);
-                                let now = Date.now();
+                            snap.forEach(child => {
+                                let popupData = child.val();
                                 
-                                if (!lastSeen || (now - parseInt(lastSeen)) > 86400000) {
-                                    document.getElementById("urgentTaskTitle").innerText = task.title;
-                                    document.getElementById("urgentTaskDesc").innerText = task.desc;
+                                // Check if user has already seen this specific popup
+                                if(popupData.timestamp > lastPopupTime) {
+                                    document.getElementById("urgentTaskTitle").innerText = popupData.title;
+                                    document.getElementById("urgentTaskDesc").innerText = popupData.message;
                                     
-                                    document.getElementById("urgentTaskBtn").onclick = () => { 
-                                        localStorage.setItem(cacheKey, now);
-                                        window.location.href = task.url; 
-                                    };
-                                    document.getElementById("btnSkipUrgentTask").onclick = () => {
-                                        localStorage.setItem(cacheKey, now);
-                                        document.getElementById("urgentTaskModalOverlay").style.display = "none";
+                                    let popupIcon = document.querySelector("#urgentTaskOverlay .fa-triangle-exclamation").parentElement;
+                                    let popupCard = document.querySelector("#urgentTaskOverlay > div");
+                                    let actionBtn = document.getElementById("urgentTaskBtn");
+                                    actionBtn.style.display = "block";
+
+                                    // Dynamic Design Logic based on Type (App, Video, Alert)
+                                    if(popupData.type === 'video') {
+                                        popupIcon.innerHTML = `<i class="fa-brands fa-youtube"></i>`; popupIcon.style.color = '#ef4444'; popupCard.style.borderColor = '#ef4444';
+                                        actionBtn.style.background = 'linear-gradient(135deg, #ef4444, #991b1b)'; actionBtn.innerText = "📺 WATCH VIDEO";
+                                    } else if(popupData.type === 'app') {
+                                        popupIcon.innerHTML = `<i class="fa-brands fa-google-play"></i>`; popupIcon.style.color = '#06b6d4'; popupCard.style.borderColor = '#06b6d4';
+                                        actionBtn.style.background = 'linear-gradient(135deg, #06b6d4, #0369a1)'; actionBtn.innerText = "📲 DOWNLOAD APP";
+                                    } else if(popupData.type === 'success') {
+                                        popupIcon.innerHTML = `🎉`; popupIcon.style.color = '#10b981'; popupCard.style.borderColor = '#10b981';
+                                        actionBtn.style.background = 'linear-gradient(135deg, #10b981, #047857)'; actionBtn.innerText = "✅ VIEW DETAILS";
+                                    } else {
+                                        popupIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`; popupIcon.style.color = '#f59e0b'; popupCard.style.borderColor = '#f59e0b';
+                                        actionBtn.style.background = 'linear-gradient(135deg, #f59e0b, #b45309)'; actionBtn.innerText = "⚠️ PROCEED NOW";
+                                    }
+
+                                    // Action Button Link
+                                    if (popupData.url && popupData.url.trim() !== "") {
+                                        actionBtn.onclick = () => { 
+                                            localStorage.setItem("lastPopupTime", popupData.timestamp);
+                                            window.location.href = popupData.url; 
+                                        };
+                                    } else { actionBtn.style.display = "none"; }
+
+                                    // Close Button Logic
+                                    document.getElementById("urgentTaskCloseBtn").onclick = () => {
+                                        localStorage.setItem("lastPopupTime", popupData.timestamp);
+                                        document.getElementById("urgentTaskOverlay").style.display = "none";
                                     };
 
-                                    document.getElementById("urgentTaskModalOverlay").style.display = "flex";
-                                } else {
-                                    document.getElementById("urgentTaskModalOverlay").style.display = "none";
+                                    document.getElementById("urgentTaskOverlay").style.display = "flex";
                                 }
-                            } else { document.getElementById("urgentTaskModalOverlay").style.display = "none"; }
+                            });
                         }
                     });
+
 
                     // 4. Admin Mega Winner
                     db.ref('global_system_runtime_configurations/latest_surprise_winner').on('value', snap => {
@@ -1079,23 +1124,86 @@ db.ref(`users/${uid}/admin_alert`).on('value', (snap) => {
                         }
                     });
 
-                    // 5. Notification Center
-                    db.ref('notification_center').limitToLast(20).on('value', snap => {
-                        const container = document.getElementById("notifListContainer");
-                        const badge = document.getElementById("mainNotifBadge");
-                        container.innerHTML = "";
-                        if(snap.exists()){
-                            let notifs = []; snap.forEach(child => { notifs.push(child.val()); }); notifs.reverse();
-                            badge.innerText = notifs.length; badge.style.display = "flex";
-                            notifs.forEach(n => {
-                                let color = n.type === 'success' ? '#10b981' : (n.type === 'urgent' ? '#ef4444' : '#06b6d4');
-                                container.innerHTML += `<div class="notif-item" style="border-left-color: ${color}">
-                                    <h4 style="margin:0 0 4px 0; color:#fff; font-size:13.5px;">${n.title}</h4>
-                                    <p style="margin:0; color:var(--text-sub); font-size:11.5px;">${n.message}</p>
-                                </div>`;
+                                       // 5. Notification Center (Categorized Inbox & Permanent Delete)
+                    let clearedTime = parseInt(localStorage.getItem("clearedNotifTime") || "0");
+                    window.allNotificationsList = [];
+
+                    db.ref('notification_center').limitToLast(30).on('value', snap => {
+                        window.allNotificationsList = [];
+                        if(snap.exists()) {
+                            snap.forEach(child => {
+                                let n = child.val();
+                                // Only show notifications that are not permanently deleted by user
+                                if(n.timestamp > clearedTime) {
+                                    window.allNotificationsList.push(n);
+                                }
                             });
-                        } else { badge.style.display = "none"; container.innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:13.5px; margin-top:30px; font-weight:bold;">No new updates...</div>`; }
+                            window.allNotificationsList.reverse(); // Newest first
+
+                            const badge = document.getElementById("mainNotifBadge");
+                            if(window.allNotificationsList.length > 0) {
+                                badge.innerText = window.allNotificationsList.length; 
+                                badge.style.display = "flex";
+                            } else {
+                                badge.style.display = "none";
+                            }
+                            filterNotifications('all'); // Refresh Inbox view
+                        } else {
+                            document.getElementById("mainNotifBadge").style.display = "none"; 
+                            document.getElementById("notifListContainer").innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:13.5px; margin-top:30px; font-weight:bold;">No new updates...</div>`; 
+                        }
                     });
+
+                    // 🗂️ Category Filtering System
+                    window.filterNotifications = function(category) {
+                        document.querySelectorAll('.notif-tab-btn').forEach(btn => btn.classList.remove('active'));
+                        if(event) event.currentTarget.classList.add('active');
+
+                        const container = document.getElementById("notifListContainer");
+                        container.innerHTML = "";
+                        
+                        let filteredList = window.allNotificationsList;
+                        if(category !== 'all') {
+                            filteredList = window.allNotificationsList.filter(n => n.type === category);
+                        }
+
+                        if(filteredList.length === 0) {
+                            container.innerHTML = `<div style="text-align:center; color:var(--text-sub); font-size:12px; margin-top:20px; font-weight:bold;">No messages in this category.</div>`;
+                            return;
+                        }
+
+                        filteredList.forEach(n => {
+                            let color = '#94a3b8'; let icon = '📢'; let btnTxt = 'View'; let btnClass = '';
+                            if (n.type === 'app') { color = '#06b6d4'; icon = '📲'; btnTxt = 'Download App'; btnClass = 'app'; }
+                            else if (n.type === 'video') { color = '#ef4444'; icon = '📺'; btnTxt = 'Watch Video'; btnClass = 'video'; }
+                            else if (n.type === 'alert') { color = '#f59e0b'; icon = '⚠️'; btnTxt = 'Check Alert'; btnClass = 'alert'; }
+                            else if (n.type === 'success') { color = '#10b981'; icon = '🎉'; btnTxt = 'Claim Reward'; }
+
+                            let actionBtnHTML = (n.url && n.url.trim() !== "") ? `<a target="_blank" href="${n.url}" class="notif-action-btn ${btnClass}">${btnTxt}</a>` : '';
+
+                            container.innerHTML += `<div class="notif-item" style="border-left-color: ${color}">
+                                <div style="display:flex; gap:8px; align-items:flex-start;">
+                                    <div style="font-size:18px;">${icon}</div>
+                                    <div>
+                                        <h4 style="margin:0 0 4px 0; color:#fff; font-size:13.5px;">${n.title}</h4>
+                                        <p style="margin:0; color:var(--text-sub); font-size:11.5px; line-height:1.4;">${n.message}</p>
+                                        ${actionBtnHTML}
+                                    </div>
+                                </div>
+                            </div>`;
+                        });
+                    };
+
+                    // 🗑️ Permanent User-side Delete Logic
+                    window.clearAllNotifications = function() {
+                        if(window.allNotificationsList.length > 0) {
+                            let newestTime = window.allNotificationsList[0].timestamp;
+                            localStorage.setItem("clearedNotifTime", newestTime);
+                            window.allNotificationsList = [];
+                            document.getElementById("mainNotifBadge").style.display = "none";
+                            document.getElementById("notifListContainer").innerHTML = `<div style="text-align:center; color:var(--text-sub); margin-top:30px; font-weight:bold;">All Cleared!</div>`;
+                        }
+                    };
 
                     // 6. UNIVERSAL ADMIN HIDE/SHOW MODULE TOGGLES
                     db.ref('global_system_runtime_configurations/module_toggles').on('value', (snap) => {

@@ -111,7 +111,7 @@
         .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
         .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-green); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
         .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
     </style>
 </head>
@@ -127,7 +127,7 @@
     <div class="in-app-ad-viewer" id="inAppAdViewer">
         <div class="ad-header">
             <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Secure Verification</div>
-            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: 25s</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
         <!-- Sandbox mode for extreme safety -->
@@ -233,7 +233,7 @@
         <span data-i18n="pl_security">Dynamic Matchmaking is verifying your connection. Please do not switch tabs or minimize the application, doing so will result in an automatic loss.</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -250,8 +250,12 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC TIME & SDK CONFIGS 🔥
         let globalAdTimerSeconds = 25; // Default time
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; 
+        
+        let globalSdkName = "";
+        let globalSdkId = "";
 
         // 🌐 FULL 13+ LANGUAGES SUPPORT WITH POLITE ERRORS
         const langData = {
@@ -294,7 +298,6 @@
         let currentUserCoinsGlobal = 0;
         let currentCustomBetValue = 10;
         let adminMinEntryFee = 10;
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; 
         
         let matchResultCalculated = null; // Will store "win" or "lose" locally via randomizer
 
@@ -344,13 +347,15 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Min Entry Fee, Smartlink & Time)
+                    // 2. Fetch Admin Configurations (Banners, Min Entry Fee, Smartlink, SDK & Time)
                     db.ref('global_system_runtime_configurations/pool_game_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED TIME
+                            // 🔥 GET ADMIN CONTROLLED SETTINGS 🔥
                             if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
+                            if (adminData.sdk_name) { globalSdkName = adminData.sdk_name.trim(); }
+                            if (adminData.sdk_id) { globalSdkId = adminData.sdk_id.trim(); }
 
                             // Load Banners (setTimeout fix for safety)
                             let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
@@ -644,89 +649,121 @@
             });
         }
 
-        // 🚀 VERIFICATION AND CLAIMING LOGIC WITH IN-APP VIEWER
+        // 🚀 VERIFICATION AND CLAIMING LOGIC WITH HYBRID SDK ROUTING
         let monetizationIntervalLockRef = null;
         let countdownTime = 25;
 
         function executeEvaluateAndTriggerEarningVerificationRoute() {
             document.getElementById("claimPoolRewardBtn").style.display = "none";
-
-            countdownTime = globalAdTimerSeconds;
-            totalSecondsOpen = 0;
             window.hasMainTabHidden = false; // Tracker reset
 
-            let currentLang = localStorage.getItem("selectedLang") || "en";
-            let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying Integrity... ";
-
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-            
-            // Load Ad URL into iframe
-            document.getElementById("adIframe").src = activeAdminSmartlinkUrl;
-
-            if (monetizationIntervalLockRef) clearInterval(monetizationIntervalLockRef);
-
-            monetizationIntervalLockRef = setInterval(() => {
-                countdownTime--;
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Wait: ${countdownTime}s`;
-
-                // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                if (document.hidden) { 
-                    clearInterval(monetizationIntervalLockRef);
-                    document.getElementById("inAppAdViewer").style.display = "none";
-                    document.getElementById("adIframe").src = "";
-                    executeResetApplicationToInitialPanelState();
-                    showCustomAlert("err_invalid");
-                    return;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    // SDK को Prize Value भेजेंगे, लेकिन क्रेडिट सिर्फ जीतने पर होगा (वह लॉजिक नीचे है)
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, databaseCalculatedPrizePoolValue, "pool_game");
+                } else {
+                    openHTMLIframeViewer();
                 }
-
-                if (countdownTime <= 0) {
-                    clearInterval(monetizationIntervalLockRef);
-                    document.getElementById("adTimerDisplay").style.display = "none";
-                    document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                }
-            }, 1000);
+            } else {
+                openHTMLIframeViewer();
+            }
         }
 
+        function openHTMLIframeViewer() {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                countdownTime = globalAdTimerSeconds;
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if (monetizationIntervalLockRef) clearInterval(monetizationIntervalLockRef);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    monetizationIntervalLockRef = setInterval(() => {
+                        countdownTime--;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if (document.hidden) { 
+                            clearInterval(monetizationIntervalLockRef);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            executeResetApplicationToInitialPanelState();
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(monetizationIntervalLockRef);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
+                        }
+                    }, 1000);
+                };
+
+                // Load Ad URL into iframe
+                iframeNode.src = activeAdminSmartlinkUrl;
+            }, 600); // 600ms gap
+        }
+
+        // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
 
-            if (matchResultCalculated === "win") {
-                executeFinalWinClaimFirebaseAPI();
-            } else {
-                executeResetApplicationToInitialPanelState();
-                showCustomAlert("lose_msg");
-            }
+            processFinalGameResultOutcome(false);
+        }
+
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            processFinalGameResultOutcome(true);
         }
 
         // 💰 REWARD ENGINE: Pure Firebase Transaction + UNIVERSAL HISTORY CREDIT
-        function executeFinalWinClaimFirebaseAPI() {
-            // 1. Add Prize Pool Coins securely via Transaction
-            db.ref(`users/${uid}/coins`).transaction((current) => {
-                return (current || 0) + databaseCalculatedPrizePoolValue;
-            }).then(() => {
-                
-                // 2. 🔥 Add Universal History Credit Log for Prize Win 🔥
-                db.ref(`users/${uid}/history`).push({
-                    title: `Multiplayer Pool Victory`,
-                    amount: databaseCalculatedPrizePoolValue,
-                    type: "credit",
-                    txn_type: "game_reward",
-                    status: "SUCCESSFUL",
-                    date: new Date().toLocaleDateString(),
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
+        function processFinalGameResultOutcome(isSdk) {
+            let sdkTag = isSdk ? " [SDK]" : "";
+
+            if (matchResultCalculated === "win") {
+                // 1. Add Prize Pool Coins securely via Transaction
+                db.ref(`users/${uid}/coins`).transaction((current) => {
+                    return (current || 0) + databaseCalculatedPrizePoolValue;
+                }).then(() => {
+                    
+                    // 2. 🔥 Add Universal History Credit Log for Prize Win 🔥
+                    db.ref(`users/${uid}/history`).push({
+                        title: `Multiplayer Pool Victory${sdkTag}`,
+                        amount: databaseCalculatedPrizePoolValue,
+                        type: "credit",
+                        txn_type: "game_reward",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    executeResetApplicationToInitialPanelState();
+                    showCustomAlert("win_msg", `${databaseCalculatedPrizePoolValue} 🪙`, true);
+                }).catch(() => {
+                    executeResetApplicationToInitialPanelState();
+                    showCustomAlert("lose_msg"); // Fallback
                 });
 
+            } else {
+                // User lost, no credit applied
                 executeResetApplicationToInitialPanelState();
-                showCustomAlert("win_msg", `${databaseCalculatedPrizePoolValue} 🪙`, true);
-            }).catch(() => {
-                executeResetApplicationToInitialPanelState();
-                showCustomAlert("lose_msg"); // Fallback
-            });
+                showCustomAlert("lose_msg");
+            }
         }
 
         function executeResetApplicationToInitialPanelState() {

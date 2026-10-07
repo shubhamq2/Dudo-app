@@ -98,7 +98,7 @@
     <div class="overlay" id="alertOverlay"></div>
     <div class="custom-alert" id="customAlertBox">
         <p id="alertMessage">Message</p>
-        <button onclick="closeCustomAlert()">OK</button>
+        <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
     <!-- 🌐 OFFLINE SCREEN -->
@@ -175,7 +175,7 @@
         <span data-i18n="mq_security">Stay active and complete the verification process. Skipping ads or closing tabs early will cancel your reward.</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -192,11 +192,15 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🔥 ADMIN CONTROLLED DYNAMIC TIME, COINS & LIMITS 🔥
+        // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
         let globalAdTimerSeconds = 25;  // Default time
         let globalBaseReward = 10;      // Default base coins for Level 1
         let globalDailyLimit = 20;      // Default daily max claims
         
+        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
+        let globalSdkName = "";
+        let globalSdkId = "";
+
         let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         let userTodayClaimsCount = 0;
 
@@ -243,7 +247,6 @@
         let computedCorrectAnswer = 0;
         let consecutiveCorrectAnswersCount = 0;
         let currentPayoutCoins = 10; // Dynamic, depends on base and multiplier
-        let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; // Fallback URL
 
         // Network Monitor
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
@@ -291,7 +294,7 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Link, Time, Base Coins, Limits)
+                    // 2. Fetch Admin Configurations (Banners, Link, SDK, Time, Base Coins, Limits)
                     db.ref('global_system_runtime_configurations/math_quiz_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
@@ -303,6 +306,10 @@
                                 globalDailyLimit = parseInt(adminData.daily_limit); 
                                 document.getElementById("totalMathLimit").innerText = globalDailyLimit;
                             }
+
+                            // SDK Configs
+                            if (adminData.sdk_name) { globalSdkName = adminData.sdk_name.trim(); }
+                            if (adminData.sdk_id) { globalSdkId = adminData.sdk_id.trim(); }
 
                             // Update UI instantly with new scaled coins
                             executeUpdateStreakVisualInterface();
@@ -336,12 +343,12 @@
                                 setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
                             } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
 
-                            // Setup Game Link
+                            // Setup Task Link
                             if (adminData.math_task_link) {
                                 activeAdminSmartlinkUrl = adminData.math_task_link;
                             }
                         } else {
-                            // Fallback to Global Smartlink
+                            // Fallback
                             db.ref('global_system_runtime_configurations/globalSmartlink').once('value').then(globalSnap => {
                                 if(globalSnap.exists()) activeAdminSmartlinkUrl = globalSnap.val();
                             });
@@ -430,7 +437,7 @@
         let platformTimer = null;
         let isValidationActive = false;
 
-        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC (WITH IN-APP VIEWER)
+        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH HYBRID SDK
         function verifyQuizAnswerSubmit() {
             // 🔥 ANTI-BAN: Custom Limit Check
             if(userTodayClaimsCount >= globalDailyLimit) {
@@ -455,66 +462,94 @@
                 return;
             }
 
-            // Trigger Secure View Phase (In-App)
+            // Trigger Verification Phase
             isValidationActive = true;
-            let countdownTime = globalAdTimerSeconds;
             btn.disabled = true;
 
             let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
             btn.innerText = baseWaitTxt;
 
-            // Show In-App Viewer
-            document.getElementById("inAppAdViewer").style.display = "flex";
-            document.getElementById("adTimerDisplay").style.display = "flex";
-            document.getElementById("adCloseBtn").style.display = "none";
-            
-            // 🔥 Wait for Ad to Load fully before countdown
-            document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-            
-            let iframeNode = document.getElementById("adIframe");
-
-            iframeNode.onload = function() {
-                if (platformTimer) clearInterval(platformTimer);
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                platformTimer = setInterval(() => {
-                    countdownTime--;
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
-
-                    // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                    if (document.hidden) { 
-                        clearInterval(platformTimer);
-                        document.getElementById("inAppAdViewer").style.display = "none";
-                        document.getElementById("adIframe").src = "";
-                        resetQuizSubmitButton();
-                        showCustomAlert("err_invalid");
-                        return;
-                    }
-
-                    if (countdownTime <= 0) {
-                        clearInterval(platformTimer);
-                        document.getElementById("adTimerDisplay").style.display = "none";
-                        document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                    }
-                }, 1000);
-            };
-
-            iframeNode.src = activeAdminSmartlinkUrl;
+            // 🔥 HYBRID SDK ROUTING 🔥
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Send to Android Native SDK
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, currentPayoutCoins, "math_quiz");
+                } else {
+                    openHTMLIframeViewer();
+                }
+            } else {
+                openHTMLIframeViewer();
+            }
         }
 
-        // 💰 REWARD SYNC API, HISTORY & DAILY CHECKLIST INTEGRATION
+        function openHTMLIframeViewer() {
+            // Anti-clash buffer 600ms
+            setTimeout(() => {
+                let countdownTime = globalAdTimerSeconds;
+
+                // Show In-App Viewer
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                // 🔥 Wait for Ad to Load fully before countdown
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+
+                iframeNode.onload = function() {
+                    if (platformTimer) clearInterval(platformTimer);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                    platformTimer = setInterval(() => {
+                        countdownTime--;
+                        document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: ${countdownTime}s`;
+
+                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
+                        if (document.hidden) { 
+                            clearInterval(platformTimer);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            document.getElementById("adIframe").src = "";
+                            resetQuizSubmitButton();
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(platformTimer);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
+                        }
+                    }, 1000);
+                };
+
+                iframeNode.src = activeAdminSmartlinkUrl;
+            }, 600); // 600ms gap
+        }
+
+        // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; // Stop video/ad
-
+            
             consecutiveCorrectAnswersCount++;
             executeUpdateStreakVisualInterface(); // Update multiplier to get currentPayoutCoins
-
-            evaluateQuizRewardViaFirebase(currentPayoutCoins);
+            
+            evaluateQuizRewardViaFirebase(currentPayoutCoins, false);
         }
 
-        function evaluateQuizRewardViaFirebase(rewardAmount) {
+        // Android SDK Callback Handler
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            consecutiveCorrectAnswersCount++;
+            executeUpdateStreakVisualInterface(); 
+            // We use parsed rewardCoins from SDK or currentPayoutCoins, both are same.
+            evaluateQuizRewardViaFirebase(currentPayoutCoins, true);
+        }
+
+        // 💰 REWARD SYNC API, HISTORY & DAILY CHECKLIST INTEGRATION
+        function evaluateQuizRewardViaFirebase(rewardAmount, isSdk) {
+            let sdkTag = isSdk ? " [SDK]" : "";
 
             // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
@@ -529,7 +564,7 @@
 
                 // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health)
                 db.ref(`users/${uid}/history`).push({
-                    title: `Math Quiz Reward`,
+                    title: `Math Quiz Reward${sdkTag}`,
                     amount: rewardAmount,
                     type: "credit",
                     txn_type: "math_quiz",
