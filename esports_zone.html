@@ -221,7 +221,7 @@
         </div>
     </div>
 
-    <!-- 🔥 FIREBASE ENGINE -->
+    <!-- 🔥 FIREBASE ENGINE (WITH UNIVERSAL BANNER AD INJECTOR) -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
@@ -237,7 +237,6 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🌐 LANGUAGE SUPPORT
         const langData = {
             "en": { 
                 "sa_title": "Skills Arena", "sa_banner_title": "Daily Skills Arena", "sa_banner_desc": "Join Custom Rooms & Win Premium Rewards!",
@@ -276,14 +275,61 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+        // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Native SDK Banner
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: HTML / INS Script Banner
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
         }
 
         const uid = localStorage.getItem("userId");
@@ -293,7 +339,6 @@
         let allMatches = {};
         let allParticipants = {};
 
-        // Network Monitor
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
         window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
 
@@ -319,17 +364,15 @@
                         if(snap.exists()) { currentCoins = snap.val().coins || 0; document.getElementById("userCoins").innerText = currentCoins; }
                     });
 
-                    // 2. Fetch Admin Module Controls & Banners
+                    // 2. Fetch Admin Module Controls & Universal Banners
                     db.ref('global_system_runtime_configurations').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 PLAY STORE INVISIBLE SWITCH (Master Toggle)
                             let isArenaActive = true;
                             if(adminData.module_toggles && adminData.module_toggles.esports_zone !== undefined) {
                                 isArenaActive = adminData.module_toggles.esports_zone === true || adminData.module_toggles.esports_zone === "true";
                             }
-                            // If Safe Mode is ON, force close Arena too
                             if(adminData.module_toggles && (adminData.module_toggles.play_store_review_safe_mode === true || adminData.module_toggles.play_store_review_safe_mode === "true")) {
                                 isArenaActive = false;
                             }
@@ -343,26 +386,15 @@
                                 document.getElementById("masterArenaContainer").style.display = "none";
                             }
 
-                            // Setup Banners via esports_configs (Fixed with setTimeout)
+                            // Setup Universal Banners via esports_configs
                             if(adminData.esports_configs) {
-                                let s1Code = (adminData.esports_configs.slot1 && adminData.esports_configs.slot1.code) ? adminData.esports_configs.slot1.code : adminData.esports_configs.slot1_code;
-                                let s1Active = (adminData.esports_configs.slot1 && adminData.esports_configs.slot1.active !== undefined) ? adminData.esports_configs.slot1.active : adminData.esports_configs.active;
-                                if (s1Code && s1Active !== false) {
-                                    document.getElementById("adminBannerSlot1").style.display = "flex";
-                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
-                                } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                                
-                                let s2Code = (adminData.esports_configs.slot2 && adminData.esports_configs.slot2.code) ? adminData.esports_configs.slot2.code : adminData.esports_configs.slot2_code;
-                                let s2Active = (adminData.esports_configs.slot2 && adminData.esports_configs.slot2.active !== undefined) ? adminData.esports_configs.slot2.active : adminData.esports_configs.active;
-                                if (s2Code && s2Active !== false) {
-                                    document.getElementById("adminBannerSlot2").style.display = "flex";
-                                    setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
-                                } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                                injectUniversalBanner("adminBannerSlot1", adminData.esports_configs.slot1);
+                                injectUniversalBanner("adminBannerSlot2", adminData.esports_configs.slot2);
                             }
                         }
                     });
 
-                    // 3. 📊 LIVE POLL SYSTEM (Safe Database Path)
+                    // 3. LIVE POLL SYSTEM
                     db.ref('arena_game_1/live_poll').on('value', (snap) => {
                         const pollBox = document.getElementById("livePollContainer");
                         if(snap.exists() && snap.val().active) {
@@ -374,7 +406,7 @@
                         }
                     });
 
-                    // 4. 🔥 LIVE MATCHES SYNC (Play Store Safe Paths)
+                    // 4. LIVE MATCHES SYNC
                     function updateMatchesUI() { renderMatchesList(); }
 
                     db.ref('arena_game_1/matches').on('value', (snap) => {
@@ -401,7 +433,6 @@
             });
         });
 
-        // 🔥 POLL RENDERING ENGINE
         function renderPollUI() {
             const socket = document.getElementById("pollOptionsSocket");
             const qNode = document.getElementById("pollQuestion");
@@ -449,7 +480,6 @@
             });
         }
 
-        // 🔥 MATCHES RENDERING ENGINE
         function renderMatchesList() {
             const activeBox = document.getElementById("activeMatchesContainer");
             const pastBox = document.getElementById("pastMatchesContainer");
@@ -540,7 +570,6 @@
             } else { alert(`🔔 Reminder Saved! Check the app 15 minutes before ${time}.`); }
         }
 
-        // JOINING LOGIC & UNIVERSAL HISTORY UPDATE 🔥
         function openJoinModal(matchId, registrationPoints, title, gameType) {
             activeJoiningMatch = { id: matchId, fee: registrationPoints, title: title, game: gameType };
             document.getElementById("playerIdInput").value = "";
@@ -561,12 +590,10 @@
                 if (error || !committed) {
                     alert("❌ Transaction failed due to network or insufficient balance."); resetJoinBtn(btn);
                 } else {
-                    // Register participant
                     let p1 = db.ref(`arena_${activeJoiningMatch.game}/participants/${activeJoiningMatch.id}/${uid}`).set({
                         game_uid: playerIdValue, joinedAt: firebase.database.ServerValue.TIMESTAMP
                     });
 
-                    // Old Transactions List (for legacy display)
                     let p2 = db.ref(`users/${uid}/transactions`).push({ 
                         action: `Arena Reg: ${activeJoiningMatch.title}`, 
                         amount: -activeJoiningMatch.fee, 
@@ -575,10 +602,9 @@
                         timestamp: Date.now() 
                     });
 
-                    // 🔥 NEW UNIVERSAL HISTORY PUSH (For Account Health) 🔥
                     let p3 = db.ref(`users/${uid}/history`).push({
                         title: `Arena Reg: ${activeJoiningMatch.title}`,
-                        amount: activeJoiningMatch.fee, // Shown as debit type below
+                        amount: activeJoiningMatch.fee,
                         type: "debit",
                         txn_type: "game_fee",
                         status: "SUCCESSFUL",

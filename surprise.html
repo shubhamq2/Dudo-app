@@ -38,21 +38,20 @@
         .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-gold); font-weight: bold; cursor: pointer; }
         
-        /* 🔥 Smart Avatar Icon Styles */
+        /* Smart Avatar Icon Styles */
         .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
         .profile-icon:active { transform: scale(0.9); border-color: var(--accent-pink); }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto 0 auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; }
 
-        /* PLAY STORE SAFE: Only show Coins */
         .balance-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1px solid var(--accent-gold); padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-sizing: border-box; box-shadow: 0 8px 25px rgba(234, 179, 8, 0.2); backdrop-filter: blur(10px); }
         .balance-card span { font-size: 14px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
         .coin-txt { color: var(--accent-gold) !important; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); font-size: 20px !important; }
 
-        /* 📢 AD SLOTS */
+        /* Banner Slots */
         .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: none; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(234, 179, 8, 0.4); box-sizing: border-box; }
 
-        /* 🎫 Mega Reward Display Card */
+        /* Reward Banner Card */
         .reward-banner-card { background: linear-gradient(135deg, #ca8a04, #854d0e); border-radius: 24px; padding: 30px 20px; text-align: center; box-shadow: 0 15px 35px rgba(234, 179, 8, 0.3); color: #fff; position: relative; overflow: hidden; border: 1px solid #facc15; }
         .reward-banner-card::before { content: '🎁'; position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.1; transform: rotate(15deg); }
         .reward-banner-card div { font-size: 12.5px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fef08a; }
@@ -66,7 +65,7 @@
         .tracker-metric-box .metric-value { font-size: 24px; font-weight: 900; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .tracker-metric-box .value-gold { color: var(--accent-gold); }
 
-        /* Claim Interface Center Card */
+        /* Claim Terminal Card */
         .entry-pass-card { background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.4); backdrop-filter: blur(10px); }
         .pass-cost-badge { display: inline-block; background: rgba(234, 179, 8, 0.15); color: var(--accent-gold); padding: 8px 18px; border-radius: 50px; font-size: 14px; font-weight: 900; margin-bottom: 20px; border: 1px solid rgba(234, 179, 8, 0.3); box-shadow: inset 0 0 10px rgba(234, 179, 8, 0.1); }
         
@@ -74,14 +73,14 @@
         .buy-action-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4); }
         .buy-action-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
-        /* User's Current Live Pass Numbers Array Box */
+        /* User Pass List */
         .my-passes-section { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 18px; margin-top: 25px; text-align: left; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 4px 10px rgba(0,0,0,0.3); }
         .my-passes-title { font-size: 12px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
         .passes-wrapper-flex { display: flex; flex-wrap: wrap; gap: 8px; }
         .pass-tag-pill { background: rgba(30, 41, 59, 0.8); color: var(--accent-gold); border: 1px solid rgba(234, 179, 8, 0.3); padding: 8px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 900; font-family: monospace; letter-spacing: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .no-passes-txt { font-size: 13px; color: #64748b; font-weight: 600; font-style: italic; }
 
-        /* Custom Modern Alert Modal Popup style */
+        /* Custom Alert Modal */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 1000; width: 85%; max-width: 360px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 20px 50px rgba(16, 185, 129, 0.2); }
         .custom-alert h4 { margin: 0 0 12px 0; font-size: 20px; color: var(--accent-pink); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -92,7 +91,7 @@
         .custom-alert.success-border button { background: var(--accent-green); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
         
-        /* 🏆 WINNER CELEBRATION POPUP */
+        /* Winner Celebration Modal */
         .winner-modal-view { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(11, 15, 25, 0.9); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(8px); padding: 20px; box-sizing: border-box; }
         .winner-modal-card { width:100%; max-width:380px; background: linear-gradient(135deg, #1e1b4b, #581c87); border-radius:30px; border:3px solid var(--accent-gold); padding:35px 20px; box-shadow:0 0 50px rgba(234, 179, 8, 0.4); text-align:center; position:relative; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-sizing: border-box; }
         @keyframes popIn { from { transform: scale(0.7); opacity:0; } to { transform: scale(1); opacity:1; } }
@@ -113,7 +112,7 @@
         <button onclick="closeCustomAlert()">OK</button>
     </div>
 
-    <!-- 🌐 OFFLINE SCREEN -->
+    <!-- Offline Screen -->
     <div id="globalOfflineWarningOverlay">
         <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
         <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
@@ -121,7 +120,7 @@
         <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
-    <!-- 🎉 WINNER CELEBRATION POPUP FRAME -->
+    <!-- Winner Celebration Modal -->
     <div class="winner-modal-view" id="lotteryWinnerModalFrame">
         <div class="winner-modal-card">
             <div style="font-size:60px; margin-bottom:10px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🎉👑</div>
@@ -144,30 +143,28 @@
                 <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
                 <option value="ru">RU</option>
             </select>
-            <!-- 👤 Header Smart Avatar -->
             <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
         </div>
     </div>
 
     <div class="main-container">
         
-        <!-- PLAY STORE SAFE: Only show Coins -->
         <div class="balance-card">
             <span data-i18n="wd_wallet">🎟️ Weekly Drop</span>
             <span class="coin-txt"><span id="liveUserCoins">0</span> 🪙</span>
         </div>
 
-        <!-- 📢 ADMIN CONNECTED AD SLOT 1 -->
+        <!-- TOP BANNER -->
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
-        <!-- Grand Reward Presentation Banner -->
+        <!-- Hero Presentation Banner -->
         <div class="reward-banner-card">
             <div data-i18n="wd_hero_sub">🔥 Weekly Mega Reward 🔥</div>
             <h3 id="jackpotAmountDisplay" data-i18n="wd_hero_main">🎁 SURPRISE COINS</h3>
             <p data-i18n="wd_hero_desc">More Entry Passes = Higher Chances!</p>
         </div>
 
-        <!-- Real-time Global Counters Tracker Grid -->
+        <!-- Global Counters Tracker Grid -->
         <div class="pool-tracker-grid">
             <div class="tracker-metric-box">
                 <div class="metric-label" data-i18n="wd_total">Total Participants</div>
@@ -179,12 +176,11 @@
             </div>
         </div>
 
-        <!-- Claim Terminal Card -->
+        <!-- Claim Pass Card -->
         <div class="entry-pass-card">
             <div class="pass-cost-badge"><i class="fa-solid fa-ticket"></i> <span id="passCostDisplay">1 Entry Pass = 50 Coins</span></div>
             <button class="buy-action-btn" id="btnClaimPass" onclick="executeClaimEntryPass()"><span data-i18n="wd_btn_claim">Claim Entry Pass</span> 🎟️</button>
             
-            <!-- User Personal Active List -->
             <div class="my-passes-section">
                 <div class="my-passes-title"><i class="fa-solid fa-list-check"></i> <span data-i18n="wd_active_list">Your Active Pass Codes</span></div>
                 <div class="passes-wrapper-flex" id="myActivePassesBox">
@@ -193,28 +189,27 @@
             </div>
         </div>
 
-        <!-- 📢 ADMIN CONNECTED AD SLOT 2 -->
+        <!-- BOTTOM BANNER -->
         <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 FIREBASE REALTIME SCRIPT ENGINE (WITH UNIVERSAL BANNER INJECTOR) -->
     <script>
-       const firebaseConfig = {
-    apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
-    authDomain: "dudo-dc7cd.firebaseapp.com",
-    databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
-    projectId: "dudo-dc7cd",
-    storageBucket: "dudo-dc7cd.firebasestorage.app",
-    messagingSenderId: "254085241041",
-    appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
-    measurementId: "G-8BKZSHYLF6"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT WITH 100% PLAY STORE SAFE TERMS
         const langData = {
             "en": {
                 "wd_title": "Weekly Drop", "wd_wallet": "🎟️ Weekly Drop", "wd_hero_sub": "🔥 Weekly Mega Reward 🔥", "wd_hero_main": "🎁 SURPRISE COINS", "wd_hero_desc": "More Entry Passes = Higher Chances!",
@@ -231,18 +226,7 @@
                 "err_nsf_title": "❌ अपर्याप्त कॉइन्स", "err_nsf_desc": "पर्याप्त कॉइन्स नहीं हैं! कमाने के लिए और टास्क पूरे करें।",
                 "pass_success_title": "🎉 पास प्राप्त हुआ", "pass_success_desc": "सफलतापूर्वक प्राप्त हुआ! अवसर बढ़ाने के लिए भाग लेते रहें।",
                 "win_title": "बधाई हो!", "win_desc": "आप इस सप्ताह के मेगा ड्रॉप के चैंपियन हैं!", "win_btn": "रिवॉर्ड क्लेम करें 🪙", "mod_no_net": "इंटरनेट नहीं है", "mod_retry": "फिर से कोशिश करें"
-            },
-            "bn": { "wd_title": "সাপ্তাহিক ড্রপ", "wd_hero_main": "🎁 সারপ্রাইজ কয়েন", "wd_btn_claim": "এন্ট্রি পাস নিন", "err_nsf_title": "❌ কয়েন নেই", "pass_success_title": "🎉 পাস পেয়েছেন", "win_title": "অভিনন্দন!" },
-            "te": { "wd_title": "వీక్లీ డ్రాప్", "wd_hero_main": "🎁 సర్ప్రైజ్ కాయిన్స్", "wd_btn_claim": "పాస్ పొందండి", "err_nsf_title": "❌ కాయిన్స్ లేవు", "pass_success_title": "🎉 పాస్ వచ్చింది", "win_title": "అభినందనలు!" },
-            "mr": { "wd_title": "साप्ताहिक ड्रॉप", "wd_hero_main": "🎁 सरप्राईज कॉइन्स", "wd_btn_claim": "पास मिळवा", "err_nsf_title": "❌ कॉइन्स नाहीत", "pass_success_title": "🎉 पास मिळाला", "win_title": "अभिनंदन!" },
-            "ta": { "wd_title": "வாராந்திர டிராப்", "wd_hero_main": "🎁 ஆச்சரிய நாணயங்கள்", "wd_btn_claim": "பாஸ் பெறுக", "err_nsf_title": "❌ நாணயங்கள் இல்லை", "pass_success_title": "🎉 பாஸ் பெறப்பட்டது", "win_title": "வாழ்த்துக்கள்!" },
-            "ur": { "wd_title": "ہفتہ وار ڈراپ", "wd_hero_main": "🎁 سرپرائز کوئنز", "wd_btn_claim": "پاس حاصل کریں", "err_nsf_title": "❌ کوئنز ناکافی", "pass_success_title": "🎉 پاس مل گیا", "win_title": "مبارک ہو!" },
-            "gu": { "wd_title": "સાપ્તાહિક ડ્રોપ", "wd_hero_main": "🎁 સરપ્રાઈઝ સિક્કા", "wd_btn_claim": "પાસ મેળવો", "err_nsf_title": "❌ સિક્કા નથી", "pass_success_title": "🎉 પાસ મળ્યો", "win_title": "અભિનંદન!" },
-            "es": { "wd_title": "Drop Semanal", "wd_hero_main": "🎁 MONEDAS SORPRESA", "wd_btn_claim": "Reclamar Pase", "err_nsf_title": "❌ Monedas Insuficientes", "pass_success_title": "🎉 Pase Reclamado", "win_title": "¡FELICIDADES!" },
-            "fr": { "wd_title": "Drop Hebdomadaire", "wd_hero_main": "🎁 PIÈCES SURPRISES", "wd_btn_claim": "Réclamer le Pass", "err_nsf_title": "❌ Pièces Insuffisantes", "pass_success_title": "🎉 Pass Réclamé", "win_title": "FÉLICITATIONS!" },
-            "ar": { "wd_title": "السحب الأسبوعي", "wd_hero_main": "🎁 عملات مفاجئة", "wd_btn_claim": "احصل على بطاقة", "err_nsf_title": "❌ عملات غير كافية", "pass_success_title": "🎉 تم الحصول", "win_title": "مبروك!" },
-            "pt": { "wd_title": "Drop Semanal", "wd_hero_main": "🎁 MOEDAS SURPRESA", "wd_btn_claim": "Resgatar Passe", "err_nsf_title": "❌ Moedas Insuficientes", "pass_success_title": "🎉 Passe Resgatado", "win_title": "PARABÉNS!" },
-            "ru": { "wd_title": "Еженедельный Дроп", "wd_hero_main": "🎁 СЮРПРИЗ-МОНЕТЫ", "wd_btn_claim": "Получить Пропуск", "err_nsf_title": "❌ Недостаточно монет", "pass_success_title": "🎉 Пропуск Получен", "win_title": "ПОЗДРАВЛЯЕМ!" }
+            }
         };
 
         function changeLanguage(langCode) {
@@ -258,18 +242,81 @@
 
         function updateCostText() {
             let lang = localStorage.getItem("selectedLang") || "en";
-            let pre = langData[lang]["wd_cost_pre"] || "1 Entry Pass = ";
-            let post = langData[lang]["wd_cost_post"] || " Coins";
+            let trans = langData[lang] || langData["en"];
+            let pre = trans["wd_cost_pre"] || "1 Entry Pass = ";
+            let post = trans["wd_cost_post"] || " Coins";
             document.getElementById("passCostDisplay").innerText = pre + singlePassCostInt + post;
         }
 
-        // 💡 SMART EMOJI-TO-IMAGE CONVERTER FIX
         function createEmojiURI(emoji) {
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
             return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
         }
 
-        // Network Monitor
+        // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            let slot = slotData;
+            if (typeof slotData === 'string') {
+                slot = { code: slotData, active: true, type: 'html' };
+            }
+
+            if (!slot || slot.active === false) {
+                container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Native SDK Banner
+            if (slot.type === 'sdk' && slot.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--accent-gold); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slot.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slot.sdk_name, slot.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: HTML / INS Script Banner
+            const adCode = slot.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
+        }
+
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
         window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
 
@@ -295,7 +342,6 @@
                             userMasterCoinsCounter = data.coins || 0;
                             document.getElementById("liveUserCoins").innerText = userMasterCoinsCounter;
                             
-                            // Smart Avatar Sync
                             let userName = data.name || "Player";
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
@@ -313,7 +359,8 @@
                         const wrapper = document.getElementById("myActivePassesBox");
                         wrapper.innerHTML = "";
                         let currentLang = localStorage.getItem("selectedLang") || "en";
-                        let noPassTxt = langData[currentLang]["wd_no_pass"] || "You don't hold any passes for this week yet.";
+                        let trans = langData[currentLang] || langData["en"];
+                        let noPassTxt = trans["wd_no_pass"] || "You don't hold any passes for this week yet.";
 
                         if (snap.exists()) {
                             let codes = [];
@@ -338,20 +385,8 @@
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // Load Banners (Safely with setTimeout)
-                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
-                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
-                            if (s1Code && s1Active !== false) {
-                                document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
-                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-
-                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
-                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
-                            if (s2Code && s2Active !== false) {
-                                document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
-                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
+                            injectUniversalBanner("adminBannerSlot1", adminData.slot1 || adminData.slot1_code);
+                            injectUniversalBanner("adminBannerSlot2", adminData.slot2 || adminData.slot2_code);
 
                             if(adminData.pass_cost) {
                                 singlePassCostInt = parseInt(adminData.pass_cost);
@@ -368,10 +403,8 @@
                     db.ref('weekly_drop').on('value', (snap) => {
                         if(snap.exists()) {
                             let data = snap.val();
-                            
                             document.getElementById("globalPoolSold").innerText = data.global_passes_count || 0;
 
-                            // Check for Jackpot Winner
                             if(data.winner_uid === uid) {
                                 db.ref(`users/${uid}/claimed_jackpot`).once('value', (cSnap) => {
                                     if(!cSnap.exists() || cSnap.val() !== true) {
@@ -391,23 +424,13 @@
             });
         });
 
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
-        }
-
-        // 🚀 CLAIM PASS (PURE FIREBASE TRANSACTION + UNIVERSAL HISTORY DEBIT)
+        // 🚀 CLAIM PASS (FIREBASE TRANSACTION + UNIVERSAL HISTORY DEBIT)
         function executeClaimEntryPass() {
             let currentLang = localStorage.getItem("selectedLang") || "en";
+            let trans = langData[currentLang] || langData["en"];
             
             if (userMasterCoinsCounter < singlePassCostInt) {
-                showCustomAlert("err_nsf_title", langData[currentLang]["err_nsf_desc"], false);
+                showCustomAlert("err_nsf_title", trans["err_nsf_desc"], false);
                 return;
             }
 
@@ -415,29 +438,24 @@
             btn.disabled = true;
             btn.innerText = "PROCESSING...";
 
-            // 1. Deduct Coins safely
             db.ref(`users/${uid}/coins`).transaction((currentCoins) => {
                 if (currentCoins >= singlePassCostInt) {
                     return currentCoins - singlePassCostInt;
                 }
-                return; // Abort
+                return;
             }).then((result) => {
                 if(result.committed) {
-                    // Generate pseudo-random Code
                     let newCode = "DRP-" + Math.floor(Math.random() * 900000 + 100000);
                     
-                    // 2. Add pass to user
                     let p1 = db.ref(`users/${uid}/weekly_passes`).push({
                         code: newCode,
                         timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
 
-                    // 3. Increment global counter
                     let p2 = db.ref('weekly_drop/global_passes_count').transaction((count) => {
                         return (count || 0) + 1;
                     });
 
-                    // 🔥 4. UNIVERSAL HISTORY PUSH FOR DEBIT (Account Health)
                     let p3 = db.ref(`users/${uid}/history`).push({
                         title: `Bought Weekly Pass`,
                         amount: singlePassCostInt,
@@ -453,18 +471,18 @@
                     throw new Error("Transaction aborted");
                 }
             }).then((newCode) => {
-                let descTxt = langData[currentLang]["pass_success_desc"] || "acquired successfully! Keep participating.";
+                let descTxt = trans["pass_success_desc"] || "acquired successfully! Keep participating.";
                 showCustomAlert("pass_success_title", `Pass Code ${newCode} ${descTxt}`, true);
             }).catch((err) => {
                 showCustomAlert("err_nsf_title", "Transaction failed.", false);
             }).finally(() => {
-                let btnTxt = langData[currentLang]["wd_btn_claim"] || "Claim Entry Pass";
+                let btnTxt = trans["wd_btn_claim"] || "Claim Entry Pass";
                 btn.disabled = false;
                 btn.innerHTML = `<span>${btnTxt}</span> 🎟️`;
             });
         }
 
-        // 🏆 CLAIM MEGA REWARD (PURE FIREBASE TRANSACTION + UNIVERSAL HISTORY CREDIT)
+        // 🏆 CLAIM MEGA REWARD (FIREBASE TRANSACTION + UNIVERSAL HISTORY CREDIT)
         function executeClaimJackpotPoolCredits() {
             const btn = document.querySelector(".winner-claim-btn");
             btn.disabled = true;
@@ -474,8 +492,6 @@
                 return (current || 0) + jackpotAmountInt;
             }).then((result) => {
                 if(result.committed) {
-                    
-                    // 🔥 UNIVERSAL HISTORY PUSH FOR WIN (Account Health)
                     let p1 = db.ref(`users/${uid}/history`).push({
                         title: `Mega Drop Winner!`,
                         amount: jackpotAmountInt,
@@ -502,7 +518,8 @@
 
         function showCustomAlert(headerKey, messageText, isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let headerStr = langData[currentLang][headerKey] || headerKey;
+            let trans = langData[currentLang] || langData["en"];
+            let headerStr = trans[headerKey] || headerKey;
 
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");

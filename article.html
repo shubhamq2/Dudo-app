@@ -288,28 +288,76 @@
             }
         }
 
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+                // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Native SDK Banner
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: HTML / INS Script Banner
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
         }
+
 
         const uid = localStorage.getItem("userId");
 
         // 🔥 DYNAMIC INDIVIDUAL LINKS, TIMER, REWARD & SDK CONFIG FOR ALL 6 ARTICLES 🔥
-        let articleLinksAdminConfig = {
-            tech: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
-            crypto: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
-            health: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
-            gaming: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
-            finance: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" },
-            sports: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "" }
+                let articleLinksAdminConfig = {
+            tech: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "", mode: "timer" },
+            crypto: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "", mode: "timer" },
+            health: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "", mode: "timer" },
+            gaming: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "", mode: "timer" },
+            finance: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "", mode: "timer" },
+            sports: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 60, reward: 25, sdk_name: "", sdk_id: "", mode: "timer" }
         };
+ 
 
         let userDailyClicksData = {};
 
@@ -347,49 +395,21 @@
                     });
 
                     // 2. Fetch Admin Configurations (Banners & 6 Specific Links/Timers/Rewards/SDK)
-                    db.ref('global_system_runtime_configurations/read_articles').on('value', (snap) => {
-                        if(snap.exists()) {
-                            const aData = snap.val();
-                            
-                            // Load Individual Configurations
+                                                // Load Individual Configurations with Mode & SDK
                             ['tech', 'crypto', 'health', 'gaming', 'finance', 'sports'].forEach(cat => {
+                                if(aData['mode_' + cat]) articleLinksAdminConfig[cat].mode = aData['mode_' + cat].trim().toLowerCase();
                                 if(aData['link_' + cat]) articleLinksAdminConfig[cat].url = aData['link_' + cat];
                                 if(aData['timer_' + cat]) articleLinksAdminConfig[cat].timer = parseInt(aData['timer_' + cat]);
                                 if(aData['reward_' + cat]) articleLinksAdminConfig[cat].reward = parseInt(aData['reward_' + cat]);
-                                
-                                // Load SDK Configs
                                 if(aData['sdk_name_' + cat]) articleLinksAdminConfig[cat].sdk_name = aData['sdk_name_' + cat].trim();
                                 if(aData['sdk_id_' + cat]) articleLinksAdminConfig[cat].sdk_id = aData['sdk_id_' + cat].trim();
                             });
 
-                            // 🔥 FIXED BANNER LOADING WITH SETTIMEOUT 🔥
-                            let s1Code = (aData.slot1 && aData.slot1.code) ? aData.slot1.code : aData.slot1_code;
-                            let s1Active = (aData.slot1 && aData.slot1.active !== undefined) ? aData.slot1.active : aData.active;
-                            if (s1Code && s1Active !== false) {
-                                document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
-                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            
-                            let s2Code = (aData.slot2 && aData.slot2.code) ? aData.slot2.code : aData.slot2_code;
-                            let s2Active = (aData.slot2 && aData.slot2.active !== undefined) ? aData.slot2.active : aData.active;
-                            if (s2Code && s2Active !== false) {
-                                document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
-                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            
-                            let s3Code = (aData.slot3 && aData.slot3.code) ? aData.slot3.code : aData.slot3_code;
-                            let s3Active = (aData.slot3 && aData.slot3.active !== undefined) ? aData.slot3.active : aData.active;
-                            if (s3Code && s3Active !== false) {
-                                document.getElementById("adminBannerSlot3").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
-                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            
-                            let s4Code = (aData.slot4 && aData.slot4.code) ? aData.slot4.code : aData.slot4_code;
-                            let s4Active = (aData.slot4 && aData.slot4.active !== undefined) ? aData.slot4.active : aData.active;
-                            if (s4Code && s4Active !== false) {
-                                document.getElementById("adminBannerSlot4").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
-                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            // 🔥 Universal Injector Calls (Slot 1 to Slot 4)
+                            injectUniversalBanner("adminBannerSlot1", aData.slot1);
+                            injectUniversalBanner("adminBannerSlot2", aData.slot2);
+                            injectUniversalBanner("adminBannerSlot3", aData.slot3);
+                            injectUniversalBanner("adminBannerSlot4", aData.slot4);
                         }
                     });
 
@@ -454,72 +474,82 @@
         }
 
         // 🚀 SMART TIMER LOGIC WITH HYBRID SDK ROUTING 🔥
-        function executeArticleTaskRedirection() {
+                function executeArticleTaskRedirection() {
             let taskKey = currentActiveTaskKey;
             pendingTaskKey = taskKey;
             let config = articleLinksAdminConfig[taskKey];
+            let isPostback = (config.mode === "postback");
             
             const startBtn = document.getElementById("btnStartArticleTask");
             startBtn.disabled = true;
 
-            // 🔥 HYBRID SDK ROUTING 🔥
-            if (config.sdk_id && config.sdk_id !== "") {
+            // 🔥 HYBRID SDK ROUTING (Timer mode me agar SDK placement di ho)
+            if (!isPostback && config.sdk_id && config.sdk_id !== "") {
                 if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
                     window.AndroidBridge.showNativeAd(config.sdk_name, config.sdk_id, config.reward, "article_" + taskKey);
                     closeArticleInstructionModal();
-                } else {
-                    openInAppAdViewerHTML(config.url, config.reward, config.timer);
+                    return;
                 }
-            } else {
-                openInAppAdViewerHTML(config.url, config.reward, config.timer);
             }
+
+            openInAppAdViewerHTML(config.url, config.reward, config.timer, isPostback);
         }
 
-        function openInAppAdViewerHTML(targetDestinationUrl, rewardCoinsAmount, timerSeconds) {
-            // Anti-clash buffer
+        function openInAppAdViewerHTML(targetDestinationUrl, rewardCoinsAmount, timerSeconds, isPostbackMode = false) {
             setTimeout(() => {
                 pendingRewardCoins = rewardCoinsAmount;
-                let countdownTime = timerSeconds;
-                
                 document.getElementById("inAppAdViewer").style.display = "flex";
-                document.getElementById("adTimerDisplay").style.display = "flex";
-                document.getElementById("adCloseBtn").style.display = "none";
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Blog...`;
-                
+                let timerDisplay = document.getElementById("adTimerDisplay");
+                let closeBtn = document.getElementById("adCloseBtn");
                 let iframeNode = document.getElementById("adIframe");
 
-                iframeNode.onload = function() {
-                    if(offerTimer) clearInterval(offerTimer);
-
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                if (isPostbackMode) {
+                    // 🔥 MODE 1: DIRECT READING / POSTBACK (No countdown)
+                    timerDisplay.style.display = "flex";
+                    timerDisplay.innerHTML = `<i class="fa-solid fa-book-open"></i> Read Full Article`;
+                    closeBtn.style.display = "block";
+                    closeBtn.innerText = "✔ DONE & CLAIM";
+                } else {
+                    // 🔥 MODE 2: TIMER MODE
+                    timerDisplay.style.display = "flex";
+                    closeBtn.style.display = "none";
+                    closeBtn.innerText = "✖ CLOSE & CLAIM";
+                    timerDisplay.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Blog...`;
                     
-                    offerTimer = setInterval(() => {
-                        countdownTime--;
-                        let spanNode = document.getElementById("adSecondsSpan");
-                        if(spanNode) spanNode.innerText = countdownTime;
+                    let countdownTime = timerSeconds;
+                    iframeNode.onload = function() {
+                        if(offerTimer) clearInterval(offerTimer);
 
-                        if (document.hidden) { 
-                            clearInterval(offerTimer);
-                            closeArticleInstructionModal();
-                            document.getElementById("inAppAdViewer").style.display = "none";
-                            document.getElementById("adIframe").src = "";
-                            showCustomAlert("err_invalid");
-                            pendingRewardCoins = 0;
-                            return;
-                        }
+                        timerDisplay.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                        
+                        offerTimer = setInterval(() => {
+                            countdownTime--;
+                            let spanNode = document.getElementById("adSecondsSpan");
+                            if(spanNode) spanNode.innerText = countdownTime;
 
-                        if (countdownTime <= 0) {
-                            clearInterval(offerTimer);
-                            document.getElementById("adTimerDisplay").style.display = "none";
-                            document.getElementById("adCloseBtn").style.display = "block"; // Show X Button
-                        }
-                    }, 1000);
-                };
+                            if (document.hidden) { 
+                                clearInterval(offerTimer);
+                                closeArticleInstructionModal();
+                                document.getElementById("inAppAdViewer").style.display = "none";
+                                iframeNode.src = "";
+                                showCustomAlert("err_invalid");
+                                pendingRewardCoins = 0;
+                                return;
+                            }
+
+                            if (countdownTime <= 0) {
+                                clearInterval(offerTimer);
+                                timerDisplay.style.display = "none";
+                                closeBtn.style.display = "block";
+                            }
+                        }, 1000);
+                    };
+                }
 
                 iframeNode.src = targetDestinationUrl;
-            }, 600); // 600ms anti-clash gap
+            }, 600);
         }
+
 
         // HTML Close Button Handler
         function closeInAppAdAndClaim() {

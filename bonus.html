@@ -221,16 +221,63 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+                // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Native SDK Banner
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: HTML / INS Script Banner
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
         }
+ 
 
         const uid = localStorage.getItem("userId");
         let myUsedReferCode = ""; // Will store which refer code this user used when signing up
@@ -279,41 +326,17 @@
                         }
                     });
 
-                    // 2. Fetch Admin Banners with Safe loading
+                                        // 2. Fetch Admin Banners with Universal Injector (Slot 1 to Slot 4)
                     db.ref('global_system_runtime_configurations/extra_bonus').on('value', (snap) => {
                         if(snap.exists()) {
                             const bData = snap.val();
                             
-                            let s1Code = (bData.slot1 && bData.slot1.code) ? bData.slot1.code : bData.slot1_code;
-                            let s1Active = (bData.slot1 && bData.slot1.active !== undefined) ? bData.slot1.active : bData.active;
-                            if (s1Code && s1Active !== false) {
-                                document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
-                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            
-                            let s2Code = (bData.slot2 && bData.slot2.code) ? bData.slot2.code : bData.slot2_code;
-                            let s2Active = (bData.slot2 && bData.slot2.active !== undefined) ? bData.slot2.active : bData.active;
-                            if (s2Code && s2Active !== false) {
-                                document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
-                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            
-                            let s3Code = (bData.slot3 && bData.slot3.code) ? bData.slot3.code : bData.slot3_code;
-                            let s3Active = (bData.slot3 && bData.slot3.active !== undefined) ? bData.slot3.active : bData.active;
-                            if (s3Code && s3Active !== false) {
-                                document.getElementById("adminBannerSlot3").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
-                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            
-                            let s4Code = (bData.slot4 && bData.slot4.code) ? bData.slot4.code : bData.slot4_code;
-                            let s4Active = (bData.slot4 && bData.slot4.active !== undefined) ? bData.slot4.active : bData.active;
-                            if (s4Code && s4Active !== false) {
-                                document.getElementById("adminBannerSlot4").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
-                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            injectUniversalBanner("adminBannerSlot1", bData.slot1);
+                            injectUniversalBanner("adminBannerSlot2", bData.slot2);
+                            injectUniversalBanner("adminBannerSlot3", bData.slot3);
+                            injectUniversalBanner("adminBannerSlot4", bData.slot4);
                         }
-                    });
-
+                    }); 
                 } else {
                     window.location.replace("index.html");
                 }

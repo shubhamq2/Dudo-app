@@ -283,26 +283,77 @@
             }
         }
 
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+                // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Agar Native SDK Banner ho
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: Agar HTML / Script / INS / Adsterra Banner ho
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
         }
 
+
         // 🔥 DYNAMIC INDIVIDUAL SETTINGS FOR EACH BUTTON (WITH HYBRID SDK) 🔥
-        let adgemLinksAdminConfig = {
-            games: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
-            apps: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
-            surveys: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
-            weboffers: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
-            quizzes: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" },
-            premium: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 40, sdk_name: "", sdk_id: "" }
-        };
+                                    let keys = ['games', 'apps', 'surveys', 'weboffers', 'quizzes', 'premium'];
+                            keys.forEach(key => {
+                                if(aData['mode_' + key]) adgemLinksAdminConfig[key].mode = aData['mode_' + key].trim().toLowerCase();
+                                if(aData['link_' + key]) adgemLinksAdminConfig[key].url = aData['link_' + key];
+                                if(aData['timer_' + key]) adgemLinksAdminConfig[key].timer = parseInt(aData['timer_' + key]);
+                                if(aData['reward_' + key]) adgemLinksAdminConfig[key].reward = parseInt(aData['reward_' + key]);
+                                
+                                // Fetch Hybrid SDK details for each button
+                                if(aData['sdk_name_' + key]) adgemLinksAdminConfig[key].sdk_name = aData['sdk_name_' + key].trim();
+                                if(aData['sdk_id_' + key]) adgemLinksAdminConfig[key].sdk_id = aData['sdk_id_' + key].trim();
+                            });
+
 
         const uid = localStorage.getItem("userId");
         let userDailyClicksData = {};
@@ -341,34 +392,12 @@
                                 if(aData['sdk_id_' + key]) adgemLinksAdminConfig[key].sdk_id = aData['sdk_id_' + key].trim();
                             });
 
-                            // Load Banners safely
-                            let s1Code = (aData.slot1 && aData.slot1.code) ? aData.slot1.code : aData.slot1_code;
-                            let s1Active = (aData.slot1 && aData.slot1.active !== undefined) ? aData.slot1.active : aData.active;
-                            if (s1Code && s1Active !== false) {
-                                document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
-                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            
-                            let s2Code = (aData.slot2 && aData.slot2.code) ? aData.slot2.code : aData.slot2_code;
-                            let s2Active = (aData.slot2 && aData.slot2.active !== undefined) ? aData.slot2.active : aData.active;
-                            if (s2Code && s2Active !== false) {
-                                document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
-                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            
-                            let s3Code = (aData.slot3 && aData.slot3.code) ? aData.slot3.code : aData.slot3_code;
-                            let s3Active = (aData.slot3 && aData.slot3.active !== undefined) ? aData.slot3.active : aData.active;
-                            if (s3Code && s3Active !== false) {
-                                document.getElementById("adminBannerSlot3").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
-                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            
-                            let s4Code = (aData.slot4 && aData.slot4.code) ? aData.slot4.code : aData.slot4_code;
-                            let s4Active = (aData.slot4 && aData.slot4.active !== undefined) ? aData.slot4.active : aData.active;
-                            if (s4Code && s4Active !== false) {
-                                document.getElementById("adminBannerSlot4").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
-                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                                                        // 🔥 Universal Injector Calls (Slot 1 to Slot 4)
+                            injectUniversalBanner("adminBannerSlot1", aData.slot1);
+                            injectUniversalBanner("adminBannerSlot2", aData.slot2);
+                            injectUniversalBanner("adminBannerSlot3", aData.slot3);
+                            injectUniversalBanner("adminBannerSlot4", aData.slot4);
+
                         }
                     });
 
@@ -435,73 +464,84 @@
         }
 
         // 🚀 SMART TIMER LOGIC WITH HYBRID IN-APP VIEWER & SDK
-        function executeAdgemTaskRedirection() {
+                function executeAdgemTaskRedirection() {
             let taskKey = currentActiveTaskKey;
             const startBtn = document.getElementById("btnStartAdgemTask");
             startBtn.disabled = true;
 
             let config = adgemLinksAdminConfig[taskKey];
+            let isPostback = (config.mode === "postback");
             
-            // 🔥 HYBRID LOGIC TRIGGER 🔥
-            if (config.sdk_id && config.sdk_id !== "") {
-                // SDK Ad (Native Android)
+            // 🔥 HYBRID SDK TRIGGER (Agar timer mode ho aur SDK placement di ho)
+            if (!isPostback && config.sdk_id && config.sdk_id !== "") {
                 if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
                     window.AndroidBridge.showNativeAd(config.sdk_name, config.sdk_id, config.reward, taskKey);
                     closeAdgemInstructionModal();
-                } else {
-                    // Fallback to HTML if bridge is missing
-                    openInAppAdViewerHTML(config);
+                    return;
                 }
-            } else {
-                // HTML Ad (Web/Iframe)
-                openInAppAdViewerHTML(config);
             }
+
+            // Fallback ya Postback Mode: In-App Viewer open karein
+            openInAppAdViewerHTML(config);
         }
 
-        function openInAppAdViewerHTML(config) {
-            // Anti-clash buffer 600ms
+
+                function openInAppAdViewerHTML(config) {
             setTimeout(() => {
                 let targetDestinationUrl = config.url;
-                let countdownTime = config.timer;
+                let isPostbackMode = (config.mode === "postback");
                 
                 document.getElementById("inAppAdViewer").style.display = "flex";
-                document.getElementById("adTimerDisplay").style.display = "flex";
-                document.getElementById("adCloseBtn").style.display = "none";
-                
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-                
+                let timerDisplay = document.getElementById("adTimerDisplay");
+                let closeBtn = document.getElementById("adCloseBtn");
                 let iframeNode = document.getElementById("adIframe");
-                
-                iframeNode.onload = function() {
-                    if(offerTimer) clearInterval(offerTimer);
-                    
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
-                    
-                    offerTimer = setInterval(() => {
-                        countdownTime--;
-                        let spanNode = document.getElementById("adSecondsSpan");
-                        if(spanNode) spanNode.innerText = countdownTime;
 
-                        if (document.hidden) { 
-                            clearInterval(offerTimer);
-                            closeAdgemInstructionModal();
-                            document.getElementById("inAppAdViewer").style.display = "none";
-                            document.getElementById("adIframe").src = "";
-                            showCustomAlert("err_invalid");
-                            return;
-                        }
+                if (isPostbackMode) {
+                    // 🔥 MODE 1: POSTBACK / DIRECT OFFERWALL (No timer)
+                    timerDisplay.style.display = "flex";
+                    timerDisplay.innerHTML = `<i class="fa-solid fa-list-check"></i> Complete Offer/Game`;
+                    closeBtn.style.display = "block";
+                    closeBtn.innerText = "✔ DONE & VERIFY";
+                } else {
+                    // 🔥 MODE 2: TIMER MODE (Countdown Timer)
+                    timerDisplay.style.display = "flex";
+                    closeBtn.style.display = "none";
+                    closeBtn.innerText = "✖ CLOSE & CLAIM";
+                    timerDisplay.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                    
+                    let countdownTime = config.timer;
+                    iframeNode.onload = function() {
+                        if(offerTimer) clearInterval(offerTimer);
+                        
+                        timerDisplay.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                        
+                        offerTimer = setInterval(() => {
+                            countdownTime--;
+                            let spanNode = document.getElementById("adSecondsSpan");
+                            if(spanNode) spanNode.innerText = countdownTime;
 
-                        if (countdownTime <= 0) {
-                            clearInterval(offerTimer);
-                            document.getElementById("adTimerDisplay").style.display = "none";
-                            document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
-                        }
-                    }, 1000);
-                };
+                            if (document.hidden) { 
+                                clearInterval(offerTimer);
+                                closeAdgemInstructionModal();
+                                document.getElementById("inAppAdViewer").style.display = "none";
+                                iframeNode.src = "";
+                                showCustomAlert("err_invalid");
+                                return;
+                            }
+
+                            if (countdownTime <= 0) {
+                                clearInterval(offerTimer);
+                                timerDisplay.style.display = "none";
+                                closeBtn.style.display = "block";
+                            }
+                        }, 1000);
+                    };
+                }
 
                 iframeNode.src = targetDestinationUrl;
             }, 600);
         }
+ 
 
         // 💰 REWARD SYNC API FOR HTML ADS
         function closeInAppAdAndClaim() {

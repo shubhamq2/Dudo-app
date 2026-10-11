@@ -60,7 +60,7 @@
         .bal-item h4 { margin: 0; font-size: 42px; color: var(--accent-gold); font-weight: 900; text-shadow: 0 0 25px rgba(245, 158, 11, 0.5); }
         .bal-item p { margin: 5px 0 0 0; font-size: 13px; color: var(--text-sub); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* 🚨 FLEXIBLE BUTTON GRID */
+        /* Action Buttons */
         .action-buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
         .action-btn { flex: 1; min-width: 90px; padding: 15px 5px; border-radius: 16px; font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center; transition: 0.2s; border: 1px solid transparent; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .action-btn:active { transform: scale(0.95); }
@@ -71,7 +71,7 @@
         .btn-icon { font-size: 24px; margin-bottom: 8px; }
 
         /* Admin Ad Banner Slots */
-        .ad-banner-slot { width: 92%; max-width: 440px; min-height: 52px; margin: 18px 0; border-radius: 14px; display: flex; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); display: none; }
+        .ad-banner-slot { width: 92%; max-width: 440px; min-height: 52px; margin: 18px 0; border-radius: 14px; display: none; justify-content: center; align-items: center; box-sizing: border-box; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); }
 
         /* Settings Menu List */
         .menu-list { width: 92%; max-width: 440px; background: var(--card-bg); border-radius: 20px; padding: 10px 20px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: flex; flex-direction: column; }
@@ -83,7 +83,7 @@
         .menu-text { flex-grow: 1; font-size: 15px; font-weight: 700; }
         .menu-arrow { color: var(--text-sub); font-weight: bold; font-size: 13px; }
 
-        /* Safety & Logout Buttons */
+        /* Danger Zone */
         .danger-zone { width: 92%; max-width: 440px; display: flex; gap: 15px; margin-top: 25px; }
         .logout-btn { flex: 1; background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 16px; border-radius: 14px; font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .logout-btn:active { background: rgba(255,255,255,0.1); }
@@ -95,7 +95,7 @@
         #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.98); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; }
     </style>
 
-    <!-- ⚡⚡ ANTI-FLICKER SCRIPT: PREVENTS BUTTON BLINKING COMPLETELY ⚡⚡ -->
+    <!-- ⚡⚡ ANTI-FLICKER SCRIPT ⚡⚡ -->
     <script>
         try {
             let cToggles = localStorage.getItem("d_toggles");
@@ -257,9 +257,8 @@
         }
     </script>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 FIREBASE SCRIPT ENGINE (WITH UNIVERSAL BANNER AD INJECTOR) -->
     <script>
-        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
             authDomain: "dudo-dc7cd.firebaseapp.com",
@@ -274,7 +273,6 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🌐 TRANSLATIONS (13+ Languages)
         const langData = {
             "en": {
                 "profile_title": "Profile", "total_coins": "Total Points",
@@ -295,7 +293,7 @@
             "mr": { "profile_title": "प्रोफाइल", "total_coins": "एकूण पॉइंट्स", "withdraw": "माझे लेजर", "deposit": "पॉइंट्स जोडा", "history": "इतिहास", "refer_earn": "रेफर आणि कमवा", "edit_profile": "संपादित करा", "change_pass": "पासकोड बदला", "priv_policy": "गोपनीयता धोरण", "help_support": "सपोर्ट", "logout": "लॉगआउट", "delete_acc": "खाते हटवा", "uid_copied": "कॉपी केले!" },
             "ta": { "profile_title": "சுயவிவரம்", "total_coins": "மொத்த புள்ளிகள்", "withdraw": "என் லெட்ஜர்", "deposit": "புள்ளிகளைச் சேர்", "history": "வரலாறு", "refer_earn": "பரிந்துரை & சம்பாதி", "edit_profile": "சுயவிவரத்தை திருத்து", "change_pass": "கடவுச்சொல்", "priv_policy": "தனியுரிமை", "help_support": "ஆதரவு", "logout": "வெளியேறு", "delete_acc": "கணக்கை நீக்கு", "uid_copied": "நகலெடுக்கப்பட்டது!" },
             "ur": { "profile_title": "پروفائل", "total_coins": "کل پوائنٹس", "withdraw": "میرا لیجر", "deposit": "پوائنٹس شامل کریں", "history": "تاریخ", "refer_earn": "ریفر اور کمائیں", "edit_profile": "پروفائل میں ترمیم", "change_pass": "پاس کوڈ تبدیل کریں", "priv_policy": "پرائیویسی پالیسی", "help_support": "مدد اور سپورٹ", "logout": "لاگ آؤٹ", "delete_acc": "اکاؤنٹ حذف کریں", "uid_copied": "UID کاپی ہو گیا!" },
-            "gu": { "profile_title": "પ્રોફાઇલ", "total_coins": "કુલ પોઇન્ટ્સ", "withdraw": "મારું લેજર", "deposit": "પોઈન્ટ્સ ઉમેરો", "history": "ઇતિહાસ", "refer_earn": "રેફર એન્ડ અર્ન", "edit_profile": "પ્રોફાઇલ સંપાદિત કરો", "change_pass": "પાસકોડ બદલો", "priv_policy": "ગોપનીયતા નીતિ", "help_support": "સહાય અને સપોર્ટ", "logout": "લોગઆઉટ", "delete_acc": "એકાઉન્ટ કાઢી નાખો", "uid_copied": "UID કૉપિ થઈ ગયું!" },
+            "gu": { "profile_title": "પ્ર્રોફાઇલ", "total_coins": "કુલ પોઇન્ટ્સ", "withdraw": "મારું લેજર", "deposit": "પોઈન્ટ્સ ઉમેરો", "history": "ઇતિહાસ", "refer_earn": "રેફર એન્ડ અર્ન", "edit_profile": "પ્ર્રોફાઇલ સંપાદિત કરો", "change_pass": "પાસકોડ બદલો", "priv_policy": "ગોપનીયતા નીતિ", "help_support": "સહાય અને સપોર્ટ", "logout": "લોગઆઉટ", "delete_acc": "એકાઉન્ટ કાઢી નાખો", "uid_copied": "UID કૉપિ થઈ ગયું!" },
             "es": { "profile_title": "Perfil", "total_coins": "Puntos Totales", "withdraw": "Mi Libro", "deposit": "Añadir Puntos", "history": "Historial", "refer_earn": "Recomendar", "edit_profile": "Editar Perfil", "change_pass": "Cambiar Código", "priv_policy": "Política Privacidad", "help_support": "Soporte", "logout": "Cerrar Sesión", "delete_acc": "Borrar Cuenta", "uid_copied": "¡Copiado!" },
             "fr": { "profile_title": "Profil", "total_coins": "Points Totaux", "withdraw": "Mon Livre", "deposit": "Ajouter Points", "history": "Historique", "refer_earn": "Parrainer", "edit_profile": "Modifier Profil", "change_pass": "Changer Code", "priv_policy": "Confidentialité", "help_support": "Support", "logout": "Déconnexion", "delete_acc": "Supprimer Compte", "uid_copied": "Copié !" },
             "ar": { "profile_title": "الملف الشخصي", "total_coins": "إجمالي النقاط", "withdraw": "سجلي", "deposit": "إضافة نقاط", "history": "السجل", "refer_earn": "إحالة", "edit_profile": "تعديل الملف", "change_pass": "تغيير الرمز", "priv_policy": "الخصوصية", "help_support": "الدعم", "logout": "خروج", "delete_acc": "حذف الحساب", "uid_copied": "تم النسخ!" },
@@ -313,13 +311,76 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        // Check Network Status
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
         window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
 
         function createEmojiURI(emoji) {
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
             return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
+        // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            let slot = slotData;
+            if (typeof slotData === 'string') {
+                slot = { code: slotData, active: true, type: 'html' };
+            }
+
+            if (!slot || slot.active === false) {
+                container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Native SDK Banner
+            if (slot.type === 'sdk' && slot.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--accent-cyan); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slot.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slot.sdk_name, slot.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: HTML / INS Script Banner
+            const adCode = slot.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
         }
 
         const uid = localStorage.getItem("userId");
@@ -338,7 +399,6 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-
                     // 1. Fetch Live User Data & Avatar Sync
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
@@ -361,7 +421,6 @@
                                 avatarContainer.innerHTML = `<img src="${createEmojiURI(finalAvatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                             }
                             
-                            // Save to Cache for next reload
                             localStorage.setItem("d_coins", fCoins);
                             localStorage.setItem("d_name", fName);
                             localStorage.setItem("d_phone", fPhone);
@@ -384,25 +443,16 @@
                         }
                     });
 
-                    // 3. Admin Ad Banners (Profile Page Configs)
+                    // 3. Admin Ad Banners (Universal Injector)
                     db.ref('global_system_runtime_configurations/profile_page_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             let adminData = snap.val();
                             
-                            // Load Banners Safely
-                            if(adminData.slot1_code) {
-                                document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), adminData.slot1_code), 400);
-                            } else {
-                                document.getElementById("adminBannerSlot1").style.display = "none";
-                            }
+                            let s1 = adminData.slot1 || adminData.slot1_code;
+                            let s2 = adminData.slot2 || adminData.slot2_code;
 
-                            if(adminData.slot2_code) {
-                                document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), adminData.slot2_code), 800);
-                            } else {
-                                document.getElementById("adminBannerSlot2").style.display = "none";
-                            }
+                            injectUniversalBanner("adminBannerSlot1", s1);
+                            injectUniversalBanner("adminBannerSlot2", s2);
                         }
                     });
 
@@ -412,26 +462,14 @@
             });
         });
 
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
-        }
-
-        // 📋 COPY UID
         function copyUID() {
             navigator.clipboard.writeText(currentUID).then(() => {
                 let currentLang = localStorage.getItem("selectedLang") || "en";
-                let msg = langData[currentLang]["uid_copied"] || "UID Copied!";
+                let msg = (langData[currentLang] && langData[currentLang]["uid_copied"]) ? langData[currentLang]["uid_copied"] : "UID Copied!";
                 alert("📋 " + msg + "\n\nYour Unique ID: " + currentUID);
             });
         }
 
-        // 🚪 LOGOUT (Safe Clear)
         function logoutUser() {
             if(confirm("Are you sure you want to Logout?")) {
                 auth.signOut().then(() => {
@@ -441,7 +479,6 @@
             }
         }
 
-        // 🛑 PLAY STORE MANDATORY: PURE FIREBASE DELETE ACCOUNT
         function deleteUserAccount() {
             if(confirm("⚠️ WARNING: Are you sure you want to PERMANENTLY delete your account? All your points and data will be lost. This cannot be undone.")) {
 
@@ -453,10 +490,8 @@
 
                 let user = auth.currentUser;
                 if(user) {
-                    // 1. Erase Data from Realtime Database
                     db.ref('users/' + uid).remove()
                     .then(() => {
-                        // 2. Delete user from Firebase Authentication
                         return user.delete();
                     })
                     .then(() => {

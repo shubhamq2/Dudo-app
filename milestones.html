@@ -38,16 +38,16 @@
         .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-purple); font-weight: bold; cursor: pointer; }
         
-        /* 🔥 Smart Avatar Icon Styles */
+        /* Smart Avatar Icon Styles */
         .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
         .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
         .main-container { width: 92%; max-width: 440px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
 
-        /* 📢 AD INCOME SOURCE SLOTS */
+        /* Banner Slots */
         .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(168, 85, 247, 0.4); margin: 5px 0; box-sizing: border-box; display: none; }
 
-        /* 📊 Dynamic Metric Target Ring Indicator Ribbon */
+        /* Metric Target Header */
         .user-metric-card { background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(124, 58, 237, 0.9)); border-radius: 20px; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .metric-details { text-align: left; }
         .metric-details span { font-size: 12.5px; font-weight: 800; text-transform: uppercase; color: #e9d5ff; letter-spacing: 1px; }
@@ -55,11 +55,10 @@
         .coin-icon-pouch { font-size: 40px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4)); animation: floatCoin 2s infinite alternate; }
         @keyframes floatCoin { 0% { transform: translateY(0); } 100% { transform: translateY(-5px); } }
 
-        /* 🎟️ Premium Neon Sponsorship Cards Grids Layout */
+        /* Milestone Grid & Cards */
         .milestone-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 5px; }
-        .sponsor-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.4); box-sizing: border-box; backdrop-filter: blur(10px); display: none; /* Hidden by default until loaded */ }
+        .sponsor-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.4); box-sizing: border-box; backdrop-filter: blur(10px); }
 
-        /* Visual Border Indicator Stripes for Different Tiers */
         .sponsor-card::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; }
         .card-bronze::before { background: linear-gradient(to bottom, #d97706, #b45309); }
         .card-silver::before { background: linear-gradient(to bottom, #cbd5e1, #94a3b8); }
@@ -69,14 +68,12 @@
         .sponsor-info-block .card-title { font-size: 15px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
         .sponsor-info-block .card-desc { font-size: 12px; color: var(--text-sub); font-weight: 600; line-height: 1.4; }
 
-        /* Bar Indicator showing progress to goal */
         .progress-micro-bar { width: 100%; background: rgba(0,0,0,0.5); height: 8px; border-radius: 50px; margin-top: 8px; overflow: hidden; position: relative; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease-in-out; border-radius: 50px; }
         .card-bronze .progress-fill { background: linear-gradient(90deg, #d97706, #f59e0b); box-shadow: 0 0 10px #d97706; }
         .card-silver .progress-fill { background: linear-gradient(90deg, #94a3b8, #cbd5e1); box-shadow: 0 0 10px #cbd5e1; }
         .card-gold .progress-fill { background: linear-gradient(90deg, #ca8a04, #fde047); box-shadow: 0 0 10px #facc15; }
 
-        /* Interaction Status Buttons Styles */
         .milestone-action-btn { border: none; padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; min-width: 100px; text-align: center; letter-spacing: 1px; }
         .btn-locked { background: #334155; color: #94a3b8; cursor: not-allowed; }
         .btn-claimable { background: linear-gradient(135deg, var(--accent-green), #059669); color: #fff; box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); animation: pulseBtn 1.5s infinite alternate; }
@@ -117,17 +114,16 @@
                 <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
                 <option value="ru">RU</option>
             </select>
-            <!-- 👤 Header Smart Avatar -->
             <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
         </div>
     </div>
 
     <div class="main-container">
 
-        <!-- 📢 AD CONTEXT INTERACTION TOP REVENUE FIELD -->
+        <!-- Top Banner Slot -->
         <div class="ad-banner-slot" id="adminBannerSlot1"></div>
 
-        <!-- Live Score Tracking Statistics Header -->
+        <!-- Live Score Tracking -->
         <div class="user-metric-card">
             <div class="metric-details">
                 <span data-i18n="ms_lifetime">Total Lifetime Score</span>
@@ -138,7 +134,7 @@
 
         <div class="milestone-grid" id="milestoneGridBox">
 
-            <!-- Milestone 1: Bronze Level Card -->
+            <!-- Bronze Level Card -->
             <div class="sponsor-card card-bronze" id="cardBox_bronze">
                 <div class="sponsor-info-block">
                     <span class="card-title" id="title_bronze">Bronze Rank Bonus</span>
@@ -148,7 +144,7 @@
                 <button class="milestone-action-btn btn-locked" id="btnBronze">Locked <i class="fa-solid fa-lock"></i></button>
             </div>
 
-            <!-- Milestone 2: Silver Level Card -->
+            <!-- Silver Level Card -->
             <div class="sponsor-card card-silver" id="cardBox_silver">
                 <div class="sponsor-info-block">
                     <span class="card-title" id="title_silver">Silver Elite Pass</span>
@@ -158,10 +154,10 @@
                 <button class="milestone-action-btn btn-locked" id="btnSilver">Locked <i class="fa-solid fa-lock"></i></button>
             </div>
 
-            <!-- 📢 AD CONTEXT MID BANNER SLOT -->
+            <!-- Mid Banner Slot -->
             <div class="ad-banner-slot" id="adminBannerSlot2"></div>
 
-            <!-- Milestone 3: Gold Level Card -->
+            <!-- Gold Level Card -->
             <div class="sponsor-card card-gold" id="cardBox_gold">
                 <div class="sponsor-info-block">
                     <span class="card-title" id="title_gold">Gold Master Jackpot</span>
@@ -173,14 +169,13 @@
 
         </div>
 
-        <!-- 📢 AD CONTEXT BOTTOM BANNER SLOT -->
+        <!-- Bottom Banner Slot -->
         <div class="ad-banner-slot" id="adminBannerSlot3"></div>
 
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE -->
+    <!-- 🔥 FIREBASE ENGINE (WITH UNIVERSAL BANNER & REPAIRED MILESTONE LOGIC) -->
     <script>
-        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
             authDomain: "dudo-dc7cd.firebaseapp.com",
@@ -195,21 +190,9 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
             "en": { "ms_title": "Milestone Rewards", "ms_lifetime": "Total Lifetime Score", "ms_locked": "Locked", "ms_claim": "Claim", "ms_target": "Reach target:", "ms_reward": "Reward:", "err_success": "Level-Up Bonus! Points credited straight inside your wallet.", "err_server": "Server error while claiming reward." },
-            "hi": { "ms_title": "माइलस्टोन इनाम", "ms_lifetime": "कुल लाइफटाइम स्कोर", "ms_locked": "लॉक्ड", "ms_claim": "प्राप्त करें", "ms_target": "लक्ष्य:", "ms_reward": "इनाम:", "err_success": "लेवल-अप बोनस! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं।", "err_server": "इनाम प्राप्त करते समय सर्वर एरर।" },
-            "bn": { "ms_title": "মাইলস্টোন পুরস্কার", "ms_lifetime": "মোট লাইফটাইম স্কোর", "ms_locked": "লকড", "ms_claim": "দাবি করুন", "ms_target": "লক্ষ্য:", "ms_reward": "পুরস্কার:", "err_success": "লেভেল-আপ বোনাস! ওয়ালেটে পয়েন্ট যোগ হয়েছে।", "err_server": "সার্ভার ত্রুটি।" },
-            "te": { "ms_title": "మైల్‌స్టోన్ రివార్డ్స్", "ms_lifetime": "మొత్తం స్కోర్", "ms_locked": "లాక్ చేయబడింది", "ms_claim": "క్లెయిమ్ చేయండి", "ms_target": "లక్ష్యం:", "ms_reward": "రివార్డ్:", "err_success": "లెవెల్-అప్ బోనస్! పాయింట్లు జోడించబడ్డాయి.", "err_server": "సర్వర్ లోపం." },
-            "mr": { "ms_title": "माईलस्टोन बक्षिसे", "ms_lifetime": "एकूण लाइफटाइम स्कोअर", "ms_locked": "लॉक केलेले", "ms_claim": "मिळवा", "ms_target": "लक्ष्य:", "ms_reward": "बक्षीस:", "err_success": "लेव्हल-अप बोनस! पॉइंट्स जमा झाले.", "err_server": "सर्व्हर त्रुटी." },
-            "ta": { "ms_title": "மைல்ஸ்டோன் பரிசுகள்", "ms_lifetime": "மொத்த மதிப்பெண்", "ms_locked": "பூட்டப்பட்டது", "ms_claim": "பெறு", "ms_target": "இலக்கு:", "ms_reward": "பரிசு:", "err_success": "லெவல்-அப் போனஸ்! புள்ளிகள் சேர்க்கப்பட்டன.", "err_server": "சர்வர் பிழை." },
-            "ur": { "ms_title": "مائل اسٹون انعام", "ms_lifetime": "کل لائف ٹائم سکور", "ms_locked": "مقفل", "ms_claim": "حاصل کریں", "ms_target": "ہدف:", "ms_reward": "انعام:", "err_success": "لیول اپ بونس! پوائنٹس والیٹ میں شامل کر دیے گئے۔", "err_server": "سرور کا مسئلہ۔" },
-            "gu": { "ms_title": "માઇલસ્ટોન ઇનામ", "ms_lifetime": "કુલ લાઇફટાઇમ સ્કોર", "ms_locked": "લોક કરેલ", "ms_claim": "મેળવો", "ms_target": "લક્ષ્ય:", "ms_reward": "ઇનામ:", "err_success": "લેવલ-અપ બોનસ! પોઇન્ટ્સ ઉમેરવામાં આવ્યા છે.", "err_server": "સર્વર સમસ્યા." },
-            "es": { "ms_title": "Recompensas por Hitos", "ms_lifetime": "Puntuación Total", "ms_locked": "Bloqueado", "ms_claim": "Reclamar", "ms_target": "Objetivo:", "ms_reward": "Premio:", "err_success": "¡Bono de nivel! Puntos añadidos.", "err_server": "Error de servidor." },
-            "fr": { "ms_title": "Récompenses Étapes", "ms_lifetime": "Score Total à Vie", "ms_locked": "Verrouillé", "ms_claim": "Réclamer", "ms_target": "Cible :", "ms_reward": "Prix :", "err_success": "Bonus de niveau ! Points ajoutés.", "err_server": "Erreur serveur." },
-            "ar": { "ms_title": "مكافآت المراحل", "ms_lifetime": "إجمالي النقاط", "ms_locked": "مغلق", "ms_claim": "المطالبة", "ms_target": "الهدف:", "ms_reward": "مكافأة:", "err_success": "مكافأة مستوى جديد! أضيفت النقاط.", "err_server": "خطأ في الخادم." },
-            "pt": { "ms_title": "Recompensas de Marcos", "ms_lifetime": "Pontuação Total", "ms_locked": "Bloqueado", "ms_claim": "Reivindicar", "ms_target": "Alvo:", "ms_reward": "Prêmio:", "err_success": "Bônus de nível! Pontos adicionados.", "err_server": "Erro de servidor." },
-            "ru": { "ms_title": "Награды за этапы", "ms_lifetime": "Общий счет", "ms_locked": "Закрыто", "ms_claim": "Получить", "ms_target": "Цель:", "ms_reward": "Награда:", "err_success": "Бонус за уровень! Очки зачислены.", "err_server": "Ошибка сервера." }
+            "hi": { "ms_title": "माइलस्टोन इनाम", "ms_lifetime": "कुल लाइफटाइम स्कोर", "ms_locked": "लॉक्ड", "ms_claim": "प्राप्त करें", "ms_target": "लक्ष्य:", "ms_reward": "इनाम:", "err_success": "लेवल-अप बोनस! आपके वॉलेट में पॉइंट्स जोड़ दिए गए हैं।", "err_server": "इनाम प्राप्त करते समय सर्वर एरर।" }
         };
 
         function changeLanguage(langCode) {
@@ -220,32 +203,83 @@
                 if(transObj[key]) elem.innerText = transObj[key];
             });
             document.getElementById("appLanguage").value = langCode;
-            // Force redraw of cards to update translations inside dynamic JS
-            if(userMasterCoinsCounter !== null && lastKnownClaimedLogs !== null && globalMilestoneGoals !== null) {
-                renderAllMilestoneCards(userMasterCoinsCounter, lastKnownClaimedLogs, globalMilestoneGoals);
+            if(userMasterCoinsCounter !== null) {
+                renderAllMilestoneCards();
             }
         }
 
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+        // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            let slot = slotData;
+            if (typeof slotData === 'string') {
+                slot = { code: slotData, active: true, type: 'html' };
+            }
+
+            if (!slot || slot.active === false) {
+                container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Native SDK Banner
+            if (slot.type === 'sdk' && slot.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--accent-purple); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slot.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slot.sdk_name, slot.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: HTML / INS Script Banner
+            const adCode = slot.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
         }
 
         const uid = localStorage.getItem("userId");
-        let userMasterCoinsCounter = null;
-        let lastKnownClaimedLogs = null;
-        let globalMilestoneGoals = null; 
+        let userMasterCoinsCounter = 0;
+        let lastKnownClaimedLogs = {};
+        let globalMilestoneGoals = {};
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!uid) { window.location.replace("index.html"); return; }
             
-            // Sync Language from Home Page
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
 
@@ -254,51 +288,24 @@
                     
                     // 1. Fetch Admin Banners and Milestone Goals Configuration
                     db.ref('global_system_runtime_configurations/milestone_configs').on('value', (snap) => {
-                        if(snap.exists()) {
-                            const adminData = snap.val();
-                            globalMilestoneGoals = adminData;
-                            
-                            // Load Banners (Safely with setTimeout to prevent crash)
-                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
-                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
-                            if (s1Code && s1Active !== false) {
-                                document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
-                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            
-                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
-                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
-                            if (s2Code && s2Active !== false) {
-                                document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
-                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            
-                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
-                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
-                            if (s3Code && s3Active !== false) {
-                                document.getElementById("adminBannerSlot3").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
-                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            
-                            // Re-render cards if user data is already loaded
-                            if(userMasterCoinsCounter !== null && lastKnownClaimedLogs !== null) {
-                                renderAllMilestoneCards(userMasterCoinsCounter, lastKnownClaimedLogs, globalMilestoneGoals);
-                            }
-                        }
+                        globalMilestoneGoals = snap.exists() ? snap.val() : {};
+                        
+                        injectUniversalBanner("adminBannerSlot1", globalMilestoneGoals.slot1);
+                        injectUniversalBanner("adminBannerSlot2", globalMilestoneGoals.slot2);
+                        injectUniversalBanner("adminBannerSlot3", globalMilestoneGoals.slot3);
+                        
+                        renderAllMilestoneCards();
                     });
 
-                    // 2. Live User Data (Coins and Milestones logic) & Smart Avatar
+                    // 2. Live User Data (Coins and Claimed Milestones)
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const d = snapshot.val();
-                            userMasterCoinsCounter = d.coins || 0;
+                            userMasterCoinsCounter = parseInt(d.coins) || 0;
                             document.getElementById("masterScoreTxt").innerText = `${userMasterCoinsCounter} 🪙`;
 
                             lastKnownClaimedLogs = d.claimed_milestones || {};
-                            
-                            if(globalMilestoneGoals !== null) {
-                                renderAllMilestoneCards(userMasterCoinsCounter, lastKnownClaimedLogs, globalMilestoneGoals);
-                            }
+                            renderAllMilestoneCards();
 
                             // Smart Avatar Sync
                             let userName = d.name || "Player";
@@ -324,137 +331,124 @@
             });
         });
 
-        // 🔥 LEVEL 1 vs LEVEL 2 CONFIGURATIONS AUTOMATION ROUTER
-        function renderAllMilestoneCards(coins, logs, adminConfig) {
-            
-            // 1. Bronze Processing
-            let b_l1_goal = parseInt(adminConfig.bronze_l1_goal) || 500;
-            let b_l1_reward = parseInt(adminConfig.bronze_l1_reward) || 100;
-            let b_l2_goal = b_l1_goal * 3;
-            let b_l2_reward = b_l1_reward * 2.5;
+        // 🔥 ROBUST LEVEL 1 / LEVEL 2 CARD PIPELINE
+        function renderAllMilestoneCards() {
+            let coins = userMasterCoinsCounter;
+            let logs = lastKnownClaimedLogs;
+            let admin = globalMilestoneGoals;
 
-            let bronzeGoal = (logs.bronze_l1 === true) ? b_l2_goal : b_l1_goal;
-            let bronzeReward = (bronzeGoal === b_l2_goal) ? b_l2_reward : b_l1_reward;
-            let bronzeKey = (bronzeGoal === b_l2_goal) ? 'bronze_l2' : 'bronze_l1';
-            let bronzeTitle = (bronzeGoal === b_l2_goal) ? "Bronze Champion [LVL 2]" : "Bronze Rank Bonus";
-            
-            setupDynamicCardModule(coins, bronzeGoal, bronzeReward, bronzeKey, bronzeTitle, logs[bronzeKey], "barBronze", "btnBronze", "title_bronze", "desc_bronze", "cardBox_bronze");
+            // 1. Bronze (Defaults: 500 / 100)
+            let b_l1_g = parseInt(admin.bronze_l1_goal) || 500;
+            let b_l1_r = parseInt(admin.bronze_l1_reward) || 100;
+            let b_l2_g = parseInt(admin.bronze_l2_goal) || (b_l1_g * 3);
+            let b_l2_r = parseInt(admin.bronze_l2_reward) || Math.floor(b_l1_r * 2.5);
 
-            // 2. Silver Processing
-            let s_l1_goal = parseInt(adminConfig.silver_l1_goal) || 2000;
-            let s_l1_reward = parseInt(adminConfig.silver_l1_reward) || 300;
-            let s_l2_goal = s_l1_goal * 2;
-            let s_l2_reward = s_l1_reward * 2;
+            let bronzeGoal = (logs.bronze_l1 === true) ? b_l2_g : b_l1_g;
+            let bronzeReward = (logs.bronze_l1 === true) ? b_l2_r : b_l1_r;
+            let bronzeKey = (logs.bronze_l1 === true) ? 'bronze_l2' : 'bronze_l1';
+            let bronzeTitle = (logs.bronze_l1 === true) ? "Bronze Champion [LVL 2]" : "Bronze Rank Bonus";
+            let bronzeDone = (logs.bronze_l2 === true);
 
-            let silverGoal = (logs.silver_l1 === true) ? s_l2_goal : s_l1_goal;
-            let silverReward = (silverGoal === s_l2_goal) ? s_l2_reward : s_l1_reward;
-            let silverKey = (silverGoal === s_l2_goal) ? 'silver_l2' : 'silver_l1';
-            let silverTitle = (silverGoal === s_l2_goal) ? "Silver Elite Pass [LVL 2]" : "Silver Elite Pass";
-            
-            setupDynamicCardModule(coins, silverGoal, silverReward, silverKey, silverTitle, logs[silverKey], "barSilver", "btnSilver", "title_silver", "desc_silver", "cardBox_silver");
+            setupCard("cardBox_bronze", "title_bronze", "desc_bronze", "barBronze", "btnBronze", bronzeTitle, bronzeGoal, bronzeReward, bronzeKey, coins, bronzeDone);
 
-            // 3. Gold Processing
-            let g_l1_goal = parseInt(adminConfig.gold_l1_goal) || 5000;
-            let g_l1_reward = parseInt(adminConfig.gold_l1_reward) || 1000;
-            let g_l2_goal = g_l1_goal * 2;
-            let g_l2_reward = g_l1_reward * 2.5;
+            // 2. Silver (Defaults: 2000 / 300)
+            let s_l1_g = parseInt(admin.silver_l1_goal) || 2000;
+            let s_l1_r = parseInt(admin.silver_l1_reward) || 300;
+            let s_l2_g = parseInt(admin.silver_l2_goal) || (s_l1_g * 2);
+            let s_l2_r = parseInt(admin.silver_l2_reward) || (s_l1_r * 2);
 
-            let goldGoal = (logs.gold_l1 === true) ? g_l2_goal : g_l1_goal;
-            let goldReward = (goldGoal === g_l2_goal) ? g_l2_reward : g_l1_reward;
-            let goldKey = (goldGoal === g_l2_goal) ? 'gold_l2' : 'gold_l1';
-            let goldTitle = (goldGoal === g_l2_goal) ? "Gold God Tier [LVL 2]" : "Gold Master Jackpot";
-            
-            setupDynamicCardModule(coins, goldGoal, goldReward, goldKey, goldTitle, logs[goldKey], "barGold", "btnGold", "title_gold", "desc_gold", "cardBox_gold");
+            let silverGoal = (logs.silver_l1 === true) ? s_l2_g : s_l1_g;
+            let silverReward = (logs.silver_l1 === true) ? s_l2_r : s_l1_r;
+            let silverKey = (logs.silver_l1 === true) ? 'silver_l2' : 'silver_l1';
+            let silverTitle = (logs.silver_l1 === true) ? "Silver Elite Pass [LVL 2]" : "Silver Elite Pass";
+            let silverDone = (logs.silver_l2 === true);
+
+            setupCard("cardBox_silver", "title_silver", "desc_silver", "barSilver", "btnSilver", silverTitle, silverGoal, silverReward, silverKey, coins, silverDone);
+
+            // 3. Gold (Defaults: 5000 / 1000)
+            let g_l1_g = parseInt(admin.gold_l1_goal) || 5000;
+            let g_l1_r = parseInt(admin.gold_l1_reward) || 1000;
+            let g_l2_g = parseInt(admin.gold_l2_goal) || (g_l1_g * 2);
+            let g_l2_r = parseInt(admin.gold_l2_reward) || Math.floor(g_l1_r * 2.5);
+
+            let goldGoal = (logs.gold_l1 === true) ? g_l2_g : g_l1_g;
+            let goldReward = (logs.gold_l1 === true) ? g_l2_r : g_l1_r;
+            let goldKey = (logs.gold_l1 === true) ? 'gold_l2' : 'gold_l1';
+            let goldTitle = (logs.gold_l1 === true) ? "Gold God Tier [LVL 2]" : "Gold Master Jackpot";
+            let goldDone = (logs.gold_l2 === true);
+
+            setupCard("cardBox_gold", "title_gold", "desc_gold", "barGold", "btnGold", goldTitle, goldGoal, goldReward, goldKey, coins, goldDone);
         }
 
-        // 🛠️ LEVEL-UP RENDER PIPELINE
-        function setupDynamicCardModule(currentCoins, targetGoal, rewardCoins, stateDbKey, titleText, isAlreadyClaimed, barId, btnId, titleId, descId, boxId) {
-            const bar = document.getElementById(barId);
-            const btn = document.getElementById(btnId);
-            const titleElem = document.getElementById(titleId);
-            const descElem = document.getElementById(descId);
+        function setupCard(boxId, titleId, descId, barId, btnId, titleTxt, targetGoal, rewardCoins, dbKey, currentCoins, isCompleted) {
             const box = document.getElementById(boxId);
-            
-            let currentLang = localStorage.getItem("selectedLang") || "en";
+            if (!box) return;
 
-            if (isAlreadyClaimed === true) {
-                box.style.display = "none"; // Hides permanently only after ultimate level completion
+            if (isCompleted) {
+                box.style.display = "none";
                 return;
             }
 
             box.style.display = "flex";
-            titleElem.innerText = titleText;
-            
-            let targetTxt = langData[currentLang]["ms_target"] || "Reach target:";
-            let rewardTxt = langData[currentLang]["ms_reward"] || "Reward:";
-            descElem.innerText = `${targetTxt} ${targetGoal}. ${rewardTxt} +${rewardCoins} 🪙`;
+            document.getElementById(titleId).innerText = titleTxt;
 
-            let percentage = (currentCoins / targetGoal) * 100;
-            if(percentage > 100) percentage = 100;
-            bar.style.width = percentage + "%";
+            let lang = localStorage.getItem("selectedLang") || "en";
+            let trans = langData[lang] || langData["en"];
+            document.getElementById(descId).innerText = `${trans.ms_target || 'Target:'} ${targetGoal} 🪙 | ${trans.ms_reward || 'Reward:'} +${rewardCoins} 🪙`;
 
-            // Clean click router override assignment
-            btn.onclick = () => executeClaimMilestoneCoins(stateDbKey, targetGoal, rewardCoins, btn, titleText);
+            let pct = Math.min(100, Math.floor((currentCoins / targetGoal) * 100));
+            document.getElementById(barId).style.width = pct + "%";
+
+            const btn = document.getElementById(btnId);
+            btn.onclick = () => executeClaimMilestoneCoins(dbKey, targetGoal, rewardCoins, btn, titleTxt);
 
             if (currentCoins >= targetGoal) {
                 btn.className = "milestone-action-btn btn-claimable";
-                btn.innerHTML = `${langData[currentLang]["ms_claim"] || "Claim"} <i class="fa-solid fa-gift"></i>`;
+                btn.innerHTML = `${trans.ms_claim || 'Claim'} <i class="fa-solid fa-gift"></i>`;
                 btn.disabled = false;
             } else {
                 btn.className = "milestone-action-btn btn-locked";
-                btn.innerHTML = `${langData[currentLang]["ms_locked"] || "Locked"} <i class="fa-solid fa-lock"></i>`;
+                btn.innerHTML = `${trans.ms_locked || 'Locked'} <i class="fa-solid fa-lock"></i>`;
                 btn.disabled = true;
             }
         }
 
-        // 💰 TRANSACTION DISPATCH ROUTER: Pure Firebase Updates with Universal History
-        function executeClaimMilestoneCoins(stateDbKey, goalLimitCheck, rewardBonusCoins, btnObj, milestoneName) {
-            if(userMasterCoinsCounter < goalLimitCheck) return;
+        // 💰 CLAIM MILESTONE TRANSACTION (SECURE)
+        function executeClaimMilestoneCoins(stateDbKey, goalRequired, rewardCoins, btnObj, milestoneName) {
+            if (userMasterCoinsCounter < goalRequired) return;
 
             btnObj.disabled = true;
-            btnObj.innerText = "PROCESSING...";
+            btnObj.innerText = "CLAIMING...";
             btnObj.className = "milestone-action-btn btn-locked";
 
-            let currentLang = localStorage.getItem("selectedLang") || "en";
-
-            // 1. Add Coins securely via Transaction
-            db.ref(`users/${uid}/coins`).transaction((current) => {
-                return (current || 0) + rewardBonusCoins;
+            db.ref(`users/${uid}/coins`).transaction((cur) => {
+                return (cur || 0) + rewardCoins;
             }).then(() => {
-                
-                // 2. Mark this specific milestone key as claimed
-                let p1 = db.ref(`users/${uid}/claimed_milestones/${stateDbKey}`).set(true);
-
-                // 3. 🔥 UNIVERSAL HISTORY PUSH (For Account Health & Referral Unlocks)
-                let p2 = db.ref(`users/${uid}/history`).push({
+                // Set Claimed Flag
+                return db.ref(`users/${uid}/claimed_milestones/${stateDbKey}`).set(true);
+            }).then(() => {
+                // Universal History Log
+                return db.ref(`users/${uid}/history`).push({
                     title: `Milestone Achieved (${milestoneName})`,
-                    amount: rewardBonusCoins,
+                    amount: rewardCoins,
                     type: "credit",
                     txn_type: "milestone",
                     status: "SUCCESSFUL",
                     date: new Date().toLocaleDateString(),
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
-
-                return Promise.all([p1, p2]);
-
             }).then(() => {
-                let successMsg = langData[currentLang]["err_success"] || "Level-Up Bonus! Points credited straight inside your wallet.";
-                showCustomAlert(`🎉 ${successMsg} (+${rewardBonusCoins} 🪙)`, true);
-                
-                // Note: The renderAllMilestoneCards will automatically trigger via the .on('value') listener above!
-            }).catch((error) => {
-                let errMsg = langData[currentLang]["err_server"] || "Server error while claiming reward.";
-                showCustomAlert(`⚠️ ${errMsg}`);
-                
-                // Re-enable button manually on failure
+                let lang = localStorage.getItem("selectedLang") || "en";
+                let successMsg = (langData[lang] && langData[lang].err_success) ? langData[lang].err_success : "Level-Up Bonus! Points credited.";
+                showCustomAlert(`🎉 ${successMsg} (+${rewardCoins} 🪙)`, true);
+            }).catch((err) => {
+                showCustomAlert("⚠️ Transaction Failed. Try again.");
                 btnObj.disabled = false;
-                btnObj.innerHTML = `${langData[currentLang]["ms_claim"] || "Claim"} <i class="fa-solid fa-gift"></i>`;
                 btnObj.className = "milestone-action-btn btn-claimable";
+                btnObj.innerText = "Claim";
             });
         }
 
-        // Custom Modern Alert Popup
         function showCustomAlert(msg, isSuccess = false) {
             const alertBox = document.getElementById("customAlertBox");
             if(isSuccess) alertBox.classList.add("success-border");

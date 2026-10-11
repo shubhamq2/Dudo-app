@@ -38,7 +38,7 @@
         .header-controls { display: flex; gap: 10px; align-items: center; }
         .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-pink); font-weight: bold; cursor: pointer; }
         
-        /* 🔥 Smart Avatar Icon Styles */
+        /* Profile Icon */
         .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; transition: 0.3s; }
         .profile-icon:active { transform: scale(0.9); border-color: var(--accent-gold); }
 
@@ -54,26 +54,21 @@
         /* Main Captcha Card Box */
         .captcha-main-card { width: 92%; max-width: 440px; background: var(--card-bg); border-radius: 24px; padding: 30px 20px; text-align: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(10px); margin-bottom: 10px; }
         
-        /* 🔥 UPGRADED: Interactive Captcha Display Box */
         .captcha-display-box { background: linear-gradient(135deg, #1e1b4b, #311042); border-radius: 16px; padding: 25px 20px; font-size: 38px; font-weight: 900; color: var(--accent-gold); border: 2px solid var(--accent-purple); margin: 20px 0; letter-spacing: 10px; font-style: italic; text-shadow: 0 4px 15px rgba(251, 191, 36, 0.6); user-select: none; position: relative; box-shadow: inset 0 0 30px rgba(168,85,247,0.3), 0 8px 25px rgba(0,0,0,0.4); overflow: hidden; }
         .captcha-display-box::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px); pointer-events: none; }
         .captcha-refresh-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 22px; cursor: pointer; color: #fff; transition: 0.3s; background: rgba(0,0,0,0.4); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); z-index: 2; }
         .captcha-refresh-icon:active { transform: translateY(-50%) rotate(180deg); background: var(--accent-pink); border-color: var(--accent-pink); }
 
-        /* 🔥 UPGRADED: Input Grouping Field */
         .captcha-input { width: 100%; background: rgba(0,0,0,0.4); border: 2px solid rgba(236, 72, 153, 0.4); border-radius: 16px; color: #fff; padding: 18px; font-size: 22px; font-weight: 900; text-align: center; outline: none; box-sizing: border-box; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 5px; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.3); }
         .captcha-input:focus { border-color: var(--accent-gold); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4), inset 0 4px 10px rgba(0,0,0,0.3); background: rgba(0,0,0,0.6); }
         .captcha-input::placeholder { color: #475569; font-weight: 700; letter-spacing: 2px; }
 
-        /* Action Status Button */
         .status-btn { width: 100%; background: linear-gradient(135deg, var(--accent-pink), #be185d); color: #fff; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 900; box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4); outline: none; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; }
         .status-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); }
         .status-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
-        /* Notice Board Security Safe Box */
         .security-box { width: 92%; max-width: 440px; border: 1px dashed var(--accent-pink); background: rgba(236, 72, 153, 0.08); border-radius: 16px; padding: 15px 18px; margin-top: 15px; box-sizing: border-box; font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; gap: 10px; font-weight: 600; }
 
-        /* Custom Modern Alert Modal Popup style */
         .custom-alert { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); border: 2px solid var(--accent-pink); padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 1000; width: 85%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
         .custom-alert.success-border { border-color: var(--accent-green); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); }
         .custom-alert p { margin: 0 0 18px 0; font-size: 14.5px; color: #fff; font-weight: 700; line-height: 1.5; }
@@ -82,7 +77,7 @@
         .custom-alert.success-border button { background: var(--accent-green); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 999; backdrop-filter: blur(5px); }
 
-        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        /* In-App Viewer */
         .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
         .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-pink); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
@@ -98,11 +93,11 @@
         <button id="alertBtn" onclick="closeCustomAlert()">OK</button>
     </div>
 
-    <!-- 🌐 OFFLINE SCREEN -->
+    <!-- Offline Screen -->
     <div id="globalOfflineWarningOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,9,19,0.95); z-index:99999999; flex-direction:column; justify-content:center; align-items:center; text-align:center; backdrop-filter:blur(10px);">
         <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
         <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet</h2>
-        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
         <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
     </div>
 
@@ -113,7 +108,6 @@
             <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
-        <!-- Sandbox mode for extreme safety -->
         <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
@@ -129,7 +123,6 @@
                 <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
                 <option value="ru">RU</option>
             </select>
-            <!-- 👤 Header Smart Avatar -->
             <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
         </div>
     </div>
@@ -171,7 +164,7 @@
         <span data-i18n="cc_security">Please type the words accurately. Stay on the sponsor page to successfully claim your reward points.</span>
     </div>
 
-    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE (WITH HYBRID SDK LOGIC) -->
+    <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE (WITH HYBRID SDK & DUAL-MODE) -->
     <script>
         // 1. Firebase Config
         const firebaseConfig = {
@@ -189,9 +182,10 @@
         const db = firebase.database();
 
         // 🔥 ADMIN CONTROLLED DYNAMIC CONFIGS 🔥
-        let globalAdTimerSeconds = 25; // Default time
-        let globalRewardCoins = 5;     // Default coins
-        let globalDailyLimit = 10;     // Default daily max claims
+        let globalCaptchaMode = "timer"; // 'timer' ya 'postback'
+        let globalAdTimerSeconds = 25; 
+        let globalRewardCoins = 5;     
+        let globalDailyLimit = 10;     
         
         let activeAdminSmartlinkUrl = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js"; 
         let globalSdkName = "";
@@ -246,15 +240,61 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+        // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Native SDK Banner
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: HTML / INS Script Banner
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
         }
 
         const uid = localStorage.getItem("userId");
@@ -271,7 +311,6 @@
             if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
             if (!uid) { window.location.replace("index.html"); return; }
             
-            // Sync Language from Home Page
             let savedLang = localStorage.getItem("selectedLang") || "en";
             changeLanguage(savedLang);
             generateNewCaptchaCode();
@@ -284,7 +323,6 @@
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
                             
-                            // Load Anti-Ban Click Data (Daily limit logic)
                             if(data.daily_captcha_claims && data.daily_captcha_claims.date === todayDateString) {
                                 userTodayClaimsCount = data.daily_captcha_claims.count || 0;
                             } else {
@@ -292,7 +330,6 @@
                             }
                             document.getElementById("todayCaptchaDone").innerText = userTodayClaimsCount;
 
-                            // Smart Avatar
                             let userName = data.name || "Player";
                             let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
                             
@@ -310,12 +347,12 @@
                         }
                     });
 
-                    // 2. Fetch Admin Configurations (Banners, Captcha Link, Limit, Coins/Time, & SDK Data)
+                    // 2. Fetch Admin Configurations (Captcha Settings + Universal Banners)
                     db.ref('global_system_runtime_configurations/captcha_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
                             
-                            // 🔥 GET ADMIN CONTROLLED SETTINGS
+                            if (adminData.mode) { globalCaptchaMode = adminData.mode.trim().toLowerCase(); }
                             if (adminData.ad_timer) { globalAdTimerSeconds = parseInt(adminData.ad_timer); }
                             if (adminData.reward_coins) { globalRewardCoins = parseInt(adminData.reward_coins); }
                             if (adminData.daily_limit) { 
@@ -323,39 +360,15 @@
                                 document.getElementById("totalCaptchaLimit").innerText = globalDailyLimit;
                             }
                             
-                            // 🔥 FETCH SDK LOGIC 🔥
                             if (adminData.sdk_name) { globalSdkName = adminData.sdk_name.trim(); }
                             if (adminData.sdk_id) { globalSdkId = adminData.sdk_id.trim(); }
                             if (adminData.captcha_link) { activeAdminSmartlinkUrl = adminData.captcha_link; }
 
-                            // Load Banners (Fixed with setTimeout)
-                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
-                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
-                            if (s1Code && s1Active !== false) {
-                                document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
-                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            
-                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
-                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
-                            if (s2Code && s2Active !== false) {
-                                document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
-                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            
-                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
-                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
-                            if (s3Code && s3Active !== false) {
-                                document.getElementById("adminBannerSlot3").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
-                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            
-                            let s4Code = (adminData.slot4 && adminData.slot4.code) ? adminData.slot4.code : adminData.slot4_code;
-                            let s4Active = (adminData.slot4 && adminData.slot4.active !== undefined) ? adminData.slot4.active : adminData.active;
-                            if (s4Code && s4Active !== false) {
-                                document.getElementById("adminBannerSlot4").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
-                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            // 🔥 Universal Injector Calls (Slot 1 to Slot 4)
+                            injectUniversalBanner("adminBannerSlot1", adminData.slot1);
+                            injectUniversalBanner("adminBannerSlot2", adminData.slot2);
+                            injectUniversalBanner("adminBannerSlot3", adminData.slot3);
+                            injectUniversalBanner("adminBannerSlot4", adminData.slot4);
                         }
                     });
 
@@ -365,7 +378,6 @@
             });
         });
 
-        // Dynamic 6-Character Shield Token Generator
         function generateNewCaptchaCode() {
             const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
             let code = "";
@@ -400,9 +412,7 @@
         let platformTimer = null;
         let isValidationActive = false;
 
-        // 🚀 PLAY STORE SAFE ANTI-CHEATING LOGIC WITH HYBRID SDK ROUTING
         function verifyCaptchaCodeSubmit() {
-            // 🔥 ANTI-BAN: Custom Limit Check
             if(userTodayClaimsCount >= globalDailyLimit) {
                 showCustomAlert("err_limit");
                 return;
@@ -416,78 +426,78 @@
 
             if (!userInput) return;
 
-            // Step 1: Strict word matching
             if (userInput !== currentActiveCaptchaCode) {
                 showCustomAlert("err_wrong");
                 generateNewCaptchaCode();
                 return;
             }
 
-            // Step 2: Proceed to SDK or HTML
             isValidationActive = true;
             btn.disabled = true;
-            
-            let baseWaitTxt = langData[currentLang]["wait_txt"] || "Verifying... ";
-            btn.innerText = baseWaitTxt;
+            btn.innerText = langData[currentLang]["wait_txt"] || "Verifying... ";
 
-            // 🔥 HYBRID SDK ROUTING 🔥
-            if (globalSdkId && globalSdkId !== "") {
+            let isPostback = (globalCaptchaMode === "postback");
+
+            // 🔥 HYBRID SDK ROUTING (Timer mode me agar SDK placement di ho)
+            if (!isPostback && globalSdkId && globalSdkId !== "") {
                 if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
-                    // Send to Android Native SDK
                     window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, globalRewardCoins, "captcha_task");
-                } else {
-                    // Fallback to HTML
-                    openHTMLIframeViewer();
+                    return;
                 }
-            } else {
-                openHTMLIframeViewer();
             }
+
+            openHTMLIframeViewer(isPostback);
         }
 
-        function openHTMLIframeViewer() {
-            // Anti-clash buffer 600ms
+        function openHTMLIframeViewer(isPostbackMode = false) {
             setTimeout(() => {
-                let countdownTime = globalAdTimerSeconds;
-                
-                // Show In-App Viewer
                 document.getElementById("inAppAdViewer").style.display = "flex";
-                document.getElementById("adTimerDisplay").style.display = "flex";
-                document.getElementById("adCloseBtn").style.display = "none";
-                
-                // 🔥 Wait for Ad to Load fully before countdown
-                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
-                
+                let timerDisplay = document.getElementById("adTimerDisplay");
+                let closeBtn = document.getElementById("adCloseBtn");
                 let iframeNode = document.getElementById("adIframe");
 
-                iframeNode.onload = function() {
-                    if (platformTimer) clearInterval(platformTimer);
+                if (isPostbackMode) {
+                    // 🔥 MODE 1: DIRECT CLAIM / POSTBACK (No countdown)
+                    timerDisplay.style.display = "flex";
+                    timerDisplay.innerHTML = `<i class="fa-solid fa-check"></i> Captcha Verified`;
+                    closeBtn.style.display = "block";
+                    closeBtn.innerText = "✔ CLAIM COINS";
+                } else {
+                    // 🔥 MODE 2: TIMER MODE (Countdown Timer)
+                    timerDisplay.style.display = "flex";
+                    closeBtn.style.display = "none";
+                    closeBtn.innerText = "✖ CLOSE & CLAIM";
+                    timerDisplay.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
                     
-                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
-                    
-                    platformTimer = setInterval(() => {
-                        countdownTime--;
-                        let s = document.getElementById("adSecondsSpan");
-                        if(s) s.innerText = countdownTime;
+                    let countdownTime = globalAdTimerSeconds;
+                    iframeNode.onload = function() {
+                        if (platformTimer) clearInterval(platformTimer);
+                        
+                        timerDisplay.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                        
+                        platformTimer = setInterval(() => {
+                            countdownTime--;
+                            let s = document.getElementById("adSecondsSpan");
+                            if(s) s.innerText = countdownTime;
 
-                        // 🛡️ ANTI-CHEAT FIX: Only triggers if the entire app is minimized
-                        if (document.hidden) { 
-                            clearInterval(platformTimer);
-                            document.getElementById("inAppAdViewer").style.display = "none";
-                            document.getElementById("adIframe").src = "";
-                            resetCaptchaSubmitButton();
-                            showCustomAlert("err_invalid");
-                            return;
-                        }
+                            if (document.hidden) { 
+                                clearInterval(platformTimer);
+                                document.getElementById("inAppAdViewer").style.display = "none";
+                                iframeNode.src = "";
+                                resetCaptchaSubmitButton();
+                                showCustomAlert("err_invalid");
+                                return;
+                            }
 
-                        if (countdownTime <= 0) {
-                            clearInterval(platformTimer);
-                            document.getElementById("adTimerDisplay").style.display = "none";
-                            document.getElementById("adCloseBtn").style.display = "block"; // Show Claim Button
-                        }
-                    }, 1000);
-                };
+                            if (countdownTime <= 0) {
+                                clearInterval(platformTimer);
+                                timerDisplay.style.display = "none";
+                                closeBtn.style.display = "block";
+                            }
+                        }, 1000);
+                    };
+                }
 
-                // Load Ad URL into iframe
                 iframeNode.src = activeAdminSmartlinkUrl;
             }, 600);
         }
@@ -495,7 +505,7 @@
         // HTML Ad Close Button Action
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
-            document.getElementById("adIframe").src = ""; // Stop video/ad
+            document.getElementById("adIframe").src = "";
             grantCaptchaReward(globalRewardCoins, false);
         }
 
@@ -504,24 +514,22 @@
             grantCaptchaReward(parseInt(rewardCoins), true);
         }
 
-        // 💰 REWARD SYNC API & DAILY CHECKLIST INTEGRATION (PURE FIREBASE)
         function grantCaptchaReward(rewardToGive, isSdk) {
             if(rewardToGive <= 0 || !uid) return;
             
             let sdkTag = isSdk ? " [SDK]" : "";
 
-            // Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
                 return (current || 0) + rewardToGive;
             }).then(() => {
                 
-                // 1. 🔥 ANTI-BAN LOGIC: Register limits
+                // 1. Register daily count
                 db.ref(`users/${uid}/daily_captcha_claims`).set({
                     date: todayDateString,
                     count: userTodayClaimsCount + 1
                 });
 
-                // 2. 🔥 UNIVERSAL HISTORY PUSH
+                // 2. Push to Universal History
                 db.ref(`users/${uid}/history`).push({
                     title: `Captcha Reward${sdkTag}`,
                     amount: rewardToGive,

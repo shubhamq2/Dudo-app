@@ -170,6 +170,7 @@
             <button class="nav-action-tab-btn" id="btn_tab_notifications" onclick="switchActiveWorkspacePaneSelector('pane_notifications')">Alerts & Feeds</button>
             <button class="nav-action-tab-btn" id="btn_tab_support" onclick="switchActiveWorkspacePaneSelector('pane_support')">Support Desk</button>
             <button class="nav-action-tab-btn" id="btn_tab_allfiles" onclick="switchActiveWorkspacePaneSelector('pane_allfiles')">App Configs & Links</button>
+            
             <button class="nav-action-tab-btn" id="btn_tab_settings" onclick="switchActiveWorkspacePaneSelector('pane_settings')">Global Settings</button>
         </div>
 
@@ -576,7 +577,7 @@
                     <div class="file-box" onclick="openDynamicDeepFileSettings('captcha_configs')">🔥⌨️ Captcha Config</div>
                     
                     <div class="file-box" onclick="openDynamicDeepFileSettings('timewall_configs')">⚡ Timewall / Offerwall Config</div>
-                    <div class="file-box" onclick="openDynamicDeepFileSettings('bitlabs_offers')">📋 Surveys Config</div>
+                    <div class="file-box" onclick="openDynamicDeepFileSettings('bitlabs_offers')">📋 BitLabs Surveys Config</div>
                     <div class="file-box" onclick="openDynamicDeepFileSettings('adgem_offers')">🎮 AdGem Games Config</div>
                     
                     <div class="file-box" onclick="openDynamicDeepFileSettings('smartlinks')">🔗 Global Smartlinks<br><small>(Secure Cloud, Web Visit)</small></div>
@@ -611,12 +612,17 @@
                 
                     <div class="file-box" onclick="openDynamicDeepFileSettings('premium_ads_configs')">📺 Premium Ads Config</div>
                 </div>
+                <div class="file-box" onclick="openDynamicDeepFileSettings('custom_cards_manager')">
+    🎴 Home Dynamic Cards & Buttons
+</div>
+
                 <div class="control-block-card" style="border-color: var(--cyber-green);">
                     <div class="block-title-txt" style="color:var(--cyber-green);">➕ ADD NEW CUSTOM MODULE TO HOME</div>
                     <div class="input-row-group">
                         <input type="text" id="nfTitle" class="std-panel-input" placeholder="Title (e.g. New Game)" style="margin-bottom:0;">
                         <input type="text" id="nfIcon" class="std-panel-input" placeholder="Emoji Icon (e.g. 🎲)" style="margin-bottom:0;">
                     </div>
+                    
                     <input type="text" id="nfDesc" class="std-panel-input" placeholder="Short Description">
                     <input type="text" id="nfUrl" class="std-panel-input" placeholder="Destination URL Link (e.g. new_game.html)">
                     <input type="text" id="nfBadge" class="std-panel-input" placeholder="Badge Text (e.g. HOT / NEW)">
@@ -633,6 +639,29 @@
                     <div class="module-toggle-grid" id="moduleTogglesContainer"></div>
                     <button class="std-panel-btn btn-green" style="width:100%; margin-bottom: 0;" onclick="saveModuleToggles()">💾 SAVE VISIBILITY SETTINGS</button>
                 </div>
+
+                <!-- 🚀 APP FORCE UPDATE CONTROLLER -->
+                <div class="control-block-card" style="border-color: var(--cyber-orange); background: rgba(249, 115, 22, 0.05);">
+                    <div class="block-title-txt" style="color:var(--cyber-orange);">🚀 APP FORCE UPDATE MANAGER</div>
+                    <p style="font-size: 11px; color: #94a3b8; margin-bottom: 12px;">App ke users ki screen ko lock karke Play Store update lene par majboor karein.</p>
+                    
+                    <label style="font-size:11px; color:var(--text-dim); font-weight:bold;">Force Update Mode</label>
+                    <select id="adminForceUpdateStatus" class="std-panel-input">
+                        <option value="false">OFF - Normal App Mode</option>
+                        <option value="true">ON - Lock App & Force Update</option>
+                    </select>
+
+                    <label style="font-size:11px; color:var(--text-dim); font-weight:bold;">Update Message Displayed to User</label>
+                    <textarea id="adminUpdateMsg" class="std-panel-textarea" placeholder="Update message..." style="height:70px;"></textarea>
+
+                    <label style="font-size:11px; color:var(--text-dim); font-weight:bold;">Play Store Redirect Link</label>
+                    <input type="text" id="adminUpdatePlayUrl" class="std-panel-input" value="https://play.google.com/store/apps/details?id=com.dudo.app">
+
+                    <button class="std-panel-btn btn-orange" style="width:100%; margin-top:5px; margin-bottom:0;" onclick="saveAdminForceUpdateConfig()">
+                        DEPLOY UPDATE COMMAND
+                    </button>
+                </div>
+
 
                 <div class="control-block-card" style="border-color: var(--cyber-pink);">
                     <div class="block-title-txt" style="color:var(--cyber-pink);">🔗 GLOBAL LINKS & SUPPORT MANAGER</div>
@@ -855,9 +884,17 @@ const auth = firebase.auth();
                 {id: 't4_name', label: 'Tab 4 Name (e.g. Leaders)', type: 'input'}, {id: 't4_icon', label: 'Tab 4 Icon (e.g. fa-solid fa-trophy)', type: 'input'}, {id: 't4_url', label: 'Tab 4 Target URL', type: 'input'},
                 {id: 't5_name', label: 'Tab 5 Name (e.g. Vault)', type: 'input'}, {id: 't5_icon', label: 'Tab 5 Icon (e.g. fa-solid fa-wallet)', type: 'input'}, {id: 't5_url', label: 'Tab 5 Target URL', type: 'input'}
             ] },
-           'profile_page_configs': { name: 'Profile Page Configs', path: 'global_system_runtime_configurations/profile_page_configs', fields: [ 
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Bottom)', type: 'textarea'}
+                      'profile_page_configs': { name: 'Profile Page Configs', path: 'global_system_runtime_configurations/profile_page_configs', fields: [ 
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
             ] },
             'withdraw_settings': { name: 'Withdraw & Limits Config', path: 'global_system_runtime_configurations/withdraw_settings', fields: [ 
                 {id: 'min_upi', label: 'Min UPI (₹)', type: 'input'},
@@ -882,180 +919,459 @@ const auth = firebase.auth();
             ] },
             'history_settings': { name: 'History Page Config', path: 'global_system_runtime_configurations/history_page', fields: [ {id: 'history_alert_text', label: 'History Top Alert Message', type: 'input'} ] },
 
-           'global_banners': { name: 'Global Banners', path: 'global_system_runtime_configurations/banner_ads', fields: [ 
-                {id: 'slot1_code', label: 'Slot 1 HTML (Top)', type: 'textarea'}, {id: 'slot2_code', label: 'Slot 2 HTML', type: 'textarea'}, 
-                {id: 'slot3_code', label: 'Slot 3 HTML', type: 'textarea'}, {id: 'slot4_code', label: 'Slot 4 HTML', type: 'textarea'},
-                {id: 'slot5_code', label: 'Slot 5 HTML', type: 'textarea'}, {id: 'slot6_code', label: 'Slot 6 HTML', type: 'textarea'},
-                {id: 'slot7_code', label: 'Slot 7 HTML', type: 'textarea'}, {id: 'slot8_code', label: 'Slot 8 HTML (Bottom)', type: 'textarea'} 
-            ]},
-                        'video_zone_configs': { name: 'Video Zone Configs (18 Servers)', path: 'global_system_runtime_configurations/video_zone_configs', fields: [ 
-                {id: 'daily_limit', label: 'Daily Limit (Max video claims per day)', type: 'input'},
-                
-                {id: 'adscend', label: '🎬 Adscend Media', type: 'header'},
-                {id: 'link_adscend_s1', label: 'HTML S1 Link', type: 'input'}, {id: 'timer_adscend_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_adscend_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_adscend_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_adscend_s1', label: 'S1 SDK ID', type: 'input'},
-                {id: 'link_adscend_s2', label: 'HTML S2 Link', type: 'input'}, {id: 'timer_adscend_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_adscend_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_adscend_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_adscend_s2', label: 'S2 SDK ID', type: 'input'},
-                {id: 'link_adscend_s3', label: 'HTML S3 Link', type: 'input'}, {id: 'timer_adscend_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_adscend_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_adscend_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_adscend_s3', label: 'S3 SDK ID', type: 'input'},
-                
-                {id: 'lootably', label: '🔥 Lootably', type: 'header'},
-                {id: 'link_lootably_s1', label: 'HTML S1 Link', type: 'input'}, {id: 'timer_lootably_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_lootably_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_lootably_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_lootably_s1', label: 'S1 SDK ID', type: 'input'},
-                {id: 'link_lootably_s2', label: 'HTML S2 Link', type: 'input'}, {id: 'timer_lootably_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_lootably_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_lootably_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_lootably_s2', label: 'S2 SDK ID', type: 'input'},
-                {id: 'link_lootably_s3', label: 'HTML S3 Link', type: 'input'}, {id: 'timer_lootably_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_lootably_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_lootably_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_lootably_s3', label: 'S3 SDK ID', type: 'input'},
-                
-                {id: 'hideout', label: '📺 Hideout.tv', type: 'header'},
-                {id: 'link_hideout_s1', label: 'HTML S1 Link', type: 'input'}, {id: 'timer_hideout_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_hideout_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_hideout_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_hideout_s1', label: 'S1 SDK ID', type: 'input'},
-                {id: 'link_hideout_s2', label: 'HTML S2 Link', type: 'input'}, {id: 'timer_hideout_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_hideout_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_hideout_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_hideout_s2', label: 'S2 SDK ID', type: 'input'},
-                {id: 'link_hideout_s3', label: 'HTML S3 Link', type: 'input'}, {id: 'timer_hideout_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_hideout_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_hideout_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_hideout_s3', label: 'S3 SDK ID', type: 'input'},
-                
-                {id: 'timewall', label: '⚡ Timewall Clicks', type: 'header'},
-                {id: 'link_timewall_s1', label: 'HTML S1 Link', type: 'input'}, {id: 'timer_timewall_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_timewall_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_timewall_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_timewall_s1', label: 'S1 SDK ID', type: 'input'},
-                {id: 'link_timewall_s2', label: 'HTML S2 Link', type: 'input'}, {id: 'timer_timewall_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_timewall_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_timewall_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_timewall_s2', label: 'S2 SDK ID', type: 'input'},
-                {id: 'link_timewall_s3', label: 'HTML S3 Link', type: 'input'}, {id: 'timer_timewall_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_timewall_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_timewall_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_timewall_s3', label: 'S3 SDK ID', type: 'input'},
-                
-                {id: 'notik', label: '📱 Notik Me', type: 'header'},
-                {id: 'link_notik_s1', label: 'HTML S1 Link', type: 'input'}, {id: 'timer_notik_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_notik_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_notik_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_notik_s1', label: 'S1 SDK ID', type: 'input'},
-                {id: 'link_notik_s2', label: 'HTML S2 Link', type: 'input'}, {id: 'timer_notik_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_notik_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_notik_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_notik_s2', label: 'S2 SDK ID', type: 'input'},
-                {id: 'link_notik_s3', label: 'HTML S3 Link', type: 'input'}, {id: 'timer_notik_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_notik_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_notik_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_notik_s3', label: 'S3 SDK ID', type: 'input'},
-                
-                {id: 'monlix', label: '🚀 Monlix Videos', type: 'header'},
-                {id: 'link_monlix_s1', label: 'HTML S1 Link', type: 'input'}, {id: 'timer_monlix_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_monlix_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_monlix_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_monlix_s1', label: 'S1 SDK ID', type: 'input'},
-                {id: 'link_monlix_s2', label: 'HTML S2 Link', type: 'input'}, {id: 'timer_monlix_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_monlix_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_monlix_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_monlix_s2', label: 'S2 SDK ID', type: 'input'},
-                {id: 'link_monlix_s3', label: 'HTML S3 Link', type: 'input'}, {id: 'timer_monlix_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_monlix_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_monlix_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_monlix_s3', label: 'S3 SDK ID', type: 'input'},
+           // 📢 GLOBAL BANNERS (Universal HTML / Script & SDK)
+'global_banners': { name: 'Home Global Banners (8 Slots)', path: 'global_system_runtime_configurations/banner_ads', fields: [ 
+    {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+    {id: 'slot1_code', label: 'Slot 1 HTML / Script', type: 'textarea'},
+    {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+    {id: 'slot1_sdk_id', label: 'Slot 1 SDK ID', type: 'input'},
 
-                {id: 'banners', label: '📢 Banners', type: 'header'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-                      'social_tasks_configs': { name: 'Social Tasks Configs (8 Nets)', path: 'global_system_runtime_configurations/social_tasks_configs', fields: [ 
-                {id: 'support_email', label: 'Promo Contact Email', type: 'input'},
-                
-                {id: 'telegram', label: '✈️ Telegram', type: 'header'},
-                {id: 'link_telegram', label: 'Telegram (Link)', type: 'input'}, {id: 'timer_telegram', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_telegram', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_telegram', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_telegram', label: 'SDK ID', type: 'input'},
-                
-                {id: 'youtube', label: '📺 YouTube', type: 'header'},
-                {id: 'link_youtube', label: 'YouTube (Link)', type: 'input'}, {id: 'timer_youtube', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_youtube', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_youtube', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_youtube', label: 'SDK ID', type: 'input'},
-                
-                {id: 'instagram', label: '📸 Instagram', type: 'header'},
-                {id: 'link_instagram', label: 'Instagram (Link)', type: 'input'}, {id: 'timer_instagram', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_instagram', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_instagram', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_instagram', label: 'SDK ID', type: 'input'},
-                
-                {id: 'whatsapp', label: '💬 WhatsApp', type: 'header'},
-                {id: 'link_whatsapp', label: 'WhatsApp (Link)', type: 'input'}, {id: 'timer_whatsapp', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_whatsapp', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_whatsapp', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_whatsapp', label: 'SDK ID', type: 'input'},
-                
-                {id: 'timewall', label: '⚡ Timewall', type: 'header'},
-                {id: 'link_timewall', label: 'Timewall (Link)', type: 'input'}, {id: 'timer_timewall', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_timewall', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_timewall', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_timewall', label: 'SDK ID', type: 'input'},
-                
-                {id: 'notik', label: '📝 Notik Me', type: 'header'},
-                {id: 'link_notik', label: 'Notik Me (Link)', type: 'input'}, {id: 'timer_notik', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_notik', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_notik', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_notik', label: 'SDK ID', type: 'input'},
-                
-                {id: 'monlix', label: '🚀 Monlix', type: 'header'},
-                {id: 'link_monlix', label: 'Monlix (Link)', type: 'input'}, {id: 'timer_monlix', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_monlix', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_monlix', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_monlix', label: 'SDK ID', type: 'input'},
-                
-                {id: 'wannads', label: '🎯 Wannads', type: 'header'},
-                {id: 'link_wannads', label: 'Wannads (Link)', type: 'input'}, {id: 'timer_wannads', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_wannads', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_wannads', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_wannads', label: 'SDK ID', type: 'input'},
+    {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+    {id: 'slot2_code', label: 'Slot 2 HTML / Script', type: 'textarea'},
+    {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+    {id: 'slot2_sdk_id', label: 'Slot 2 SDK ID', type: 'input'},
 
-                {id: 'banners', label: '📢 Banners', type: 'header'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'}
+    {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+    {id: 'slot3_code', label: 'Slot 3 HTML / Script', type: 'textarea'},
+    {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+    {id: 'slot3_sdk_id', label: 'Slot 3 SDK ID', type: 'input'},
+
+    {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+    {id: 'slot4_code', label: 'Slot 4 HTML / Script', type: 'textarea'},
+    {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+    {id: 'slot4_sdk_id', label: 'Slot 4 SDK ID', type: 'input'},
+
+    {id: 'slot5_type', label: 'Slot 5 Type (html / sdk)', type: 'input'},
+    {id: 'slot5_code', label: 'Slot 5 HTML / Script', type: 'textarea'},
+    {id: 'slot5_sdk_name', label: 'Slot 5 SDK Name', type: 'input'},
+    {id: 'slot5_sdk_id', label: 'Slot 5 SDK ID', type: 'input'},
+
+    {id: 'slot6_type', label: 'Slot 6 Type (html / sdk)', type: 'input'},
+    {id: 'slot6_code', label: 'Slot 6 HTML / Script', type: 'textarea'},
+    {id: 'slot6_sdk_name', label: 'Slot 6 SDK Name', type: 'input'},
+    {id: 'slot6_sdk_id', label: 'Slot 6 SDK ID', type: 'input'},
+
+    {id: 'slot7_type', label: 'Slot 7 Type (html / sdk)', type: 'input'},
+    {id: 'slot7_code', label: 'Slot 7 HTML / Script', type: 'textarea'},
+    {id: 'slot7_sdk_name', label: 'Slot 7 SDK Name', type: 'input'},
+    {id: 'slot7_sdk_id', label: 'Slot 7 SDK ID', type: 'input'},
+
+    {id: 'slot8_type', label: 'Slot 8 Type (html / sdk)', type: 'input'},
+    {id: 'slot8_code', label: 'Slot 8 HTML / Script', type: 'textarea'},
+    {id: 'slot8_sdk_name', label: 'Slot 8 SDK Name', type: 'input'},
+    {id: 'slot8_sdk_id', label: 'Slot 8 SDK ID', type: 'input'}
+]},
+
+// 🎴 DYNAMIC CARDS (Position & Size Manager)
+'custom_cards_manager': { name: 'Home Dynamic Cards & Buttons', path: 'global_system_runtime_configurations/custom_cards', fields: [
+    {id: 'card1_header', label: '🃏 Card 1 Settings', type: 'header'},
+    {id: 'c1_active', label: 'Show Card 1? (true / false)', type: 'input'},
+    {id: 'c1_title', label: 'Title (e.g. Special Mission)', type: 'input'},
+    {id: 'c1_desc', label: 'Subtitle (e.g. Win 500 Coins)', type: 'input'},
+    {id: 'c1_icon', label: 'Icon (e.g. 🚀 / 💎 / 🎁)', type: 'input'},
+    {id: 'c1_color', label: 'Color Hex (e.g. #f59e0b)', type: 'input'},
+    {id: 'c1_size', label: 'Size (half / full)', type: 'input'},
+    {id: 'c1_target_section', label: 'Position (top / middle / quick_tasks / games / bottom)', type: 'input'},
+    {id: 'c1_badge', label: 'Badge Text (Optional: NEW / HOT)', type: 'input'},
+    {id: 'c1_url', label: 'Target URL (e.g. bonus.html)', type: 'input'},
+
+    {id: 'card2_header', label: '🃏 Card 2 Settings', type: 'header'},
+    {id: 'c2_active', label: 'Show Card 2? (true / false)', type: 'input'},
+    {id: 'c2_title', label: 'Title', type: 'input'},
+    {id: 'c2_desc', label: 'Subtitle', type: 'input'},
+    {id: 'c2_icon', label: 'Icon', type: 'input'},
+    {id: 'c2_color', label: 'Color Hex', type: 'input'},
+    {id: 'c2_size', label: 'Size (half / full)', type: 'input'},
+    {id: 'c2_target_section', label: 'Position (top / middle / quick_tasks / games / bottom)', type: 'input'},
+    {id: 'c2_badge', label: 'Badge Text', type: 'input'},
+    {id: 'c2_url', label: 'Target URL', type: 'input'}
+]},
+            'video_zone_configs': { name: 'Video Zone Configs', path: 'global_system_runtime_configurations/video_zone_configs', fields: [ 
+                {id: 'vz_core', label: '🎬 Video Zone Core Controls', type: 'header'},
+                {id: 'daily_limit', label: 'Daily Video Stream Limit (e.g. 20)', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'},
+
+                {id: 'h_adscend', label: '🎬 Adscend Media (3 Servers)', type: 'header'},
+                {id: 'mode_adscend_s1', label: 'Server 1 Mode (timer / postback)', type: 'input'},
+                {id: 'link_adscend_s1', label: 'Server 1 URL', type: 'input'}, {id: 'timer_adscend_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_adscend_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_adscend_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_adscend_s1', label: 'S1 SDK ID', type: 'input'},
+                {id: 'mode_adscend_s2', label: 'Server 2 Mode (timer / postback)', type: 'input'},
+                {id: 'link_adscend_s2', label: 'Server 2 URL', type: 'input'}, {id: 'timer_adscend_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_adscend_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_adscend_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_adscend_s2', label: 'S2 SDK ID', type: 'input'},
+                {id: 'mode_adscend_s3', label: 'Server 3 Mode (timer / postback)', type: 'input'},
+                {id: 'link_adscend_s3', label: 'Server 3 URL', type: 'input'}, {id: 'timer_adscend_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_adscend_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_adscend_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_adscend_s3', label: 'S3 SDK ID', type: 'input'},
+
+                {id: 'h_lootably', label: '🔥 Lootably (3 Servers)', type: 'header'},
+                {id: 'mode_lootably_s1', label: 'Server 1 Mode (timer / postback)', type: 'input'},
+                {id: 'link_lootably_s1', label: 'Server 1 URL', type: 'input'}, {id: 'timer_lootably_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_lootably_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_lootably_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_lootably_s1', label: 'S1 SDK ID', type: 'input'},
+                {id: 'mode_lootably_s2', label: 'Server 2 Mode (timer / postback)', type: 'input'},
+                {id: 'link_lootably_s2', label: 'Server 2 URL', type: 'input'}, {id: 'timer_lootably_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_lootably_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_lootably_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_lootably_s2', label: 'S2 SDK ID', type: 'input'},
+                {id: 'mode_lootably_s3', label: 'Server 3 Mode (timer / postback)', type: 'input'},
+                {id: 'link_lootably_s3', label: 'Server 3 URL', type: 'input'}, {id: 'timer_lootably_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_lootably_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_lootably_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_lootably_s3', label: 'S3 SDK ID', type: 'input'},
+
+                {id: 'h_hideout', label: '📺 Hideout.tv (3 Servers)', type: 'header'},
+                {id: 'mode_hideout_s1', label: 'Server 1 Mode (timer / postback)', type: 'input'},
+                {id: 'link_hideout_s1', label: 'Server 1 URL', type: 'input'}, {id: 'timer_hideout_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_hideout_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_hideout_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_hideout_s1', label: 'S1 SDK ID', type: 'input'},
+                {id: 'mode_hideout_s2', label: 'Server 2 Mode (timer / postback)', type: 'input'},
+                {id: 'link_hideout_s2', label: 'Server 2 URL', type: 'input'}, {id: 'timer_hideout_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_hideout_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_hideout_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_hideout_s2', label: 'S2 SDK ID', type: 'input'},
+                {id: 'mode_hideout_s3', label: 'Server 3 Mode (timer / postback)', type: 'input'},
+                {id: 'link_hideout_s3', label: 'Server 3 URL', type: 'input'}, {id: 'timer_hideout_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_hideout_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_hideout_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_hideout_s3', label: 'S3 SDK ID', type: 'input'},
+
+                {id: 'h_timewall', label: '⚡ Timewall Clicks (3 Servers)', type: 'header'},
+                {id: 'mode_timewall_s1', label: 'Server 1 Mode (timer / postback)', type: 'input'},
+                {id: 'link_timewall_s1', label: 'Server 1 URL', type: 'input'}, {id: 'timer_timewall_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_timewall_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_timewall_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_timewall_s1', label: 'S1 SDK ID', type: 'input'},
+                {id: 'mode_timewall_s2', label: 'Server 2 Mode (timer / postback)', type: 'input'},
+                {id: 'link_timewall_s2', label: 'Server 2 URL', type: 'input'}, {id: 'timer_timewall_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_timewall_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_timewall_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_timewall_s2', label: 'S2 SDK ID', type: 'input'},
+                {id: 'mode_timewall_s3', label: 'Server 3 Mode (timer / postback)', type: 'input'},
+                {id: 'link_timewall_s3', label: 'Server 3 URL', type: 'input'}, {id: 'timer_timewall_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_timewall_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_timewall_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_timewall_s3', label: 'S3 SDK ID', type: 'input'},
+
+                {id: 'h_notik', label: '📱 Notik Me (3 Servers)', type: 'header'},
+                {id: 'mode_notik_s1', label: 'Server 1 Mode (timer / postback)', type: 'input'},
+                {id: 'link_notik_s1', label: 'Server 1 URL', type: 'input'}, {id: 'timer_notik_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_notik_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_notik_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_notik_s1', label: 'S1 SDK ID', type: 'input'},
+                {id: 'mode_notik_s2', label: 'Server 2 Mode (timer / postback)', type: 'input'},
+                {id: 'link_notik_s2', label: 'Server 2 URL', type: 'input'}, {id: 'timer_notik_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_notik_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_notik_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_notik_s2', label: 'S2 SDK ID', type: 'input'},
+                {id: 'mode_notik_s3', label: 'Server 3 Mode (timer / postback)', type: 'input'},
+                {id: 'link_notik_s3', label: 'Server 3 URL', type: 'input'}, {id: 'timer_notik_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_notik_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_notik_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_notik_s3', label: 'S3 SDK ID', type: 'input'},
+
+                {id: 'h_monlix', label: '🚀 Monlix Videos (3 Servers)', type: 'header'},
+                {id: 'mode_monlix_s1', label: 'Server 1 Mode (timer / postback)', type: 'input'},
+                {id: 'link_monlix_s1', label: 'Server 1 URL', type: 'input'}, {id: 'timer_monlix_s1', label: 'S1 Timer (s)', type: 'input'}, {id: 'reward_monlix_s1', label: 'S1 Reward', type: 'input'}, {id: 'sdk_name_monlix_s1', label: 'S1 SDK Name', type: 'input'}, {id: 'sdk_id_monlix_s1', label: 'S1 SDK ID', type: 'input'},
+                {id: 'mode_monlix_s2', label: 'Server 2 Mode (timer / postback)', type: 'input'},
+                {id: 'link_monlix_s2', label: 'Server 2 URL', type: 'input'}, {id: 'timer_monlix_s2', label: 'S2 Timer (s)', type: 'input'}, {id: 'reward_monlix_s2', label: 'S2 Reward', type: 'input'}, {id: 'sdk_name_monlix_s2', label: 'S2 SDK Name', type: 'input'}, {id: 'sdk_id_monlix_s2', label: 'S2 SDK ID', type: 'input'},
+                {id: 'mode_monlix_s3', label: 'Server 3 Mode (timer / postback)', type: 'input'},
+                {id: 'link_monlix_s3', label: 'Server 3 URL', type: 'input'}, {id: 'timer_monlix_s3', label: 'S3 Timer (s)', type: 'input'}, {id: 'reward_monlix_s3', label: 'S3 Reward', type: 'input'}, {id: 'sdk_name_monlix_s3', label: 'S3 SDK Name', type: 'input'}, {id: 'sdk_id_monlix_s3', label: 'S3 SDK ID', type: 'input'}
             ] },
+                                  'social_tasks_configs': { name: 'Social Tasks Config', path: 'global_system_runtime_configurations/social_tasks_configs', fields: [ 
+                {id: 'support_email', label: 'Support / Advertiser Contact Email', type: 'input'},
+
+                {id: 'h_tg', label: '✈️ Telegram Channel Configuration', type: 'header'},
+                {id: 'mode_telegram', label: 'Telegram Mode (timer / postback)', type: 'input'},
+                {id: 'link_telegram', label: 'Telegram Link / Ad URL', type: 'input'}, {id: 'timer_telegram', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_telegram', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_telegram', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_telegram', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_yt', label: '📺 YouTube Channel Configuration', type: 'header'},
+                {id: 'mode_youtube', label: 'YouTube Mode (timer / postback)', type: 'input'},
+                {id: 'link_youtube', label: 'YouTube Link / Ad URL', type: 'input'}, {id: 'timer_youtube', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_youtube', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_youtube', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_youtube', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_ig', label: '📸 Instagram Configuration', type: 'header'},
+                {id: 'mode_instagram', label: 'Instagram Mode (timer / postback)', type: 'input'},
+                {id: 'link_instagram', label: 'Instagram Link / Ad URL', type: 'input'}, {id: 'timer_instagram', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_instagram', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_instagram', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_instagram', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_wa', label: '💬 WhatsApp Share Configuration', type: 'header'},
+                {id: 'mode_whatsapp', label: 'WhatsApp Mode (timer / postback)', type: 'input'},
+                {id: 'link_whatsapp', label: 'WhatsApp Link / Ad URL', type: 'input'}, {id: 'timer_whatsapp', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_whatsapp', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_whatsapp', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_whatsapp', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_tw', label: '⚡ Timewall Social Configuration', type: 'header'},
+                {id: 'mode_timewall', label: 'Timewall Mode (timer / postback)', type: 'input'},
+                {id: 'link_timewall', label: 'Timewall URL', type: 'input'}, {id: 'timer_timewall', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_timewall', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_timewall', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_timewall', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_notik', label: '📝 Notik Me Configuration', type: 'header'},
+                {id: 'mode_notik', label: 'Notik Mode (timer / postback)', type: 'input'},
+                {id: 'link_notik', label: 'Notik URL', type: 'input'}, {id: 'timer_notik', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_notik', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_notik', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_notik', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_monlix', label: '🚀 Monlix Social Configuration', type: 'header'},
+                {id: 'mode_monlix', label: 'Monlix Mode (timer / postback)', type: 'input'},
+                {id: 'link_monlix', label: 'Monlix URL', type: 'input'}, {id: 'timer_monlix', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_monlix', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_monlix', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_monlix', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_wannads', label: '🎯 Wannads Configuration', type: 'header'},
+                {id: 'mode_wannads', label: 'Wannads Mode (timer / postback)', type: 'input'},
+                {id: 'link_wannads', label: 'Wannads URL', type: 'input'}, {id: 'timer_wannads', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_wannads', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_wannads', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_wannads', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'}
+            ] },
+                        'bitlabs_offers': { name: 'BitLabs Surveys Config', path: 'global_system_runtime_configurations/bitlabs_offers', fields: [ 
+                {id: 'wall_header', label: '📋 BitLabs Survey Settings', type: 'header'},
+                {id: 'mode', label: 'Mode (timer / postback)', type: 'input'},
+                {id: 'bitlabs_link', label: 'BitLabs Offerwall Link (URL)', type: 'input'},
+                {id: 'ad_timer', label: 'Timer in Seconds (If Timer Mode)', type: 'input'},
+                {id: 'reward_coins', label: 'Reward Coins per Survey', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
+            ] },
+
             'smartlinks': { name: 'Global Smartlink Config', path: 'global_system_runtime_configurations', fields: [ {id: 'globalSmartlink', label: 'Global Fallback Smartlink URL', type: 'input'} ] },
                     'offerwalls': { name: 'Partner Tasks (Offerwalls)', path: 'global_system_runtime_configurations/timewall_configs', fields: [ 
                 {id: 'timewall_url', label: '🔗 Offerwall Target Link (URL)', type: 'input'}
-            ] },   'secure_cloud_configs': { name: 'Secure Cloud Server Configs', path: 'global_system_runtime_configurations/secure_cloud_configs', fields: [ 
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (Max claims per day)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 's1_name', label: 'Server 1 Name', type: 'input'}, {id: 's1_sub', label: 'S1 Subtitle', type: 'input'}, {id: 's1_link', label: 'HTML S1 Link', type: 'input'}, {id: 's1_reward', label: 'S1 Reward Coins', type: 'input'},
-                {id: 's2_name', label: 'Server 2 Name', type: 'input'}, {id: 's2_sub', label: 'S2 Subtitle', type: 'input'}, {id: 's2_link', label: 'HTML S2 Link', type: 'input'}, {id: 's2_reward', label: 'S2 Reward Coins', type: 'input'},
-                {id: 's3_name', label: 'Server 3 Name', type: 'input'}, {id: 's3_sub', label: 'S3 Subtitle', type: 'input'}, {id: 's3_link', label: 'HTML S3 Link', type: 'input'}, {id: 's3_reward', label: 'S3 Reward Coins', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML (Bottom)', type: 'textarea'}
+            ] },               'secure_cloud_configs': { name: 'Secure Cloud Configs', path: 'global_system_runtime_configurations/secure_cloud_configs', fields: [ 
+                {id: 'cloud_header', label: '🖥️ Secure Cloud Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'daily_limit', label: 'Daily Claims Limit (e.g. 15)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'}
             ] },
-                                  'sponsor_visit_configs': { name: 'Sponsor Visits Configs', path: 'global_system_runtime_configurations/sponsor_visits_configs', fields: [ 
-                {id: 'task_ad_link', label: 'HTML Target Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
+                                       'smart_tasks_configs': { name: 'Smart Task Wall Config', path: 'global_system_runtime_configurations/smart_tasks_configs', fields: [ 
+                {id: 'wall_header', label: '🧩 Smart Tasks Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'daily_limit', label: 'Daily Claims Limit (e.g. 15)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'tasks_sec', label: '📋 Tasks Configuration (Up to 10 Tasks)', type: 'header'},
+                {id: 't1_title', label: 'Task 1 Title', type: 'input'}, {id: 't1_desc', label: 'Task 1 Description', type: 'input'}, {id: 't1_reward', label: 'Task 1 Coins', type: 'input'}, {id: 't1_link', label: 'Task 1 Target URL', type: 'input'},
+                {id: 't2_title', label: 'Task 2 Title', type: 'input'}, {id: 't2_desc', label: 'Task 2 Description', type: 'input'}, {id: 't2_reward', label: 'Task 2 Coins', type: 'input'}, {id: 't2_link', label: 'Task 2 Target URL', type: 'input'},
+                {id: 't3_title', label: 'Task 3 Title', type: 'input'}, {id: 't3_desc', label: 'Task 3 Description', type: 'input'}, {id: 't3_reward', label: 'Task 3 Coins', type: 'input'}, {id: 't3_link', label: 'Task 3 Target URL', type: 'input'}
+            ] },
+                   'sponsor_visit_configs': { name: 'Sponsor Visits / Articles Config', path: 'global_system_runtime_configurations/sponsor_visit_configs', fields: [ 
+                {id: 'sv_header', label: '📰 Sponsor Visits Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'task_ad_link', label: 'Target Website / Ad URL', type: 'input'},
+                {id: 'ad_timer', label: 'Stay Timer (Seconds - If Timer Mode)', type: 'input'},
                 {id: 'reward_coins', label: 'Reward Coins (e.g. 5)', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (Max claims per day)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'}
-            ] },
-                 'timewall_configs': { name: 'Partner Tasks (Offerwall)', path: 'global_system_runtime_configurations/timewall_configs', fields: [ 
-                {id: 'timewall_url', label: '🔗 Offerwall Target Link (URL)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
+                {id: 'daily_limit', label: 'Daily Claims Limit (e.g. 15)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
 
-                        'partner_offers_configs': { name: 'Partner Offers Configs', path: 'global_system_runtime_configurations/partner_offers_configs', fields: [ 
-                {id: 'surveys', label: '📊 Surveys', type: 'header'},
-                {id: 'link_surveys', label: 'HTML Surveys (Link)', type: 'input'}, {id: 'timer_surveys', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_surveys', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_surveys', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_surveys', label: 'SDK ID', type: 'input'},
-                
-                {id: 'apps', label: '📱 App Discovery', type: 'header'},
-                {id: 'link_apps', label: 'HTML Apps (Link)', type: 'input'}, {id: 'timer_apps', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_apps', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_apps', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_apps', label: 'SDK ID', type: 'input'},
-                
-                {id: 'games', label: '🎮 Web Games', type: 'header'},
-                {id: 'link_games', label: 'HTML Games (Link)', type: 'input'}, {id: 'timer_games', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_games', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_games', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_games', label: 'SDK ID', type: 'input'},
-                
-                {id: 'signups', label: '📝 Sign-up Tasks', type: 'header'},
-                {id: 'link_signups', label: 'HTML Sign-ups (Link)', type: 'input'}, {id: 'timer_signups', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_signups', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_signups', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_signups', label: 'SDK ID', type: 'input'},
-                
-                {id: 'quizzes', label: '🧠 Quizzes', type: 'header'},
-                {id: 'link_quizzes', label: 'HTML Quizzes (Link)', type: 'input'}, {id: 'timer_quizzes', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_quizzes', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_quizzes', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_quizzes', label: 'SDK ID', type: 'input'},
-                
-                {id: 'premium', label: '💎 Premium', type: 'header'},
-                {id: 'link_premium', label: 'HTML Premium (Link)', type: 'input'}, {id: 'timer_premium', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_premium', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_premium', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_premium', label: 'SDK ID', type: 'input'},
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
 
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'}
             ] },
-                        'video_tasks_settings': { name: 'Video Tasks Configs', path: 'global_system_runtime_configurations/video_tasks_settings', fields: [ 
+                             'timewall_configs': { name: 'Timewall Offerwall Config', path: 'global_system_runtime_configurations/timewall_configs', fields: [ 
+                {id: 'tw_header', label: '⚡ Timewall Portal Controls', type: 'header'},
+                {id: 'timewall_url', label: 'Timewall Offerwall Base URL', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
+            ] },
+                            'partner_offers_configs': { name: 'Partner Offers Config', path: 'global_system_runtime_configurations/partner_offers_configs', fields: [ 
+                {id: 'surveys_h', label: '📊 Surveys Configuration', type: 'header'},
+                {id: 'mode_surveys', label: 'Surveys Mode (timer / postback)', type: 'input'},
+                {id: 'link_surveys', label: 'Surveys URL', type: 'input'}, {id: 'timer_surveys', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_surveys', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_surveys', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_surveys', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'apps_h', label: '📱 App Discovery Configuration', type: 'header'},
+                {id: 'mode_apps', label: 'Apps Mode (timer / postback)', type: 'input'},
+                {id: 'link_apps', label: 'Apps URL', type: 'input'}, {id: 'timer_apps', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_apps', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_apps', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_apps', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'games_h', label: '🎮 Web Games Configuration', type: 'header'},
+                {id: 'mode_games', label: 'Games Mode (timer / postback)', type: 'input'},
+                {id: 'link_games', label: 'Games URL', type: 'input'}, {id: 'timer_games', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_games', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_games', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_games', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'signups_h', label: '📝 Sign-ups Configuration', type: 'header'},
+                {id: 'mode_signups', label: 'Sign-ups Mode (timer / postback)', type: 'input'},
+                {id: 'link_signups', label: 'Sign-ups URL', type: 'input'}, {id: 'timer_signups', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_signups', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_signups', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_signups', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'quizzes_h', label: '🧠 Quizzes Configuration', type: 'header'},
+                {id: 'mode_quizzes', label: 'Quizzes Mode (timer / postback)', type: 'input'},
+                {id: 'link_quizzes', label: 'Quizzes URL', type: 'input'}, {id: 'timer_quizzes', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_quizzes', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_quizzes', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_quizzes', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'premium_h', label: '💎 Premium Offers Configuration', type: 'header'},
+                {id: 'mode_premium', label: 'Premium Mode (timer / postback)', type: 'input'},
+                {id: 'link_premium', label: 'Premium URL', type: 'input'}, {id: 'timer_premium', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_premium', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_premium', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_premium', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot  1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
+            ] },
+                                    'video_tasks_settings': { name: 'Micro Video Tasks Config', path: 'global_system_runtime_configurations/video_tasks_settings', fields: [ 
+                {id: 'vt_header', label: '📺 Micro-Video Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
                 {id: 'videoId', label: 'YouTube Video ID (e.g. dQw4w9WgXcQ)', type: 'input'},
-                {id: 'videoDuration', label: 'Required Watch Time (Seconds)', type: 'input'},
+                {id: 'videoDuration', label: 'Required Watch Duration (Seconds, e.g. 60)', type: 'input'},
                 {id: 'videoReward', label: 'Reward Coins (e.g. 40)', type: 'input'},
-                {id: 'task_ad_link', label: 'Ad Link Before Claim (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Ad Timer (Seconds)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Bottom)', type: 'textarea'}
+
+                {id: 'ad_header', label: '⚡ Ad Verification Controls', type: 'header'},
+                {id: 'task_ad_link', label: 'Ad Smartlink URL', type: 'input'},
+                {id: 'ad_timer', label: 'Ad Stay Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
             ] },
-           'weekly_drop_configs': { name: 'Weekly Drop Configs', path: 'global_system_runtime_configurations/weekly_drop_configs', fields: [ 
-                {id: 'pass_cost', label: 'Ticket Entry Fee (Coins)', type: 'input'},
-                {id: 'jackpot_amount', label: 'Mega Jackpot Reward (Coins)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Bottom)', type: 'textarea'}
+                       'weekly_drop_configs': { name: 'Weekly Drop Configs', path: 'global_system_runtime_configurations/weekly_drop_configs', fields: [ 
+                {id: 'drop_header', label: '🎟️ Weekly Drop Controls', type: 'header'},
+                {id: 'pass_cost', label: '1 Pass Cost in Coins (e.g. 50)', type: 'input'},
+                {id: 'jackpot_amount', label: 'Jackpot Prize in Coins (e.g. 5000)', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
             ] },
+
             'scratch_configs': { name: 'Scratch & Market Configs', path: 'global_system_runtime_configurations/scratch_settings', fields: [
                 {id: 'enable_weekly_drop_configs', label: 'Show Weekly Drop in Scratch? (true/false)', type: 'input'}, {id: 'enable_marketplace', label: 'Show Premium Passes? (true/false)', type: 'input'}
             ]},
             'top_rewards': { name: 'Instant Coins / Tap', path: 'global_system_runtime_configurations/tap_settings', fields: [ {id: 'direct_link', label: 'Tap Reward Destination URL', type: 'input'} ] },
-            'spin_win': { name: 'Spin & Win', path: 'global_system_runtime_configurations/spin_win', fields: [ {id: 'daily_limit', label: 'Daily Spin Limits', type: 'input'} ] },
-                        'scratch_pass_configs': { name: 'Scratch & Passes Configs', path: 'global_system_runtime_configurations/scratch_pass_configs', fields: [ 
-                {id: 'scratch_ad_link', label: 'HTML Scratch Target Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
-                {id: 'min_reward', label: 'Min Reward Coins (e.g. 10)', type: 'input'},
-                {id: 'max_reward', label: 'Max Reward Coins (e.g. 30)', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (Max claims per day)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
+                  'scratch_pass_configs': { name: 'Scratch & Passes Config', path: 'global_system_runtime_configurations/scratch_pass_configs', fields: [ 
+                {id: 'scratch_header', label: '🎟️ Scratch Card Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'scratch_ad_link', label: 'HTML Target Ad (URL)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'min_reward', label: 'Minimum Scratch Coins (e.g. 10)', type: 'input'},
+                {id: 'max_reward', label: 'Maximum Scratch Coins (e.g. 30)', type: 'input'},
+                {id: 'daily_limit', label: 'Daily Claims Limit (e.g. 15)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
             ] },
             'hourly_key': { name: 'Hourly Bonus', path: 'global_system_runtime_configurations/hourly_key', fields: [ {id: 'reward_amount', label: 'Hourly Coins Reward', type: 'input'} ] },
-                      'checkin_configs': { name: 'Daily Check-in Configs', path: 'global_system_runtime_configurations/checkin_configs', fields: [ 
-                {id: 'checkin_link', label: 'HTML Check-in Target Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
+                                  'checkin_configs': { name: 'Daily Check-in Configs', path: 'global_system_runtime_configurations/checkin_configs', fields: [ 
+                {id: 'checkin_header', label: '📅 Check-in Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'checkin_link', label: 'HTML Target Ad (URL)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
                 {id: 'reward_d1', label: 'Day 1 Coins (e.g. 10)', type: 'input'},
                 {id: 'reward_d2', label: 'Day 2 Coins (e.g. 20)', type: 'input'},
                 {id: 'reward_d3', label: 'Day 3 Coins (e.g. 30)', type: 'input'},
@@ -1063,71 +1379,213 @@ const auth = firebase.auth();
                 {id: 'reward_d5', label: 'Day 5 Coins (e.g. 50)', type: 'input'},
                 {id: 'reward_d6', label: 'Day 6 Coins (e.g. 60)', type: 'input'},
                 {id: 'reward_d7', label: 'Day 7+ Coins (e.g. 100)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
             ] },
-                        '1v1': { name: '1v1 Battles Config', path: 'global_system_runtime_configurations/1v1', fields: [ 
+                                              'premium_ads_configs': { name: 'Premium Ads Configs', path: 'global_system_runtime_configurations/premium_ads_configs', fields: [ 
+                {id: 'h_smartlink', label: '🚀 Smartlink Ads Configuration', type: 'header'},
+                {id: 'mode_smartlink', label: 'Smartlink Mode (timer / postback)', type: 'input'},
+                {id: 'link_smartlink', label: 'Smartlink URL', type: 'input'}, {id: 'timer_smartlink', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_smartlink', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_smartlink', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_smartlink', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_popunder', label: '🖱️ Popunder Ads Configuration', type: 'header'},
+                {id: 'mode_popunder', label: 'Popunder Mode (timer / postback)', type: 'input'},
+                {id: 'link_popunder', label: 'Popunder URL', type: 'input'}, {id: 'timer_popunder', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_popunder', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_popunder', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_popunder', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_push', label: '🔔 Push Ads Configuration', type: 'header'},
+                {id: 'mode_push', label: 'Push Mode (timer / postback)', type: 'input'},
+                {id: 'link_push', label: 'Push URL', type: 'input'}, {id: 'timer_push', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_push', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_push', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_push', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_interstitial', label: '🖼️ Interstitial Ads Configuration', type: 'header'},
+                {id: 'mode_interstitial', label: 'Interstitial Mode (timer / postback)', type: 'input'},
+                {id: 'link_interstitial', label: 'Interstitial URL', type: 'input'}, {id: 'timer_interstitial', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_interstitial', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_interstitial', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_interstitial', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_inpage', label: '📱 In-Page Push Configuration', type: 'header'},
+                {id: 'mode_inpage', label: 'In-Page Mode (timer / postback)', type: 'input'},
+                {id: 'link_inpage', label: 'In-Page URL', type: 'input'}, {id: 'timer_inpage', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_inpage', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_inpage', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_inpage', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'h_reward', label: '🎁 Reward Ads Configuration', type: 'header'},
+                {id: 'mode_reward', label: 'Reward Mode (timer / postback)', type: 'input'},
+                {id: 'link_reward', label: 'Reward URL', type: 'input'}, {id: 'timer_reward', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_reward', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_reward', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_reward', label: 'SDK Unit ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
+            ] },
+              '1v1': { name: '1v1 Battles Config', path: 'global_system_runtime_configurations/1v1', fields: [ 
                 {id: 'battle_link', label: 'HTML Ad Target (URL)', type: 'input'},
                 {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
                 {id: 'win_multiplier', label: 'Win Multiplier (e.g. 2 for Double)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity, startio)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Top Banner HTML', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Bottom Banner HTML', type: 'textarea'}
+                {id: 'sdk_name', label: 'Post-Win Native SDK Name (e.g. admob, unity)', type: 'input'},
+                {id: 'sdk_id', label: 'Post-Win SDK ID (Blank = Show HTML Ad)', type: 'input'},
+                
+                {id: 'banners_sec', label: '📢 Banners Configuration', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
             ] },
-                        'rps_game': { name: 'Rock Paper Scissors', path: 'global_system_runtime_configurations/rps_game', fields: [ 
+                                 'rps_game': { name: 'Rock Paper Scissors', path: 'global_system_runtime_configurations/rps_game', fields: [ 
                 {id: 'battle_link', label: 'HTML Ad Target (URL)', type: 'input'},
                 {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
                 {id: 'win_multiplier', label: 'Win Multiplier (e.g. 1.8)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity, startio)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Top Banner HTML', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Bottom Banner HTML', type: 'textarea'}
+                {id: 'sdk_name', label: 'Post-Match Native SDK Name (e.g. admob, unity)', type: 'input'},
+                {id: 'sdk_id', label: 'Post-Match SDK ID (Blank = Show HTML Ad)', type: 'input'},
+                
+                {id: 'banners_sec', label: '📢 Banners Configuration', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
+                ] },
+                          'extra_bonus': { name: 'Extra Bonus Zone', path: 'global_system_runtime_configurations/extra_bonus', fields: [ 
+                {id: 'bonus_link', label: 'Bonus Action URL (Optional)', type: 'input'},
+                
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
             ] },
-            'extra_bonus': { name: 'Extra Bonus Zone', path: 'global_system_runtime_configurations/extra_bonus', fields: [ 
-                {id: 'bonus_link', label: 'Bonus Action URL', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-                        'read_articles': { name: 'Read Articles Config', path: 'global_system_runtime_configurations/read_articles', fields: [ 
+                                    'read_articles': { name: 'Read Articles Config', path: 'global_system_runtime_configurations/read_articles', fields: [ 
                 {id: 'tech', label: '📱 Tech News', type: 'header'},
-                {id: 'link_tech', label: 'URL', type: 'input'}, {id: 'timer_tech', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_tech', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_tech', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_tech', label: 'SDK ID', type: 'input'},
+                {id: 'mode_tech', label: 'Tech Mode (timer / postback)', type: 'input'},
+                {id: 'link_tech', label: 'Tech URL', type: 'input'}, {id: 'timer_tech', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_tech', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_tech', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_tech', label: 'SDK Unit ID', type: 'input'},
                 
                 {id: 'crypto', label: '₿ Crypto Updates', type: 'header'},
-                {id: 'link_crypto', label: 'URL', type: 'input'}, {id: 'timer_crypto', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_crypto', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_crypto', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_crypto', label: 'SDK ID', type: 'input'},
+                {id: 'mode_crypto', label: 'Crypto Mode (timer / postback)', type: 'input'},
+                {id: 'link_crypto', label: 'Crypto URL', type: 'input'}, {id: 'timer_crypto', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_crypto', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_crypto', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_crypto', label: 'SDK Unit ID', type: 'input'},
                 
                 {id: 'health', label: '🍎 Health Tips', type: 'header'},
-                {id: 'link_health', label: 'URL', type: 'input'}, {id: 'timer_health', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_health', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_health', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_health', label: 'SDK ID', type: 'input'},
+                {id: 'mode_health', label: 'Health Mode (timer / postback)', type: 'input'},
+                {id: 'link_health', label: 'Health URL', type: 'input'}, {id: 'timer_health', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_health', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_health', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_health', label: 'SDK Unit ID', type: 'input'},
                 
                 {id: 'gaming', label: '🎮 Gaming World', type: 'header'},
-                {id: 'link_gaming', label: 'URL', type: 'input'}, {id: 'timer_gaming', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_gaming', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_gaming', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_gaming', label: 'SDK ID', type: 'input'},
+                {id: 'mode_gaming', label: 'Gaming Mode (timer / postback)', type: 'input'},
+                {id: 'link_gaming', label: 'Gaming URL', type: 'input'}, {id: 'timer_gaming', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_gaming', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_gaming', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_gaming', label: 'SDK Unit ID', type: 'input'},
                 
                 {id: 'finance', label: '💹 Finance Guide', type: 'header'},
-                {id: 'link_finance', label: 'URL', type: 'input'}, {id: 'timer_finance', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_finance', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_finance', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_finance', label: 'SDK ID', type: 'input'},
+                {id: 'mode_finance', label: 'Finance Mode (timer / postback)', type: 'input'},
+                {id: 'link_finance', label: 'Finance URL', type: 'input'}, {id: 'timer_finance', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_finance', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_finance', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_finance', label: 'SDK Unit ID', type: 'input'},
                 
                 {id: 'sports', label: '⚽ Sports News', type: 'header'},
-                {id: 'link_sports', label: 'URL', type: 'input'}, {id: 'timer_sports', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_sports', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_sports', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_sports', label: 'SDK ID', type: 'input'},
+                {id: 'mode_sports', label: 'Sports Mode (timer / postback)', type: 'input'},
+                {id: 'link_sports', label: 'Sports URL', type: 'input'}, {id: 'timer_sports', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_sports', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_sports', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_sports', label: 'SDK Unit ID', type: 'input'},
                 
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'}, {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'}, {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'}, {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
             ] },
             'lucky_box': { name: 'Mega Weekly Drop', path: 'global_system_runtime_configurations/lucky_box', fields: [ {id: 'drop_active', label: 'Is Event Active? (true/false)', type: 'input'} ] },
             'surprise': { name: 'Surprise Box', path: 'global_system_runtime_configurations/surprise', fields: [ {id: 'surprise_active', label: 'Is Event Active? (true/false)', type: 'input'} ] },
-                      'pool_game_configs': { name: 'Multiplayer Pool Configs', path: 'global_system_runtime_configurations/pool_game_configs', fields: [ 
-                {id: 'task_ad_link', label: 'HTML Post-Game Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
-                {id: 'min_entry_fee', label: 'Minimum Entry Fee (e.g. 10)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Mid)', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML (Bottom 1)', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom 2)', type: 'textarea'}
+                                  'pool_game_configs': { name: 'Pool Game Settings', path: 'global_system_runtime_configurations/pool_game_configs', fields: [ 
+                {id: 'pool_header', label: '🎱 Multiplayer Pool Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'min_entry_fee', label: 'Minimum Entry Fee Coins (e.g. 10)', type: 'input'},
+                {id: 'task_ad_link', label: 'HTML Target Ad (URL)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
             ] },
             'add_points': { name: 'Add Points Configs', path: 'global_system_runtime_configurations/add_points', fields: [ 
                 {id: 'slot1_code', label: 'Slot 1 Top Banner HTML', type: 'textarea'},
@@ -1143,11 +1601,19 @@ const auth = firebase.auth();
                 {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
                 {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
             ] },
-           'esports_configs': { name: 'Skills Arena Banners', path: 'global_system_runtime_configurations/esports_configs', fields: [ 
-                {id: 'slot1_code', label: 'Slo!= t 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Bottom)', type: 'textarea'}
+                       'esports_configs': { name: 'Skills Arena Banners', path: 'global_system_runtime_configurations/esports_configs', fields: [ 
+                {id: 'banners_sec', label: '📢 Arena Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
             ] },
-            'festival_wish_configs': { name: 'Viral Festival Wish Config', path: 'global_system_runtime_configurations/festival_wish_configs', fields: [ 
+                         'festival_wish_configs': { name: 'Viral Festival Wish Config', path: 'global_system_runtime_configurations/festival_wish_configs', fields: [ 
                 {id: 'fest_name', label: 'Festival Name (e.g. Happy Diwali)', type: 'input'},
                 {id: 'greeting_msg_top', label: 'Top Greeting Line (e.g. Aapko aur aapke poore pariwar ko)', type: 'input'},
                 {id: 'greeting_msg_bottom', label: 'Bottom Greeting Line (e.g. Ki Hardik Shubhkamnayein!)', type: 'input'},
@@ -1161,9 +1627,19 @@ const auth = firebase.auth();
                 {id: 'promo_title', label: 'Promo App Title', type: 'input'},
                 {id: 'promo_desc', label: 'Promo App Description', type: 'textarea'},
                 {id: 'app_link', label: 'Promo App Download Link (URL)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Bottom)', type: 'textarea'}
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
             ] },
+
             'hourly_rewards_configs': { name: 'Hourly Rewards Configs', path: 'global_system_runtime_configurations/hourly_rewards_configs', fields: [ 
                 {id: 'task_ad_link', label: 'Hourly Target Ad (URL)', type: 'input'},
                 {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
@@ -1172,247 +1648,248 @@ const auth = firebase.auth();
                 {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
                 {id: 'slot2_code', label: 'Slot 2 Banner HTML (Bottom)', type: 'textarea'}
             ] },
-                                    'hourly_bonus': { name: 'Hourly Rewards Configs', path: 'global_system_runtime_configurations/hourly_bonus', fields: [ 
-                {id: 'task_ad_link', label: 'HTML Hourly Target Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
-                {id: 'reward_amount', label: 'Reward Coins (e.g. 35)', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (Max claims per day)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, startio)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-            'support_configs': { name: 'Help & Support Configs', path: 'global_system_runtime_configurations/support_configs', fields: [ 
-                {id: 'support_email', label: 'Support Email Address', type: 'input'},
-                
-                {id: 'active_whatsapp', label: 'Show WhatsApp Button (true/false)', type: 'input'},
-                {id: 'link_whatsapp', label: 'WhatsApp Link', type: 'input'},
-                
-                {id: 'active_telegram', label: 'Show Telegram Button (true/false)', type: 'input'},
-                {id: 'link_telegram', label: 'Telegram Link', type: 'input'}
-            ] },
-                        'app_offers': { name: 'App Offers Config', path: 'global_system_runtime_configurations/app_offers', fields: [ 
-                {id: 'torox', label: '💎 Torox', type: 'header'},
-                {id: 'torox_srv1', label: 'Srv 1 Link', type: 'input'}, {id: 'timer_torox_srv1', label: 'Srv 1 Timer', type: 'input'}, {id: 'reward_torox_srv1', label: 'Srv 1 Coins', type: 'input'}, {id: 'sdk_name_torox_srv1', label: 'Srv 1 SDK Name', type: 'input'}, {id: 'sdk_id_torox_srv1', label: 'Srv 1 SDK ID', type: 'input'},
-                {id: 'torox_srv2', label: 'Srv 2 Link', type: 'input'}, {id: 'timer_torox_srv2', label: 'Srv 2 Timer', type: 'input'}, {id: 'reward_torox_srv2', label: 'Srv 2 Coins', type: 'input'}, {id: 'sdk_name_torox_srv2', label: 'Srv 2 SDK Name', type: 'input'}, {id: 'sdk_id_torox_srv2', label: 'Srv 2 SDK ID', type: 'input'},
-                {id: 'torox_srv3', label: 'Srv 3 Link', type: 'input'}, {id: 'timer_torox_srv3', label: 'Srv 3 Timer', type: 'input'}, {id: 'reward_torox_srv3', label: 'Srv 3 Coins', type: 'input'}, {id: 'sdk_name_torox_srv3', label: 'Srv 3 SDK Name', type: 'input'}, {id: 'sdk_id_torox_srv3', label: 'Srv 3 SDK ID', type: 'input'},
-                
-                {id: 'hangmyads', label: '📱 Hang My Ads', type: 'header'},
-                {id: 'hangmyads_srv1', label: 'Srv 1 Link', type: 'input'}, {id: 'timer_hangmyads_srv1', label: 'Srv 1 Timer', type: 'input'}, {id: 'reward_hangmyads_srv1', label: 'Srv 1 Coins', type: 'input'}, {id: 'sdk_name_hangmyads_srv1', label: 'Srv 1 SDK Name', type: 'input'}, {id: 'sdk_id_hangmyads_srv1', label: 'Srv 1 SDK ID', type: 'input'},
-                {id: 'hangmyads_srv2', label: 'Srv 2 Link', type: 'input'}, {id: 'timer_hangmyads_srv2', label: 'Srv 2 Timer', type: 'input'}, {id: 'reward_hangmyads_srv2', label: 'Srv 2 Coins', type: 'input'}, {id: 'sdk_name_hangmyads_srv2', label: 'Srv 2 SDK Name', type: 'input'}, {id: 'sdk_id_hangmyads_srv2', label: 'Srv 2 SDK ID', type: 'input'},
-                {id: 'hangmyads_srv3', label: 'Srv 3 Link', type: 'input'}, {id: 'timer_hangmyads_srv3', label: 'Srv 3 Timer', type: 'input'}, {id: 'reward_hangmyads_srv3', label: 'Srv 3 Coins', type: 'input'}, {id: 'sdk_name_hangmyads_srv3', label: 'Srv 3 SDK Name', type: 'input'}, {id: 'sdk_id_hangmyads_srv3', label: 'Srv 3 SDK ID', type: 'input'},
-                
-                {id: 'adgate', label: '🎯 AdGate Media', type: 'header'},
-                {id: 'adgate_srv1', label: 'Srv 1 Link', type: 'input'}, {id: 'timer_adgate_srv1', label: 'Srv 1 Timer', type: 'input'}, {id: 'reward_adgate_srv1', label: 'Srv 1 Coins', type: 'input'}, {id: 'sdk_name_adgate_srv1', label: 'Srv 1 SDK Name', type: 'input'}, {id: 'sdk_id_adgate_srv1', label: 'Srv 1 SDK ID', type: 'input'},
-                {id: 'adgate_srv2', label: 'Srv 2 Link', type: 'input'}, {id: 'timer_adgate_srv2', label: 'Srv 2 Timer', type: 'input'}, {id: 'reward_adgate_srv2', label: 'Srv 2 Coins', type: 'input'}, {id: 'sdk_name_adgate_srv2', label: 'Srv 2 SDK Name', type: 'input'}, {id: 'sdk_id_adgate_srv2', label: 'Srv 2 SDK ID', type: 'input'},
-                {id: 'adgate_srv3', label: 'Srv 3 Link', type: 'input'}, {id: 'timer_adgate_srv3', label: 'Srv 3 Timer', type: 'input'}, {id: 'reward_adgate_srv3', label: 'Srv 3 Coins', type: 'input'}, {id: 'sdk_name_adgate_srv3', label: 'Srv 3 SDK Name', type: 'input'}, {id: 'sdk_id_adgate_srv3', label: 'Srv 3 SDK ID', type: 'input'},
-                
-                {id: 'pubscale', label: '👑 Pubscale', type: 'header'},
-                {id: 'pubscale_srv1', label: 'Srv 1 Link', type: 'input'}, {id: 'timer_pubscale_srv1', label: 'Srv 1 Timer', type: 'input'}, {id: 'reward_pubscale_srv1', label: 'Srv 1 Coins', type: 'input'}, {id: 'sdk_name_pubscale_srv1', label: 'Srv 1 SDK Name', type: 'input'}, {id: 'sdk_id_pubscale_srv1', label: 'Srv 1 SDK ID', type: 'input'},
-                {id: 'pubscale_srv2', label: 'Srv 2 Link', type: 'input'}, {id: 'timer_pubscale_srv2', label: 'Srv 2 Timer', type: 'input'}, {id: 'reward_pubscale_srv2', label: 'Srv 2 Coins', type: 'input'}, {id: 'sdk_name_pubscale_srv2', label: 'Srv 2 SDK Name', type: 'input'}, {id: 'sdk_id_pubscale_srv2', label: 'Srv 2 SDK ID', type: 'input'},
-                {id: 'pubscale_srv3', label: 'Srv 3 Link', type: 'input'}, {id: 'timer_pubscale_srv3', label: 'Srv 3 Timer', type: 'input'}, {id: 'reward_pubscale_srv3', label: 'Srv 3 Coins', type: 'input'}, {id: 'sdk_name_pubscale_srv3', label: 'Srv 3 SDK Name', type: 'input'}, {id: 'sdk_id_pubscale_srv3', label: 'Srv 3 SDK ID', type: 'input'},
-                
-                {id: 'revlum', label: '🎮 Revlum', type: 'header'},
-                {id: 'revlum_srv1', label: 'Srv 1 Link', type: 'input'}, {id: 'timer_revlum_srv1', label: 'Srv 1 Timer', type: 'input'}, {id: 'reward_revlum_srv1', label: 'Srv 1 Coins', type: 'input'}, {id: 'sdk_name_revlum_srv1', label: 'Srv 1 SDK Name', type: 'input'}, {id: 'sdk_id_revlum_srv1', label: 'Srv 1 SDK ID', type: 'input'},
-                {id: 'revlum_srv2', label: 'Srv 2 Link', type: 'input'}, {id: 'timer_revlum_srv2', label: 'Srv 2 Timer', type: 'input'}, {id: 'reward_revlum_srv2', label: 'Srv 2 Coins', type: 'input'}, {id: 'sdk_name_revlum_srv2', label: 'Srv 2 SDK Name', type: 'input'}, {id: 'sdk_id_revlum_srv2', label: 'Srv 2 SDK ID', type: 'input'},
-                {id: 'revlum_srv3', label: 'Srv 3 Link', type: 'input'}, {id: 'timer_revlum_srv3', label: 'Srv 3 Timer', type: 'input'}, {id: 'reward_revlum_srv3', label: 'Srv 3 Coins', type: 'input'}, {id: 'sdk_name_revlum_srv3', label: 'Srv 3 SDK Name', type: 'input'}, {id: 'sdk_id_revlum_srv3', label: 'Srv 3 SDK ID', type: 'input'},
-                
-                {id: 'ayetstudios', label: '🕹️ Ayet Studios', type: 'header'},
-                {id: 'ayetstudios_srv1', label: 'Srv 1 Link', type: 'input'}, {id: 'timer_ayetstudios_srv1', label: 'Srv 1 Timer', type: 'input'}, {id: 'reward_ayetstudios_srv1', label: 'Srv 1 Coins', type: 'input'}, {id: 'sdk_name_ayetstudios_srv1', label: 'Srv 1 SDK Name', type: 'input'}, {id: 'sdk_id_ayetstudios_srv1', label: 'Srv 1 SDK ID', type: 'input'},
-                {id: 'ayetstudios_srv2', label: 'Srv 2 Link', type: 'input'}, {id: 'timer_ayetstudios_srv2', label: 'Srv 2 Timer', type: 'input'}, {id: 'reward_ayetstudios_srv2', label: 'Srv 2 Coins', type: 'input'}, {id: 'sdk_name_ayetstudios_srv2', label: 'Srv 2 SDK Name', type: 'input'}, {id: 'sdk_id_ayetstudios_srv2', label: 'Srv 2 SDK ID', type: 'input'},
-                {id: 'ayetstudios_srv3', label: 'Srv 3 Link', type: 'input'}, {id: 'timer_ayetstudios_srv3', label: 'Srv 3 Timer', type: 'input'}, {id: 'reward_ayetstudios_srv3', label: 'Srv 3 Coins', type: 'input'}, {id: 'sdk_name_ayetstudios_srv3', label: 'Srv 3 SDK Name', type: 'input'}, {id: 'sdk_id_ayetstudios_srv3', label: 'Srv 3 SDK ID', type: 'input'},
-                
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'}, {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'}, {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'}, {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-                      'adgem_offers': { name: 'AdGem Games & Offers', path: 'global_system_runtime_configurations/adgem_offers', fields: [ 
-                {id: 'link_games', label: '1. Play Games (Link)', type: 'input'},
-                {id: 'timer_games', label: 'Play Games (Timer in Seconds)', type: 'input'},
-                {id: 'reward_games', label: 'Play Games (Reward Coins)', type: 'input'},
-                {id: 'sdk_name_games', label: '1. SDK Name (e.g. admob)', type: 'input'}, {id: 'sdk_id_games', label: '1. SDK ID', type: 'input'},
-                
-                {id: 'link_apps', label: '2. Quick Apps (Link)', type: 'input'},
-                {id: 'timer_apps', label: 'Quick Apps (Timer in Seconds)', type: 'input'},
-                {id: 'reward_apps', label: 'Quick Apps (Reward Coins)', type: 'input'},
-                {id: 'sdk_name_apps', label: '2. SDK Name', type: 'input'}, {id: 'sdk_id_apps', label: '2. SDK ID', type: 'input'},
-                
-                {id: 'link_surveys', label: '3. Surveys (Link)', type: 'input'},
-                {id: 'timer_surveys', label: 'Surveys (Timer in Seconds)', type: 'input'},
-                {id: 'reward_surveys', label: 'Surveys (Reward Coins)', type: 'input'},
-                {id: 'sdk_name_surveys', label: '3. SDK Name', type: 'input'}, {id: 'sdk_id_surveys', label: '3. SDK ID', type: 'input'},
-                
-                {id: 'link_weboffers', label: '4. Web Tasks (Link)', type: 'input'},
-                {id: 'timer_weboffers', label: 'Web Tasks (Timer in Seconds)', type: 'input'},
-                {id: 'reward_weboffers', label: 'Web Tasks (Reward Coins)', type: 'input'},
-                {id: 'sdk_name_weboffers', label: '4. SDK Name', type: 'input'}, {id: 'sdk_id_weboffers', label: '4. SDK ID', type: 'input'},
-                
-                {id: 'link_quizzes', label: '5. Brain Quizzes (Link)', type: 'input'},
-                {id: 'timer_quizzes', label: 'Brain Quizzes (Timer in Seconds)', type: 'input'},
-                {id: 'reward_quizzes', label: 'Brain Quizzes (Reward Coins)', type: 'input'},
-                {id: 'sdk_name_quizzes', label: '5. SDK Name', type: 'input'}, {id: 'sdk_id_quizzes', label: '5. SDK ID', type: 'input'},
-                
-                {id: 'link_premium', label: '6. Exclusive VIP (Link)', type: 'input'},
-                {id: 'timer_premium', label: 'Exclusive VIP (Timer in Seconds)', type: 'input'},
-                {id: 'reward_premium', label: 'Exclusive VIP (Reward Coins)', type: 'input'},
-                {id: 'sdk_name_premium', label: '6. SDK Name', type: 'input'}, {id: 'sdk_id_premium', label: '6. SDK ID', type: 'input'},
+                                                'hourly_bonus': { name: 'Hourly Bonus Configs', path: 'global_system_runtime_configurations/hourly_bonus', fields: [ 
+                {id: 'hourly_header', label: '⏱️ Hourly Bonus Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'task_ad_link', label: 'HTML Target Ad (URL)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'reward_amount', label: 'Hourly Reward Coins (e.g. 35)', type: 'input'},
+                {id: 'daily_limit', label: 'Daily Claims Limit (e.g. 24)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
 
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-                        
-            'leaderboard_configs': { name: 'Leaderboard Page Configs', path: 'global_system_runtime_configurations/leaderboard_configs', fields: [ 
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Mid)', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-                        'premium_ads_configs': { name: 'Premium Ads Configs', path: 'global_system_runtime_configurations/premium_ads_configs', fields: [ 
-                {id: 'smartlink', label: '🚀 Smartlink Ads', type: 'header'},
-                {id: 'link_smartlink', label: 'HTML Smartlink (Link)', type: 'input'}, {id: 'timer_smartlink', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_smartlink', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_smartlink', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_smartlink', label: 'SDK ID', type: 'input'},
-                
-                {id: 'popunder', label: '🖱️ Popunders', type: 'header'},
-                {id: 'link_popunder', label: 'HTML Popunder (Link)', type: 'input'}, {id: 'timer_popunder', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_popunder', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_popunder', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_popunder', label: 'SDK ID', type: 'input'},
-                
-                {id: 'push', label: '🔔 Push Ads', type: 'header'},
-                {id: 'link_push', label: 'HTML Push Ads (Link)', type: 'input'}, {id: 'timer_push', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_push', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_push', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_push', label: 'SDK ID', type: 'input'},
-                
-                {id: 'interstitial', label: '🖼️ Interstitials', type: 'header'},
-                {id: 'link_interstitial', label: 'HTML Interstitial (Link)', type: 'input'}, {id: 'timer_interstitial', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_interstitial', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_interstitial', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_interstitial', label: 'SDK ID', type: 'input'},
-                
-                {id: 'inpage', label: '📱 In-Page Push', type: 'header'},
-                {id: 'link_inpage', label: 'HTML In-Page Push (Link)', type: 'input'}, {id: 'timer_inpage', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_inpage', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_inpage', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_inpage', label: 'SDK ID', type: 'input'},
-                
-                {id: 'reward', label: '🎁 Reward Ads', type: 'header'},
-                {id: 'link_reward', label: 'HTML Reward Ads (Link)', type: 'input'}, {id: 'timer_reward', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_reward', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_reward', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_reward', label: 'SDK ID', type: 'input'},
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
 
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-   'captcha_configs': { name: 'Captcha Type Configs', path: 'global_system_runtime_configurations/captcha_configs', fields: [ 
-                {id: 'captcha_link', label: 'HTML Captcha Target Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
-                {id: 'reward_coins', label: 'Reward Coins per Captcha', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (e.g. 10 or 20)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, startio)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-            'change_passcode': { name: 'Change Passcode Config', path: 'global_system_runtime_configurations/change_passcode', fields: [ 
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-            'cpx_surveys': { name: 'CPX Surveys Config', path: 'global_system_runtime_configurations/cpx_surveys', fields: [ 
-                {id: 'cpx_app_id', label: 'CPX Research App ID (e.g. 33205)', type: 'input'}
-            ] },  
-            'edit_profile_configs': { name: 'Edit Profile Configs', path: 'global_system_runtime_configurations/edit_profile_configs', fields: [ 
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-                        'math_quiz_configs': { name: 'Math Quiz Configs', path: 'global_system_runtime_configurations/math_quiz_configs', fields: [ 
-                {id: 'math_task_link', label: 'HTML Math Target Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
-                {id: 'reward_coins', label: 'Base Reward Coins (Level 1)', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (Max claims per day)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, startio)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-                        'spin_win_configs': { name: 'Spin & Win Configs', path: 'global_system_runtime_configurations/spin_win_configs', fields: [ 
-                {id: 'task_ad_link', label: 'HTML Watch Ad for Spin (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (Max ad spins per day)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-                      'mystery_box_configs': { name: 'Surprise Rewards Configs', path: 'global_system_runtime_configurations/mystery_box_configs', fields: [ 
-                {id: 'task_ad_link', label: 'HTML Mystery Box Target Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
-                {id: 'min_reward', label: 'Min Reward Coins (e.g. 20)', type: 'input'},
-                {id: 'max_reward', label: 'Max Reward Coins (e.g. 60)', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (Max claims per day)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML (Bottom)', type: 'textarea'}
-            ] },
-           
-                        'premium_offers_configs': { name: 'Premium Offers Configs (14 Nets)', path: 'global_system_runtime_configurations/premium_offers_configs', fields: [ 
-                {id: 'torox', label: '💎 Torox', type: 'header'},
-                {id: 'link_torox', label: 'HTML Torox (Link)', type: 'input'}, {id: 'timer_torox', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_torox', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_torox', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_torox', label: 'SDK ID', type: 'input'},
-                
-                {id: 'lootably', label: '🔥 Lootably', type: 'header'},
-                {id: 'link_lootably', label: 'HTML Lootably (Link)', type: 'input'}, {id: 'timer_lootably', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_lootably', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_lootably', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_lootably', label: 'SDK ID', type: 'input'},
-                
-                {id: 'ayet', label: '🕹️ Ayet Studios', type: 'header'},
-                {id: 'link_ayet', label: 'HTML Ayet (Link)', type: 'input'}, {id: 'timer_ayet', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_ayet', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_ayet', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_ayet', label: 'SDK ID', type: 'input'},
-                
-                {id: 'timewall', label: '⚡ Timewall', type: 'header'},
-                {id: 'link_timewall', label: 'HTML Timewall (Link)', type: 'input'}, {id: 'timer_timewall', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_timewall', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_timewall', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_timewall', label: 'SDK ID', type: 'input'},
-                
-                {id: 'adgate', label: '🎯 AdGate Media', type: 'header'},
-                {id: 'link_adgate', label: 'HTML AdGate (Link)', type: 'input'}, {id: 'timer_adgate', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_adgate', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_adgate', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_adgate', label: 'SDK ID', type: 'input'},
-                
-                {id: 'monlix', label: '🚀 Monlix', type: 'header'},
-                {id: 'link_monlix', label: 'HTML Monlix (Link)', type: 'input'}, {id: 'timer_monlix', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_monlix', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_monlix', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_monlix', label: 'SDK ID', type: 'input'},
-                
-                {id: 'hangmyads', label: '📱 Hang My Ads', type: 'header'},
-                {id: 'link_hangmyads', label: 'HTML Hang My Ads (Link)', type: 'input'}, {id: 'timer_hangmyads', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_hangmyads', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_hangmyads', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_hangmyads', label: 'SDK ID', type: 'input'},
-                
-                {id: 'pubscale', label: '👑 Pubscale', type: 'header'},
-                {id: 'link_pubscale', label: 'HTML Pubscale (Link)', type: 'input'}, {id: 'timer_pubscale', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_pubscale', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_pubscale', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_pubscale', label: 'SDK ID', type: 'input'},
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
 
-                {id: 'cpx', label: '📊 CPX Research', type: 'header'},
-                {id: 'link_cpx', label: 'HTML CPX Research (Link)', type: 'input'}, {id: 'timer_cpx', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_cpx', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_cpx', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_cpx', label: 'SDK ID', type: 'input'},
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
 
-                {id: 'bitlabs', label: '📋 Bitlabs Surveys', type: 'header'},
-                {id: 'link_bitlabs', label: 'HTML Bitlabs Surveys (Link)', type: 'input'}, {id: 'timer_bitlabs', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_bitlabs', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_bitlabs', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_bitlabs', label: 'SDK ID', type: 'input'},
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
+            ] },                        'math_quiz_configs': { name: 'Math Quiz Configs', path: 'global_system_runtime_configurations/math_quiz_configs', fields: [ 
+                {id: 'quiz_header', label: '🧠 Math Quiz Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'math_task_link', label: 'HTML Target Ad (URL)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'reward_coins', label: 'Base Reward Coins (Level 1, e.g. 10)', type: 'input'},
+                {id: 'daily_limit', label: 'Daily Claims Limit (e.g. 20)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
 
-                {id: 'inbrain', label: '🧠 Inbrain Surveys', type: 'header'},
-                {id: 'link_inbrain', label: 'HTML Inbrain Surveys (Link)', type: 'input'}, {id: 'timer_inbrain', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_inbrain', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_inbrain', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_inbrain', label: 'SDK ID', type: 'input'},
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
 
-                {id: 'theorem', label: '📈 Theoremreach', type: 'header'},
-                {id: 'link_theorem', label: 'HTML Theoremreach (Link)', type: 'input'}, {id: 'timer_theorem', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_theorem', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_theorem', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_theorem', label: 'SDK ID', type: 'input'},
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
 
-                {id: 'notik', label: '📝 Notik Me', type: 'header'},
-                {id: 'link_notik', label: 'HTML Notik Me (Link)', type: 'input'}, {id: 'timer_notik', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_notik', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_notik', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_notik', label: 'SDK ID', type: 'input'},
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
 
-                {id: 'adscend', label: '🎬 Adscend Media', type: 'header'},
-                {id: 'link_adscend', label: 'HTML Adscend Media (Link)', type: 'input'}, {id: 'timer_adscend', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_adscend', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_adscend', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_adscend', label: 'SDK ID', type: 'input'},
-
-                {id: 'banners', label: '📢 Banners', type: 'header'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'},
-                {id: 'slot4_code', label: 'Slot 4 Banner HTML (Bottom)', type: 'textarea'}
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
             ] },
-      'web_tasks_configs': { name: 'Web Tasks Configs', path: 'global_system_runtime_configurations/web_tasks_configs', fields: [ 
-                {id: 'task_ad_link', label: 'HTML Web Task Target Ad (URL)', type: 'input'},
-                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds)', type: 'input'},
+                             'spin_win_configs': { name: 'Spin & Win Configs', path: 'global_system_runtime_configurations/spin_win_configs', fields: [ 
+                {id: 'spin_header', label: '🎡 Spin & Win Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'task_ad_link', label: 'HTML Target Ad (URL)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'daily_limit', label: 'Daily Ad Spins Limit (e.g. 10)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
+            ] },
+                                  'mystery_box_configs': { name: 'Surprise Box Configs', path: 'global_system_runtime_configurations/mystery_box_configs', fields: [ 
+                {id: 'box_header', label: '🎁 Surprise Box Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'task_ad_link', label: 'HTML Target Ad (URL)', type: 'input'},
+                {id: 'ad_timer', label: 'Smart Ad Timer (Seconds - If Timer Mode)', type: 'input'},
+                {id: 'min_reward', label: 'Minimum Coins Range (e.g. 20)', type: 'input'},
+                {id: 'max_reward', label: 'Maximum Coins Range (e.g. 60)', type: 'input'},
+                {id: 'daily_limit', label: 'Daily Claims Limit (e.g. 10)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'}
+            ] },                       'premium_offers_configs': { name: 'Mega Offerwalls (14 Walls)', path: 'global_system_runtime_configurations/premium_offers_configs', fields: [ 
+                {id: 'h_torox', label: '💎 Torox Settings', type: 'header'},
+                {id: 'mode_torox', label: 'Torox Mode (timer / postback)', type: 'input'},
+                {id: 'link_torox', label: 'Torox URL', type: 'input'}, {id: 'timer_torox', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_torox', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_torox', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_torox', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_lootably', label: '🔥 Lootably Settings', type: 'header'},
+                {id: 'mode_lootably', label: 'Lootably Mode (timer / postback)', type: 'input'},
+                {id: 'link_lootably', label: 'Lootably URL', type: 'input'}, {id: 'timer_lootably', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_lootably', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_lootably', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_lootably', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_ayet', label: '🕹️ Ayet Studios Settings', type: 'header'},
+                {id: 'mode_ayet', label: 'Ayet Mode (timer / postback)', type: 'input'},
+                {id: 'link_ayet', label: 'Ayet URL', type: 'input'}, {id: 'timer_ayet', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_ayet', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_ayet', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_ayet', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_timewall', label: '⚡ Timewall Settings', type: 'header'},
+                {id: 'mode_timewall', label: 'Timewall Mode (timer / postback)', type: 'input'},
+                {id: 'link_timewall', label: 'Timewall URL', type: 'input'}, {id: 'timer_timewall', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_timewall', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_timewall', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_timewall', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_adgate', label: '🎯 AdGate Media Settings', type: 'header'},
+                {id: 'mode_adgate', label: 'AdGate Mode (timer / postback)', type: 'input'},
+                {id: 'link_adgate', label: 'AdGate URL', type: 'input'}, {id: 'timer_adgate', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_adgate', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_adgate', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_adgate', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_monlix', label: '🚀 Monlix Settings', type: 'header'},
+                {id: 'mode_monlix', label: 'Monlix Mode (timer / postback)', type: 'input'},
+                {id: 'link_monlix', label: 'Monlix URL', type: 'input'}, {id: 'timer_monlix', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_monlix', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_monlix', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_monlix', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_hangmyads', label: '📱 Hang My Ads Settings', type: 'header'},
+                {id: 'mode_hangmyads', label: 'Hang My Ads Mode (timer / postback)', type: 'input'},
+                {id: 'link_hangmyads', label: 'Hang My Ads URL', type: 'input'}, {id: 'timer_hangmyads', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_hangmyads', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_hangmyads', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_hangmyads', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_pubscale', label: '👑 Pubscale Settings', type: 'header'},
+                {id: 'mode_pubscale', label: 'Pubscale Mode (timer / postback)', type: 'input'},
+                {id: 'link_pubscale', label: 'Pubscale URL', type: 'input'}, {id: 'timer_pubscale', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_pubscale', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_pubscale', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_pubscale', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_cpx', label: '📊 CPX Research Settings', type: 'header'},
+                {id: 'mode_cpx', label: 'CPX Mode (timer / postback)', type: 'input'},
+                {id: 'link_cpx', label: 'CPX URL', type: 'input'}, {id: 'timer_cpx', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_cpx', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_cpx', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_cpx', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_bitlabs', label: '📋 Bitlabs Settings', type: 'header'},
+                {id: 'mode_bitlabs', label: 'Bitlabs Mode (timer / postback)', type: 'input'},
+                {id: 'link_bitlabs', label: 'Bitlabs URL', type: 'input'}, {id: 'timer_bitlabs', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_bitlabs', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_bitlabs', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_bitlabs', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_inbrain', label: '🧠 Inbrain Settings', type: 'header'},
+                {id: 'mode_inbrain', label: 'Inbrain Mode (timer / postback)', type: 'input'},
+                {id: 'link_inbrain', label: 'Inbrain URL', type: 'input'}, {id: 'timer_inbrain', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_inbrain', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_inbrain', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_inbrain', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_theorem', label: '📈 Theoremreach Settings', type: 'header'},
+                {id: 'mode_theorem', label: 'Theoremreach Mode (timer / postback)', type: 'input'},
+                {id: 'link_theorem', label: 'Theoremreach URL', type: 'input'}, {id: 'timer_theorem', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_theorem', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_theorem', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_theorem', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_notik', label: '📝 Notik Me Settings', type: 'header'},
+                {id: 'mode_notik', label: 'Notik Mode (timer / postback)', type: 'input'},
+                {id: 'link_notik', label: 'Notik URL', type: 'input'}, {id: 'timer_notik', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_notik', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_notik', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_notik', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'h_adscend', label: '🎬 Adscend Media Settings', type: 'header'},
+                {id: 'mode_adscend', label: 'Adscend Mode (timer / postback)', type: 'input'},
+                {id: 'link_adscend', label: 'Adscend URL', type: 'input'}, {id: 'timer_adscend', label: 'Timer (Sec)', type: 'input'}, {id: 'reward_adscend', label: 'Reward Coins', type: 'input'}, {id: 'sdk_name_adscend', label: 'SDK Name', type: 'input'}, {id: 'sdk_id_adscend', label: 'SDK Placement ID', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'},
+
+                {id: 'slot4_type', label: 'Slot 4 Type (html / sdk)', type: 'input'},
+                {id: 'slot4_code', label: 'Slot 4 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot4_sdk_name', label: 'Slot 4 SDK Name', type: 'input'},
+                {id: 'slot4_sdk_id', label: 'Slot 4 SDK Unit ID', type: 'input'}
+            ] },
+                        'milestone_configs': { name: 'Milestone Rewards Config', path: 'global_system_runtime_configurations/milestone_configs', fields: [ 
+                {id: 'm_bronze', label: '🥉 Bronze Tier Controls', type: 'header'},
+                {id: 'bronze_l1_goal', label: 'Bronze LVL 1 Goal (e.g. 500)', type: 'input'},
+                {id: 'bronze_l1_reward', label: 'Bronze LVL 1 Reward Coins (e.g. 100)', type: 'input'},
+                {id: 'bronze_l2_goal', label: 'Bronze LVL 2 Goal (e.g. 1500)', type: 'input'},
+                {id: 'bronze_l2_reward', label: 'Bronze LVL 2 Reward Coins (e.g. 250)', type: 'input'},
+
+                {id: 'm_silver', label: '🥈 Silver Tier Controls', type: 'header'},
+                {id: 'silver_l1_goal', label: 'Silver LVL 1 Goal (e.g. 2000)', type: 'input'},
+                {id: 'silver_l1_reward', label: 'Silver LVL 1 Reward Coins (e.g. 300)', type: 'input'},
+                {id: 'silver_l2_goal', label: 'Silver LVL 2 Goal (e.g. 4000)', type: 'input'},
+                {id: 'silver_l2_reward', label: 'Silver LVL 2 Reward Coins (e.g. 600)', type: 'input'},
+
+                {id: 'm_gold', label: '🥇 Gold Tier Controls', type: 'header'},
+                {id: 'gold_l1_goal', label: 'Gold LVL 1 Goal (e.g. 5000)', type: 'input'},
+                {id: 'gold_l1_reward', label: 'Gold LVL 1 Reward Coins (e.g. 1000)', type: 'input'},
+                {id: 'gold_l2_goal', label: 'Gold LVL 2 Goal (e.g. 10000)', type: 'input'},
+                {id: 'gold_l2_reward', label: 'Gold LVL 2 Reward Coins (e.g. 2500)', type: 'input'},
+
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'}
+            ] },
+            
+                  'web_tasks_configs': { name: 'Web Tasks Config', path: 'global_system_runtime_configurations/web_tasks_configs', fields: [ 
+                {id: 'web_header', label: '🌐 Web Tasks Core Controls', type: 'header'},
+                {id: 'mode', label: 'Verification Mode (timer / postback)', type: 'input'},
+                {id: 'task_ad_link', label: 'Target Website / Ad URL', type: 'input'},
+                {id: 'ad_timer', label: 'Stay Timer (Seconds - If Timer Mode)', type: 'input'},
                 {id: 'reward_coins', label: 'Reward Coins (e.g. 5)', type: 'input'},
-                {id: 'daily_limit', label: 'Daily Limit (Max claims per day)', type: 'input'},
-                {id: 'sdk_name', label: 'Native SDK Name (e.g. admob, unity)', type: 'input'},
-                {id: 'sdk_id', label: 'Native SDK ID (Blank = Show HTML Ad)', type: 'input'},
-                {id: 'slot1_code', label: 'Slot 1 Banner HTML (Top)', type: 'textarea'},
-                {id: 'slot2_code', label: 'Slot 2 Banner HTML', type: 'textarea'},
-                {id: 'slot3_code', label: 'Slot 3 Banner HTML', type: 'textarea'}
-            ] }
+                {id: 'daily_limit', label: 'Daily Claims Limit (e.g. 15)', type: 'input'},
+                {id: 'sdk_name', label: 'Native SDK Name (admob, unity, startio)', type: 'input'},
+                {id: 'sdk_id', label: 'Native SDK Placement ID', type: 'input'},
 
+                {id: 'banners_sec', label: '📢 Banners Configuration (Universal / SDK)', type: 'header'},
+                {id: 'slot1_type', label: 'Slot 1 Type (html / sdk)', type: 'input'},
+                {id: 'slot1_code', label: 'Slot 1 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot1_sdk_name', label: 'Slot 1 SDK Name (admob/unity)', type: 'input'},
+                {id: 'slot1_sdk_id', label: 'Slot 1 SDK Unit ID', type: 'input'},
+
+                {id: 'slot2_type', label: 'Slot 2 Type (html / sdk)', type: 'input'},
+                {id: 'slot2_code', label: 'Slot 2 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot2_sdk_name', label: 'Slot 2 SDK Name', type: 'input'},
+                {id: 'slot2_sdk_id', label: 'Slot 2 SDK Unit ID', type: 'input'},
+
+                {id: 'slot3_type', label: 'Slot 3 Type (html / sdk)', type: 'input'},
+                {id: 'slot3_code', label: 'Slot 3 HTML / INS Script Tag', type: 'textarea'},
+                {id: 'slot3_sdk_name', label: 'Slot 3 SDK Name', type: 'input'},
+                {id: 'slot3_sdk_id', label: 'Slot 3 SDK Unit ID', type: 'input'}
+            ] }
         };
 
         let activeDeepFileKey = "";
@@ -1605,6 +2082,21 @@ const auth = firebase.auth();
                     }
                 }
             });
+                            // Live fetch force update settings
+            database.ref('global_system_runtime_configurations/app_force_update').on('value', snap => {
+                if (snap.exists()) {
+                    let d = snap.val();
+                    let statusEl = document.getElementById("adminForceUpdateStatus");
+                    let msgEl = document.getElementById("adminUpdateMsg");
+                    let urlEl = document.getElementById("adminUpdatePlayUrl");
+                    if (statusEl) statusEl.value = (d.enabled === true || d.enabled === "true") ? "true" : "false";
+                    if (msgEl) msgEl.value = d.message || "New version available with high-paying ad networks. Please update now!";
+                    if (urlEl && d.playstore_url) urlEl.value = d.playstore_url;
+                }
+            
+
+            });
+        
 
             database.ref('global_system_runtime_configurations/social_settings').on('value', snap => {
                 if(snap.exists()) {
@@ -2735,6 +3227,28 @@ function sendAlertToUser() {
         document.getElementById("adminAlertMsg").value = "";
     }).catch(e => alert("Error: " + e.message));
 }
+// 🚀 FORCE UPDATE SAVE FUNCTION
+function saveAdminForceUpdateConfig() {
+    let isEnabled = document.getElementById("adminForceUpdateStatus").value === "true";
+    let msg = document.getElementById("adminUpdateMsg").value.trim();
+    let playUrl = document.getElementById("adminUpdatePlayUrl").value.trim();
+
+    if (!playUrl) {
+        alert("Play Store URL cannot be empty!");
+        return;
+    }
+
+    database.ref('global_system_runtime_configurations/app_force_update').set({
+        enabled: isEnabled,
+        message: msg || "A critical update is available. Please update the app to continue.",
+        playstore_url: playUrl,
+        updated_at: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+        triggerUiToastNotifierNotificationBox(isEnabled ? "🚀 Force Update Turned ON (App Locked Live!)" : "✅ Force Update Turned OFF", true);
+        executeLogAgentAuditTrackingActionTrail(`Force Update toggled: ${isEnabled ? 'ON' : 'OFF'}`);
+    }).catch(err => alert("Error: " + err.message));
+}
+
     </script>
 </body>
 </html>

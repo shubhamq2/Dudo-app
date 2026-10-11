@@ -293,16 +293,63 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+                // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Agar Native SDK Banner ho
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-muted); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: Agar HTML / Script / INS / Adsterra Banner ho
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
         }
+
 
         // Check Network Status
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
@@ -366,28 +413,18 @@
 
                             adjustEntryFee(0);
                             
-                            // 🔥 FIXED Banner Ad Clash & Visibility 🔥
-                            if (adminData.slot1 && adminData.slot1.code && adminData.slot1.active !== false) {
-                                document.getElementById("battleAdSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("battleAdSlot1"), adminData.slot1.code), 400);
-                            } else {
-                                document.getElementById("battleAdSlot1").style.display = "none";
+                            // 🔥 Universal Injector Calls (Slot 1 & Slot 2)
+                            injectUniversalBanner("battleAdSlot1", adminData.slot1);
+                            injectUniversalBanner("battleAdSlot2", adminData.slot2);
                             }
-
-                            if (adminData.slot2 && adminData.slot2.code && adminData.slot2.active !== false) {
-                                document.getElementById("battleAdSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("battleAdSlot2"), adminData.slot2.code), 800);
-                            } else {
-                                document.getElementById("battleAdSlot2").style.display = "none";
+                            });
+                            
                             }
-                        }
-                    });
-
-                } else {
-                    window.location.replace("index.html");
-                }
-            });
-        });
+                            else {
+                                window.location.replace("index.html");
+                            }
+                            });
+                            });
 
         // 🎛️ ADJUST ENTRY FEE FUNCTION
         function adjustEntryFee(change) {

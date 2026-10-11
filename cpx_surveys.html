@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPX Surveys - Dudo</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --primary-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --accent-pink: #ec4899;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); padding-bottom: 20px; min-height: 100vh; }
+        
+        /* Premium Header */
+        .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent-cyan); backdrop-filter: blur(10px); }
+        .back-btn { font-size: 20px; font-weight: bold; color: var(--accent-cyan); text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(6, 182, 212, 0.15); transition: 0.2s; border: 1px solid rgba(6, 182, 212, 0.3); }
+        .back-btn:active { transform: scale(0.9); }
+        .header h2 { margin: 0; font-size: 19px; color: #fff; font-weight: 800; flex-grow: 1; text-align: center; margin-right: 40px; letter-spacing: 0.5px; }
+        
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); outline: none; font-size: 12px; background: #1e293b; color: var(--accent-cyan); font-weight: bold; cursor: pointer; }
+
+        /* Banner Ads Slots */
+        .ad-container-block { width: 92%; max-width: 480px; display: flex; flex-direction: column; gap: 10px; margin: 10px 0 5px 0; }
+        .ad-slot-banner { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(6, 182, 212, 0.4); box-sizing: border-box; display: none; }
+
+        /* Live Synced Mini Dashboard */
+        .task-status-bar { width: 92%; max-width: 480px; background: rgba(6, 182, 212, 0.1); border: 1px dashed var(--accent-cyan); padding: 12px 18px; border-radius: 12px; margin-top: 10px; display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 800; color: #a5f3fc; box-sizing: border-box; align-items: center; }
+        .coin-accent { color: var(--accent-gold); font-size: 15px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(251,191,36,0.3); transition: 0.3s; }
+
+        .main-container { width: 100%; max-width: 500px; margin-top: 12px; box-sizing: border-box; flex-grow: 1; display: flex; flex-direction: column; padding: 0 10px; }
+        .iframe-wrapper { width: 100%; height: 80vh; background: #ffffff; border-radius: 16px; overflow: hidden; border: 2px solid rgba(6, 182, 212, 0.25); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .loading-wall { text-align: center; color: var(--text-sub); margin-top: 50px; font-weight: 600; font-size: 14px; }
+        
+        /* Fallback View (Timer Mode Card) */
+        .fallback-card { display: none; background: var(--card-bg); border-radius: 20px; padding: 30px 20px; text-align: center; border: 1px solid var(--accent-cyan); box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2); margin-top: 20px; }
+        .fallback-btn { width: 100%; background: linear-gradient(135deg, var(--accent-cyan), #0284c7); color: #fff; border: none; padding: 16px; border-radius: 50px; font-size: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 20px; box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4); }
+        
+        /* In-App Viewer */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent-cyan); }
+        .ad-timer-text { color: var(--accent-gold); font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--accent-pink); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+
+        #globalOfflineWarningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body>
+
+    <!-- Offline Screen -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--accent-pink); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue earning.</p>
+        <button onclick="window.location.reload()" style="background: var(--accent-pink); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
+    </div>
+
+    <!-- In-App Viewer -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--accent-green);"></i> Survey Verification</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
+        </div>
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
+    <div class="header">
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 data-i18n="task_title">CPX Surveys</h2>
+        <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+            <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+            <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+            <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option>
+            <option value="ru">RU</option>
+        </select>
+    </div>
+
+    <!-- Top Banner Slots -->
+    <div class="ad-container-block">
+        <div class="ad-slot-banner" id="adminBannerSlot1"></div>
+        <div class="ad-slot-banner" id="adminBannerSlot2"></div>
+    </div>
+
+    <div class="task-status-bar">
+        <span><i class="fa-solid fa-satellite-dish" style="color: var(--accent-green);"></i> <span data-i18n="wall_active">CPX Wall Connected</span></span>
+        <span>Points: <span class="coin-accent" id="liveTaskCoins">...</span></span>
+    </div>
+
+    <div class="main-container">
+        <!-- Direct Mode: iFrame container -->
+        <div id="offerwallLocation">
+            <div class="loading-wall"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading secure CPX surveys...</div>
+        </div>
+
+        <!-- Timer / Fallback Mode Card -->
+        <div class="fallback-card" id="fallbackCardBox">
+            <div style="font-size: 50px; margin-bottom: 10px;">📊</div>
+            <h3 style="margin: 0; font-size: 20px; color: #67e8f9;">CPX Research Surveys</h3>
+            <p style="color: var(--text-sub); font-size: 13px; margin: 10px 0 20px 0;">Answer genuine opinion surveys and questionnaires to claim points.</p>
+            <button class="fallback-btn" id="startFallbackBtn" onclick="launchFallbackTask()">Start Survey</button>
+        </div>
+    </div>
+
+    <!-- 🔥 FIREBASE REALTIME SCRIPT ENGINE (WITH UNIVERSAL BANNER & DUAL-MODE) -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // Admin Controlled Configs
+        let currentMode = "postback"; // Default: postback (Direct iFrame)
+        let cpxAppId = "33205";
+        let fallbackAdLink = "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js";
+        let fallbackTimer = 25;
+        let fallbackReward = 40;
+        let globalSdkName = "";
+        let globalSdkId = "";
+
+        const langData = {
+            "en": { "task_title": "CPX Surveys", "wall_active": "CPX Wall Connected", "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi.", "mod_retry": "Retry Connection" },
+            "hi": { "task_title": "सीपेक्स सर्वे", "wall_active": "सर्वेक्षण कनेक्टेड", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "मोबाइल डेटा चालू करें।", "mod_retry": "फिर से कोशिश करें" }
+        };
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) elem.innerText = transObj[key];
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+        // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
+        }
+
+        const uid = localStorage.getItem("userId");
+        let currentDisplayedCoins = -1;
+
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
+            if (!uid) { window.location.replace("index.html"); return; }
+            
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    initCPXSurveyModule(user);
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+        });
+
+        function initCPXSurveyModule(user) {
+            let uname = "Player";
+            let uemail = user.email || "user@gmail.com";
+
+            // 1. Live Wallet Sync
+            db.ref('users/' + uid).on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    uname = encodeURIComponent(userData.name || "Player");
+                    const newCoins = userData.coins || 0;
+                    const coinDisplay = document.getElementById("liveTaskCoins");
+
+                    if (currentDisplayedCoins !== -1 && newCoins > currentDisplayedCoins) {
+                        let earnedAmount = newCoins - currentDisplayedCoins;
+                        coinDisplay.innerText = newCoins + " 🪙";
+                        coinDisplay.style.color = "var(--accent-green)";
+                        setTimeout(() => { coinDisplay.style.color = "var(--accent-gold)"; }, 3000);
+                        syncDailyTaskCompletion(earnedAmount);
+                    } else {
+                        coinDisplay.innerText = newCoins + " 🪙";
+                    }
+                    currentDisplayedCoins = newCoins;
+                }
+            });
+
+            // 2. Fetch Admin Configurations
+            db.ref('global_system_runtime_configurations/cpx_surveys').on('value', (snap) => {
+                if(snap.exists()) {
+                    const adminData = snap.val();
+                    if(adminData.mode) currentMode = adminData.mode.trim().toLowerCase();
+                    if(adminData.cpx_app_id) cpxAppId = adminData.cpx_app_id;
+                    if(adminData.fallback_link) fallbackAdLink = adminData.fallback_link;
+                    if(adminData.ad_timer) fallbackTimer = parseInt(adminData.ad_timer);
+                    if(adminData.reward_coins) fallbackReward = parseInt(adminData.reward_coins);
+                    if(adminData.sdk_name) globalSdkName = adminData.sdk_name.trim();
+                    if(adminData.sdk_id) globalSdkId = adminData.sdk_id.trim();
+
+                    // Render Banners
+                    injectUniversalBanner("adminBannerSlot1", adminData.slot1);
+                    injectUniversalBanner("adminBannerSlot2", adminData.slot2);
+                }
+
+                // Render based on Mode
+                if (currentMode === "timer") {
+                    document.getElementById("offerwallLocation").style.display = "none";
+                    document.getElementById("fallbackCardBox").style.display = "block";
+                    document.getElementById("startFallbackBtn").innerText = `Start Survey (${fallbackTimer}s)`;
+                } else {
+                    document.getElementById("fallbackCardBox").style.display = "none";
+                    document.getElementById("offerwallLocation").style.display = "block";
+                    
+                    let secureFrameSrc = `https://offers.cpx-research.com/index.php?app_id=${cpxAppId}&ext_user_id=${uid}&username=${uname}&email=${uemail}`;
+                    document.getElementById("offerwallLocation").innerHTML = `
+                        <iframe class="iframe-wrapper" src="${secureFrameSrc}" allow="clipboard-write; clipboard-read"></iframe>
+                    `;
+                }
+            });
+        }
+
+        // Fallback Timer Mode Launch
+        let adInterval = null;
+        function launchFallbackTask() {
+            if (globalSdkId && globalSdkId !== "") {
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(globalSdkName, globalSdkId, fallbackReward, "cpx_survey");
+                    return;
+                }
+            }
+            openInAppViewerHTML();
+        }
+
+        function openInAppViewerHTML() {
+            setTimeout(() => {
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                let countdownTime = fallbackTimer;
+                let timerDisplay = document.getElementById("adTimerDisplay");
+                let closeBtn = document.getElementById("adCloseBtn");
+                let iframeNode = document.getElementById("adIframe");
+
+                timerDisplay.style.display = "flex";
+                closeBtn.style.display = "none";
+                timerDisplay.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading...`;
+
+                iframeNode.onload = function() {
+                    if (adInterval) clearInterval(adInterval);
+                    timerDisplay.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+
+                    adInterval = setInterval(() => {
+                        countdownTime--;
+                        let s = document.getElementById("adSecondsSpan");
+                        if(s) s.innerText = countdownTime;
+
+                        if (document.hidden) {
+                            clearInterval(adInterval);
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            iframeNode.src = "";
+                            return;
+                        }
+
+                        if (countdownTime <= 0) {
+                            clearInterval(adInterval);
+                            timerDisplay.style.display = "none";
+                            closeBtn.style.display = "block";
+                        }
+                    }, 1000);
+                };
+                iframeNode.src = fallbackAdLink;
+            }, 600);
+        }
+
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = "";
+            grantCPXReward(fallbackReward, false);
+        }
+
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            grantCPXReward(parseInt(rewardCoins), true);
+        }
+
+        function grantCPXReward(rewardToGive, isSdk) {
+            if(rewardToGive <= 0 || !uid) return;
+            let sdkTag = isSdk ? " [SDK]" : "";
+
+            db.ref(`users/${uid}/coins`).transaction(cur => (cur || 0) + rewardToGive).then(() => {
+                db.ref(`users/${uid}/history`).push({
+                    title: `CPX Survey Reward${sdkTag}`,
+                    amount: rewardToGive,
+                    type: "credit",
+                    txn_type: "offerwall",
+                    status: "SUCCESSFUL",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                syncDailyTaskCompletion(rewardToGive);
+                alert(`🎉 Reward Credited: +${rewardToGive} Coins!`);
+            });
+        }
+
+        function syncDailyTaskCompletion(earnedCoins) {
+            db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                let tasks = snap.val() || [];
+                if (!tasks.includes("t6")) {
+                    tasks.push("t6");
+                    db.ref(`users/${uid}/completed_daily_tasks`).set(tasks);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

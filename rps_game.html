@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors - Dudo</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🔥 Firebase SDKs (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 30, 49, 0.85);
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-glow: rgba(59, 130, 246, 0.18);
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 60%); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* HEADER */
+        .header { background: rgba(15, 23, 42, 0.9); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 10; backdrop-filter: blur(12px); }
+        .back-btn { color: var(--danger); text-decoration: none; font-size: 20px; font-weight: bold; padding: 5px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); transition: 0.2s; }
+        .back-btn:active { transform: scale(0.9); }
+        .title { margin: 0; font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fff; flex-grow: 1; text-align: center; }
+        
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .custom-lang-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; outline: none; font-size: 12px; background: #0f172a; color: var(--primary); font-weight: bold; cursor: pointer; }
+        .profile-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), var(--accent-cyan)); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; transition: 0.3s; }
+        
+        .wallet-box { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px; font-weight: 800; color: var(--success); display: flex; align-items: center; gap: 6px; font-size: 14px; margin-right: 10px; }
+
+        .main-container { flex: 1; overflow-y: auto; padding: 20px; position: relative; max-width: 440px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+
+        /* ADMIN BANNER SLOTS */
+        .ad-banner-slot { width: 100%; min-height: 52px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px dashed rgba(255,255,255,0.15); margin-bottom: 15px; }
+
+        /* LOBBY SCREEN */
+        #lobbyScreen { display: flex; flex-direction: column; gap: 15px; }
+        .arena-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border-glow); position: relative; overflow: hidden; backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        .arena-title { font-size: 20px; font-weight: 900; margin: 0 0 5px 0; color: #fff; }
+        .arena-desc { font-size: 12.5px; color: var(--text-muted); margin: 0 0 20px 0; line-height: 1.4; }
+        
+        .battle-tier { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; transition: 0.2s; }
+        .battle-tier:active { transform: scale(0.98); border-color: var(--primary); }
+        .tier-info h4 { margin: 0 0 4px 0; font-size: 15px; color: #fff; font-weight: 800; }
+        .tier-info p { margin: 0; font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+        .win-amt { color: var(--warning); font-weight: 900; }
+        .play-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); text-transform: uppercase; }
+
+        /* MATCHMAKING SCREEN */
+        #matchmakingScreen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+        .radar-animation { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--primary); border-top-color: transparent; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .finding-text { font-size: 16px; font-weight: 800; color: var(--primary); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* BATTLE SCREEN */
+        #battleScreen { display: none; flex-direction: column; height: 100%; justify-content: space-between; padding-bottom: 20px; box-sizing: border-box; }
+        
+        .versus-header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px; border-radius: 16px; border: 1px solid var(--border-glow); }
+        .player-box { text-align: center; width: 40%; }
+        .player-avatar { width: 55px; height: 55px; background: #0f172a; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 5px; border: 2px solid var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.3); overflow: hidden;}
+        .opponent-avatar { border-color: var(--danger); box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+        .player-name { font-size: 12px; font-weight: 800; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .vs-badge { font-size: 20px; font-weight: 900; color: var(--warning); font-style: italic; }
+
+        .battle-arena { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .choice-display { display: flex; justify-content: space-between; width: 100%; padding: 0 30px; box-sizing: border-box; }
+        .move-icon { font-size: 55px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); transition: 0.3s; }
+        #oppMove { transform: scaleX(-1); }
+        .timer { font-size: 38px; font-weight: 900; color: #fff; position: absolute; text-shadow: 0 0 15px rgba(255,255,255,0.5); }
+
+        .controls { display: flex; justify-content: center; gap: 15px; background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid var(--border-glow); }
+        .action-btn { background: rgba(51, 65, 85, 0.5); border: 2px solid #475569; border-radius: 50%; width: 65px; height: 65px; font-size: 30px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .action-btn:active { transform: scale(0.9); }
+        .action-btn.selected { border-color: var(--primary); background: rgba(59, 130, 246, 0.25); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .action-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+        /* RESULT MODAL */
+        .result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(8px); }
+        .result-card { background: var(--card-bg); width: 100%; max-width: 320px; border-radius: 20px; padding: 30px 20px; text-align: center; border: 2px solid var(--primary); box-shadow: 0 0 35px rgba(59, 130, 246, 0.3); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        
+        #resIcon { font-size: 55px; margin-bottom: 8px; }
+        #resTitle { font-size: 22px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; }
+        #resMsg { font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; font-weight: 600; }
+        .res-btn { background: linear-gradient(135deg, var(--primary), #2563eb); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+
+        #globalOfflineWarningOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6, 9, 19, 0.95); z-index: 99999999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; backdrop-filter: blur(10px); }
+
+        /* 🔥 IN-APP AD VIEWER CSS 🔥 */
+        .in-app-ad-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: #000; flex-direction: column; }
+        .ad-header { height: 55px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid #06b6d4; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ad-timer-text { color: #facc15; font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .ad-close-btn { display: none; background: var(--danger); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        .ad-iframe-frame { width: 100%; height: calc(100% - 55px); border: none; background: #fff; }
+    </style>
+</head>
+<body>
+
+    <!-- 🌐 OFFLINE SCREEN -->
+    <div id="globalOfflineWarningOverlay">
+        <div style="font-size:55px; margin-bottom:15px;">📡❌</div>
+        <h2 style="color: var(--danger); font-size: 20px; font-weight: 900; text-transform: uppercase;" data-i18n="mod_no_net">No Internet Connection</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin: 10px 0 20px 0;" data-i18n="mod_no_net_d">Please enable Mobile Data or Wi-Fi to continue.</p>
+        <button onclick="window.location.reload()" style="background: var(--danger); color: #fff; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer;" data-i18n="mod_retry">Retry Connection</button>
+    </div>
+
+    <!-- 🔥 IN-APP AD VIEWER HTML 🔥 -->
+    <div class="in-app-ad-viewer" id="inAppAdViewer">
+        <div class="ad-header">
+            <div style="color:#fff; font-weight:bold; font-size:13px;"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Secure Ad Task</div>
+            <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
+            <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & RETURN</button>
+        </div>
+        <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <a href="ho.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 class="title" data-i18n="arena_title">Arena</h2>
+        
+        <div class="header-controls">
+            <div class="wallet-box">🪙 <span id="userBalance">0</span></div>
+            <select class="custom-lang-select" id="appLanguage" onchange="changeLanguage(this.value)">
+                <option value="en">EN</option><option value="hi">HI</option><option value="bn">BN</option>
+                <option value="te">TE</option><option value="mr">MR</option><option value="ta">TA</option>
+                <option value="ur">UR</option><option value="gu">GU</option><option value="es">ES</option>
+                <option value="fr">FR</option><option value="ar">AR</option><option value="pt">PT</option><option value="ru">RU</option>
+            </select>
+            <a href="profile.html" class="profile-icon notranslate" id="headerProfileIcon">👤</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <!-- Admin Dynamic Banner Slot 1 -->
+        <div class="ad-banner-slot" id="adminBannerSlot1"></div>
+
+        <!-- LOBBY SCREEN -->
+        <div id="lobbyScreen">
+            <div class="arena-card">
+                <h3 class="arena-title" data-i18n="rps_title">Rock Paper Scissors</h3>
+                <p class="arena-desc" data-i18n="rps_desc">Play 1v1 tactical matches against live challengers. Win rewards instantly!</p>
+                
+                <div class="battle-tier">
+                    <div class="tier-info">
+                        <h4 data-i18n="tier_starter">Starter Battle</h4>
+                        <p><span data-i18n="participation">Participation:</span> 10 Pts | <span data-i18n="reward">Reward:</span> <span class="win-amt">18 Pts</span></p>
+                    </div>
+                    <button class="play-btn" onclick="startMatchmaking(10, 18)" data-i18n="btn_play">Play 10</button>
+                </div>
+
+                <div class="battle-tier">
+                    <div class="tier-info">
+                        <h4 data-i18n="tier_pro">Pro Arena</h4>
+                        <p><span data-i18n="participation">Participation:</span> 50 Pts | <span data-i18n="reward">Reward:</span> <span class="win-amt">90 Pts</span></p>
+                    </div>
+                    <button class="play-btn" onclick="startMatchmaking(50, 90)" data-i18n="btn_play">Play 50</button>
+                </div>
+
+                <div class="battle-tier" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.05);">
+                    <div class="tier-info">
+                        <h4 style="color: var(--warning);" data-i18n="tier_high">High Roller</h4>
+                        <p><span data-i18n="participation">Participation:</span> 100 Pts | <span data-i18n="reward">Reward:</span> <span class="win-amt">180 Pts</span></p>
+                    </div>
+                    <button class="play-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="startMatchmaking(100, 180)" data-i18n="btn_play">Play 100</button>
+                </div>
+            </div>
+
+            <div class="arena-card" style="background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.3); text-align: center; padding: 15px;">
+                <h4 style="margin: 0 0 4px 0; color: var(--primary); font-size: 14px;" data-i18n="rules_title">Game Rules</h4>
+                <p style="margin: 0; font-size: 11.5px; color: var(--text-muted);" data-i18n="rules_desc">Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.</p>
+            </div>
+        </div>
+
+        <!-- MATCHMAKING SCREEN -->
+        <div id="matchmakingScreen">
+            <div class="radar-animation"></div>
+            <div class="finding-text" data-i18n="matching_text">Matching with Challenger...</div>
+            <p style="color: var(--text-muted); font-size: 12px; margin-top: 10px;" data-i18n="matching_warn">Please keep the app open during matchmaking.</p>
+        </div>
+
+        <!-- BATTLE SCREEN -->
+        <div id="battleScreen">
+            <div class="versus-header">
+                <div class="player-box">
+                    <div class="player-avatar" id="myAvatarIcon">👤</div>
+                    <div class="player-name" id="myName">You</div>
+                </div>
+                <div class="vs-badge">VS</div>
+                <div class="player-box">
+                    <div class="player-avatar opponent-avatar" id="oppAvatarIcon">😈</div>
+                    <div class="player-name" id="oppName">Opponent</div>
+                </div>
+            </div>
+
+            <div class="battle-arena">
+                <div class="timer" id="roundTimer">5</div>
+                <div class="choice-display">
+                    <div class="move-icon" id="myMove">❓</div>
+                    <div class="move-icon" id="oppMove">❓</div>
+                </div>
+                <div id="winnerText" style="position: absolute; bottom: 10px; font-weight: 900; font-size: 18px; color: var(--warning); display: none; text-transform: uppercase; letter-spacing: 1px;"></div>
+            </div>
+
+            <div class="controls" id="playerControls">
+                <button class="action-btn" onclick="selectMove('rock', '✊')">✊</button>
+                <button class="action-btn" onclick="selectMove('paper', '✋')">✋</button>
+                <button class="action-btn" onclick="selectMove('scissors', '✌️')">✌️</button>
+            </div>
+        </div>
+
+        <!-- Admin Dynamic Promo Banner Slot 2 -->
+        <div class="ad-banner-slot" id="adminBannerSlot2" style="margin-top: 15px;"></div>
+
+    </div>
+
+    <!-- RESULT MODAL -->
+    <div class="result-overlay" id="resultModal">
+        <div class="result-card" id="resCardBox">
+            <div id="resIcon">🏆</div>
+            <h2 id="resTitle">Victory!</h2>
+            <p id="resMsg">Reward added to your balance.</p>
+            <button class="res-btn" onclick="returnToLobby()" data-i18n="btn_return">Return to Arena</button>
+        </div>
+    </div>
+
+    <!-- 🟢 PURE FIREBASE ENGINE -->
+    <script>
+        // 1. Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
+            authDomain: "dudo-dc7cd.firebaseapp.com",
+            databaseURL: "https://dudo-dc7cd-default-rtdb.firebaseio.com",
+            projectId: "dudo-dc7cd",
+            storageBucket: "dudo-dc7cd.firebasestorage.app",
+            messagingSenderId: "254085241041",
+            appId: "1:254085241041:web:3a8f3d8490aa37ff454df0",
+            measurementId: "G-8BKZSHYLF6"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let adPartnerLink = ""; 
+        let globalAdTimerSeconds = 25; 
+        
+        // 🔥 HYBRID AD CONTROL VARIABLES 🔥
+        let globalNativeSdkName = ""; 
+        let globalNativeSdkId = "";   
+
+        // Check Network Status
+        window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
+        window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
+
+        // Translations Dictionary
+        const langData = {
+    "en": {
+        "arena_title": "Arena", "rps_title": "Rock Paper Scissors", "rps_desc": "Play 1v1 tactical matches against live challengers. Win rewards instantly!",
+        "tier_starter": "Starter Battle", "tier_pro": "Pro Arena", "tier_high": "High Roller",
+        "participation": "Participation:", "reward": "Reward:", "btn_play": "Play",
+        "rules_title": "Game Rules", "rules_desc": "Choose Rock ✊, Paper ✋, or Scissors ✌️ before the countdown ends. Rock crushes Scissors, Scissors cut Paper, Paper covers Rock.",
+        "matching_text": "Matching with Challenger...", "matching_warn": "Please keep the app open during matchmaking.", "btn_return": "Return to Arena"
+    },
+    "hi": {
+        "arena_title": "एरिना", "rps_title": "रॉक पेपर सीज़र्स", "rps_desc": "लाइव चैलेंजर्स के खिलाफ 1v1 मैच खेलें। तुरंत इनाम जीतें!",
+        "tier_starter": "स्टार्टर बैटल", "tier_pro": "प्रो एरिना", "tier_high": "हाई रोलर",
+        "participation": "प्रवेश:", "reward": "इनाम:", "btn_play": "खेलें",
+        "rules_title": "खेल के नियम", "rules_desc": "समय खत्म होने से पहले रॉक ✊, पेपर ✋, या सीज़र्स ✌️ चुनें। रॉक सीज़र्स को तोड़ता है, सीज़र्स पेपर को काटता है, पेपर रॉक को ढकता है।",
+        "matching_text": "चैलेंजर खोज रहे हैं...", "matching_warn": "कृपया मैचमेकिंग के दौरान ऐप को खुला रखें।", "btn_return": "वापस जाएँ"
+    },
+    "bn": {
+        "arena_title": "অ্যারিনা", "rps_title": "রক পেপার সিজারস", "rps_desc": "লাইভ চ্যালেঞ্জারদের বিপক্ষে 1v1 ম্যাচ খেলুন। সাথে সাথে পুরস্কার জিতুন!",
+        "tier_starter": "স্টার্টার ব্যাটল", "tier_pro": "প্রো অ্যারিনা", "tier_high": "হাই রোলার",
+        "participation": "অংশগ্রহণ:", "reward": "পুরস্কার:", "btn_play": "খেলুন",
+        "rules_title": "খেলার নিয়ম", "rules_desc": "সময় শেষ হওয়ার আগে রক ✊, পেপার ✋, বা সিজারস ✌️ বেছে নিন।",
+        "matching_text": "চ্যালেঞ্জার খোঁজা হচ্ছে...", "matching_warn": "ম্যাচমেকিং এর সময় দয়া করে অ্যাপটি খোলা রাখুন।", "btn_return": "ফিরে যান"
+    },
+    "te": {
+        "arena_title": "అరేనా", "rps_title": "రాక్ పేపర్ సిజర్స్", "rps_desc": "లైవ్ ఛాలెంజర్స్‌తో 1v1 మ్యాచ్‌లు ఆడండి. తక్షణమే బహుమతులు గెలుచుకోండి!",
+        "tier_starter": "స్టార్టర్ బ్యాటిల్", "tier_pro": "ప్రో అరేనా", "tier_high": "హై రోలర్",
+        "participation": "ప్రవేశం:", "reward": "బహుమతి:", "btn_play": "ఆడండి",
+        "rules_title": "ఆట నియమాలు", "rules_desc": "సమయం ముగిసేలోపు రాక్ ✊, పేపర్ ✋, లేదా సిజర్స్ ✌️ ఎంచుకోండి.",
+        "matching_text": "ఛాలెంజర్‌ను వెతుకుతోంది...", "matching_warn": "మ్యాచ్‌మేకింగ్ సమయంలో దయచేసి యాప్‌ను తెరిచి ఉంచండి.", "btn_return": "వెనక్కి వెళ్ళండి"
+    },
+    "mr": {
+        "arena_title": "अरीना", "rps_title": "रॉक पेपर सिझर्स", "rps_desc": "लाईव्ह चॅलेंजर्सविरुद्ध 1v1 मॅच खेळा. लगेच बक्षिसे जिंका!",
+        "tier_starter": "स्टार्टर बॅटल", "tier_pro": "प्रो अरीना", "tier_high": "हाय रोलर",
+        "participation": "प्रवेश:", "reward": "बक्षीस:", "btn_play": "खेळा",
+        "rules_title": "खेळाचे नियम", "rules_desc": "वेळ संपण्यापूर्वी रॉक ✊, पेपर ✋, किंवा सिझर्स ✌️ निवडा.",
+        "matching_text": "चॅलेंजर शोधत आहे...", "matching_warn": "कृपया मॅचमेकिंग दरम्यान ॲप उघडे ठेवा.", "btn_return": "परत जा"
+    },
+    "ur": {
+        "arena_title": "ارینا", "rps_title": "راک پیپر سیزرز", "rps_desc": "لائیو چیلنجرز کے خلاف 1v1 میچ کھیلیں۔ فوری انعام جیتیں!",
+        "tier_starter": "اسٹارٹر بیٹل", "tier_pro": "پرو ارینا", "tier_high": "ہائی رولر",
+        "participation": "شمولیت:", "reward": "انعام:", "btn_play": "کھیلیں",
+        "rules_title": "کھیل کے اصول", "rules_desc": "وقت ختم ہونے سے پہلے راک ✊، پیپر ✋، یا سیزرز ✌️ کا انتخاب کریں۔",
+        "matching_text": "چیلنجر تلاش کر رہا ہے...", "matching_warn": "براہ کرم میچ میکنگ کے دوران ایپ کو کھلا رکھیں۔", "btn_return": "واپس جائیں"
+    },
+    "ta": {
+        "arena_title": "அரங்கம்", "rps_title": "ராக் பேப்பர் சிசர்ஸ்", "rps_desc": "நேரடி சவாலாளர்களுக்கு எதிராக 1v1 விளையாடுங்கள். உடனடியாக வெகுமதிகளை வெல்லுங்கள்!",
+        "tier_starter": "ஸ்டார்டர் போர்", "tier_pro": "ப்ரோ அரங்கம்", "tier_high": "ஹை ரோலர்",
+        "participation": "பங்கேற்பு:", "reward": "வெகுமதி:", "btn_play": "விளையாடு",
+        "rules_title": "விளையாட்டு விதிகள்", "rules_desc": "நேரம் முடிவதற்குள் ராக் ✊, பேப்பர் ✋, அல்லது சிசர்ஸ் ✌️ தேர்ந்தெடுக்கவும்.",
+        "matching_text": "சவாலாளரைத் தேடுகிறது...", "matching_warn": "போட்டி தேடும் போது ஆப்பை திறந்து வைக்கவும்.", "btn_return": "திரும்பிச் செல்"
+    },
+    "gu": {
+        "arena_title": "અરેના", "rps_title": "રોક પેપર સિઝર્સ", "rps_desc": "લાઇવ ચેલેન્જર્સ સામે 1v1 મેચ રમો. તરત જ ઇનામો જીતો!",
+        "tier_starter": "સ્ટાર્ટર બેટલ", "tier_pro": "પ્રો અરેના", "tier_high": "હાઈ રોલર",
+        "participation": "પ્રવેશ:", "reward": "ઇનામ:", "btn_play": "રમો",
+        "rules_title": "રમત ના નિયમો", "rules_desc": "સમય પૂરો થાય તે પહેલાં રોક ✊, પેપર ✋, અથવા સિઝર્સ ✌️ પસંદ કરો.",
+        "matching_text": "ચેલેન્જર શોધી રહ્યા છે...", "matching_warn": "કૃપા કરીને મેચમેકિંગ દરમિયાન એપ ખુલ્લી રાખો.", "btn_return": "પાછા જાઓ"
+    },
+    "es": {
+        "arena_title": "Arena", "rps_title": "Piedra Papel Tijera", "rps_desc": "Juega partidas 1v1 contra retadores en vivo. ¡Gana recompensas al instante!",
+        "tier_starter": "Batalla Inicial", "tier_pro": "Arena Pro", "tier_high": "Alto Riesgo",
+        "participation": "Participación:", "reward": "Recompensa:", "btn_play": "Jugar",
+        "rules_title": "Reglas del Juego", "rules_desc": "Elige Piedra ✊, Papel ✋ o Tijera ✌️ antes de que termine el tiempo.",
+        "matching_text": "Buscando retador...", "matching_warn": "Por favor, mantén la aplicación abierta.", "btn_return": "Volver a la Arena"
+    },
+    "fr": {
+        "arena_title": "Arène", "rps_title": "Pierre Papier Ciseaux", "rps_desc": "Jouez des matchs 1v1 contre des joueurs en direct. Gagnez des récompenses instantanément !",
+        "tier_starter": "Bataille de Départ", "tier_pro": "Arène Pro", "tier_high": "Gros Pari",
+        "participation": "Participation :", "reward": "Récompense :", "btn_play": "Jouer",
+        "rules_title": "Règles du jeu", "rules_desc": "Choisissez Pierre ✊, Papier ✋ ou Ciseaux ✌️ avant la fin du temps.",
+        "matching_text": "Recherche d'un adversaire...", "matching_warn": "Veuillez garder l'application ouverte.", "btn_return": "Retour à l'Arène"
+    },
+    "ar": {
+        "arena_title": "الساحة", "rps_title": "حجر ورقة مقص", "rps_desc": "العب مباريات 1 ضد 1 ضد لاعبين حقيقيين. اربح المكافآت فوراً!",
+        "tier_starter": "معركة البداية", "tier_pro": "الساحة الاحترافية", "tier_high": "رهان عالي",
+        "participation": "الدخول:", "reward": "المكافأة:", "btn_play": "العب",
+        "rules_title": "قواعد اللعبة", "rules_desc": "اختر حجر ✊، ورقة ✋، أو مقص ✌️ قبل انتهاء الوقت.",
+        "matching_text": "جاري البحث عن منافس...", "matching_warn": "يرجى إبقاء التطبيق مفتوحًا أثناء البحث.", "btn_return": "العودة للساحة"
+    },
+    "pt": {
+        "arena_title": "Arena", "rps_title": "Pedra Papel Tesoura", "rps_desc": "Jogue partidas 1v1 contra desafiantes ao vivo. Ganhe recompensas na hora!",
+        "tier_starter": "Batalha Inicial", "tier_pro": "Arena Pro", "tier_high": "Aposta Alta",
+        "participation": "Participação:", "reward": "Recompensa:", "btn_play": "Jogar",
+        "rules_title": "Regras do Jogo", "rules_desc": "Escolha Pedra ✊, Papel ✋ ou Tesoura ✌️ antes que o tempo acabe.",
+        "matching_text": "Procurando desafiante...", "matching_warn": "Mantenha o aplicativo aberto durante a busca.", "btn_return": "Voltar para a Arena"
+    },
+    "ru": {
+        "arena_title": "Арена", "rps_title": "Камень Ножницы Бумага", "rps_desc": "Играйте матчи 1 на 1 против реальных игроков. Выигрывайте награды мгновенно!",
+        "tier_starter": "Начальная битва", "tier_pro": "Про Арена", "tier_high": "Крупная ставка",
+        "participation": "Взнос:", "reward": "Награда:", "btn_play": "Играть",
+        "rules_title": "Правила игры", "rules_desc": "Выберите Камень ✊, Бумагу ✋ или Ножницы ✌️ до окончания времени.",
+        "matching_text": "Поиск соперника...", "matching_warn": "Пожалуйста, не закрывайте приложение.", "btn_return": "Вернуться на Арену"
+    }
+};
+
+        function changeLanguage(langCode) {
+            localStorage.setItem("selectedLang", langCode);
+            const transObj = langData[langCode] || langData["en"];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute("data-i18n");
+                if(transObj[key]) { elem.innerText = transObj[key]; }
+            });
+            document.getElementById("appLanguage").value = langCode;
+        }
+
+                // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            // Case 1: Agar Native SDK Banner ho
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-muted); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            // Case 2: Agar HTML / Script / INS / Adsterra Banner ho
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
+        }
+
+        let currentBalance = 0;
+        let activeBet = 0;
+        let activeWinPrize = 0;
+        let myChoice = null;
+        let myChoiceIcon = '❓';
+        let countdownInterval;
+        let isMatchmakingActive = false;
+        
+        const virtualNames = ["Rahul_99", "ProGamer_X", "Aman_Destroyer", "Vikas.123", "Neha_Queen", "KillerBoy", "ShadowNinja", "Rajput_Don"];
+        const virtualAvatars = ["🎯", "🦊", "🥷", "🦁", "🐉", "🦅", "💀", "👦"];
+        
+        const moves = [
+            { id: 'rock', icon: '✊' },
+            { id: 'paper', icon: '✋' },
+            { id: 'scissors', icon: '✌️' }
+        ];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!navigator.onLine) document.getElementById("globalOfflineWarningOverlay").style.display = "flex";
+            
+            let savedLang = localStorage.getItem("selectedLang") || "en";
+            changeLanguage(savedLang);
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const uid = user.uid;
+                    
+                    // 1. Live Balance & Smart Avatar Sync
+                    db.ref('users/' + uid).on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            currentBalance = data.coins || 0;
+                            document.getElementById("userBalance").innerText = currentBalance;
+                            
+                            let userName = data.name || "Player";
+                            document.getElementById("myName").innerText = userName.split(" ")[0];
+
+                            let finalAvatar = data.profile_pic ? data.profile_pic : `https://api.dicebear.com/7.x/adventurer/svg?seed=${userName || uid}&backgroundColor=b6e3f4`;
+                            
+                            document.getElementById("headerProfileIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            document.getElementById("myAvatarIcon").innerHTML = `<img src="${finalAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                        }
+                    });
+
+                    // 📡 2. FETCH ADMIN BANNERS, REWARD LINK & HYBRID SDK DATA
+                    db.ref('global_system_runtime_configurations/rps_game').on('value', (snap) => {
+                        if (snap.exists()) {
+                            const adminData = snap.val();
+                            
+                            if (adminData.battle_link && adminData.battle_link.trim() !== "") {
+                                adPartnerLink = adminData.battle_link;
+                            }
+                            
+                            if (adminData.ad_timer) {
+                                globalAdTimerSeconds = parseInt(adminData.ad_timer);
+                            }
+
+                            // 🔥 Fetch SDK Logic 🔥
+                            if (adminData.sdk_name) globalNativeSdkName = adminData.sdk_name.trim();
+                            if (adminData.sdk_id) globalNativeSdkId = adminData.sdk_id.trim();
+                            
+                                                        // 🔥 Universal Injector Calls (Slot 1 & Slot 2)
+                            injectUniversalBanner("adminBannerSlot1", adminData.slot1);
+                            injectUniversalBanner("adminBannerSlot2", adminData.slot2);
+
+                        }
+                    });
+
+                } else {
+                    window.location.replace("index.html");
+                }
+            });
+        });
+
+        // ⚔️ STEP 1: MATCHMAKING & FIREBASE DEDUCTION
+        function startMatchmaking(entryFee, winPrize) {
+            if (Number(currentBalance) < Number(entryFee)) {
+                alert("❌ Insufficient Points! You need at least " + entryFee + " points to participate.");
+                return;
+            }
+
+            activeBet = Number(entryFee);
+            activeWinPrize = Number(winPrize);
+            isMatchmakingActive = true;
+
+            document.getElementById("lobbyScreen").style.display = "none";
+            document.getElementById("matchmakingScreen").style.display = "flex";
+
+            // Instant Fee Deduction via Firebase
+            const uid = localStorage.getItem("userId");
+            db.ref(`users/${uid}/coins`).transaction(current => (current || 0) - activeBet);
+
+            let delay = Math.floor(Math.random() * 2000) + 2000;
+            setTimeout(startBattle, delay);
+        }
+
+        // ⚔️ STEP 2: START BATTLE
+        function startBattle() {
+            let randomIdx = Math.floor(Math.random() * virtualNames.length);
+            document.getElementById("oppName").innerText = virtualNames[randomIdx];
+            document.getElementById("oppAvatarIcon").innerText = virtualAvatars[randomIdx];
+
+            document.getElementById("matchmakingScreen").style.display = "none";
+            document.getElementById("battleScreen").style.display = "flex";
+
+            resetBattleUI();
+            
+            let timeLeft = 5;
+            document.getElementById("roundTimer").innerText = timeLeft;
+            
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById("roundTimer").innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    resolveMatch();
+                }
+            }, 1000);
+        }
+
+        function resetBattleUI() {
+            myChoice = null; 
+            myChoiceIcon = '❓';
+            document.getElementById("myMove").innerText = '❓';
+            document.getElementById("oppMove").innerText = '❓';
+            document.getElementById("winnerText").style.display = "none";
+            
+            let btns = document.querySelectorAll(".action-btn");
+            btns.forEach(btn => {
+                btn.classList.remove("selected");
+                btn.classList.remove("disabled");
+            });
+        }
+
+        // ⚔️ STEP 3: PLAYER CHOOSES MOVE
+        function selectMove(moveId, icon) {
+            if (myChoice !== null) return; 
+            
+            myChoice = moveId;
+            myChoiceIcon = icon;
+            document.getElementById("myMove").innerText = icon;
+
+            let btns = document.querySelectorAll(".action-btn");
+            btns.forEach(btn => {
+                if (!btn.innerHTML.includes(icon)) btn.classList.add("disabled");
+                else btn.classList.add("selected");
+            });
+        }
+
+        // 🛡️ ANTI-CHEAT: AUTO CANCEL ON MINIMIZE
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && isMatchmakingActive) {
+                clearInterval(countdownInterval);
+                document.getElementById("battleScreen").style.display = "none";
+                document.getElementById("matchmakingScreen").style.display = "none";
+                
+                alert("❌ Match cancelled because app was minimized. Participation fee lost.");
+                
+                isMatchmakingActive = false;
+                document.getElementById("lobbyScreen").style.display = "flex";
+            }
+        });
+
+        // ⚔️ STEP 4: RESOLVE MATCH & ADD REWARD (FIREBASE)
+        function resolveMatch() {
+            isMatchmakingActive = false;
+
+            if (myChoice === null) {
+                let randomMyMove = moves[Math.floor(Math.random() * moves.length)];
+                myChoice = randomMyMove.id;
+                myChoiceIcon = randomMyMove.icon;
+                document.getElementById("myMove").innerText = myChoiceIcon;
+            }
+
+            let sysMove = moves[Math.floor(Math.random() * moves.length)];
+            document.getElementById("oppMove").innerText = sysMove.icon;
+
+            let result = "DRAW";
+            if (myChoice === sysMove.id) {
+                result = "DRAW";
+            } else if (
+                (myChoice === "rock" && sysMove.id === "scissors") ||
+                (myChoice === "paper" && sysMove.id === "rock") ||
+                (myChoice === "scissors" && sysMove.id === "paper")
+            ) {
+                result = "WIN";
+            } else {
+                result = "LOSS";
+            }
+
+            let wText = document.getElementById("winnerText");
+            wText.style.display = "block";
+            wText.innerText = result === "WIN" ? "VICTORY!" : (result === "LOSS" ? "DEFEAT!" : "IT'S A TIE!");
+            wText.style.color = result === "WIN" ? "var(--success)" : (result === "LOSS" ? "var(--danger)" : "var(--warning)");
+
+            setTimeout(() => { showResultModal(result); }, 1500);
+        }
+
+        function showResultModal(result) {
+            const modal = document.getElementById("resultModal");
+            const resBox = document.getElementById("resCardBox");
+            const resIcon = document.getElementById("resIcon");
+            const resTitle = document.getElementById("resTitle");
+            const resMsg = document.getElementById("resMsg");
+
+            const uid = localStorage.getItem("userId");
+
+            if (result === "WIN") {
+                resBox.style.borderColor = "var(--success)";
+                resBox.style.boxShadow = "0 0 35px rgba(16, 185, 129, 0.3)";
+                resIcon.innerText = "🏆";
+                resTitle.innerText = "VICTORY!";
+                resTitle.style.color = "var(--success)";
+                resMsg.innerText = `Awesome! You won ${activeWinPrize} Points.`;
+                
+                // Add Winning via Firebase Transaction & Push History
+                db.ref(`users/${uid}/coins`).transaction(current => (current || 0) + activeWinPrize).then(() => {
+                    db.ref(`users/${uid}/history`).push({
+                        title: "RPS Game Win",
+                        amount: activeWinPrize,
+                        type: "credit",
+                        txn_type: "credit",
+                        status: "SUCCESSFUL",
+                        date: new Date().toLocaleDateString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    
+                    // Update Daily Tasks
+                    db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
+                        let tasks = snap.val() || [];
+                        if (!tasks.includes("rps_game")) { 
+                            tasks.push("rps_game"); 
+                            db.ref(`users/${uid}/completed_daily_tasks`).set(tasks); 
+                        }
+                    });
+                });
+
+            } else if (result === "LOSS") {
+                resBox.style.borderColor = "var(--danger)";
+                resBox.style.boxShadow = "0 0 35px rgba(239, 68, 68, 0.3)";
+                resIcon.innerText = "💀";
+                resTitle.innerText = "DEFEATED!";
+                resTitle.style.color = "var(--danger)";
+                resMsg.innerText = `You lost ${activeBet} Points. Better luck next time!`;
+                
+            } else {
+                resBox.style.borderColor = "var(--warning)";
+                resBox.style.boxShadow = "0 0 35px rgba(245, 158, 11, 0.3)";
+                resIcon.innerText = "🤝";
+                resTitle.innerText = "MATCH DRAW!";
+                resTitle.style.color = "var(--warning)";
+                resMsg.innerText = `Participation fee of ${activeBet} Points has been refunded.`;
+                
+                // Refund Fee via Firebase Transaction
+                db.ref(`users/${uid}/coins`).transaction(current => (current || 0) + activeBet);
+            }
+
+            modal.style.display = "flex";
+        }
+
+        // 🔥 ADVANCED IN-APP AD VIEWER LOGIC WITH SMART TIMER & 600MS GAP 🔥
+        let adTimerInterval = null;
+
+        function openInAppAdViewer(adUrl, rewardCoinsAmount, timerSeconds, taskName = "ad_task") {
+            setTimeout(() => {
+                let countdownTime = timerSeconds;
+                
+                document.getElementById("inAppAdViewer").style.display = "flex";
+                document.getElementById("adTimerDisplay").style.display = "flex";
+                document.getElementById("adCloseBtn").style.display = "none";
+                
+                document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let iframeNode = document.getElementById("adIframe");
+                
+                iframeNode.onload = function() {
+                    if(adTimerInterval) clearInterval(adTimerInterval);
+                    
+                    document.getElementById("adTimerDisplay").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    adTimerInterval = setInterval(() => {
+                        countdownTime--;
+                        let span = document.getElementById("adSecondsSpan");
+                        if(span) span.innerText = countdownTime;
+
+                        if(countdownTime <= 0) {
+                            clearInterval(adTimerInterval);
+                            document.getElementById("adTimerDisplay").style.display = "none";
+                            document.getElementById("adCloseBtn").style.display = "block"; 
+                        }
+                    }, 1000);
+                };
+
+                iframeNode.src = adUrl;
+            }, 600); // Anti-Clash 600ms Timer
+        }
+
+        // 🔥 MODIFIED RETURN LOGIC: HYBRID SDK TRIGGER 🔥
+        function returnToLobby() {
+            document.getElementById("resultModal").style.display = "none";
+            
+            if (globalNativeSdkId && globalNativeSdkId !== "") {
+                // SDK Ad (Native Android)
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    // Reward is 0 because the resultModal already gave the coins. We just want to show the Ad.
+                    window.AndroidBridge.showNativeAd(globalNativeSdkName, globalNativeSdkId, 0, "rps_post_match_ad");
+                    executeReturnToLobbyUI();
+                } else if (adPartnerLink && adPartnerLink.trim() !== "") {
+                    // Fallback to HTML Ad
+                    openInAppAdViewer(adPartnerLink, 0, globalAdTimerSeconds, 'rps_post_match_ad');
+                } else {
+                    executeReturnToLobbyUI();
+                }
+            } else if (adPartnerLink && adPartnerLink.trim() !== "") {
+                // HTML Ad
+                openInAppAdViewer(adPartnerLink, 0, globalAdTimerSeconds, 'rps_post_match_ad');
+            } else {
+                executeReturnToLobbyUI();
+            }
+        }
+
+        // HTML Ad Close Button Action
+        function closeInAppAdAndClaim() {
+            document.getElementById("inAppAdViewer").style.display = "none";
+            document.getElementById("adIframe").src = ""; // Stop video/ad
+            executeReturnToLobbyUI();
+        }
+
+        // Complete SDK Task Callback (If Android Bridge Returns it)
+        function completeAndroidSdkTask(rewardCoins, taskName) {
+            // Since reward is already given before the ad in this specific game, 
+            // we just safely return the user to the lobby.
+            executeReturnToLobbyUI();
+        }
+
+        function executeReturnToLobbyUI() {
+            document.getElementById("resultModal").style.display = "none";
+            document.getElementById("battleScreen").style.display = "none";
+            document.getElementById("lobbyScreen").style.display = "flex";
+            isMatchmakingActive = false;
+            resetBattleUI();
+        }
+    </script>
+</body>
+</html>

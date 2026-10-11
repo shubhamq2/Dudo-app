@@ -67,7 +67,7 @@
         .save-btn:active:not(:disabled) { transform: scale(0.97); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, #1e3a8a, var(--primary-blue)); }
         .save-btn:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
-        /* 🔥 SAFE PRE-LOADED AVATAR MODAL */
+        /* Modal Overlay & Avatar Grid */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); z-index: 1000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
         .avatar-modal { background: var(--card-bg); width: 100%; max-width: 440px; border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px; box-sizing: border-box; text-align: center; border-top: 4px solid var(--primary-blue); animation: slideUp 0.3s ease-out; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -133,7 +133,7 @@
 
     <div class="form-container">
         
-        <!-- 🔥 PROFILE AVATAR EDITOR -->
+        <!-- PROFILE AVATAR EDITOR -->
         <div class="avatar-edit-section">
             <div class="avatar-preview-box" onclick="openAvatarModal()">
                 <div id="editDisplayPic" class="profile-img-preview"></div>
@@ -195,7 +195,6 @@
 
     <!-- 🟢 PURE FIREBASE REALTIME SCRIPT ENGINE -->
     <script>
-        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
             authDomain: "dudo-dc7cd.firebaseapp.com",
@@ -210,11 +209,9 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Check Network Status
         window.addEventListener('online', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "none"; });
         window.addEventListener('offline', () => { document.getElementById("globalOfflineWarningOverlay").style.display = "flex"; });
 
-        // 🌐 FULL 13+ LANGUAGES SUPPORT
         const langData = {
             "en": { "edit_title": "Edit Profile", "locked": "Locked", "lbl_uid": "User Unique ID (UID)", "lbl_name": "Full Name", "lbl_email": "Gmail Address / Email", "lbl_state": "State / Region", "btn_save": "Update Profile", "success_msg": "Profile metadata updated successfully!", "tap_avatar": "Tap to change Avatar", "err_empty": "❌ Full Name cannot be empty!", "err_server": "❌ Update Failed. Please try again.", "mod_no_net": "No Internet", "mod_no_net_d": "Please enable Mobile Data or Wi-Fi to continue earning.", "mod_retry": "Retry Connection" },
             "hi": { "edit_title": "प्रोफाइल बदलें", "locked": "सुरक्षित", "lbl_uid": "यूज़र यूनिक ID (UID)", "lbl_name": "पूरा नाम", "lbl_email": "जीमेल एड्रेस / ईमेल", "lbl_state": "राज्य / क्षेत्र", "btn_save": "प्रोफाइल अपडेट करें", "success_msg": "आपकी प्रोफाइल जानकारी सफलतापूर्वक बदल दी गई है!", "tap_avatar": "अवतार बदलने के लिए टैप करें", "err_empty": "❌ पूरा नाम खाली नहीं हो सकता!", "err_server": "❌ अपडेट विफल। कृपया पुनः प्रयास करें।", "mod_no_net": "इंटरनेट नहीं है", "mod_no_net_d": "पैसे कमाने के लिए मोबाइल डेटा या वाई-फाई चालू करें।", "mod_retry": "फिर से कोशिश करें" },
@@ -223,7 +220,7 @@
             "mr": { "edit_title": "प्रोफाइल संपादित करा", "locked": "लॉक केलेले", "lbl_uid": "वापरकर्ता आयडी", "lbl_name": "पूर्ण नाव", "lbl_email": "ईमेल", "lbl_state": "राज्य", "btn_save": "अपडेट करा", "success_msg": "प्रोफाइल यशस्वीरित्या अपडेट केले!", "tap_avatar": "अवतार बदलण्यासाठी टॅप करा", "err_empty": "❌ नाव रिकामे असू शकत नाही!", "err_server": "❌ अपडेट अयशस्वी." },
             "ta": { "edit_title": "சுயவிவரத்தைத் திருத்து", "locked": "பூட்டப்பட்டது", "lbl_uid": "பயனர் ஐடி", "lbl_name": "முழு பெயர்", "lbl_email": "மின்னஞ்சல்", "lbl_state": "மாநிலம்", "btn_save": "புதுப்பி", "success_msg": "சுயவிவரம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது!", "tap_avatar": "அவதாரத்தை மாற்ற தட்டவும்", "err_empty": "❌ பெயர் காலியாக இருக்கக்கூடாது!", "err_server": "❌ பிழை ஏற்பட்டது." },
             "ur": { "edit_title": "پروفائل میں ترمیم", "locked": "مقفل", "lbl_uid": "صارف کی شناخت", "lbl_name": "پورا نام", "lbl_email": "ای میل", "lbl_state": "ریاست", "btn_save": "اپ ڈیٹ کریں", "success_msg": "پروفائل کامیابی سے اپ ڈیٹ ہو گیا!", "tap_avatar": "اوتار تبدیل کرنے کے لیے تھپتھپائیں", "err_empty": "❌ نام ضروری ہے!", "err_server": "❌ سرور کا مسئلہ۔" },
-            "gu": { "edit_title": "પ્રોફાઇલ સંપાદિત કરો", "locked": "લોક કરેલ", "lbl_uid": "વપરાશકર્તા ID", "lbl_name": "પૂરું નામ", "lbl_email": "ઇમેઇલ", "lbl_state": "રાજ્ય", "btn_save": "અપડેટ કરો", "success_msg": "પ્રોફાઇલ સફળતાપૂર્વક અપડેટ થઈ!", "tap_avatar": "અવતાર બદલવા માટે ટેપ કરો", "err_empty": "❌ નામ ખાલી ન હોઈ શકે!", "err_server": "❌ સર્વર સમસ્યા." },
+            "gu": { "edit_title": "પ્ર્રોફાઇલ સંપાદિત કરો", "locked": "લોક કરેલ", "lbl_uid": "વપરાશકર્તા ID", "lbl_name": "પૂરું નામ", "lbl_email": "ઇમેઇલ", "lbl_state": "રાજ્ય", "btn_save": "અપડેટ કરો", "success_msg": "પ્ર્રોફાઇલ સફળતાપૂર્વક અપડેટ થઈ!", "tap_avatar": "અવતાર બદલવા માટે ટેપ કરો", "err_empty": "❌ નામ ખાલી ન હોઈ શકે!", "err_server": "❌ સર્વર સમસ્યા." },
             "es": { "edit_title": "Editar Perfil", "locked": "Bloqueado", "lbl_uid": "ID de Usuario", "lbl_name": "Nombre Completo", "lbl_email": "Correo", "lbl_state": "Estado / Región", "btn_save": "Actualizar", "success_msg": "¡Perfil actualizado con éxito!", "tap_avatar": "Toca para cambiar de avatar", "err_empty": "❌ ¡El nombre es obligatorio!", "err_server": "❌ Error al actualizar." },
             "fr": { "edit_title": "Éditer le Profil", "locked": "Verrouillé", "lbl_uid": "ID Utilisateur", "lbl_name": "Nom Complet", "lbl_email": "E-mail", "lbl_state": "État / Région", "btn_save": "Mettre à jour", "success_msg": "Profil mis à jour avec succès !", "tap_avatar": "Appuyez pour changer d'avatar", "err_empty": "❌ Le nom est obligatoire !", "err_server": "❌ Échec de la mise à jour." },
             "ar": { "edit_title": "تعديل الملف", "locked": "مغلق", "lbl_uid": "معرف المستخدم", "lbl_name": "الاسم الكامل", "lbl_email": "البريد الإلكتروني", "lbl_state": "الولاية", "btn_save": "تحديث", "success_msg": "تم تحديث الملف الشخصي بنجاح!", "tap_avatar": "انقر لتغيير الصورة", "err_empty": "❌ الاسم مطلوب!", "err_server": "❌ فشل التحديث." },
@@ -241,17 +238,70 @@
             document.getElementById("appLanguage").value = langCode;
         }
 
+        // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        function injectUniversalBanner(containerId, slotData) {
+            const container = document.getElementById(containerId);
+            if (!container || !slotData || slotData.active === false) {
+                if (container) container.style.display = "none";
+                return;
+            }
+
+            if (slotData.type === 'sdk' && slotData.sdk_name) {
+                container.style.display = "flex";
+                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                }
+                return;
+            }
+
+            const adCode = slotData.code || "";
+            if (!adCode.trim()) {
+                container.style.display = "none";
+                return;
+            }
+
+            container.style.display = "flex";
+            container.innerHTML = "";
+
+            if (adCode.includes("<script") || adCode.includes("<ins")) {
+                const iframe = document.createElement("iframe");
+                iframe.style.width = "320px";
+                iframe.style.height = "50px";
+                iframe.style.border = "none";
+                iframe.style.overflow = "hidden";
+                iframe.scrolling = "no";
+                iframe.setAttribute("frameborder", "0");
+
+                const docContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=320, initial-scale=1">
+                        <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+                    </head>
+                    <body>${adCode}</body>
+                    </html>
+                `;
+
+                container.appendChild(iframe);
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(docContent);
+                iframe.contentWindow.document.close();
+            } else {
+                container.innerHTML = adCode;
+            }
+        }
+
         const uid = localStorage.getItem("userId");
-        let pendingAvatarUrl = "https://api.dicebear.com/7.x/fun-emoji/svg?seed=Smile&backgroundColor=b6e3f4"; // Fallback
+        let pendingAvatarUrl = "https://api.dicebear.com/7.x/fun-emoji/svg?seed=Smile&backgroundColor=b6e3f4";
         
-        // 🔥 MAPPED BOT AVATARS FROM 1v1.html / game.html
         const systemAvatarsList = [
             "🎯", "🦊", "🥷", "🦁", "🐉", "🦅", "💀", "👦", "😎", "👩", 
             "https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul&backgroundColor=b6e3f4",
             "https://api.dicebear.com/7.x/micah/svg?seed=King&backgroundColor=e2e8f0"
         ];
 
-        // 💡 SMART EMOJI-TO-IMAGE CONVERTER
         function createEmojiURI(emoji) {
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><text x="50%" y="54%" font-size="55" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`;
             return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
@@ -271,11 +321,9 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Fetch User Data to Populate Edit Form
                     db.ref('users/' + uid).once('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
-                            
                             document.getElementById("displayEmail").value = data.email || user.email || "Not Available";
                             document.getElementById("editName").value = data.name || "";
                             document.getElementById("editState").value = data.state || "";
@@ -287,39 +335,14 @@
                         }
                     });
 
-                    // 2. Fetch Admin Banners for Edit Profile Page
+                    // Fetch Admin Configurations (Universal Banners)
                     db.ref('global_system_runtime_configurations/edit_profile_configs').on('value', (snap) => {
                         if(snap.exists()) {
                             const adminData = snap.val();
-                            
-                            // Load Banners safely to prevent app crash
-                            let s1Code = (adminData.slot1 && adminData.slot1.code) ? adminData.slot1.code : adminData.slot1_code;
-                            let s1Active = (adminData.slot1 && adminData.slot1.active !== undefined) ? adminData.slot1.active : adminData.active;
-                            if (s1Code && s1Active !== false) {
-                                document.getElementById("adminBannerSlot1").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot1"), s1Code), 400);
-                            } else { document.getElementById("adminBannerSlot1").style.display = "none"; }
-                            
-                            let s2Code = (adminData.slot2 && adminData.slot2.code) ? adminData.slot2.code : adminData.slot2_code;
-                            let s2Active = (adminData.slot2 && adminData.slot2.active !== undefined) ? adminData.slot2.active : adminData.active;
-                            if (s2Code && s2Active !== false) {
-                                document.getElementById("adminBannerSlot2").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot2"), s2Code), 800);
-                            } else { document.getElementById("adminBannerSlot2").style.display = "none"; }
-                            
-                            let s3Code = (adminData.slot3 && adminData.slot3.code) ? adminData.slot3.code : adminData.slot3_code;
-                            let s3Active = (adminData.slot3 && adminData.slot3.active !== undefined) ? adminData.slot3.active : adminData.active;
-                            if (s3Code && s3Active !== false) {
-                                document.getElementById("adminBannerSlot3").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot3"), s3Code), 1200);
-                            } else { document.getElementById("adminBannerSlot3").style.display = "none"; }
-                            
-                            let s4Code = (adminData.slot4 && adminData.slot4.code) ? adminData.slot4.code : adminData.slot4_code;
-                            let s4Active = (adminData.slot4 && adminData.slot4.active !== undefined) ? adminData.slot4.active : adminData.active;
-                            if (s4Code && s4Active !== false) {
-                                document.getElementById("adminBannerSlot4").style.display = "flex";
-                                setTimeout(() => setAdHTML(document.getElementById("adminBannerSlot4"), s4Code), 1600);
-                            } else { document.getElementById("adminBannerSlot4").style.display = "none"; }
+                            injectUniversalBanner("adminBannerSlot1", adminData.slot1);
+                            injectUniversalBanner("adminBannerSlot2", adminData.slot2);
+                            injectUniversalBanner("adminBannerSlot3", adminData.slot3);
+                            injectUniversalBanner("adminBannerSlot4", adminData.slot4);
                         }
                     });
                 } else {
@@ -328,28 +351,14 @@
             });
         });
 
-        // Script Injector for Admin Banners
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
-        }
-
-        // Generate Avatar Modal Selection Grid
         function populateAvatarModal() {
             const gridBox = document.getElementById("avatarGridBox");
             gridBox.innerHTML = "";
             systemAvatarsList.forEach((avatarCode) => {
                 let url = avatarCode.startsWith("http") ? avatarCode : createEmojiURI(avatarCode);
-                
                 let elem = document.createElement("div");
                 elem.className = "avatar-option";
                 elem.innerHTML = `<img src="${url}">`;
-                
                 elem.onclick = () => {
                     pendingAvatarUrl = url; 
                     updateAvatarPreviewUI(pendingAvatarUrl);
@@ -390,7 +399,6 @@
             document.getElementById("alertOverlay").style.display = "none";
         }
 
-        // 🚀 SECURE PROFILE SAVE TO PURE FIREBASE DATABASE
         function saveProfileData() {
             let nameInput = document.getElementById("editName").value.trim();
             let stateInput = document.getElementById("editState").value.trim();
@@ -406,7 +414,6 @@
             btn.innerText = "SAVING...";
             btn.disabled = true;
 
-            // Direct Firebase Update
             db.ref(`users/${uid}`).update({
                 name: nameInput,
                 state: stateInput,
@@ -416,7 +423,7 @@
                 localStorage.setItem("userName", nameInput);
                 showCustomAlert("success_msg", true, "profile.html"); 
             })
-            .catch((error) => {
+            .catch(() => {
                 showCustomAlert("err_server");
             })
             .finally(() => {

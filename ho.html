@@ -165,6 +165,17 @@
     </script>
 </head>
 <body>
+    <!-- 🚀 UNCLOSABLE FORCE UPDATE MODAL (ADMIN CONTROLLED) -->
+    <div id="homeForceUpdateModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.98); z-index: 999999999; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; box-sizing: border-box; backdrop-filter: blur(15px);">
+        <div style="font-size: 65px; margin-bottom: 15px;">🚀</div>
+        <h2 style="color: #f59e0b; font-size: 22px; font-weight: 900; margin: 0 0 10px 0; text-transform: uppercase;">Update Required</h2>
+        <p id="homeUpdateMessageText" style="color: #cbd5e1; font-size: 14px; margin: 0 0 25px 0; line-height: 1.6; max-width: 320px;">
+            A critical update is available. Please update the app to continue earning.
+        </p>
+        <a id="homeUpdatePlaystoreLink" href="https://play.google.com/store/apps/details?id=com.dudo.app" style="width: 85%; max-width: 280px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; text-decoration: none; padding: 16px; border-radius: 50px; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4); display: inline-block;">
+            UPDATE NOW
+        </a>
+    </div>
 
     <!-- 🌐 1. OFFLINE SCREEN -->
     <div class="system-modal-overlay" id="globalOfflineWarningOverlay">
@@ -334,7 +345,7 @@
     </div>
 
     <div class="smart-flex-grid">
-        <a href="offer2.html" class="zone-card" id="mod_offerwalls" style="border-color: rgba(168, 85, 247, 0.5);">
+        <a href="Premium_Offers.html" class="zone-card" id="mod_offerwalls" style="border-color: rgba(168, 85, 247, 0.5);">
             <div class="zone-icon">🤝</div><h3 style="color: var(--accent-purple);" data-i18n="c_partner_t">Partner Tasks</h3><p data-i18n="c_partner_d">Surveys</p>
         </a>
         <a href="premium.html" class="zone-card" id="mod_secure_cloud" style="border-color: rgba(245, 158, 11, 0.5);">
@@ -449,7 +460,7 @@
     <!-- IMAGE 1 Layout -->
     <div class="section-title" data-i18n="sec_quick">⚡ Quick Tasks</div>
     <div class="smart-flex-grid">
-        <a href="cpx.html" class="zone-card" id="mod_cpx" style="border-color: rgba(255, 255, 255, 0.3);">
+        <a href="cpx_surveys.html" class="zone-card" id="mod_cpx" style="border-color: rgba(255, 255, 255, 0.3);">
             <div class="zone-icon">📊</div><h3 style="color: #fff;" data-i18n="c_cpx_t">CPX Surveys</h3><p style="color: var(--accent-green);" data-i18n="c_cpx_d">Up to 50 🪙</p>
         </a>
         <a href="milestones.html" class="zone-card" id="mod_tap_rewards" style="border-color: rgba(255, 255, 255, 0.3);">
@@ -475,7 +486,7 @@
         <a href="1v1.html" class="zone-card" id="mod_1v1" style="border-color: rgba(245, 158, 11, 0.5);">
             <div class="zone-icon">⚔️</div><h3 style="color: var(--accent-gold);" data-i18n="c_1v1_t">Point Battle</h3><p data-i18n="c_1v1_d">Clash to win</p>
         </a>
-        <a href="1v1_ga.html" class="zone-card" id="mod_rps" style="border-color: rgba(6, 182, 212, 0.5);">
+        <a href="rps_game.html" class="zone-card" id="mod_rps" style="border-color: rgba(6, 182, 212, 0.5);">
     <div class="zone-icon" style="font-size: 15px; letter-spacing: -1px; white-space: nowrap;">✊🖐️✌️</div>
     <h3 style="color: var(--accent-cyan);" data-i18n="c_rps_t">Rock Paper Scissor</h3>
     <p data-i18n="c_rps_d">Classic game</p>
@@ -980,15 +991,69 @@
             document.getElementById("taskProgressFill").style.width = ((doneCount / 15) * 100) + "%"; 
         }
 
-        function setAdHTML(container, html) {
-            container.innerHTML = html;
-            Array.from(container.querySelectorAll("script")).forEach(oldScript => {
-                const newScript = document.createElement("script");
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+       // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & NATIVE SDK)
+function injectUniversalBanner(containerId, slotData) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    let slot = slotData;
+    if (typeof slotData === 'string') {
+        slot = { code: slotData, active: true, type: 'html' };
+    }
+
+    if (!slot || slot.active === false) {
+        container.style.display = "none";
+        return;
+    }
+
+    // Case 1: Native Android SDK Banner (AdMob, Unity, Start.io)
+    if (slot.type === 'sdk' && slot.sdk_name) {
+        container.style.display = "flex";
+        container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slot.sdk_name}</div>`;
+        if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
+            window.AndroidBridge.showNativeAd(slot.sdk_name, slot.sdk_id || '', 0, 'banner');
         }
+        return;
+    }
+
+    // Case 2: HTML / INS Script Banner (Adsterra / Iframe)
+    const adCode = slot.code || "";
+    if (!adCode.trim()) {
+        container.style.display = "none";
+        return;
+    }
+
+    container.style.display = "flex";
+    container.innerHTML = "";
+
+    if (adCode.includes("<script") || adCode.includes("<ins")) {
+        const iframe = document.createElement("iframe");
+        iframe.style.width = "320px";
+        iframe.style.height = "50px";
+        iframe.style.border = "none";
+        iframe.style.overflow = "hidden";
+        iframe.scrolling = "no";
+        iframe.setAttribute("frameborder", "0");
+
+        const docContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=320, initial-scale=1">
+                <style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style>
+            </head>
+            <body>${adCode}</body>
+            </html>
+        `;
+
+        container.appendChild(iframe);
+        iframe.contentWindow.document.open();
+        iframe.contentWindow.document.write(docContent);
+        iframe.contentWindow.document.close();
+    } else {
+        container.innerHTML = adCode;
+    }
+}
 
         document.addEventListener("DOMContentLoaded", () => {
             checkUserNetworkStatusConnection();
@@ -1224,25 +1289,24 @@ db.ref(`users/${uid}/admin_alert`).on('value', (snap) => {
                         }
                     });
 
-                    // 7. BANNERS DISPLAY (FIXED: Sequential Loading)
-                    db.ref('global_system_runtime_configurations/banner_ads').on('value', (snap) => {
-                        const adsData = snap.exists() ? snap.val() : {};
-                        for(let i=1; i<=8; i++) {
-                            let slot = document.getElementById("bannerSlot" + i);
-                            if(slot) {
-                                setTimeout(() => {
-                                    if(adsData["slot" + i] && adsData["slot" + i].active && adsData["slot" + i].code) {
-                                        slot.style.display = "flex";
-                                        setAdHTML(slot, adsData["slot" + i].code);
-                                    } else if(adsData["slot" + i] && adsData["slot" + i].active === false) {
-                                        slot.style.display = "none";
-                                    } else {
-                                        slot.style.display = "flex";
-                                    }
-                                }, i * 400); 
-                            }
-                        }
-                    });
+                    // 7. UNIVERSAL BANNERS DISPLAY (Slot 1 to 8)
+db.ref('global_system_runtime_configurations/banner_ads').on('value', (snap) => {
+    if (snap.exists()) {
+        const adsData = snap.val();
+        for (let i = 1; i <= 8; i++) {
+            let slotKey = "slot" + i;
+            let slotNodeId = "bannerSlot" + i;
+            if (adsData[slotKey]) {
+                setTimeout(() => {
+                    injectUniversalBanner(slotNodeId, adsData[slotKey]);
+                }, i * 150);
+            } else {
+                let node = document.getElementById(slotNodeId);
+                if (node) node.style.display = "none";
+            }
+        }
+    }
+});
 
                     // 8. DYNAMIC BOTTOM NAV
                     db.ref('global_system_runtime_configurations/bottom_tabs').on('value', (snap) => {
@@ -1278,18 +1342,67 @@ db.ref(`users/${uid}/admin_alert`).on('value', (snap) => {
                         }
                     });
 
-                    // 9. NEW DYNAMIC CARDS FROM ADMIN
-                    db.ref('global_system_runtime_configurations/custom_cards').on('value', (snap) => {
-                        const container = document.getElementById("dynamicAdminCardsContainer");
-                        if(snap.exists()) {
-                            container.style.display = "flex"; container.innerHTML = ""; const cards = snap.val();
-                            cards.forEach(card => {
-                                let widthStyle = card.isFullWidth ? "flex: 1 1 100%; min-height: 90px; flex-direction: row; gap: 15px;" : "";
-                                let iconStyle = card.isFullWidth ? "margin-bottom: 0; font-size: 32px;" : "";
-                                container.innerHTML += `<a href="${card.url}" class="zone-card" style="${widthStyle} border-color: ${card.color};"><div class="zone-icon" style="${iconStyle}">${card.icon}</div><h3 style="color: ${card.color};">${card.title}</h3><p>${card.desc}</p></a>`;
-                            });
-                        } else { container.style.display = "none"; }
-                    });
+                    // 9. ADVANCED DYNAMIC CARDS ENGINE (Position, Size, Icon, URL & Badges)
+db.ref('global_system_runtime_configurations/custom_cards').on('value', (snap) => {
+    // Purane dynamically added cards remove karein taaki duplication na ho
+    document.querySelectorAll('.dynamic-admin-card-node').forEach(el => el.remove());
+
+    if (snap.exists()) {
+        const cardsData = snap.val();
+        const cardKeys = Object.keys(cardsData);
+
+        cardKeys.forEach(key => {
+            const card = cardsData[key];
+            if (card.active === false || card.active === "false") return;
+
+            // Target Anchor Container Dhundna
+            let targetContainer = document.querySelector('.smart-flex-grid'); // Default Top
+            if (card.target_section === "middle") {
+                targetContainer = document.querySelector('.smart-flex-grid:nth-of-type(3)') || targetContainer;
+            } else if (card.target_section === "quick_tasks") {
+                targetContainer = document.querySelector('.section-title[data-i18n="sec_quick"] + .smart-flex-grid') || targetContainer;
+            } else if (card.target_section === "games") {
+                targetContainer = document.querySelector('.section-title[data-i18n="sec_games"] + .smart-flex-grid') || targetContainer;
+            } else if (card.target_section === "bottom") {
+                targetContainer = document.getElementById("dynamicAdminCardsContainer");
+                if (targetContainer) targetContainer.style.display = "flex";
+            }
+
+            if (!targetContainer) return;
+
+            // Size Layout: Full width (100%) vs Half width (50%)
+            let isFull = (card.size === "full" || card.isFullWidth === true || card.isFullWidth === "true");
+            let fullClass = isFull ? "full-width-card" : "";
+            let cardColor = card.color || "var(--accent-cyan)";
+            let badgeHTML = card.badge ? `<div class="zone-badge badge-new" style="background:${card.badge_color || 'var(--accent-pink)'}">${card.badge}</div>` : '';
+
+            const cardElement = document.createElement("a");
+            cardElement.href = card.url || "#";
+            cardElement.className = `zone-card ${fullClass} dynamic-admin-card-node`;
+            cardElement.style.borderColor = cardColor;
+
+            if (isFull) {
+                cardElement.innerHTML = `
+                    ${badgeHTML}
+                    <div class="zone-icon" style="font-size: 28px; width: 55px; height: 55px;">${card.icon || '🎁'}</div>
+                    <div style="text-align: left;">
+                        <h3 style="color: ${cardColor}; font-size: 17px;">${card.title || 'Special Task'}</h3>
+                        <p style="font-size: 12px;">${card.desc || 'Explore now'}</p>
+                    </div>
+                `;
+            } else {
+                cardElement.innerHTML = `
+                    ${badgeHTML}
+                    <div class="zone-icon">${card.icon || '🎁'}</div>
+                    <h3 style="color: ${cardColor};">${card.title || 'Task'}</h3>
+                    <p>${card.desc || 'Earn coins'}</p>
+                `;
+            }
+
+            targetContainer.appendChild(cardElement);
+        });
+    }
+});
 
                     // 10. TOP WINNERS PODIUM
                     db.ref('global_system_runtime_configurations/top_winners_podium').on('value', (snap) => {
@@ -1306,6 +1419,27 @@ db.ref(`users/${uid}/admin_alert`).on('value', (snap) => {
                             if(podium.rank3) {
                                 document.getElementById("lblWinnerRank3Name").innerText = podium.rank3.name;
                                 document.getElementById("lblWinnerRank3Prize").innerText = podium.rank3.prize;
+                            }
+                        }
+                    });
+                    // 11. ADMIN FORCE UPDATE REALTIME LISTENER
+                    db.ref('global_system_runtime_configurations/app_force_update').on('value', snap => {
+                        if (snap.exists()) {
+                            const updateData = snap.val();
+                            const updateModal = document.getElementById('homeForceUpdateModal');
+                            
+                            if (updateData.enabled === true || updateData.enabled === "true") {
+                                if (updateData.message) {
+                                    document.getElementById('homeUpdateMessageText').innerText = updateData.message;
+                                }
+                                if (updateData.playstore_url) {
+                                    document.getElementById('homeUpdatePlaystoreLink').href = updateData.playstore_url;
+                                }
+                                updateModal.style.display = 'flex';
+                                document.body.style.overflow = 'hidden';
+                            } else {
+                                updateModal.style.display = 'none';
+                                document.body.style.overflow = 'auto';
                             }
                         }
                     });
