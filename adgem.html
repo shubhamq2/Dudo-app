@@ -28,7 +28,7 @@
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--text-main); min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
         
-        /* Premium Sync Header (AdGem Theme - Indigo) */
+        /* Premium Sync Header */
         .header { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #3f51b5; backdrop-filter: blur(10px); }
         .back-btn { font-size: 20px; font-weight: bold; color: #3f51b5; text-decoration: none; padding: 5px 12px; border-radius: 8px; background: rgba(63, 81, 181, 0.15); transition: 0.2s; }
         .back-btn:active { transform: scale(0.9); }
@@ -106,7 +106,6 @@
             <div class="ad-timer-text" id="adTimerDisplay"><i class="fa-solid fa-spinner fa-spin"></i> Wait: <span id="adSecondsSpan">0</span>s</div>
             <button class="ad-close-btn" id="adCloseBtn" onclick="closeInAppAdAndClaim()">✖ CLOSE & CLAIM</button>
         </div>
-        <!-- Sandbox mode is ON for extreme safety -->
         <iframe id="adIframe" class="ad-iframe-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
@@ -206,7 +205,6 @@
 
     <!-- 🔥 PURE FIREBASE REALTIME SCRIPT ENGINE WITH HYBRID SDK -->
     <script>
-        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDuLIk8A5X7w0zZVblZZlIuMwExDUW56zQ",
             authDomain: "dudo-dc7cd.firebaseapp.com",
@@ -253,17 +251,17 @@
                 "inst_apps": "👉 <b>पूरा करने के नियम:</b><br>1. ऐप ऑफरवॉल खोलें।<br>2. ऐप इंस्टॉल करें और 3 मिनट तक इस्तेमाल करें।<br>3. ट्रैकिंग सिंक होने के लिए पहले इंतज़ार करें।<br><br>⚠️ <i>ध्यान दें: पुरानी ऐप्स को दोबारा इंस्टॉल करने पर कोई पैसा नहीं मिलेगा।</i>",
                 "inst_generic": "👉 <b>पूरा करने के नियम:</b><br>1. एडजेम ऑफर लोड करने के लिए नीचे क्लिक करें।<br>2. आवश्यक काम सही ढंग से पूरा करें।<br>3. अपना क्लिक रजिस्टर करने के लिए रुकें।"
             },
-            "bn": { "ag_title": "অ্যাডজেম গেমস", "ag_label1": "হাই পেয়িং গেমস", "ag_label2": "মাইক্রো অফার", "ag_games": "গেম খেলুন", "ag_games_desc": "লেভেল পার করুন", "ag_apps": "কুইক অ্যাপস", "ag_apps_desc": "ডাউনলোড করুন", "ag_survey": "জরিপ", "ag_survey_desc": "মতামত দিন", "ag_web": "ওয়েব টাস্ক", "ag_web_desc": "রেজিস্টার করুন", "ag_quizzes": "ব্রেইন কুইজ", "ag_quizzes_desc": "১০০% স্কোরে इनाम", "ag_premium": "এক্সক্লুসিভ", "ag_premium_desc": "ভিআইপি অফার", "ag_top": "সর্বোচ্চ", "ag_pop": "জনপ্রিয়", "ag_new": "সহজ", "ag_security": "অ্যাডজেম ট্র্যাকিং ব্যবহার করে। সততার সাথে টাস্ক পূরণ করুন।", "err_early": "❌ অফার অসম্পূর্ণ!", "err_invalid": "❌ গেম পেজেই থাকুন।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "err_success": "🎉 টাস্ক শুরু হয়েছে! পয়েন্ট যোগ করা হয়েছে: ", "verifying": "সিঙ্ক হচ্ছে... ", "start_task": "খেলা শুরু করুন", "inst_games": "👉 <b>নির্দেশনা:</b><br>১. গেম ওয়াল খুলতে ক্লিক করুন।", "inst_apps": "👉 <b>নির্দেশনা:</b><br>১. অ্যাপ ইনস্টল করুন।", "inst_generic": "👉 <b>নির্দেশনা:</b><br>১. অফার খুলুন।" },
-            "te": { "ag_title": "యాడ్జెం గేమ్స్", "ag_label1": "ఎక్కువ చెల్లించే గేమ్స్", "ag_label2": "మైక్రో ఆఫర్‌లు", "ag_games": "గేమ్స్ ఆడండి", "ag_games_desc": "స్థాయి చేరుకోండి", "ag_apps": "క్విక్ యాప్స్", "ag_apps_desc": "డౌన్‌లోడ్ చేయండి", "ag_survey": "సర్వేలు", "ag_survey_desc": "మీ అభిప్రాయం", "ag_web": "వెబ్ పనులు", "ag_web_desc": "నమోదు చేయండి", "ag_quizzes": "క్విజ్‌లు", "ag_quizzes_desc": "100% స్కోర్", "ag_premium": "ఎక్స్‌క్లూజివ్", "ag_premium_desc": "VIP ఆఫర్‌లు", "ag_top": "అత్యధికం", "ag_pop": "పాపులర్", "ag_new": "సులభం", "ag_security": "దయచేసి టాస్క్‌లను నిజాయితీగా పూర్తి చేయండి.", "err_early": "❌ ఆఫర్ అసంపూర్ణం!", "err_invalid": "❌ గేమ్ పేజీలోనే ఉండండి.", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది! రేపు మళ్లీ ప్రయత్నించండి.", "err_success": "🎉 ఆఫర్ ప్రారంభించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "verifying": "సింక్ అవుతోంది... ", "start_task": "ప్రారంభించండి", "inst_games": "👉 <b>నియమాలు:</b><br>1. గేమ్ వాల్ తెరవండి.", "inst_apps": "👉 <b>నియమాలు:</b><br>1. యాప్ ఇన్‌స్టాల్ చేయండి.", "inst_generic": "👉 <b>నియమాలు:</b><br>1. ఆఫర్ తెరవండి." },
-            "mr": { "ag_title": "अॅडजेम गेम्स", "ag_label1": "हाय पेइंग गेम्स", "ag_label2": "मायक्रो ऑफर्स", "ag_games": "गेम्स खेळा", "ag_games_desc": "लेव्हल गाठा", "ag_apps": "क्विक अॅप्स", "ag_apps_desc": "डाउनलोड करा", "ag_survey": "सर्वेक्षण", "ag_survey_desc": "मत द्या", "ag_web": "वेब टास्क", "ag_web_desc": "रजिस्टर करा", "ag_quizzes": "ब्रेन क्विझ", "ag_quizzes_desc": "100% स्कोअर", "ag_premium": "विशेष", "ag_premium_desc": "VIP ऑफर्स", "ag_top": "सर्वोच्च", "ag_pop": "लोकप्रिय", "ag_new": "सोपे", "ag_security": "कृपया प्रामाणिकपणे टास्क पूर्ण करा.", "err_early": "❌ ऑफर अपूर्ण!", "err_invalid": "❌ गेम पेजवरच राहा.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "err_success": "🎉 ऑफर सुरू! पॉइंट्स जोडले गेले: ", "verifying": "सिंक होत आहे... ", "start_task": "खेळायला सुरुवात करा", "inst_games": "👉 <b>नियम:</b><br>1. गेम वॉल उघडा.", "inst_apps": "👉 <b>नियम:</b><br>1. अॅप इन्स्टॉल करा.", "inst_generic": "👉 <b>नियम:</b><br>1. ऑफर उघडा." },
-            "ta": { "ag_title": "AdGem விளையாட்டுகள்", "ag_label1": "அதிக வருமானம் தரும் விளையாட்டுகள்", "ag_label2": "சிறிய சலுகைகள்", "ag_games": "விளையாடு", "ag_games_desc": "நிலை அடைந்து வெல்", "ag_apps": "விரைவான செயலிகள்", "ag_apps_desc": "பதிவிறக்கு", "ag_survey": "ஆய்வுகள்", "ag_survey_desc": "கருத்து கூறு", "ag_web": "வலைப் பணிகள்", "ag_web_desc": "பதிவு செய்", "ag_quizzes": "வினாடி வினா", "ag_quizzes_desc": "100% மதிப்பெண்", "ag_premium": "சிறப்பு", "ag_premium_desc": "VIP சலுகைகள்", "ag_top": "அதிகபட்சம்", "ag_pop": "பிரபலமானவை", "ag_new": "எளிதானது", "ag_security": "பணிகளை நேர்மையாக முடிக்கவும்.", "err_early": "❌ சலுகை முற்றுபெறவில்லை!", "err_invalid": "❌ பக்கத்திலேயே இருக்கவும்.", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது! நாளை மீண்டும் வரவும்.", "err_success": "🎉 சலுகை தொடங்கியது! புள்ளிகள் சேர்க்கப்பட்டன: ", "verifying": "சரிபார்க்கிறது... ", "start_task": "தொடங்கு", "inst_games": "👉 <b>விதிகள்:</b><br>1. கேம் வாலைத் திறக்கவும.", "inst_apps": "👉 <b>விதிகள்:</b><br>1. செயலியை பதிவிறக்கவும்.", "inst_generic": "👉 <b>விதிகள்:</b><br>1. சலுகையைத் திறக்கவும்." },
-            "ur": { "ag_title": "ایڈجیم گیمز", "ag_label1": "زیادہ کمانے والے گیمز", "ag_label2": "مائیکرو آفرز", "ag_games": "گیمز کھیلیں", "ag_games_desc": "لیول پار کریں", "ag_apps": "ایپس ڈاؤن لوڈ", "ag_apps_desc": "ڈاؤن لوڈ اور اوپن", "ag_survey": "سروے", "ag_survey_desc": "اپنی رائے دیں", "ag_web": "ویب ٹاسک", "ag_web_desc": "رجسٹر کریں", "ag_quizzes": "کوئز", "ag_quizzes_desc": "100٪ سکور کا انعام", "ag_premium": "خاص", "ag_premium_desc": "وی آئی پی آفرز", "ag_top": "سب سے زیادہ", "ag_pop": "مقبول", "ag_new": "آسان", "ag_security": "ایمانداری سے ٹاسک مکمل کریں۔", "err_early": "❌ آفر نامکمل!", "err_invalid": "❌ گیم پیج پر رہیں۔", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی! کل دوبارہ آئیں۔", "err_success": "🎉 آفر شروع! پوائنٹس شامل کر دیے گئے: ", "verifying": "تصدیق ہو رہی ہے... ", "start_task": "شروع کریں", "inst_games": "👉 <b>قواعد:</b><br>1. گیم وال کھولیں۔", "inst_apps": "👉 <b>قواعد:</b><br>1. ایپ انسٹال کریں۔", "inst_generic": "👉 <b>قواعد:</b><br>1. آفر کھولیں۔" },
-            "gu": { "ag_title": "એડજેમ ગેમ્સ", "ag_label1": "હાઇ પેઇંગ ગેમ્સ", "ag_label2": "માઇક્રો ઓફર્સ", "ag_games": "ગેમ્સ રમો", "ag_games_desc": "લેવલ પાર કરો", "ag_apps": "ક્વિક એપ્સ", "ag_apps_desc": "ડાઉનલોડ કરો", "ag_survey": "સર્વેક્ષણ", "ag_survey_desc": "તમારો અભિપ્રાય આપો", "ag_web": "વેબ ટાસ્ક", "ag_web_desc": "રજિસ્ટર કરો", "ag_quizzes": "ક્વિઝ", "ag_quizzes_desc": "100% સ્કોર", "ag_premium": "ખાસ", "ag_premium_desc": "VIP ઓફર્સ", "ag_top": "સૌથી વધુ", "ag_pop": "લોકપ્રિય", "ag_new": "સરળ", "ag_security": "કૃપા કરીને પ્રામાણિકપણે કાર્યો પૂર્ણ કરો.", "err_early": "❌ ઓફર અધૂરી!", "err_invalid": "❌ ગેમ પેજ પર જ રહો.", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ! કાલે ફરી પ્રયાસ કરો.", "err_success": "🎉 ઓફર શરૂ! પોઇન્ટ્સ ઉમેરવામાં આવ્યા: ", "verifying": "ચકાસણી... ", "start_task": "શરૂ કરો", "inst_games": "👉 <b>નિયમો:</b><br>1. ગેમ વોલ ખોલો.", "inst_apps": "👉 <b>નિયમો:</b><br>1. એપ ઇન્સ્ટોલ કરો.", "inst_generic": "👉 <b>નિયમો:</b><br>1. ઓફર ખોલો." },
-            "fr": { "ag_title": "Jeux AdGem", "ag_label1": "Hautes Récompenses", "ag_label2": "Micro Offres", "ag_games": "Jouer", "ag_games_desc": "Atteindre le niveau", "ag_apps": "Apps Rapides", "ag_apps_desc": "Télécharger", "ag_survey": "Sondages", "ag_survey_desc": "Votre avis", "ag_web": "Tâches Web", "ag_web_desc": "S'inscrire", "ag_quizzes": "Quiz", "ag_quizzes_desc": "Score 100%", "ag_premium": "Exclusif", "ag_premium_desc": "Offres VIP", "ag_top": "Top", "ag_pop": "Populaire", "ag_new": "Facile", "ag_security": "Complétez honnêtement.", "err_early": "❌ Incomplet !", "err_invalid": "❌ Restez sur la page.", "err_limit": "⏳ Limite quotidienne atteinte ! Revenez demain.", "err_success": "🎉 Offre lancée ! Points ajoutés: ", "verifying": "Vérification... ", "start_task": "Commencer", "inst_games": "👉 <b>ÉTAPES:</b><br>1. Ouvrez le mur de jeux.", "inst_apps": "👉 <b>ÉTAPES:</b><br>1. Installez l'application.", "inst_generic": "👉 <b>ÉTAPES:</b><br>1. Ouvrez l'offre." },
-            "ar": { "ag_title": "ألعاب AdGem", "ag_label1": "ألعاب ذات دفع عالي", "ag_label2": "عروض صغيرة", "ag_games": "العب الألعاب", "ag_games_desc": "الوصول إلى المستوى", "ag_apps": "تطبيقات سريعة", "ag_apps_desc": "تحميل", "ag_survey": "استطلاعات", "ag_survey_desc": "رأيك", "ag_web": "مهام الويب", "ag_web_desc": "سجل لتربح", "ag_quizzes": "اختبارات", "ag_quizzes_desc": "درجة 100%", "ag_premium": "حصري", "ag_premium_desc": "عروض VIP", "ag_top": "الأعلى", "ag_pop": "شائع", "ag_new": "سهل", "ag_security": "أكمل المهام بصدق.", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ ابق في الصفحة.", "err_limit": "⏳ تم الوصول للحد اليومي! عد غداً.", "err_success": "🎉 بدأت العرض! تم إضافة النقاط: ", "verifying": "جارِ التحقق... ", "start_task": "ابدأ", "inst_games": "👉 <b>الخطوات:</b><br>1. افتح الجدار.", "inst_apps": "👉 <b>الخطوات:</b><br>1. ثبت التطبيق.", "inst_generic": "👉 <b>الخطوات:</b><br>1. افتح العرض." },
-            "pt": { "ag_title": "Jogos AdGem", "ag_label1": "Altas Recompensas", "ag_label2": "Micro Ofertas", "ag_games": "Jogar", "ag_games_desc": "Alcance o nível", "ag_apps": "Apps Rápidos", "ag_apps_desc": "Baixar", "ag_survey": "Pesquisas", "ag_survey_desc": "Sua opinião", "ag_web": "Tarefas Web", "ag_web_desc": "Registrar", "ag_quizzes": "Quizzes", "ag_quizzes_desc": "100% Pontuação", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP", "ag_top": "Topo", "ag_pop": "Popular", "ag_new": "Fácil", "ag_security": "Complete honestamente.", "err_early": "❌ Incompleto!", "err_invalid": "❌ Fique na página.", "err_limit": "⏳ Limite diário atingido! Volte amanhã.", "err_success": "🎉 Oferta iniciada! Pontos adicionados: ", "verifying": "Verificando... ", "start_task": "Começar", "inst_games": "👉 <b>PASSOS:</b><br>1. Abra a parede.", "inst_apps": "👉 <b>PASSOS:</b><br>1. Instale o app.", "inst_generic": "👉 <b>PASSOS:</b><br>1. Abra a oferta." },
-            "ru": { "ag_title": "Игры AdGem", "ag_label1": "Высокая оплата", "ag_label2": "Микро офферы", "ag_games": "Играть", "ag_games_desc": "Достигни уровня", "ag_apps": "Приложения", "ag_apps_desc": "Скачать", "ag_survey": "Опросы", "ag_survey_desc": "Ваше мнение", "ag_web": "Веб задания", "ag_web_desc": "Регистрация", "ag_quizzes": "Викторины", "ag_quizzes_desc": "100% Счет", "ag_premium": "Эксклюзив", "ag_premium_desc": "VIP офферы", "ag_top": "Топ", "ag_pop": "Популярно", "ag_new": "Легко", "ag_security": "Выполняйте задания честно.", "err_early": "❌ Не завершено!", "err_invalid": "❌ Оставайтесь на странице.", "err_limit": "⏳ Дневной лимит исчерпан! Возвращайтесь завтра.", "err_success": "🎉 Оффер начат! Добавлено очков: ", "verifying": "Проверка... ", "start_task": "Начать", "inst_games": "👉 <b>ШАГИ:</b><br>1. Откройте стену.", "inst_apps": "👉 <b>ШАГИ:</b><br>1. Установите.", "inst_generic": "👉 <b>ШАГИ:</b><br>1. Откройте." },
-            "es": { "ag_title": "Juegos AdGem", "ag_label1": "Alta Recompensa", "ag_label2": "Micro Ofertas", "ag_games": "Jugar Juegos", "ag_games_desc": "Alcanza el nivel", "ag_apps": "Aplicaciones Rápidas", "ag_apps_desc": "Descargar y abrir", "ag_survey": "Encuestas", "ag_survey_desc": "Comparte tu opinión", "ag_web": "Tareas Web", "ag_web_desc": "Regístrate para ganar", "ag_quizzes": "Cuestionarios", "ag_quizzes_desc": "100% Puntaje", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP secretas", "ag_top": "Mayor Pago", "ag_pop": "Popular", "ag_new": "Fácil", "ag_security": "AdGem usa rastreo avanzado. Completa honestamente.", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ Interrumpido: Quédese en la página.", "err_limit": "⏳ ¡Límite diario! Vuelve mañana.", "err_success": "🎉 ¡Iniciado! Puntos añadidos: ", "verifying": "Verificando... ", "start_task": "Empezar a Jugar", "inst_games": "👉 <b>PASOS:</b><br>1. Haz clic abajo.", "inst_apps": "👉 <b>PASOS:</b><br>1. Instala la app.", "inst_generic": "👉 <b>PASOS:</b><br>1. Carga la oferta." }
+            "bn": { "ag_title": "অ্যাডজেম গেমস", "ag_label1": "হাই পেয়িং গেমস", "ag_label2": "মাইক্রো অফার", "ag_games": "গেম খেলুন", "ag_games_desc": "লেভেল পার করুন", "ag_apps": "কুইক অ্যাপস", "ag_apps_desc": "ডাউনলোড করুন", "ag_survey": "জরিপ", "ag_survey_desc": "মতামত দিন", "ag_web": "ওয়েব টাস্ক", "ag_web_desc": "রেজিস্টার করুন", "ag_quizzes": "ব্রেইন কুইজ", "ag_quizzes_desc": "১০০% স্কোরে इनाम", "ag_premium": "এক্সক্লুসিভ", "ag_premium_desc": "ভিআইপি অফার", "ag_top": "সর্বোচ্চ", "ag_pop": "জনপ্রিয়", "ag_new": "সহজ", "ag_security": "অ্যাডজেম ট্র্যাকিং ব্যবহার করে। সততার সাথে টাস্ক পূরণ করুন।", "err_early": "❌ অফার অসম্পূর্ণ!", "err_invalid": "❌ গেম পেজেই থাকুন।", "err_limit": "⏳ দৈনিক সীমা শেষ! কাল আবার আসুন।", "err_success": "🎉 টাস্ক শুরু হয়েছে! পয়েন্ট যোগ করা হয়েছে: ", "verifying": "সিঙ্ক হচ্ছে... ", "start_task": "খেলা শুরু করুন" },
+            "te": { "ag_title": "యాడ్జెం గేమ్స్", "ag_label1": "ఎక్కువ చెల్లించే గేమ్స్", "ag_label2": "మైక్రో ఆఫర్‌లు", "ag_games": "గేమ్స్ ఆడండి", "ag_games_desc": "స్థాయి చేరుకోండి", "ag_apps": "క్విక్ యాప్స్", "ag_apps_desc": "డౌన్‌లోడ్ చేయండి", "ag_survey": "సర్వేలు", "ag_survey_desc": "మీ అభిప్రాయం", "ag_web": "వెబ్ పనులు", "ag_web_desc": "నమోదు చేయండి", "ag_quizzes": "క్విజ్‌లు", "ag_quizzes_desc": "100% స్కోర్", "ag_premium": "ఎక్స్‌క్లూజివ్", "ag_premium_desc": "VIP ఆఫర్‌లు", "ag_top": "అత్యధికం", "ag_pop": "పాపులర్", "ag_new": "సులభం", "ag_security": "దయచేసి టాస్క్‌లను నిజాయితీగా పూర్తి చేయండి.", "err_early": "❌ ఆఫర్ అసంపూర్ణం!", "err_invalid": "❌ గేమ్ పేజీలోనే ఉండండి.", "err_limit": "⏳ రోజువారీ పరిమితి ముగిసింది! రేపు మళ్లీ ప్రయత్నించండి.", "err_success": "🎉 ఆఫర్ ప్రారంభించబడింది! పాయింట్లు జోడించబడ్డాయి: ", "verifying": "సింక్ అవుతోంది... ", "start_task": "ప్రారంభించండి" },
+            "mr": { "ag_title": "अॅडजेम गेम्स", "ag_label1": "हाय पेइंग गेम्स", "ag_label2": "मायक्रो ऑफर्स", "ag_games": "गेम्स खेळा", "ag_games_desc": "लेव्हल गाठा", "ag_apps": "क्विक अॅप्स", "ag_apps_desc": "डाउनलोड करा", "ag_survey": "सर्वेक्षण", "ag_survey_desc": "मत द्या", "ag_web": "वेब टास्क", "ag_web_desc": "रजिस्टर करा", "ag_quizzes": "ब्रेन क्विझ", "ag_quizzes_desc": "100% स्कोअर", "ag_premium": "विशेष", "ag_premium_desc": "VIP ऑफर्स", "ag_top": "सर्वोच्च", "ag_pop": "लोकप्रिय", "ag_new": "सोपे", "ag_security": "कृपया प्रामाणिकपणे टास्क पूर्ण करा.", "err_early": "❌ ऑफर अपूर्ण!", "err_invalid": "❌ गेम पेजवरच राहा.", "err_limit": "⏳ दैनिक मर्यादा पूर्ण! उद्या पुन्हा या.", "err_success": "🎉 ऑफर सुरू! पॉइंट्स जोडले गेले: ", "verifying": "सिंक होत आहे... ", "start_task": "खेळायला सुरुवात करा" },
+            "ta": { "ag_title": "AdGem விளையாட்டுகள்", "ag_label1": "அதிக வருமானம் தரும் விளையாட்டுகள்", "ag_label2": "சிறிய சலுகைகள்", "ag_games": "விளையாடு", "ag_games_desc": "நிலை அடைந்து வெல்", "ag_apps": "விரைவான செயலிகள்", "ag_apps_desc": "பதிவிறக்கு", "ag_survey": "ஆய்வுகள்", "ag_survey_desc": "கருத்து கூறு", "ag_web": "வலைப் பணிகள்", "ag_web_desc": "பதிவு செய்", "ag_quizzes": "வினாடி வினா", "ag_quizzes_desc": "100% மதிப்பெண்", "ag_premium": "சிறப்பு", "ag_premium_desc": "VIP சலுகைகள்", "ag_top": "அதிகபட்சம்", "ag_pop": "பிரபலமானவை", "ag_new": "எளிதானது", "ag_security": "பணிகளை நேர்மையாக முடிக்கவும்.", "err_early": "❌ சலுகை முற்றுபெறவில்லை!", "err_invalid": "❌ பக்கத்திலேயே இருக்கவும்.", "err_limit": "⏳ தினசரி வரம்பு முடிந்தது! நாளை மீண்டும் வரவும்.", "err_success": "🎉 சலுகை தொடங்கியது! புள்ளிகள் சேர்க்கப்பட்டன: ", "verifying": "சரிபார்க்கிறது... ", "start_task": "தொடங்கு" },
+            "ur": { "ag_title": "ایڈجیم گیمز", "ag_label1": "زیادہ کمانے والے گیمز", "ag_label2": "مائیکرو آفرز", "ag_games": "گیمز کھیلیں", "ag_games_desc": "لیول پار کریں", "ag_apps": "ایپس ڈاؤن لوڈ", "ag_apps_desc": "ڈاؤن لوڈ اور اوپن", "ag_survey": "سروے", "ag_survey_desc": "اپنی رائے دیں", "ag_web": "ویب ٹاسک", "ag_web_desc": "رجسٹر کریں", "ag_quizzes": "کوئز", "ag_quizzes_desc": "100٪ سکور کا انعام", "ag_premium": "خاص", "ag_premium_desc": "وی آئی پی آفرز", "ag_top": "سب سے زیادہ", "ag_pop": "مقبول", "ag_new": "آسان", "ag_security": "ایمانداری سے ٹاسک مکمل کریں۔", "err_early": "❌ آفر نامکمل!", "err_invalid": "❌ گیم پیج پر رہیں۔", "err_limit": "⏳ روزانہ کی حد پوری ہو گئی! کل دوبارہ آئیں۔", "err_success": "🎉 آفر شروع! پوائنٹس شامل کر دیے گئے: ", "verifying": "تصدیق ہو رہی ہے... ", "start_task": "شروع کریں" },
+            "gu": { "ag_title": "એડજેમ ગેમ્સ", "ag_label1": "હાઇ પેઇંગ ગેમ્સ", "ag_label2": "માઇક્રો ઓફર્સ", "ag_games": "ગેમ્સ રમો", "ag_games_desc": "લેવલ પાર કરો", "ag_apps": "ક્વિક એપ્સ", "ag_apps_desc": "ડાઉનલોડ કરો", "ag_survey": "સર્વેક્ષણ", "ag_survey_desc": "તમારો અભિપ્રાય આપો", "ag_web": "વેબ ટાસ્ક", "ag_web_desc": "રજિસ્ટર કરો", "ag_quizzes": "ક્વિઝ", "ag_quizzes_desc": "100% સ્કોર", "ag_premium": "ખાસ", "ag_premium_desc": "VIP ઓફર્સ", "ag_top": "સૌથી વધુ", "ag_pop": "લોકપ્રિય", "ag_new": "સરળ", "ag_security": "કૃપા કરીને પ્રામાણિકપણે કાર્યો પૂર્ણ કરો.", "err_early": "❌ ઓફર અધૂરી!", "err_invalid": "❌ ગેમ પેજ પર જ રહો.", "err_limit": "⏳ દૈનિક મર્યાદા પૂર્ણ! કાલે ફરી પ્રયાસ કરો.", "err_success": "🎉 ઓફર શરૂ! પોઇન્ટ્સ ઉમેરવામાં આવ્યા: ", "verifying": "ચકાસણી... ", "start_task": "શરૂ કરો" },
+            "fr": { "ag_title": "Jeux AdGem", "ag_label1": "Hautes Récompenses", "ag_label2": "Micro Offres", "ag_games": "Jouer", "ag_games_desc": "Atteindre le niveau", "ag_apps": "Apps Rapides", "ag_apps_desc": "Télécharger", "ag_survey": "Sondages", "ag_survey_desc": "Votre avis", "ag_web": "Tâches Web", "ag_web_desc": "S'inscrire", "ag_quizzes": "Quiz", "ag_quizzes_desc": "Score 100%", "ag_premium": "Exclusif", "ag_premium_desc": "Offres VIP", "ag_top": "Top", "ag_pop": "Populaire", "ag_new": "Facile", "ag_security": "Complétez honnêtement.", "err_early": "❌ Incomplet !", "err_invalid": "❌ Restez sur la page.", "err_limit": "⏳ Limite quotidienne atteinte ! Revenez demain.", "err_success": "🎉 Offre lancée ! Points ajoutés: ", "verifying": "Vérification... ", "start_task": "Commencer" },
+            "ar": { "ag_title": "ألعاب AdGem", "ag_label1": "ألعاب ذات دفع عالي", "ag_label2": "عروض صغيرة", "ag_games": "العب الألعاب", "ag_games_desc": "الوصول إلى المستوى", "ag_apps": "تطبيقات سريعة", "ag_apps_desc": "تحميل", "ag_survey": "استطلاعات", "ag_survey_desc": "رأيك", "ag_web": "مهام الويب", "ag_web_desc": "سجل لتربح", "ag_quizzes": "اختبارات", "ag_quizzes_desc": "درجة 100%", "ag_premium": "حصري", "ag_premium_desc": "عروض VIP", "ag_top": "الأعلى", "ag_pop": "شائع", "ag_new": "سهل", "ag_security": "أكمل المهام بصدق.", "err_early": "❌ غير مكتمل!", "err_invalid": "❌ ابق في الصفحة.", "err_limit": "⏳ تم الوصول للحد اليومي! عد غداً.", "err_success": "🎉 بدأت العرض! تم إضافة النقاط: ", "verifying": "جارِ التحقق... ", "start_task": "ابدأ" },
+            "pt": { "ag_title": "Jogos AdGem", "ag_label1": "Altas Recompensas", "ag_label2": "Micro Ofertas", "ag_games": "Jogar", "ag_games_desc": "Alcance o nível", "ag_apps": "Apps Rápidos", "ag_apps_desc": "Baixar", "ag_survey": "Pesquisas", "ag_survey_desc": "Sua opinião", "ag_web": "Tarefas Web", "ag_web_desc": "Registrar", "ag_quizzes": "Quizzes", "ag_quizzes_desc": "100% Pontuação", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP", "ag_top": "Topo", "ag_pop": "Popular", "ag_new": "Fácil", "ag_security": "Complete honestamente.", "err_early": "❌ Incompleto!", "err_invalid": "❌ Fique na página.", "err_limit": "⏳ Limite diário atingido! Volte amanhã.", "err_success": "🎉 Oferta iniciada! Pontos adicionados: ", "verifying": "Verificando... ", "start_task": "Começar" },
+            "ru": { "ag_title": "Игры AdGem", "ag_label1": "Высокая оплата", "ag_label2": "Микро офферы", "ag_games": "Играть", "ag_games_desc": "Достигни уровня", "ag_apps": "Приложения", "ag_apps_desc": "Скачать", "ag_survey": "Опросы", "ag_survey_desc": "Ваше мнение", "ag_web": "Веб задания", "ag_web_desc": "Регистрация", "ag_quizzes": "Викторины", "ag_quizzes_desc": "100% Счет", "ag_premium": "Эксклюзив", "ag_premium_desc": "VIP офферы", "ag_top": "Топ", "ag_pop": "Популярно", "ag_new": "Легко", "ag_security": "Выполняйте задания честно.", "err_early": "❌ Не завершено!", "err_invalid": "❌ Оставайтесь на странице.", "err_limit": "⏳ Дневной лимит исчерпан! Возвращайтесь завтра.", "err_success": "🎉 Оффер начат! Добавлено очков: ", "verifying": "Проверка... ", "start_task": "Начать" },
+            "es": { "ag_title": "Juegos AdGem", "ag_label1": "Alta Recompensa", "ag_label2": "Micro Ofertas", "ag_games": "Jugar Juegos", "ag_games_desc": "Alcanza el nivel", "ag_apps": "Aplicaciones Rápidas", "ag_apps_desc": "Descargar y abrir", "ag_survey": "Encuestas", "ag_survey_desc": "Comparte tu opinión", "ag_web": "Tareas Web", "ag_web_desc": "Regístrate para ganar", "ag_quizzes": "Cuestionarios", "ag_quizzes_desc": "100% Puntaje", "ag_premium": "Exclusivo", "ag_premium_desc": "Ofertas VIP secretas", "ag_top": "Mayor Pago", "ag_pop": "Popular", "ag_new": "Fácil", "ag_security": "AdGem usa rastreo avanzado. Completa honestamente.", "err_early": "❌ ¡Incompleto!", "err_invalid": "❌ Interrumpido: Quédese en la página.", "err_limit": "⏳ ¡Límite diario! Vuelve mañana.", "err_success": "🎉 ¡Iniciado! Puntos añadidos: ", "verifying": "Verificando... ", "start_task": "Empezar a Jugar" }
         };
 
         function changeLanguage(langCode) {
@@ -275,7 +273,6 @@
             });
             document.getElementById("appLanguage").value = langCode;
             
-            // Dynamic Update for Start Button if Modal is Open
             let startBtn = document.getElementById("btnStartAdgemTask");
             if(startBtn && currentActiveTaskKey) {
                 let currentTimer = adgemLinksAdminConfig[currentActiveTaskKey].timer;
@@ -283,26 +280,31 @@
             }
         }
 
-                // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
+        // 🔥 UNIVERSAL BANNER AD INJECTOR (HTML, SCRIPT, INS & SDK)
         function injectUniversalBanner(containerId, slotData) {
             const container = document.getElementById(containerId);
-            if (!container || !slotData || slotData.active === false) {
-                if (container) container.style.display = "none";
+            if (!container) return;
+
+            let slot = slotData;
+            if (typeof slotData === 'string') {
+                slot = { code: slotData, active: true, type: 'html' };
+            }
+
+            if (!slot || slot.active === false) {
+                container.style.display = "none";
                 return;
             }
 
-            // Case 1: Agar Native SDK Banner ho
-            if (slotData.type === 'sdk' && slotData.sdk_name) {
+            if (slot.type === 'sdk' && slot.sdk_name) {
                 container.style.display = "flex";
-                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slotData.sdk_name}</div>`;
+                container.innerHTML = `<div style="color:var(--text-sub); font-size:10px; font-weight:bold;">⚡ SDK Banner: ${slot.sdk_name}</div>`;
                 if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
-                    window.AndroidBridge.showNativeAd(slotData.sdk_name, slotData.sdk_id || '', 0, 'banner');
+                    window.AndroidBridge.showNativeAd(slot.sdk_name, slot.sdk_id || '', 0, 'banner');
                 }
                 return;
             }
 
-            // Case 2: Agar HTML / Script / INS / Adsterra Banner ho
-            const adCode = slotData.code || "";
+            const adCode = slot.code || "";
             if (!adCode.trim()) {
                 container.style.display = "none";
                 return;
@@ -340,20 +342,15 @@
             }
         }
 
-
         // 🔥 DYNAMIC INDIVIDUAL SETTINGS FOR EACH BUTTON (WITH HYBRID SDK) 🔥
-                                    let keys = ['games', 'apps', 'surveys', 'weboffers', 'quizzes', 'premium'];
-                            keys.forEach(key => {
-                                if(aData['mode_' + key]) adgemLinksAdminConfig[key].mode = aData['mode_' + key].trim().toLowerCase();
-                                if(aData['link_' + key]) adgemLinksAdminConfig[key].url = aData['link_' + key];
-                                if(aData['timer_' + key]) adgemLinksAdminConfig[key].timer = parseInt(aData['timer_' + key]);
-                                if(aData['reward_' + key]) adgemLinksAdminConfig[key].reward = parseInt(aData['reward_' + key]);
-                                
-                                // Fetch Hybrid SDK details for each button
-                                if(aData['sdk_name_' + key]) adgemLinksAdminConfig[key].sdk_name = aData['sdk_name_' + key].trim();
-                                if(aData['sdk_id_' + key]) adgemLinksAdminConfig[key].sdk_id = aData['sdk_id_' + key].trim();
-                            });
-
+        let adgemLinksAdminConfig = {
+            games: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "", mode: "timer" },
+            apps: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "", mode: "timer" },
+            surveys: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "", mode: "timer" },
+            weboffers: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "", mode: "timer" },
+            quizzes: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "", mode: "timer" },
+            premium: { url: "https://www.profitablecpmrate.com/9d8e7e12df3875a6c3846d0cb748a04b/invoke.js", timer: 25, reward: 50, sdk_name: "", sdk_id: "", mode: "timer" }
+        };
 
         const uid = localStorage.getItem("userId");
         let userDailyClicksData = {};
@@ -366,12 +363,12 @@
 
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // 1. Fetch User Data (Balance & Daily Limits)
+                    // 1. Fetch User Data
                     db.ref('users/' + uid).on('value', (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             document.getElementById("liveUserCoins").innerText = data.coins || 0;
-                            userDailyClicksData = data.daily_adgem_clicks || {}; // Store clicks locally
+                            userDailyClicksData = data.daily_adgem_clicks || {};
                         }
                     });
 
@@ -380,24 +377,21 @@
                         if(snap.exists()) {
                             const aData = snap.val();
                             
-                            // Load Individual Links, Timers, Rewards, and SDK Data
                             let keys = ['games', 'apps', 'surveys', 'weboffers', 'quizzes', 'premium'];
                             keys.forEach(key => {
+                                if(aData['mode_' + key]) adgemLinksAdminConfig[key].mode = aData['mode_' + key].trim().toLowerCase();
                                 if(aData['link_' + key]) adgemLinksAdminConfig[key].url = aData['link_' + key];
                                 if(aData['timer_' + key]) adgemLinksAdminConfig[key].timer = parseInt(aData['timer_' + key]);
                                 if(aData['reward_' + key]) adgemLinksAdminConfig[key].reward = parseInt(aData['reward_' + key]);
                                 
-                                // Fetch Hybrid SDK details for each button
                                 if(aData['sdk_name_' + key]) adgemLinksAdminConfig[key].sdk_name = aData['sdk_name_' + key].trim();
                                 if(aData['sdk_id_' + key]) adgemLinksAdminConfig[key].sdk_id = aData['sdk_id_' + key].trim();
                             });
 
-                                                        // 🔥 Universal Injector Calls (Slot 1 to Slot 4)
-                            injectUniversalBanner("adminBannerSlot1", aData.slot1);
-                            injectUniversalBanner("adminBannerSlot2", aData.slot2);
-                            injectUniversalBanner("adminBannerSlot3", aData.slot3);
-                            injectUniversalBanner("adminBannerSlot4", aData.slot4);
-
+                            injectUniversalBanner("adminBannerSlot1", aData.slot1 || aData.slot1_code);
+                            injectUniversalBanner("adminBannerSlot2", aData.slot2 || aData.slot2_code);
+                            injectUniversalBanner("adminBannerSlot3", aData.slot3 || aData.slot3_code);
+                            injectUniversalBanner("adminBannerSlot4", aData.slot4 || aData.slot4_code);
                         }
                     });
 
@@ -412,7 +406,7 @@
 
         function showCustomAlert(msgKey, appendText = "", isSuccess = false) {
             let currentLang = localStorage.getItem("selectedLang") || "en";
-            let translatedMsg = langData[currentLang][msgKey] || langData["en"][msgKey];
+            let translatedMsg = (langData[currentLang] && langData[currentLang][msgKey]) ? langData[currentLang][msgKey] : (langData["en"][msgKey] || msgKey);
 
             const alertBox = document.getElementById("customAlertBox");
             const overlay = document.getElementById("alertOverlay");
@@ -431,11 +425,10 @@
         }
 
         function openAdgemInstruction(taskKey, icon, prettyTitle) {
-            // 🔥 ANTI-BAN: 1 CLICK PER DAY LOGIC 🔥
-            let todayDateString = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+            let todayDateString = new Date().toLocaleDateString("en-CA");
             if(userDailyClicksData[taskKey] === todayDateString) {
                 showCustomAlert("err_limit");
-                return; // Block opening the task
+                return;
             }
 
             currentActiveTaskKey = taskKey;
@@ -463,8 +456,7 @@
             document.getElementById("adgemInstructionModal").style.display = "none";
         }
 
-        // 🚀 SMART TIMER LOGIC WITH HYBRID IN-APP VIEWER & SDK
-                function executeAdgemTaskRedirection() {
+        function executeAdgemTaskRedirection() {
             let taskKey = currentActiveTaskKey;
             const startBtn = document.getElementById("btnStartAdgemTask");
             startBtn.disabled = true;
@@ -472,8 +464,15 @@
             let config = adgemLinksAdminConfig[taskKey];
             let isPostback = (config.mode === "postback");
             
-            // 🔥 HYBRID SDK TRIGGER (Agar timer mode ho aur SDK placement di ho)
-            if (!isPostback && config.sdk_id && config.sdk_id !== "") {
+            // Postback mode: Seedha reward bina timer ke
+            if (isPostback) {
+                closeAdgemInstructionModal();
+                grantTaskReward(config.reward, taskKey, false);
+                return;
+            }
+
+            // SDK Mode Trigger
+            if (config.sdk_id && config.sdk_id !== "") {
                 if (window.AndroidBridge && typeof window.AndroidBridge.showNativeAd === 'function') {
                     window.AndroidBridge.showNativeAd(config.sdk_name, config.sdk_id, config.reward, taskKey);
                     closeAdgemInstructionModal();
@@ -481,69 +480,54 @@
                 }
             }
 
-            // Fallback ya Postback Mode: In-App Viewer open karein
             openInAppAdViewerHTML(config);
         }
 
-
-                function openInAppAdViewerHTML(config) {
+        function openInAppAdViewerHTML(config) {
             setTimeout(() => {
                 let targetDestinationUrl = config.url;
-                let isPostbackMode = (config.mode === "postback");
-                
                 document.getElementById("inAppAdViewer").style.display = "flex";
                 let timerDisplay = document.getElementById("adTimerDisplay");
                 let closeBtn = document.getElementById("adCloseBtn");
                 let iframeNode = document.getElementById("adIframe");
 
-                if (isPostbackMode) {
-                    // 🔥 MODE 1: POSTBACK / DIRECT OFFERWALL (No timer)
-                    timerDisplay.style.display = "flex";
-                    timerDisplay.innerHTML = `<i class="fa-solid fa-list-check"></i> Complete Offer/Game`;
-                    closeBtn.style.display = "block";
-                    closeBtn.innerText = "✔ DONE & VERIFY";
-                } else {
-                    // 🔥 MODE 2: TIMER MODE (Countdown Timer)
-                    timerDisplay.style.display = "flex";
-                    closeBtn.style.display = "none";
-                    closeBtn.innerText = "✖ CLOSE & CLAIM";
-                    timerDisplay.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                timerDisplay.style.display = "flex";
+                closeBtn.style.display = "none";
+                closeBtn.innerText = "✖ CLOSE & CLAIM";
+                timerDisplay.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading Ad...`;
+                
+                let countdownTime = config.timer;
+                iframeNode.onload = function() {
+                    if(offerTimer) clearInterval(offerTimer);
                     
-                    let countdownTime = config.timer;
-                    iframeNode.onload = function() {
-                        if(offerTimer) clearInterval(offerTimer);
-                        
-                        timerDisplay.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
-                        
-                        offerTimer = setInterval(() => {
-                            countdownTime--;
-                            let spanNode = document.getElementById("adSecondsSpan");
-                            if(spanNode) spanNode.innerText = countdownTime;
+                    timerDisplay.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Wait: <span id="adSecondsSpan">${countdownTime}</span>s`;
+                    
+                    offerTimer = setInterval(() => {
+                        countdownTime--;
+                        let spanNode = document.getElementById("adSecondsSpan");
+                        if(spanNode) spanNode.innerText = countdownTime;
 
-                            if (document.hidden) { 
-                                clearInterval(offerTimer);
-                                closeAdgemInstructionModal();
-                                document.getElementById("inAppAdViewer").style.display = "none";
-                                iframeNode.src = "";
-                                showCustomAlert("err_invalid");
-                                return;
-                            }
+                        if (document.hidden) { 
+                            clearInterval(offerTimer);
+                            closeAdgemInstructionModal();
+                            document.getElementById("inAppAdViewer").style.display = "none";
+                            iframeNode.src = "";
+                            showCustomAlert("err_invalid");
+                            return;
+                        }
 
-                            if (countdownTime <= 0) {
-                                clearInterval(offerTimer);
-                                timerDisplay.style.display = "none";
-                                closeBtn.style.display = "block";
-                            }
-                        }, 1000);
-                    };
-                }
+                        if (countdownTime <= 0) {
+                            clearInterval(offerTimer);
+                            timerDisplay.style.display = "none";
+                            closeBtn.style.display = "block";
+                        }
+                    }, 1000);
+                };
 
                 iframeNode.src = targetDestinationUrl;
             }, 600);
         }
- 
 
-        // 💰 REWARD SYNC API FOR HTML ADS
         function closeInAppAdAndClaim() {
             document.getElementById("inAppAdViewer").style.display = "none";
             document.getElementById("adIframe").src = ""; 
@@ -554,13 +538,10 @@
             grantTaskReward(config.reward, taskKey, false);
         }
 
-        // 🔥 FUNCTION FOR ANDROID TO CALL AFTER SDK AD IS WATCHED 🔥
         function completeAndroidSdkTask(rewardCoins, taskName) {
-            // Android passes rewardCoins as string or int, ensure it's int
             grantTaskReward(parseInt(rewardCoins), taskName, true);
         }
 
-        // 🛡️ UNIVERSAL REWARD GIVER FUNCTION
         function grantTaskReward(rewardToGive, taskKey, isSdk) {
             if(rewardToGive <= 0 || !uid) return;
 
@@ -568,15 +549,12 @@
             let sdkTag = isSdk ? " [SDK]" : "";
             let todayDateString = new Date().toLocaleDateString("en-CA");
 
-            // 1. Add Coins securely via Transaction
             db.ref(`users/${uid}/coins`).transaction((current) => {
                 return (current || 0) + rewardToGive;
             }).then(() => {
                 
-                // 2. 🔥 ANTI-BAN LOGIC
                 db.ref(`users/${uid}/daily_adgem_clicks/${taskKey}`).set(todayDateString);
 
-                // 3. 🔥 UNIVERSAL HISTORY PUSH
                 db.ref(`users/${uid}/history`).push({
                     title: `AdGem (${nameDisplay})${sdkTag}`,
                     amount: rewardToGive,
@@ -587,7 +565,6 @@
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
 
-                // 4. Mark Daily Task as Complete
                 db.ref(`users/${uid}/completed_daily_tasks`).once('value', (snap) => {
                     let tasks = snap.val() || [];
                     if (!tasks.includes(taskKey)) {
@@ -597,7 +574,6 @@
                 });
 
                 showCustomAlert("err_success", `${rewardToGive} 🪙`, true);
-                
             }).catch(() => {
                 alert("Task Verified but couldn't sync with server. Try again.");
             });
